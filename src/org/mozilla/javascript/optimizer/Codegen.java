@@ -36,7 +36,7 @@ import org.mozilla.javascript.ast.*;
  */
 
 public class Codegen implements Evaluator {
-    private static final boolean DEBUG_CODEGEN = true;
+    private static final boolean DEBUG_CODEGEN = false;
 
 
     @Override
