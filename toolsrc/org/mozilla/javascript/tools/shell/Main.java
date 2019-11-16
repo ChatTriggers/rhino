@@ -38,6 +38,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.SecurityController;
 import org.mozilla.javascript.commonjs.module.ModuleScope;
 import org.mozilla.javascript.commonjs.module.Require;
+import org.mozilla.javascript.optimizer.Codegen;
 import org.mozilla.javascript.tools.SourceReader;
 import org.mozilla.javascript.tools.ToolErrorReporter;
 
@@ -133,6 +134,17 @@ public class Main
             }
         } catch (SecurityException ex) {
             ex.printStackTrace(System.err);
+        }
+
+        if (Codegen.DEBUG_CODEGEN) {
+            File root = new File("./out");
+
+            for (File child : root.listFiles()) {
+                for (File child2 : child.listFiles()) {
+                    child2.delete();
+                }
+                child.delete();
+            }
         }
 
         int result = exec(args);

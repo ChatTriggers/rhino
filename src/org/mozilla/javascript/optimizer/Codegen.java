@@ -88,9 +88,12 @@ public class Codegen implements Evaluator {
                 returnFunction);
 
         if (DEBUG_CODEGEN) {
-            File output = new File("./out/compiled(" + mainClassName + ").class");
-            File outputDecomp = new File("./out/compiled(" + mainClassName + ").js");
-            File outputTokens = new File("./out/compiled(" + mainClassName + ").tokens");
+            new File("./out/class").mkdirs();
+            new File("./out/js").mkdirs();
+            new File("./out/tokens").mkdirs();
+            File output = new File("./out/class/" + mainClassName + ".class");
+            File outputDecomp = new File("./out/js/" + mainClassName + ".js");
+            File outputTokens = new File("./out/tokens/" + mainClassName + ".tokens");
 
             try (FileOutputStream fos = new FileOutputStream(output)) {
                 fos.write(mainClassBytes);
@@ -127,8 +130,10 @@ public class Codegen implements Evaluator {
                 e.printStackTrace();
             }
 
+            new File("./out/nodes").mkdirs();
+
             for (int i = 0; i < scriptOrFnNodes.length; i++) {
-                File outputNodes = new File("./out/compiled(" + mainClassName + ")_" + i + ".nodes");
+                File outputNodes = new File("./out/nodes/" + mainClassName + "_" + i + ".nodes");
 
                 try (FileOutputStream fos = new FileOutputStream(outputNodes)) {
                     StringBuilder sb = new StringBuilder();
@@ -234,7 +239,8 @@ public class Codegen implements Evaluator {
         }
 
         if (DEBUG_CODEGEN) {
-            File outputIR = new File("./out/compiled(" + mainClassName + ").ir");
+            new File("./out/ir").mkdirs();
+            File outputIR = new File("./out/ir/" + mainClassName + ".ir");
 
             try (FileOutputStream fos = new FileOutputStream(outputIR)) {
                 fos.write(scriptOrFn.toStringTree(scriptOrFn).getBytes());
