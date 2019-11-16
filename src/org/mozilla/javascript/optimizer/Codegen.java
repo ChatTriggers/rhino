@@ -36,8 +36,7 @@ import org.mozilla.javascript.ast.*;
  */
 
 public class Codegen implements Evaluator {
-    private static final boolean DEBUG_CODEGEN = false;
-
+    public static final boolean DEBUG_CODEGEN = true;
 
     @Override
     public void captureStackInfo(RhinoException ex) {
@@ -232,6 +231,16 @@ public class Codegen implements Evaluator {
 
         if (Token.printTrees) {
             System.out.println(scriptOrFn.toStringTree(scriptOrFn));
+        }
+
+        if (DEBUG_CODEGEN) {
+            File outputIR = new File("./out/compiled(" + mainClassName + ").ir");
+
+            try (FileOutputStream fos = new FileOutputStream(outputIR)) {
+                fos.write(scriptOrFn.toStringTree(scriptOrFn).getBytes());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (returnFunction) {

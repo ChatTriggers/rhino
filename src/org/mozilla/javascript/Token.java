@@ -6,6 +6,8 @@
 
 package org.mozilla.javascript;
 
+import org.mozilla.javascript.optimizer.Codegen;
+
 /**
  * This class implements the JavaScript scanner.
  * <p>
@@ -234,7 +236,7 @@ public class Token {
      * otherwise it returns a string whose value is the token number.
      */
     public static String name(int token) {
-        if (!printNames) {
+        if (!printNames && !Codegen.DEBUG_CODEGEN) {
             return String.valueOf(token);
         }
         return typeToName(token);

@@ -1073,217 +1073,206 @@ public class Node implements Iterable<Node> {
     }
 
     private void toString(ObjToIntMap printIds, StringBuilder sb) {
-        if (Token.printTrees) {
-            sb.append(Token.name(type));
-            if (this instanceof Name) {
-                sb.append(' ');
-                sb.append(getString());
-                Scope scope = getScope();
-                if (scope != null) {
-                    sb.append("[scope: ");
-                    appendPrintId(scope, printIds, sb);
-                    sb.append("]");
-                }
-            } else if (this instanceof Scope) {
-                if (this instanceof ScriptNode) {
-                    ScriptNode sof = (ScriptNode) this;
-                    if (this instanceof FunctionNode) {
-                        FunctionNode fn = (FunctionNode) this;
-                        sb.append(' ');
-                        sb.append(fn.getName());
-                    }
-                    sb.append(" [source name: ");
-                    sb.append(sof.getSourceName());
-                    sb.append("] [encoded source length: ");
-                    sb.append(sof.getEncodedSourceEnd()
-                            - sof.getEncodedSourceStart());
-                    sb.append("] [base line: ");
-                    sb.append(sof.getBaseLineno());
-                    sb.append("] [end line: ");
-                    sb.append(sof.getEndLineno());
-                    sb.append(']');
-                }
-                if (((Scope) this).getSymbolTable() != null) {
-                    sb.append(" [scope ");
-                    appendPrintId(this, printIds, sb);
-                    sb.append(": ");
-                    Iterator<String> iter =
-                            ((Scope) this).getSymbolTable().keySet().iterator();
-                    while (iter.hasNext()) {
-                        sb.append(iter.next());
-                        sb.append(" ");
-                    }
-                    sb.append("]");
-                }
-            } else if (this instanceof Jump) {
-                Jump jump = (Jump) this;
-                if (type == Token.BREAK || type == Token.CONTINUE) {
-                    sb.append(" [label: ");
-                    appendPrintId(jump.getJumpStatement(), printIds, sb);
-                    sb.append(']');
-                } else if (type == Token.TRY) {
-                    Node catchNode = jump.target;
-                    Node finallyTarget = jump.getFinally();
-                    if (catchNode != null) {
-                        sb.append(" [catch: ");
-                        appendPrintId(catchNode, printIds, sb);
-                        sb.append(']');
-                    }
-                    if (finallyTarget != null) {
-                        sb.append(" [finally: ");
-                        appendPrintId(finallyTarget, printIds, sb);
-                        sb.append(']');
-                    }
-                } else if (type == Token.LABEL || type == Token.LOOP
-                        || type == Token.SWITCH) {
-                    sb.append(" [break: ");
-                    appendPrintId(jump.target, printIds, sb);
-                    sb.append(']');
-                    if (type == Token.LOOP) {
-                        sb.append(" [continue: ");
-                        appendPrintId(jump.getContinue(), printIds, sb);
-                        sb.append(']');
-                    }
-                } else {
-                    sb.append(" [target: ");
-                    appendPrintId(jump.target, printIds, sb);
-                    sb.append(']');
-                }
-            } else if (type == Token.NUMBER) {
-                sb.append(' ');
-                sb.append(getDouble());
-            } else if (type == Token.TARGET) {
-                sb.append(' ');
-                appendPrintId(this, printIds, sb);
+        sb.append(Token.name(type));
+        if (this instanceof Name) {
+            sb.append(' ');
+            sb.append(getString());
+            Scope scope = getScope();
+            if (scope != null) {
+                sb.append("[scope: ");
+                appendPrintId(scope, printIds, sb);
+                sb.append("]");
             }
-            if (lineno != -1) {
-                sb.append(' ');
-                sb.append(lineno);
-            }
-
-            for (PropListItem x = propListHead; x != null; x = x.next) {
-                int type = x.type;
-                sb.append(" [");
-                sb.append(propToString(type));
-                sb.append(": ");
-                String value;
-                switch (type) {
-                    case TARGETBLOCK_PROP: // can't add this as it recurses
-                        value = "target block property";
-                        break;
-                    case LOCAL_BLOCK_PROP:     // can't add this as it is dull
-                        value = "last local block";
-                        break;
-                    case ISNUMBER_PROP:
-                        switch (x.intValue) {
-                            case BOTH:
-                                value = "both";
-                                break;
-                            case RIGHT:
-                                value = "right";
-                                break;
-                            case LEFT:
-                                value = "left";
-                                break;
-                            default:
-                                throw Kit.codeBug();
-                        }
-                        break;
-                    case SPECIALCALL_PROP:
-                        switch (x.intValue) {
-                            case SPECIALCALL_EVAL:
-                                value = "eval";
-                                break;
-                            case SPECIALCALL_WITH:
-                                value = "with";
-                                break;
-                            default:
-                                // NON_SPECIALCALL should not be stored
-                                throw Kit.codeBug();
-                        }
-                        break;
-                    case OBJECT_IDS_PROP: {
-                        Object[] a = (Object[]) x.objectValue;
-                        value = "[";
-                        for (int i = 0; i < a.length; i++) {
-                            value += a[i].toString();
-                            if (i + 1 < a.length)
-                                value += ", ";
-                        }
-                        value += "]";
-                        break;
-                    }
-                    default:
-                        Object obj = x.objectValue;
-                        if (obj != null) {
-                            value = obj.toString();
-                        } else {
-                            value = String.valueOf(x.intValue);
-                        }
-                        break;
+        } else if (this instanceof Scope) {
+            if (this instanceof ScriptNode) {
+                ScriptNode sof = (ScriptNode) this;
+                if (this instanceof FunctionNode) {
+                    FunctionNode fn = (FunctionNode) this;
+                    sb.append(' ');
+                    sb.append(fn.getName());
                 }
-                sb.append(value);
+                sb.append(" [source name: ");
+                sb.append(sof.getSourceName());
+                sb.append("] [encoded source length: ");
+                sb.append(sof.getEncodedSourceEnd()
+                        - sof.getEncodedSourceStart());
+                sb.append("] [base line: ");
+                sb.append(sof.getBaseLineno());
+                sb.append("] [end line: ");
+                sb.append(sof.getEndLineno());
                 sb.append(']');
             }
+            if (((Scope) this).getSymbolTable() != null) {
+                sb.append(" [scope ");
+                appendPrintId(this, printIds, sb);
+                sb.append(": ");
+                Iterator<String> iter =
+                        ((Scope) this).getSymbolTable().keySet().iterator();
+                while (iter.hasNext()) {
+                    sb.append(iter.next());
+                    sb.append(" ");
+                }
+                sb.append("]");
+            }
+        } else if (this instanceof Jump) {
+            Jump jump = (Jump) this;
+            if (type == Token.BREAK || type == Token.CONTINUE) {
+                sb.append(" [label: ");
+                appendPrintId(jump.getJumpStatement(), printIds, sb);
+                sb.append(']');
+            } else if (type == Token.TRY) {
+                Node catchNode = jump.target;
+                Node finallyTarget = jump.getFinally();
+                if (catchNode != null) {
+                    sb.append(" [catch: ");
+                    appendPrintId(catchNode, printIds, sb);
+                    sb.append(']');
+                }
+                if (finallyTarget != null) {
+                    sb.append(" [finally: ");
+                    appendPrintId(finallyTarget, printIds, sb);
+                    sb.append(']');
+                }
+            } else if (type == Token.LABEL || type == Token.LOOP
+                    || type == Token.SWITCH) {
+                sb.append(" [break: ");
+                appendPrintId(jump.target, printIds, sb);
+                sb.append(']');
+                if (type == Token.LOOP) {
+                    sb.append(" [continue: ");
+                    appendPrintId(jump.getContinue(), printIds, sb);
+                    sb.append(']');
+                }
+            } else {
+                sb.append(" [target: ");
+                appendPrintId(jump.target, printIds, sb);
+                sb.append(']');
+            }
+        } else if (type == Token.NUMBER) {
+            sb.append(' ');
+            sb.append(getDouble());
+        } else if (type == Token.TARGET) {
+            sb.append(' ');
+            appendPrintId(this, printIds, sb);
+        }
+        if (lineno != -1) {
+            sb.append(' ');
+            sb.append(lineno);
+        }
+
+        for (PropListItem x = propListHead; x != null; x = x.next) {
+            int type = x.type;
+            sb.append(" [");
+            sb.append(propToString(type));
+            sb.append(": ");
+            String value;
+            switch (type) {
+                case TARGETBLOCK_PROP: // can't add this as it recurses
+                    value = "target block property";
+                    break;
+                case LOCAL_BLOCK_PROP:     // can't add this as it is dull
+                    value = "last local block";
+                    break;
+                case ISNUMBER_PROP:
+                    switch (x.intValue) {
+                        case BOTH:
+                            value = "both";
+                            break;
+                        case RIGHT:
+                            value = "right";
+                            break;
+                        case LEFT:
+                            value = "left";
+                            break;
+                        default:
+                            throw Kit.codeBug();
+                    }
+                    break;
+                case SPECIALCALL_PROP:
+                    switch (x.intValue) {
+                        case SPECIALCALL_EVAL:
+                            value = "eval";
+                            break;
+                        case SPECIALCALL_WITH:
+                            value = "with";
+                            break;
+                        default:
+                            // NON_SPECIALCALL should not be stored
+                            throw Kit.codeBug();
+                    }
+                    break;
+                case OBJECT_IDS_PROP: {
+                    Object[] a = (Object[]) x.objectValue;
+                    value = "[";
+                    for (int i = 0; i < a.length; i++) {
+                        value += a[i].toString();
+                        if (i + 1 < a.length)
+                            value += ", ";
+                    }
+                    value += "]";
+                    break;
+                }
+                default:
+                    Object obj = x.objectValue;
+                    if (obj != null) {
+                        value = obj.toString();
+                    } else {
+                        value = String.valueOf(x.intValue);
+                    }
+                    break;
+            }
+            sb.append(value);
+            sb.append(']');
         }
     }
 
     public String toStringTree(ScriptNode treeTop) {
-        if (Token.printTrees) {
-            StringBuilder sb = new StringBuilder();
-            toStringTreeHelper(treeTop, this, null, 0, sb);
-            return sb.toString();
-        }
-        return null;
+        StringBuilder sb = new StringBuilder();
+        toStringTreeHelper(treeTop, this, null, 0, sb);
+        return sb.toString();
     }
 
     private static void toStringTreeHelper(ScriptNode treeTop, Node n,
                                            ObjToIntMap printIds,
                                            int level, StringBuilder sb) {
-        if (Token.printTrees) {
-            if (printIds == null) {
-                printIds = new ObjToIntMap();
-                generatePrintIds(treeTop, printIds);
-            }
-            for (int i = 0; i != level; ++i) {
-                sb.append("    ");
-            }
-            n.toString(printIds, sb);
-            sb.append('\n');
-            for (Node cursor = n.getFirstChild(); cursor != null;
-                 cursor = cursor.getNext()) {
-                if (cursor.getType() == Token.FUNCTION) {
-                    int fnIndex = cursor.getExistingIntProp(Node.FUNCTION_PROP);
-                    FunctionNode fn = treeTop.getFunctionNode(fnIndex);
-                    toStringTreeHelper(fn, fn, null, level + 1, sb);
-                } else {
-                    toStringTreeHelper(treeTop, cursor, printIds, level + 1, sb);
-                }
+        if (printIds == null) {
+            printIds = new ObjToIntMap();
+            generatePrintIds(treeTop, printIds);
+        }
+        for (int i = 0; i != level; ++i) {
+            sb.append("    ");
+        }
+        n.toString(printIds, sb);
+        sb.append('\n');
+        for (Node cursor = n.getFirstChild(); cursor != null;
+             cursor = cursor.getNext()) {
+            if (cursor.getType() == Token.FUNCTION) {
+                int fnIndex = cursor.getExistingIntProp(Node.FUNCTION_PROP);
+                FunctionNode fn = treeTop.getFunctionNode(fnIndex);
+                toStringTreeHelper(fn, fn, null, level + 1, sb);
+            } else {
+                toStringTreeHelper(treeTop, cursor, printIds, level + 1, sb);
             }
         }
     }
 
     private static void generatePrintIds(Node n, ObjToIntMap map) {
-        if (Token.printTrees) {
-            map.put(n, map.size());
-            for (Node cursor = n.getFirstChild(); cursor != null;
-                 cursor = cursor.getNext()) {
-                generatePrintIds(cursor, map);
-            }
+        map.put(n, map.size());
+        for (Node cursor = n.getFirstChild(); cursor != null;
+             cursor = cursor.getNext()) {
+            generatePrintIds(cursor, map);
         }
     }
 
     private static void appendPrintId(Node n, ObjToIntMap printIds,
                                       StringBuilder sb) {
-        if (Token.printTrees) {
-            if (n != null) {
-                int id = printIds.get(n, -1);
-                sb.append('#');
-                if (id != -1) {
-                    sb.append(id + 1);
-                } else {
-                    sb.append("<not_available>");
-                }
+        if (n != null) {
+            int id = printIds.get(n, -1);
+            sb.append('#');
+            if (id != -1) {
+                sb.append(id + 1);
+            } else {
+                sb.append("<not_available>");
             }
         }
     }
