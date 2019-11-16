@@ -6,11 +6,10 @@
 
 package org.mozilla.javascript.ast;
 
+import org.mozilla.javascript.Kit;
 import org.mozilla.javascript.Token;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * AST node for an Object literal (also called an Object initialiser in
@@ -33,10 +32,11 @@ import java.util.List;
 public class ObjectLiteral extends AstNode implements DestructuringForm {
 
     private static final List<ObjectProperty> NO_ELEMS =
-            Collections.unmodifiableList(new ArrayList<ObjectProperty>());
+            Collections.unmodifiableList(new ArrayList<>());
 
     private List<ObjectProperty> elements;
     boolean isDestructuring;
+    private Map<String, AstNode> defaultValues = new HashMap<>();
 
     {
         type = Token.OBJECTLIT;
@@ -111,6 +111,18 @@ public class ObjectLiteral extends AstNode implements DestructuringForm {
     @Override
     public boolean isDestructuring() {
         return isDestructuring;
+    }
+
+    @Override
+    public void putDefaultValue(String key, AstNode value) {
+        if (defaultValues.containsKey(key)) Kit.codeBug("Default value map already contains value for key " + key);
+        defaultValues.put(key, value);
+    }
+
+    @Override
+    public AstNode getDefaultValue(String key) {
+        if (!defaultValues.containsKey(key)) Kit.codeBug("No default value entry for key " + key);
+        return defaultValues.get(key);
     }
 
     @Override

@@ -26,4 +26,8 @@ public interface DestructuringForm {
      * iterator of a for..in loop, etc.
      */
     boolean isDestructuring();
+
+    void putDefaultValue(String key, AstNode value);
+
+    AstNode getDefaultValue(String key);
 }

@@ -6,11 +6,10 @@
 
 package org.mozilla.javascript.ast;
 
+import org.mozilla.javascript.Kit;
 import org.mozilla.javascript.Token;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * AST node for an Array literal.  The elements list will always be
@@ -39,6 +38,7 @@ public class ArrayLiteral extends AstNode implements DestructuringForm {
     private int destructuringLength;
     private int skipCount;
     private boolean isDestructuring;
+    private Map<String, AstNode> defaultValues = new HashMap<>();
 
     {
         type = Token.ARRAYLIT;
@@ -134,6 +134,18 @@ public class ArrayLiteral extends AstNode implements DestructuringForm {
      */
     public void setDestructuringLength(int destructuringLength) {
         this.destructuringLength = destructuringLength;
+    }
+
+    @Override
+    public void putDefaultValue(String key, AstNode value) {
+        if (defaultValues.containsKey(key)) Kit.codeBug("Default value map already contains value for key " + key);
+        defaultValues.put(key, value);
+    }
+
+    @Override
+    public AstNode getDefaultValue(String key) {
+        if (!defaultValues.containsKey(key)) Kit.codeBug("No default value entry for key " + key);
+        return defaultValues.get(key);
     }
 
     /**

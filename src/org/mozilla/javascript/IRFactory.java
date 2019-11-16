@@ -88,6 +88,10 @@ public final class IRFactory extends Parser {
                 return transformFunctionCall((FunctionCall) node);
             case Token.CONTINUE:
                 return transformContinue((ContinueStatement) node);
+            case Token.DEFAULT:
+                Assignment assignment = (Assignment) node;
+                transform(assignment.getLeft());
+                transform(assignment.getRight());
             case Token.DO:
                 return transformDoLoop((DoLoop) node);
             case Token.EMPTY:
@@ -544,8 +548,7 @@ public final class IRFactory extends Parser {
             }
 
             if (destructuring != null) {
-                body.addChildToFront(new Node(Token.EXPR_VOID,
-                        destructuring, lineno));
+                body.addChildToFront(new Node(Token.EXPR_VOID, destructuring, lineno));
             }
 
             int syntheticType = fn.getFunctionType();
@@ -2361,9 +2364,9 @@ public final class IRFactory extends Parser {
             case Token.THIS:
                 decompiler.addToken(node.getType());
                 break;
-            default:
-                Kit.codeBug("unexpected token: "
-                        + Token.typeToName(node.getType()));
+            // default:
+            //     Kit.codeBug("unexpected token: "
+            //             + Token.typeToName(node.getType()));
         }
     }
 
@@ -2374,7 +2377,14 @@ public final class IRFactory extends Parser {
         int size = elems.size();
         for (int i = 0; i < size; i++) {
             AstNode elem = elems.get(i);
-            decompile(elem);
+            if (elem.getType() == Token.ASSIGN) {
+                Assignment assignment = (Assignment) elem;
+                decompile(assignment.getLeft());
+                decompiler.addToken(Token.ASSIGN);
+                decompile(assignment.getRight());
+            } else {
+                decompile(elem);
+            }
             if (i < size - 1) {
                 decompiler.addToken(Token.COMMA);
             }

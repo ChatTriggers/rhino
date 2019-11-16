@@ -2859,6 +2859,16 @@ class BodyCodegen {
                 break;
             }
 
+            case Token.DEFAULT: {
+                generateExpression(child, node);
+                generateExpression(child.getNext(), node);
+                addScriptRuntimeInvoke(
+                        "mixDefaultArgument",
+                        "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
+                );
+                break;
+            }
+
             default:
                 throw new RuntimeException("Unexpected node type " + type);
         }

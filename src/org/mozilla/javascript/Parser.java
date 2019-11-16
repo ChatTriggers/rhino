@@ -2171,8 +2171,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode assignExpr()
-            throws IOException {
+    private AstNode assignExpr() throws IOException {
         int tt = peekToken();
         if (tt == Token.YIELD) {
             return returnOrYield(tt, true);
@@ -2185,11 +2184,12 @@ public class Parser {
             tt = peekToken();
         }
         if (Token.FIRST_ASSIGN <= tt && tt <= Token.LAST_ASSIGN) {
-            if (inDestructuringAssignment) {
+            if (inDestructuringAssignment && tt != Token.ASSIGN) {
+                reportError("msg.destruct.assign.wrong.operator");
                 // default values inside destructuring assignments,
                 // like 'var [a = 10] = b' or 'var {a: b = 10} = c',
                 // are not supported
-                reportError("msg.destruct.default.vals");
+                // reportError("msg.destruct.default.vals");
             }
 
             consumeToken();
@@ -3795,6 +3795,8 @@ public class Parser {
                 }
                 comma.addChildToBack(simpleAssignment(left, createName(tempName)));
                 break;
+            case Token.ASSIGN:
+
             default:
                 reportError("msg.bad.assign.left");
         }
@@ -3820,25 +3822,27 @@ public class Parser {
                 index++;
                 continue;
             }
-            Node rightElem = new Node(Token.GETELEM,
-                    createName(tempName),
-                    createNumber(index));
+            Node rightElem = new Node(Token.GETELEM, createName(tempName), createNumber(index));
             if (n.getType() == Token.NAME) {
                 String name = n.getString();
-                parent.addChildToBack(new Node(setOp,
-                        createName(Token.BINDNAME,
-                                name, null),
-                        rightElem));
+                parent.addChildToBack(new Node(setOp, createName(Token.BINDNAME, name, null), rightElem));
+                if (variableType != -1) {
+                    defineSymbol(variableType, name, true);
+                    destructuringNames.add(name);
+                }
+            } else if (n.getType() == Token.ASSIGN) {
+                Assignment assignment = (Assignment) n;
+                String name = assignment.getLeft().getString();
+                rightElem = new Node(Token.DEFAULT, rightElem, assignment.getRight());
+                parent.addChildToBack(new Node(setOp, createName(Token.BINDNAME, name, null), rightElem));
                 if (variableType != -1) {
                     defineSymbol(variableType, name, true);
                     destructuringNames.add(name);
                 }
             } else {
-                parent.addChildToBack
-                        (destructuringAssignmentHelper
-                                (variableType, n,
-                                        rightElem,
-                                        currentScriptOrFn.getNextTempName()));
+                parent.addChildToBack(destructuringAssignmentHelper (
+                        variableType, n, rightElem, currentScriptOrFn.getNextTempName())
+                );
             }
             index++;
             empty = false;
