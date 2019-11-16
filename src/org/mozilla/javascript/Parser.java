@@ -730,18 +730,30 @@ public class Parser {
         }
         // Would prefer not to call createDestructuringAssignment until codegen,
         // but the symbol definitions have to happen now, before body is parsed.
-        final VariableDeclaration vd = variables(Token.LP, ts.tokenEnd, false);
+        final VariableDeclaration vd = variables(Token.LP, ts.tokenEnd, false, true);
         fnNode.setParams(vd);
 
         List<VariableInitializer> variables = vd.getVariables();
+        Node destructuringNode = new Node(Token.COMMA);
 
         for (int i1 = 0, variablesSize = variables.size(); i1 < variablesSize; i1++) {
             VariableInitializer variable = variables.get(i1);
-            fnNode.addParam(variable.getTarget());
-
             final AstNode initializer = variable.getInitializer();
+
+            fnNode.addParam(variable.getTarget());
             if (initializer != null)
                 fnNode.addDefaultParam(i1, initializer);
+
+            if (variable.isDestructuring()) {
+                String tempName = currentScriptOrFn.getNextTempName();
+                defineSymbol(Token.LP, tempName, false);
+                Node assign = createDestructuringAssignment(Token.LET, variable.getTarget(), createName(tempName));
+                destructuringNode.addChildToBack(assign);
+            }
+        }
+
+        if (destructuringNode.hasChildren()) {
+            fnNode.putProp(Node.DESTRUCTURING_PARAMS, destructuringNode);
         }
 
         if (mustMatchToken(Token.RP, "msg.no.paren.after.parms", true)) {
@@ -1946,6 +1958,10 @@ public class Parser {
         return bundle;
     }
 
+    private VariableDeclaration variables(int declType, int pos, boolean isStatement) throws IOException {
+        return variables(declType, pos, isStatement, false);
+    }
+
     /**
      * Parse a 'var' or 'const' statement, or a 'var' init list in a for
      * statement.
@@ -1957,7 +1973,7 @@ public class Parser {
      *                 token in the first variable declaration.
      * @return the parsed variable list
      */
-    private VariableDeclaration variables(int declType, int pos, boolean isStatement)
+    private VariableDeclaration variables(int declType, int pos, boolean isStatement, boolean isFunctionParams)
             throws IOException {
         int end;
         VariableDeclaration pn = new VariableDeclaration(pos);
@@ -2009,7 +2025,7 @@ public class Parser {
 
             VariableInitializer vi = new VariableInitializer(kidPos, end - kidPos);
             if (destructuring != null) {
-                if (init == null && !inForInit) {
+                if (init == null && !inForInit && !isFunctionParams) {
                     reportError("msg.destruct.assign.no.init");
                 }
                 vi.setTarget(destructuring);
