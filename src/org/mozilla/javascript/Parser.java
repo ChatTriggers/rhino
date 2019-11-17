@@ -3346,12 +3346,12 @@ public class Parser {
             throws IOException {
         int pos = ts.tokenBeg, lineno = ts.lineno;
         int afterComma = -1;
-        List<ObjectProperty> elems = new ArrayList<ObjectProperty>();
+        List<ObjectProperty> elems = new ArrayList<>();
         Set<String> getterNames = null;
         Set<String> setterNames = null;
         if (this.inUseStrictDirective) {
-            getterNames = new HashSet<String>();
-            setterNames = new HashSet<String>();
+            getterNames = new HashSet<>();
+            setterNames = new HashSet<>();
         }
         Comment objJsdocNode = getAndResetJsDoc();
 
@@ -3389,7 +3389,8 @@ public class Parser {
                 int peeked = peekToken();
                 if (peeked != Token.COMMA
                         && peeked != Token.COLON
-                        && peeked != Token.RC) {
+                        && peeked != Token.RC
+                        && peeked != Token.ASSIGN) {
                     if (peeked == Token.LP) {
                         entryKind = METHOD_ENTRY;
                     } else if (pname.getType() == Token.NAME) {
@@ -3502,7 +3503,7 @@ public class Parser {
         // Support, e.g., |var {x, y} = o| as destructuring shorthand
         // for |var {x: x, y: y} = o|, as implemented in spidermonkey JS 1.8.
         int tt = peekToken();
-        if ((tt == Token.COMMA || tt == Token.RC) && ptt == Token.NAME
+        if ((tt == Token.COMMA || tt == Token.RC || tt == Token.ASSIGN) && ptt == Token.NAME
                 && compilerEnv.getLanguageVersion() >= Context.VERSION_1_8) {
             if (!inDestructuringAssignment) {
                 reportError("msg.bad.object.init");
@@ -3510,13 +3511,31 @@ public class Parser {
             AstNode nn = new Name(property.getPosition(), property.getString());
             ObjectProperty pn = new ObjectProperty();
             pn.putProp(Node.DESTRUCTURING_SHORTHAND, Boolean.TRUE);
+
+            if (tt == Token.ASSIGN) {
+                consumeToken();
+                AstNode exp = condExpr();
+                pn.setDefaultValue(exp);
+            }
+
             pn.setLeftAndRight(property, nn);
+
             return pn;
         }
+
         mustMatchToken(Token.COLON, "msg.no.colon.prop", true);
         ObjectProperty pn = new ObjectProperty();
         pn.setOperatorPosition(ts.tokenBeg);
-        pn.setLeftAndRight(property, assignExpr());
+
+        AstNode exp = assignExpr();
+        if (exp instanceof Assignment) {
+            Assignment as = (Assignment) exp;
+            pn.setLeftAndRight(property, as.getLeft());
+            pn.setDefaultValue(as.getRight());
+        } else {
+            pn.setLeftAndRight(property, exp);
+        }
+
         return pn;
     }
 
@@ -3772,7 +3791,7 @@ public class Parser {
         }
         Node comma = new Node(Token.COMMA);
         result.addChildToBack(comma);
-        List<String> destructuringNames = new ArrayList<String>();
+        List<String> destructuringNames = new ArrayList<>();
         boolean empty = true;
         switch (left.getType()) {
             case Token.ARRAYLIT:
@@ -3873,7 +3892,7 @@ public class Parser {
                 lineno = ts.lineno;
             }
             AstNode id = prop.getLeft();
-            Node rightElem = null;
+            Node rightElem;
             if (id instanceof Name) {
                 Node s = Node.newString(((Name) id).getIdentifier());
                 rightElem = new Node(Token.GETPROP, createName(tempName), s);
@@ -3888,21 +3907,28 @@ public class Parser {
             }
             rightElem.setLineno(lineno);
             AstNode value = prop.getRight();
+            AstNode defaultValue = prop.getDefaultValue();
+
+            if (defaultValue != null) {
+                Node defaultExpr = this instanceof IRFactory ? ((IRFactory) this).transform(defaultValue) : defaultValue;
+                rightElem = new Node(Token.DEFAULT, rightElem, defaultExpr);
+            }
+
             if (value.getType() == Token.NAME) {
                 String name = ((Name) value).getIdentifier();
-                parent.addChildToBack(new Node(setOp,
-                        createName(Token.BINDNAME,
-                                name, null),
-                        rightElem));
+                parent.addChildToBack(new Node(
+                        setOp,
+                        createName(Token.BINDNAME, name, null),
+                        rightElem
+                ));
                 if (variableType != -1) {
                     defineSymbol(variableType, name, true);
                     destructuringNames.add(name);
                 }
             } else {
-                parent.addChildToBack
-                        (destructuringAssignmentHelper
-                                (variableType, value, rightElem,
-                                        currentScriptOrFn.getNextTempName()));
+                parent.addChildToBack(destructuringAssignmentHelper(
+                        variableType, value, rightElem,currentScriptOrFn.getNextTempName()
+                ));
             }
             empty = false;
         }

@@ -7,3 +7,5 @@ function strCmp(a = 'default func str') {
 function test(a, b = a) { return a === 5 && b === 5; }
 
 function test([a, b = a * 2]) { return [a, b]; }
+
+function test({ a = 1, b = 2 }) { return [a, b]; }

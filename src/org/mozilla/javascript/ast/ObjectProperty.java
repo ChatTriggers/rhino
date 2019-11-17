@@ -31,9 +31,18 @@ import org.mozilla.javascript.Token;
  *       NumberLiteral</pre>
  */
 public class ObjectProperty extends InfixExpression {
+    private AstNode defaultValue;
 
     {
         type = Token.COLON;
+    }
+
+    public void setDefaultValue(AstNode node) {
+        defaultValue = node;
+    }
+
+    public AstNode getDefaultValue() {
+        return defaultValue;
     }
 
     /**
