@@ -1275,7 +1275,7 @@ public class Codegen implements Evaluator {
             + "Lorg/mozilla/javascript/Context;I)V";
 
     private static final Object globalLock = new Object();
-    private static int globalSerialClassCounter;
+    public static int globalSerialClassCounter;
 
     private CompilerEnvirons compilerEnv;
 

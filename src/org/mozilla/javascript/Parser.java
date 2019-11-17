@@ -3833,7 +3833,12 @@ public class Parser {
             } else if (n.getType() == Token.ASSIGN) {
                 Assignment assignment = (Assignment) n;
                 String name = assignment.getLeft().getString();
-                rightElem = new Node(Token.DEFAULT, rightElem, assignment.getRight());
+
+                // We need to transform possible right hand expressions on destructuring defaults.
+                // However, this should only be done when we're calling from IRFactory.
+                Node defaultExpr = this instanceof IRFactory ? ((IRFactory) this).transform(assignment.getRight()) : assignment.getRight();
+
+                rightElem = new Node(Token.DEFAULT, rightElem, defaultExpr);
                 parent.addChildToBack(new Node(setOp, createName(Token.BINDNAME, name, null), rightElem));
                 if (variableType != -1) {
                     defineSymbol(variableType, name, true);

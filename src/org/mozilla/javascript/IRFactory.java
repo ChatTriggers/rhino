@@ -544,6 +544,22 @@ public final class IRFactory extends Parser {
         }
     }
 
+    private void transformDestructuringParams(Node root) {
+        Node child = root.first;
+
+        while (child != null) {
+            if (child.type == Token.DEFAULT) {
+                Node newChild = transform((AstNode) (child.last));
+                root.replaceChild(child, newChild);
+                child = newChild;
+            } else {
+                transformDestructuringParams(child);
+            }
+
+            child = child.next;
+        }
+    }
+
     private Node transformFunction(FunctionNode fn) {
         int functionType = fn.getFunctionType();
         int start = decompiler.markFunctionStart(functionType);
@@ -555,6 +571,10 @@ public final class IRFactory extends Parser {
             // If we start needing to record much more codegen metadata during
             // function parsing, we should lump it all into a helper class.
             Node destructuring = (Node) fn.getProp(Node.DESTRUCTURING_PARAMS);
+
+            // Scan tree for untransformed AstNodes
+            transformDestructuringParams(destructuring);
+
             fn.removeProp(Node.DESTRUCTURING_PARAMS);
 
             int lineno = fn.getBody().getLineno();
