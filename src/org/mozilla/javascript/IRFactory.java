@@ -545,7 +545,6 @@ public final class IRFactory extends Parser {
     }
 
     private void transformDestructuringParams(Node root) {
-        if (root == null) return;
         Node child = root.first;
 
         while (child != null) {
@@ -574,7 +573,9 @@ public final class IRFactory extends Parser {
             Node destructuring = (Node) fn.getProp(Node.DESTRUCTURING_PARAMS);
 
             // Scan tree for untransformed AstNodes
-            transformDestructuringParams(destructuring);
+            if (destructuring != null) {
+                transformDestructuringParams(destructuring);
+            }
 
             fn.removeProp(Node.DESTRUCTURING_PARAMS);
 
