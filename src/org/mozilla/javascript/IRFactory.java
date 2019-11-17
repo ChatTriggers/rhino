@@ -545,6 +545,7 @@ public final class IRFactory extends Parser {
     }
 
     private void transformDestructuringParams(Node root) {
+        if (root == null) return;
         Node child = root.first;
 
         while (child != null) {
