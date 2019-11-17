@@ -36,7 +36,7 @@ import org.mozilla.javascript.ast.*;
  */
 
 public class Codegen implements Evaluator {
-    public static final boolean DEBUG_CODEGEN = true;
+    public static final boolean DEBUG_CODEGEN = false;
 
     @Override
     public void captureStackInfo(RhinoException ex) {

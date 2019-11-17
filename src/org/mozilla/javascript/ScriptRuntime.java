@@ -7,6 +7,7 @@
 package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.optimizer.Codegen;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
 import org.mozilla.javascript.v8dtoa.FastDtoa;
 import org.mozilla.javascript.xml.XMLLib;
@@ -2747,17 +2748,8 @@ public class ScriptRuntime {
         ErrorReporter reporter;
         reporter = DefaultErrorReporter.forEval(cx.getErrorReporter());
 
-        Evaluator evaluator = Context.createInterpreter();
-        if (evaluator == null) {
-            throw new JavaScriptException("Interpreter not present",
-                    filename, lineNumber);
-        }
-
-        // Compile with explicit interpreter instance to force interpreter
-        // mode.
-        Script script = cx.compileString(x.toString(), evaluator,
+        Script script = cx.compileString(x.toString(), new Codegen(),
                 reporter, sourceName, 1, null);
-        evaluator.setEvalScriptFlag(script);
         Callable c = (Callable) script;
         return c.call(cx, scope, (Scriptable) thisArg, ScriptRuntime.emptyArgs);
     }
