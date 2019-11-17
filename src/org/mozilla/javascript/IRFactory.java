@@ -90,8 +90,9 @@ public final class IRFactory extends Parser {
                 return transformContinue((ContinueStatement) node);
             case Token.DEFAULT:
                 Assignment assignment = (Assignment) node;
-                transform(assignment.getLeft());
-                transform(assignment.getRight());
+                Node left = transform(assignment.getLeft());
+                Node right = transform(assignment.getRight());
+                return new Node(Token.DEFAULT, left, right);
             case Token.DO:
                 return transformDoLoop((DoLoop) node);
             case Token.EMPTY:
