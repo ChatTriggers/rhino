@@ -8,7 +8,10 @@ package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
+import org.mozilla.javascript.optimizer.Codegen;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -66,6 +69,27 @@ public final class IRFactory extends Parser {
             script.setEncodedSource(decompiler.getEncodedSource());
         }
 
+        String baseName = "c";
+        if (script.getSourceName().length() > 0) {
+            baseName = script.getSourceName().replaceAll("\\W", "_");
+            if (!Character.isJavaIdentifierStart(baseName.charAt(0))) {
+                baseName = "_" + baseName;
+            }
+        }
+
+        String mainClassName = "org.mozilla.javascript.gen." + baseName + "_" + (Codegen.globalSerialClassCounter + 1);
+
+        if (Codegen.DEBUG_CODEGEN) {
+            new File("./out/ir").mkdirs();
+            File outputIR = new File("./out/ir/" + mainClassName + ".ir");
+
+            try (FileOutputStream fos = new FileOutputStream(outputIR)) {
+                fos.write(script.toStringTree(script).getBytes());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         decompiler = null;
         return script;
     }
@@ -90,8 +114,9 @@ public final class IRFactory extends Parser {
                 return transformContinue((ContinueStatement) node);
             case Token.DEFAULT:
                 Assignment assignment = (Assignment) node;
-                transform(assignment.getLeft());
-                transform(assignment.getRight());
+                Node left = transform(assignment.getLeft());
+                Node right = transform(assignment.getRight());
+                return new Node(Token.DEFAULT, left, right);
             case Token.DO:
                 return transformDoLoop((DoLoop) node);
             case Token.EMPTY:
@@ -345,7 +370,7 @@ public final class IRFactory extends Parser {
                 array.addChildToBack(transform(elem));
             } else {
                 if (skipIndexes == null) {
-                    skipIndexes = new ArrayList<Integer>();
+                    skipIndexes = new ArrayList<>();
                 }
                 skipIndexes.add(i);
             }
@@ -1165,6 +1190,7 @@ public final class IRFactory extends Parser {
             Node left = null;
             if (var.isDestructuring()) {
                 decompile(target);  // decompile but don't transform
+//                left = transform(target);
                 left = target;
             } else {
                 left = transform(target);
@@ -1180,8 +1206,8 @@ public final class IRFactory extends Parser {
                 if (right == null) {  // TODO:  should this ever happen?
                     node.addChildToBack(left);
                 } else {
-                    Node d = createDestructuringAssignment(node.getType(),
-                            left, right);
+                    Node d = createDestructuringAssignment(node.getType(), left, right);
+
                     node.addChildToBack(d);
                 }
             } else {
@@ -2364,9 +2390,9 @@ public final class IRFactory extends Parser {
             case Token.THIS:
                 decompiler.addToken(node.getType());
                 break;
-            // default:
-            //     Kit.codeBug("unexpected token: "
-            //             + Token.typeToName(node.getType()));
+             default:
+//                 Kit.codeBug("unexpected token: "
+//                         + Token.typeToName(node.getType()));
         }
     }
 
