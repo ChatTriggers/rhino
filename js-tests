@@ -11,3 +11,5 @@ function test([a, b = a * 2]) { return [a, b]; }
 function test({ a = 1, b = 2 }) { return [a, b]; }
 
 new Function('a = 1', 'b = 2', 'return a === 5 && b === 2;');
+
+let a = 5; let b = 10; let c = { a, b }
