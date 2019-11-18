@@ -3528,7 +3528,14 @@ public class Parser {
         if ((tt == Token.COMMA || tt == Token.RC || tt == Token.ASSIGN) && ptt == Token.NAME
                 && compilerEnv.getLanguageVersion() >= Context.VERSION_1_8) {
             if (!inDestructuringAssignment) {
-                reportError("msg.bad.object.init");
+                if (tt == Token.ASSIGN) {
+                    reportError("msg.unexpected.object.init");
+                }
+
+                AstNode nn = new Name(property.getPosition(), property.getString());
+                ObjectProperty pn = new ObjectProperty();
+                pn.setLeftAndRight(property, nn);
+                return pn;
             }
             AstNode nn = new Name(property.getPosition(), property.getString());
             ObjectProperty pn = new ObjectProperty();
