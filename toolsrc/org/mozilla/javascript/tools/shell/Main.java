@@ -139,11 +139,21 @@ public class Main
         if (Codegen.DEBUG_CODEGEN) {
             File root = new File("./out");
 
-            for (File child : root.listFiles()) {
-                for (File child2 : child.listFiles()) {
-                    child2.delete();
+            if (root.exists()) {
+                File[] files = root.listFiles();
+
+                if (files != null) {
+                    for (File child : files) {
+                        File[] childFiles = child.listFiles();
+
+                        if (childFiles != null) {
+                            for (File child2 : childFiles) {
+                                child2.delete();
+                            }
+                            child.delete();
+                        }
+                    }
                 }
-                child.delete();
             }
         }
 
