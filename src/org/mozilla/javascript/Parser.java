@@ -735,6 +735,7 @@ public class Parser {
 
         List<VariableInitializer> variables = vd.getVariables();
         Node destructuringNode = new Node(Token.COMMA);
+        Map<String, VariableInitializer> destructVars = new HashMap<>();
 
         for (int i1 = 0, variablesSize = variables.size(); i1 < variablesSize; i1++) {
             VariableInitializer variable = variables.get(i1);
@@ -747,9 +748,17 @@ public class Parser {
             if (variable.isDestructuring()) {
                 String tempName = currentScriptOrFn.getNextTempName();
                 defineSymbol(Token.LP, tempName, false);
-                Node assign = createDestructuringAssignment(Token.LET, variable.getTarget(), createName(tempName));
-                destructuringNode.addChildToBack(assign);
+                destructVars.put(tempName, variable);
             }
+        }
+
+        for (Map.Entry<String, VariableInitializer> destructure : destructVars.entrySet()) {
+            Node assign = createDestructuringAssignment(
+                    Token.LET,
+                    destructure.getValue().getTarget(),
+                    createName(destructure.getKey())
+            );
+            destructuringNode.addChildToBack(assign);
         }
 
         if (destructuringNode.hasChildren()) {
