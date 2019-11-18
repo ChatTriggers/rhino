@@ -2396,9 +2396,8 @@ public class Parser {
         return pn;
     }
 
-    private AstNode mulExpr()
-            throws IOException {
-        AstNode pn = unaryExpr();
+    private AstNode mulExpr() throws IOException {
+        AstNode pn = expExpr();
         for (; ; ) {
             int tt = peekToken(), opPos = ts.tokenBeg;
             switch (tt) {
@@ -2408,6 +2407,20 @@ public class Parser {
                     consumeToken();
                     pn = new InfixExpression(tt, pn, unaryExpr(), opPos);
                     continue;
+            }
+            break;
+        }
+        return pn;
+    }
+
+    private AstNode expExpr() throws IOException {
+        AstNode pn = unaryExpr();
+        for (; ; ) {
+            int tt = peekToken(), opPos = ts.tokenBeg;
+            if (tt == Token.EXP) {
+                consumeToken();
+                pn = new InfixExpression(tt, pn, unaryExpr(), opPos);
+                continue;
             }
             break;
         }

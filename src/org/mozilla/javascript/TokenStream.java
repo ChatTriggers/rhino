@@ -1378,6 +1378,12 @@ class TokenStream {
                     if (matchChar('=')) {
                         return Token.ASSIGN_MUL;
                     }
+                    if (matchChar('*')) {
+                        if (matchChar('=')) {
+                            return Token.ASSIGN_EXP;
+                        }
+                        return Token.EXP;
+                    }
                     return Token.MUL;
 
                 case '/':

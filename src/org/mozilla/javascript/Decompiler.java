@@ -580,6 +580,10 @@ public class Decompiler {
                     result.append(" %= ");
                     break;
 
+                case Token.ASSIGN_EXP:
+                    result.append(" **= ");
+                    break;
+
                 case Token.ASSIGN_BITOR:
                     result.append(" |= ");
                     break;
@@ -744,6 +748,10 @@ public class Decompiler {
 
                 case Token.MUL:
                     result.append(" * ");
+                    break;
+
+                case Token.EXP:
+                    result.append(" ** ");
                     break;
 
                 case Token.DIV:

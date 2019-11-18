@@ -967,6 +967,7 @@ public class Node implements Iterable<Node> {
             case Token.ASSIGN_ADD:
             case Token.ASSIGN_SUB:
             case Token.ASSIGN_MUL:
+            case Token.ASSIGN_EXP:
             case Token.ASSIGN_DIV:
             case Token.ASSIGN_MOD:
             case Token.ASSIGN_BITOR:

@@ -2244,6 +2244,9 @@ public final class IRFactory extends Parser {
             case Token.ASSIGN_MUL:
                 assignOp = Token.MUL;
                 break;
+            case Token.ASSIGN_EXP:
+                assignOp = Token.EXP;
+                break;
             case Token.ASSIGN_DIV:
                 assignOp = Token.DIV;
                 break;

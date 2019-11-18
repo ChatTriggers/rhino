@@ -108,6 +108,7 @@ public abstract class AstNode extends Node implements Comparable<AstNode> {
         operatorNames.put(Token.ADD, "+");
         operatorNames.put(Token.SUB, "-");
         operatorNames.put(Token.MUL, "*");
+        operatorNames.put(Token.EXP, "**");
         operatorNames.put(Token.DIV, "/");
         operatorNames.put(Token.MOD, "%");
         operatorNames.put(Token.NOT, "!");
@@ -125,6 +126,7 @@ public abstract class AstNode extends Node implements Comparable<AstNode> {
         operatorNames.put(Token.ASSIGN_ADD, "+=");
         operatorNames.put(Token.ASSIGN_SUB, "-=");
         operatorNames.put(Token.ASSIGN_MUL, "*=");
+        operatorNames.put(Token.ASSIGN_EXP, "**=");
         operatorNames.put(Token.ASSIGN_DIV, "/=");
         operatorNames.put(Token.ASSIGN_MOD, "%=");
         operatorNames.put(Token.ASSIGN_BITXOR, "^=");
@@ -387,6 +389,7 @@ public abstract class AstNode extends Node implements Comparable<AstNode> {
             case Token.ASSIGN_LSH:
             case Token.ASSIGN_MOD:
             case Token.ASSIGN_MUL:
+            case Token.ASSIGN_EXP:
             case Token.ASSIGN_RSH:
             case Token.ASSIGN_SUB:
             case Token.ASSIGN_URSH:
