@@ -3222,7 +3222,7 @@ class BodyCodegen {
     /**
      * load array with property ids
      */
-    private void addLoadPropertyIds(Object[] properties, int count) {
+    private void addLoadPropertyIds(Object[] properties, int count, Node parent) {
         addNewObjectArray(count);
         for (int i = 0; i != count; ++i) {
             cfw.add(ByteCode.DUP);
@@ -3230,8 +3230,11 @@ class BodyCodegen {
             Object id = properties[i];
             if (id instanceof String) {
                 cfw.addPush((String) id);
+            } else if (id instanceof Node) {
+                Node node = (Node) id;
+                generateExpression(node, parent);
             } else {
-                cfw.addPush(((Integer) id).intValue());
+                cfw.addPush((Integer) id);
                 addScriptRuntimeInvoke("wrapInt", "(I)Ljava/lang/Integer;");
             }
             cfw.add(ByteCode.AASTORE);
@@ -3287,7 +3290,7 @@ class BodyCodegen {
         if (!topLevel && (count > 10 || cfw.getCurrentCodeOffset() > 30000)
                 && !hasVarsInRegs && !isGenerator && !inLocalBlock) {
             if (literals == null) {
-                literals = new LinkedList<Node>();
+                literals = new LinkedList<>();
             }
             literals.add(node);
             String methodName = codegen.getBodyMethodName(scriptOrFn) + "_literal" + literals.size();
@@ -3309,11 +3312,11 @@ class BodyCodegen {
             // TODO: this is actually only necessary if the yield operation is
             // a child of this object or its children (bug 757410)
             addLoadPropertyValues(node, child, count);
-            addLoadPropertyIds(properties, count);
+            addLoadPropertyIds(properties, count, node);
             // swap property-values and property-ids arrays
             cfw.add(ByteCode.SWAP);
         } else {
-            addLoadPropertyIds(properties, count);
+            addLoadPropertyIds(properties, count, node);
             addLoadPropertyValues(node, child, count);
         }
 

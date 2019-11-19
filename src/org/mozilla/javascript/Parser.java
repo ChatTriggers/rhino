@@ -3529,6 +3529,16 @@ public class Parser {
                         ts.tokenBeg, ts.getString(), ts.getNumber());
                 break;
 
+            case Token.LB:
+                consumeToken();
+                pname = assignExpr();
+                pname.putProp(Node.COMPUTED_PROP, true);
+                if (!matchToken(Token.RB, true)) {
+                    reportError("msg.bad.object.init");
+                }
+                consumeToken();
+                break;
+
             default:
                 if (compilerEnv.isReservedKeywordAsIdentifier()
                         && TokenStream.isKeyword(ts.getString(), compilerEnv.getLanguageVersion(), inUseStrictDirective)) {
@@ -3552,6 +3562,8 @@ public class Parser {
             if (!inDestructuringAssignment) {
                 if (tt == Token.ASSIGN) {
                     reportError("msg.unexpected.object.init");
+                } else if (property.getProp(Node.COMPUTED_PROP) != null) {
+                    reportError("msg.bad.object.init");
                 }
 
                 AstNode nn = new Name(property.getPosition(), property.getString());
