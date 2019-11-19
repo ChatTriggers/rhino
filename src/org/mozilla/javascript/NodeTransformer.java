@@ -144,6 +144,23 @@ public class NodeTransformer {
                     }
                     break;
 
+                case Token.OBJECTLIT:
+                    Object[] props = (Object[]) node.getProp(Node.OBJECT_IDS_PROP);
+
+                    for (int i = 0, propsLength = props.length; i < propsLength; i++) {
+                        Object prop = props[i];
+
+                        if (!(prop instanceof Node)) continue;
+
+                        Node propNode = ((Node) prop);
+                        if (propNode.getProp(Node.COMPUTED_PROP) == null) continue;
+                        Node parentNode = new Node(Token.EMPTY, propNode);
+
+                        transformCompilationUnit_r(tree, parentNode, scope, createScopeObjects, inStrictMode);
+                        props[i] = parentNode.first;
+                    }
+                    break;
+
                 case Token.YIELD:
                     ((FunctionNode) tree).addResumptionPoint(node);
                     break;

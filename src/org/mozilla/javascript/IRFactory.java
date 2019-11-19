@@ -956,7 +956,13 @@ public final class IRFactory extends Parser {
 
     private Object getPropKey(Node id) {
         Object key;
-        if (id instanceof Name) {
+
+        if (id.getProp(Node.COMPUTED_PROP) != null) {
+            key = transform((AstNode) id);
+            decompiler.addToken(Token.LB);
+            decompile((AstNode) id);
+            decompiler.addToken(Token.RB);
+        } else if (id instanceof Name) {
             String s = ((Name) id).getIdentifier();
             decompiler.addName(s);
             key = ScriptRuntime.getIndexObject(s);
