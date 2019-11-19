@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.optimizer.ClassCompiler;
+import org.mozilla.javascript.optimizer.Codegen;
 import org.mozilla.javascript.tools.SourceReader;
 import org.mozilla.javascript.tools.ToolErrorReporter;
 
@@ -107,6 +108,7 @@ public class Main {
             }
             if (arg.equals("-debug") || arg.equals("-g")) {
                 compilerEnv.setGenerateDebugInfo(true);
+                Codegen.DEBUG_CODEGEN = true;
                 continue;
             }
             if (arg.equals("-main-method-class") && ++i < args.length) {
