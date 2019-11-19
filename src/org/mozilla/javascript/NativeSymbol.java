@@ -15,9 +15,7 @@ import java.util.Map;
  * an "internal data slot" that makes them a Symbol and others cannot.
  */
 
-public class NativeSymbol
-        extends IdScriptableObject
-        implements Symbol {
+public class NativeSymbol extends IdScriptableObject implements Symbol {
     private static final long serialVersionUID = -589539749749830003L;
 
     public static final String CLASS_NAME = "Symbol";
