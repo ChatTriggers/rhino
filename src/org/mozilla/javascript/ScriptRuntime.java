@@ -1512,9 +1512,7 @@ public class ScriptRuntime {
         return getObjectElem(sobj, elem, cx);
     }
 
-    public static Object getObjectElem(Scriptable obj, Object elem,
-                                       Context cx) {
-
+    public static Object getObjectElem(Scriptable obj, Object elem, Context cx) {
         Object result;
 
         if (obj instanceof XMLObject) {
@@ -1544,8 +1542,7 @@ public class ScriptRuntime {
      * @deprecated Use {@link #getObjectProp(Object, String, Context, Scriptable)} instead
      */
     @Deprecated
-    public static Object getObjectProp(Object obj, String property,
-                                       Context cx) {
+    public static Object getObjectProp(Object obj, String property, Context cx) {
         return getObjectProp(obj, property, cx, getTopCallScope(cx));
     }
 
@@ -1554,8 +1551,7 @@ public class ScriptRuntime {
      *
      * @param scope the scope that should be used to resolve primitive prototype
      */
-    public static Object getObjectProp(Object obj, String property,
-                                       Context cx, Scriptable scope) {
+    public static Object getObjectProp(Object obj, String property, Context cx, Scriptable scope) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefReadError(obj, property);
@@ -1563,9 +1559,7 @@ public class ScriptRuntime {
         return getObjectProp(sobj, property, cx);
     }
 
-    public static Object getObjectProp(Scriptable obj, String property,
-                                       Context cx) {
-
+    public static Object getObjectProp(Scriptable obj, String property, Context cx) {
         Object result = ScriptableObject.getProperty(obj, property);
         if (result == Scriptable.NOT_FOUND) {
             if (cx.hasFeature(Context.FEATURE_STRICT_MODE)) {
@@ -3948,9 +3942,13 @@ public class ScriptRuntime {
                     boolean isSetter = getterSetter == 1;
                     so.setGetterOrSetter((String) id, 0, getterOrSetter, isSetter);
                 }
-            } else {
-                int index = ((Integer) id).intValue();
+            } else if (id instanceof Integer) {
+                int index = (Integer) id;
                 object.put(index, object, value);
+            } else if (isSymbol(id)) {
+                ScriptableObject.putProperty(object, (Symbol) id, value);
+            } else {
+                throw throwError(cx, scope, "msg.object.invalid.key.type");
             }
         }
         return object;
