@@ -3956,7 +3956,10 @@ public class Parser {
             }
             AstNode id = prop.getLeft();
             Node rightElem;
-            if (id instanceof Name) {
+            if (id.getProp(Node.COMPUTED_PROP) != null && this instanceof IRFactory) {
+                Node s = ((IRFactory) this).transform(id);
+                rightElem = new Node(Token.GETELEM, createName(tempName), s);
+            } else if (id instanceof Name) {
                 Node s = Node.newString(((Name) id).getIdentifier());
                 rightElem = new Node(Token.GETPROP, createName(tempName), s);
             } else if (id instanceof StringLiteral) {
