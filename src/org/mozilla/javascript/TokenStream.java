@@ -1291,6 +1291,8 @@ class TokenStream {
                         return Token.OR;
                     } else if (matchChar('=')) {
                         return Token.ASSIGN_BITOR;
+                    } else if (matchChar('>')) {
+                        return Token.PIPELINE;
                     } else {
                         return Token.BITOR;
                     }

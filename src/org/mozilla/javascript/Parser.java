@@ -2227,9 +2227,8 @@ public class Parser {
         return pn;
     }
 
-    private AstNode condExpr()
-            throws IOException {
-        AstNode pn = orExpr();
+    private AstNode condExpr() throws IOException {
+        AstNode pn = pipelineExpr(null);
         if (matchToken(Token.HOOK, true)) {
             int line = ts.lineno;
             int qmarkPos = ts.tokenBeg, colonPos = -1;
@@ -2262,8 +2261,20 @@ public class Parser {
         return pn;
     }
 
-    private AstNode orExpr()
-            throws IOException {
+    private AstNode pipelineExpr(AstNode previousPipeline) throws IOException {
+        AstNode pn = previousPipeline == null ? orExpr() : previousPipeline;
+
+        if (matchToken(Token.PIPELINE, true)) {
+            int opPos = ts.tokenBeg;
+            FunctionCall fc = new FunctionCall(opPos);
+            fc.setTarget(orExpr());
+            fc.setArguments(Collections.singletonList(pn));
+            pn = pipelineExpr(fc);
+        }
+        return pn;
+    }
+
+    private AstNode orExpr() throws IOException {
         AstNode pn = andExpr();
         if (matchToken(Token.OR, true)) {
             int opPos = ts.tokenBeg;
@@ -2585,8 +2596,7 @@ public class Parser {
      *
      * @param allowCallSyntax passed down to {@link #memberExprTail}
      */
-    private AstNode memberExpr(boolean allowCallSyntax)
-            throws IOException {
+    private AstNode memberExpr(boolean allowCallSyntax) throws IOException {
         int tt = peekToken(), lineno = ts.lineno;
         AstNode pn;
 

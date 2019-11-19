@@ -7,6 +7,7 @@
 package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.*;
+import org.mozilla.javascript.optimizer.Codegen;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -1065,7 +1066,7 @@ public class Node implements Iterable<Node> {
 
     @Override
     public String toString() {
-        if (Token.printTrees) {
+        if (Token.printTrees || Codegen.DEBUG_CODEGEN) {
             StringBuilder sb = new StringBuilder();
             toString(new ObjToIntMap(), sb);
             return sb.toString();

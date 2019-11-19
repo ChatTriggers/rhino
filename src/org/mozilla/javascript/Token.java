@@ -164,9 +164,9 @@ public class Token {
             INC = 109, // increment/decrement (++ --)
             DEC = 110,
             DOT = 111, // member operator (.)
-            OPTIONAL_CHAINING = 112, // optional chaining member operator (?.)
-            PIPELINE = 113, // pipeline operator (|>)
-            NULLISH_COALESCING = 114, // pipeline operator (??)
+            OPTIONAL_CHAINING = 112, // optional chaining member operator (?.) https://tc39.es/proposal-optional-chaining/
+            PIPELINE = 113, // pipeline operator (|>) https://tc39.es/proposal-pipeline-operator
+            NULLISH_COALESCING = 114, // pipeline operator (??) https://tc39.es/proposal-nullish-coalescing/
             FUNCTION = 115, // function keyword
             EXPORT = 116, // export keyword
             IMPORT = 117, // import keyword
