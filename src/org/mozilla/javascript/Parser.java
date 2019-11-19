@@ -2262,7 +2262,7 @@ public class Parser {
     }
 
     private AstNode pipelineExpr(AstNode previousPipeline) throws IOException {
-        AstNode pn = previousPipeline == null ? orExpr() : previousPipeline;
+        AstNode pn = previousPipeline == null ? shortCircuitExpr(null) : previousPipeline;
 
         if (matchToken(Token.PIPELINE, true)) {
             int opPos = ts.tokenBeg;
@@ -2271,6 +2271,18 @@ public class Parser {
             fc.setArguments(Collections.singletonList(pn));
             pn = pipelineExpr(fc);
         }
+        return pn;
+    }
+
+    private AstNode shortCircuitExpr(AstNode previousShortCircuit) throws IOException {
+        AstNode pn = previousShortCircuit == null ? orExpr() : previousShortCircuit;
+
+        if (matchToken(Token.NULLISH_COALESCING, true)) {
+            int opPos = ts.tokenBeg;
+            pn = new InfixExpression(Token.NULLISH_COALESCING, pn, orExpr(), opPos);
+            pn = shortCircuitExpr(pn);
+        }
+
         return pn;
     }
 

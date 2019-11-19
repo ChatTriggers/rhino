@@ -2873,6 +2873,16 @@ class BodyCodegen {
                 break;
             }
 
+            case Token.NULLISH_COALESCING: {
+                generateExpression(child, node);
+                generateExpression(child.getNext(), node);
+                addScriptRuntimeInvoke(
+                        "nullishCoalesce",
+                        "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
+                );
+                break;
+            }
+
             default:
                 throw new RuntimeException("Unexpected node type " + type);
         }

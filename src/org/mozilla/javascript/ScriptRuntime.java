@@ -4356,6 +4356,13 @@ public class ScriptRuntime {
                 ((NativeSymbol) obj).isSymbol())) || (obj instanceof SymbolKey);
     }
 
+    public static Object nullishCoalesce(Object left, Object right) {
+        if (left == null || left == Undefined.instance) {
+            return right;
+        }
+        return left;
+    }
+
     private static RuntimeException errorWithClassName(String msg, Object val) {
         return Context.reportRuntimeError1(msg, val.getClass().getName());
     }
