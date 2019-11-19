@@ -1052,8 +1052,15 @@ class TokenStream {
                         isEmpty = false;
                     }
                 } else {
-                    while ('0' <= c && c <= '9') {
-                        if (base == 8 && c >= '8') {
+                    while (('0' <= c && c <= '9') || c == '_') {
+                        if (c == '_') {
+                            c = getChar();
+                            if (c == 'e' || c == 'E' || c == '.' || !isDigit(c)) {
+                                parser.addError("msg.caught.nfe");
+                                return Token.ERROR;
+                            }
+                            continue;
+                        } else if (base == 8 && c >= '8') {
                             if (isOldOctal) {
                                 /*
                                  * We permit 08 and 09 as decimal numbers, which
@@ -1087,12 +1094,30 @@ class TokenStream {
                 if (base == 10 && (c == '.' || c == 'e' || c == 'E')) {
                     isInteger = false;
                     if (c == '.') {
+                        if (peekChar() == '_') {
+                            parser.addError("msg.caught.nfe");
+                            return Token.ERROR;
+                        }
+
                         do {
+                            if (c == '_') {
+                                c = getChar();
+                                if (!isDigit(c) && c != '_') {
+                                    parser.addError("msg.caught.nfe");
+                                    return Token.ERROR;
+                                }
+                                continue;
+                            }
                             addToString(c);
                             c = getChar();
-                        } while (isDigit(c));
+                        } while (isDigit(c) || c == '_');
                     }
                     if (c == 'e' || c == 'E') {
+                        if (peekChar() == '_') {
+                            parser.addError("msg.caught.nfe");
+                            return Token.ERROR;
+                        }
+
                         addToString(c);
                         c = getChar();
                         if (c == '+' || c == '-') {
@@ -1104,9 +1129,17 @@ class TokenStream {
                             return Token.ERROR;
                         }
                         do {
+                            if (c == '_') {
+                                c = getChar();
+                                if (!isDigit(c) && c != '_') {
+                                    parser.addError("msg.caught.nfe");
+                                    return Token.ERROR;
+                                }
+                                continue;
+                            }
                             addToString(c);
                             c = getChar();
-                        } while (isDigit(c));
+                        } while (isDigit(c) || c == '_');
                     }
                 }
                 ungetChar(c);
