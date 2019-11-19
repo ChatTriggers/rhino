@@ -21,6 +21,8 @@ final class NativeNumber extends IdScriptableObject {
      */
     public static final double MAX_SAFE_INTEGER = 9007199254740991.0; // Math.pow(2, 53) - 1
 
+    public static final double EPSILON = 2.220446049250313e-16; // Math.pow(2, -52)
+
     private static final Object NUMBER_TAG = "Number";
 
     private static final int MAX_PRECISION = 100;
@@ -200,6 +202,12 @@ final class NativeNumber extends IdScriptableObject {
                 return num_to(value, args, DToA.DTOSTR_STANDARD,
                         DToA.DTOSTR_PRECISION, 1, 0);
             }
+
+            case Id_parseFloat:
+                return NativeGlobal.js_parseFloat(args);
+
+            case Id_parseInt:
+                return NativeGlobal.js_parseInt(args);
 
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
@@ -404,7 +412,9 @@ final class NativeNumber extends IdScriptableObject {
             Id_toFixed = 6,
             Id_toExponential = 7,
             Id_toPrecision = 8,
-            MAX_PROTOTYPE_ID = 8;
+            Id_parseFloat = 9,
+            Id_parseInt = 10,
+            MAX_PROTOTYPE_ID = 10;
 
 // #/string_id_map#
 
