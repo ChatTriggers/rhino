@@ -413,6 +413,7 @@ public class Main
             }
             if (arg.equals("-debug")) {
                 shellContextFactory.setGeneratingDebug(true);
+                Codegen.DEBUG_CODEGEN = true;
                 continue;
             }
             if (arg.equals("-?") ||

@@ -108,7 +108,6 @@ public class Main {
             }
             if (arg.equals("-debug") || arg.equals("-g")) {
                 compilerEnv.setGenerateDebugInfo(true);
-                Codegen.DEBUG_CODEGEN = true;
                 continue;
             }
             if (arg.equals("-main-method-class") && ++i < args.length) {
