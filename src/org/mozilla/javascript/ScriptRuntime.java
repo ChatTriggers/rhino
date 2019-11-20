@@ -731,6 +731,16 @@ public class ScriptRuntime {
         }
     }
 
+    public static Object getRestParams(Object[] _args, int index, Context cx, Scriptable scope) {
+        Object[] args = new Object[_args.length - index];
+
+        for (int i = index; i < _args.length; i++) {
+            args[i - index] = _args[i];
+        }
+
+        return cx.newArray(scope, args);
+    }
+
     /**
      * Helper function for builtin objects that use the varargs form.
      * ECMA function formal arguments are undefined if not supplied;

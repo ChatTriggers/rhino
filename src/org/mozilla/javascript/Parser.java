@@ -739,9 +739,10 @@ public class Parser {
 
         for (int i1 = 0, variablesSize = variables.size(); i1 < variablesSize; i1++) {
             VariableInitializer variable = variables.get(i1);
+            final AstNode target = variable.getTarget();
             final AstNode initializer = variable.getInitializer();
 
-            fnNode.addParam(variable.getTarget());
+            fnNode.addParam(target);
             if (initializer != null)
                 fnNode.addDefaultParam(i1, initializer);
 
@@ -2000,6 +2001,7 @@ public class Parser {
             Name name = null;
             int tt = peekToken(), kidPos = ts.tokenBeg;
             end = ts.tokenEnd;
+            boolean rest = false;
 
             if (tt == Token.LB || tt == Token.LC) {
                 // Destructuring assignment, e.g., var [a,b] = ...
@@ -2009,10 +2011,19 @@ public class Parser {
                     reportError("msg.bad.assign.left", kidPos, end - kidPos);
                 markDestructuring(destructuring);
             } else {
+                if (matchToken(Token.SPREAD, true)) {
+                    rest = true;
+                }
+
                 // Simple variable name
                 mustMatchToken(Token.NAME, "msg.bad.var", true);
                 name = createNameNode();
                 name.setLineno(ts.getLineno());
+
+                if (rest) {
+                    name.putProp(Node.SPREAD_PROP, true);
+                }
+
                 if (inUseStrictDirective) {
                     String id = ts.getString();
                     if ("eval".equals(id) || "arguments".equals(ts.getString())) {
@@ -2028,6 +2039,10 @@ public class Parser {
 
             AstNode init = null;
             if (matchToken(Token.ASSIGN, true)) {
+                if (rest) {
+                    reportError("msg.rest.no.defaults");
+                }
+
                 init = assignExpr();
                 end = getNodeEnd(init);
             }
@@ -2047,8 +2062,12 @@ public class Parser {
             vi.setLineno(lineno);
             pn.addVariable(vi);
 
-            if (!matchToken(Token.COMMA, true))
+            if (!matchToken(Token.COMMA, true)) {
                 break;
+            } else if (rest) {
+                reportError("msg.rest.not.last");
+            }
+
         }
         pn.setLength(end - pos);
         pn.setIsStatement(isStatement);
