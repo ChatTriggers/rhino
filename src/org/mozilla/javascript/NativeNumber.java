@@ -17,7 +17,7 @@ final class NativeNumber extends IdScriptableObject {
     private static final long serialVersionUID = 3504516769741512101L;
 
     /**
-     * @see https://www.ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer
+     * https://www.ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer
      */
     public static final double MAX_SAFE_INTEGER = 9007199254740991.0; // Math.pow(2, 53) - 1
 
@@ -67,13 +67,14 @@ final class NativeNumber extends IdScriptableObject {
         ctor.defineProperty("MIN_SAFE_INTEGER",
                 ScriptRuntime.wrapNumber(MIN_SAFE_INTEGER),
                 attr);
+        ctor.defineProperty("EPSILON",
+                ScriptRuntime.wrapNumber(EPSILON),
+                attr);
 
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isFinite, "isFinite", 1);
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isNaN, "isNaN", 1);
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isInteger, "isInteger", 1);
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isSafeInteger, "isSafeInteger", 1);
-        addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_parseFloat, "parseFloat", 1);
-        addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_parseInt, "parseInt", 1);
 
         super.fillConstructorProperties(ctor);
     }
@@ -203,12 +204,6 @@ final class NativeNumber extends IdScriptableObject {
                         DToA.DTOSTR_PRECISION, 1, 0);
             }
 
-            case Id_parseFloat:
-                return NativeGlobal.js_parseFloat(args);
-
-            case Id_parseInt:
-                return NativeGlobal.js_parseInt(args);
-
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -252,12 +247,6 @@ final class NativeNumber extends IdScriptableObject {
                     return isSafeInteger((Number) args[0]);
                 }
                 return false;
-
-            case ConstructorId_parseFloat:
-                return NativeGlobal.js_parseFloat(args);
-
-            case ConstructorId_parseInt:
-                return NativeGlobal.js_parseInt(args);
 
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
@@ -401,8 +390,6 @@ final class NativeNumber extends IdScriptableObject {
             ConstructorId_isNaN = -2,
             ConstructorId_isInteger = -3,
             ConstructorId_isSafeInteger = -4,
-            ConstructorId_parseFloat = -5,
-            ConstructorId_parseInt = -6,
 
     Id_constructor = 1,
             Id_toString = 2,
@@ -412,8 +399,6 @@ final class NativeNumber extends IdScriptableObject {
             Id_toFixed = 6,
             Id_toExponential = 7,
             Id_toPrecision = 8,
-            Id_parseFloat = 9,
-            Id_parseInt = 10,
             MAX_PROTOTYPE_ID = 10;
 
 // #/string_id_map#
