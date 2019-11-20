@@ -3998,20 +3998,17 @@ public class ScriptRuntime {
         return getMessage(messageId, arguments);
     }
 
-    public static String getMessage2(
-            String messageId, Object arg1, Object arg2) {
+    public static String getMessage2(String messageId, Object arg1, Object arg2) {
         Object[] arguments = {arg1, arg2};
         return getMessage(messageId, arguments);
     }
 
-    public static String getMessage3(
-            String messageId, Object arg1, Object arg2, Object arg3) {
+    public static String getMessage3(String messageId, Object arg1, Object arg2, Object arg3) {
         Object[] arguments = {arg1, arg2, arg3};
         return getMessage(messageId, arguments);
     }
 
-    public static String getMessage4(
-            String messageId, Object arg1, Object arg2, Object arg3, Object arg4) {
+    public static String getMessage4(String messageId, Object arg1, Object arg2, Object arg3, Object arg4) {
         Object[] arguments = {arg1, arg2, arg3, arg4};
         return getMessage(messageId, arguments);
     }
@@ -4119,14 +4116,12 @@ public class ScriptRuntime {
         return typeError(msg);
     }
 
-    public static EcmaError typeError2(String messageId, Object arg1,
-                                       Object arg2) {
+    public static EcmaError typeError2(String messageId, Object arg1, Object arg2) {
         String msg = getMessage2(messageId, arg1, arg2);
         return typeError(msg);
     }
 
-    public static EcmaError typeError3(String messageId, String arg1,
-                                       String arg2, String arg3) {
+    public static EcmaError typeError3(String messageId, String arg1, String arg2, String arg3) {
         String msg = getMessage3(messageId, arg1, arg2, arg3);
         return typeError(msg);
     }

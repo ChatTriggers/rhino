@@ -1523,8 +1523,7 @@ public class NativeArray extends IdScriptableObject implements List {
     private static boolean isConcatSpreadable(Context cx, Scriptable scope, Object val) {
         // First, look for the new @@isConcatSpreadable test as per ECMAScript 6 and up
         if (val instanceof Scriptable) {
-            final Object spreadable =
-                    ScriptableObject.getProperty((Scriptable) val, SymbolKey.IS_CONCAT_SPREADABLE);
+            final Object spreadable = ScriptableObject.getProperty((Scriptable) val, SymbolKey.IS_CONCAT_SPREADABLE);
             if ((spreadable != Scriptable.NOT_FOUND) && !Undefined.isUndefined(spreadable)) {
                 // If @@isConcatSpreadable was undefined, we have to fall back to testing for an array.
                 // Otherwise, we found some value

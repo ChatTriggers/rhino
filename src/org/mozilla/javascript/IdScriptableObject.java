@@ -720,14 +720,11 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
      * * instance of Scriptable should be returned.
      */
     @Override
-    public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope,
-                             Scriptable thisObj, Object[] args) {
+    public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         throw f.unknown();
     }
 
-    public final IdFunctionObject exportAsJSClass(int maxPrototypeId,
-                                                  Scriptable scope,
-                                                  boolean sealed) {
+    public final IdFunctionObject exportAsJSClass(int maxPrototypeId, Scriptable scope, boolean sealed) {
         // Set scope and prototype unless this is top level scope itself
         if (scope != this && scope != null) {
             setParentScope(scope);
@@ -760,23 +757,18 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
         }
     }
 
-    public final IdFunctionObject initPrototypeMethod(Object tag, int id, String name,
-                                                      int arity) {
+    public final IdFunctionObject initPrototypeMethod(Object tag, int id, String name, int arity) {
         return initPrototypeMethod(tag, id, name, name, arity);
     }
 
-    public final IdFunctionObject initPrototypeMethod(Object tag, int id, String propertyName, String functionName,
-                                                      int arity) {
+    public final IdFunctionObject initPrototypeMethod(Object tag, int id, String propertyName, String functionName, int arity) {
         Scriptable scope = ScriptableObject.getTopLevelScope(this);
-        IdFunctionObject function = newIdFunction(tag, id,
-                functionName != null ? functionName : propertyName,
-                arity, scope);
+        IdFunctionObject function = newIdFunction(tag, id, functionName != null ? functionName : propertyName, arity, scope);
         prototypeValues.initValue(id, propertyName, function, DONTENUM);
         return function;
     }
 
-    public final IdFunctionObject initPrototypeMethod(Object tag, int id, Symbol key, String functionName,
-                                                      int arity) {
+    public final IdFunctionObject initPrototypeMethod(Object tag, int id, Symbol key, String functionName, int arity) {
         Scriptable scope = ScriptableObject.getTopLevelScope(this);
         IdFunctionObject function = newIdFunction(tag, id, functionName, arity, scope);
         prototypeValues.initValue(id, key, function, DONTENUM);
@@ -795,13 +787,11 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
         prototypeValues.initValue(id, "constructor", f, DONTENUM);
     }
 
-    public final void initPrototypeValue(int id, String name, Object value,
-                                         int attributes) {
+    public final void initPrototypeValue(int id, String name, Object value, int attributes) {
         prototypeValues.initValue(id, name, value, attributes);
     }
 
-    public final void initPrototypeValue(int id, Symbol key, Object value,
-                                         int attributes) {
+    public final void initPrototypeValue(int id, Symbol key, Object value, int attributes) {
         prototypeValues.initValue(id, key, value, attributes);
     }
 
@@ -820,8 +810,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
     protected void fillConstructorProperties(IdFunctionObject ctor) {
     }
 
-    protected void addIdFunctionProperty(Scriptable obj, Object tag, int id,
-                                         String name, int arity) {
+    protected void addIdFunctionProperty(Scriptable obj, Object tag, int id, String name, int arity) {
         Scriptable scope = ScriptableObject.getTopLevelScope(obj);
         IdFunctionObject f = newIdFunction(tag, id, name, arity, scope);
         f.addAsProperty(obj);
@@ -850,12 +839,10 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
      * @throws RuntimeException if no more instanceof target can be found
      */
     protected static EcmaError incompatibleCallError(IdFunctionObject f) {
-        throw ScriptRuntime.typeError1("msg.incompat.call",
-                f.getFunctionName());
+        throw ScriptRuntime.typeError1("msg.incompat.call", f.getFunctionName());
     }
 
-    private IdFunctionObject newIdFunction(Object tag, int id, String name,
-                                           int arity, Scriptable scope) {
+    private IdFunctionObject newIdFunction(Object tag, int id, String name, int arity, Scriptable scope) {
         IdFunctionObject function = null;
         if (Context.getContext().getLanguageVersion() < Context.VERSION_ES6) {
             function = new IdFunctionObject(this, tag, id, name, arity, scope);

@@ -349,7 +349,7 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
         ScriptableObject top = (ScriptableObject) getTopLevelScope(this);
         Map<String, NativeSymbol> map = (Map<String, NativeSymbol>) top.getAssociatedValue(GLOBAL_TABLE_KEY);
         if (map == null) {
-            map = new HashMap<String, NativeSymbol>();
+            map = new HashMap<>();
             top.associateValue(GLOBAL_TABLE_KEY, map);
         }
         return map;
