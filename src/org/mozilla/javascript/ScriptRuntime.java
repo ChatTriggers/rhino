@@ -368,7 +368,7 @@ public class ScriptRuntime {
         if (Double.isNaN(x)) {
             return ScriptRuntime.NaNobj;
         }
-        return new Double(x);
+        return x;
     }
 
     /**
@@ -379,7 +379,7 @@ public class ScriptRuntime {
     public static boolean toBoolean(Object val) {
         for (; ; ) {
             if (val instanceof Boolean)
-                return ((Boolean) val).booleanValue();
+                return (Boolean) val;
             if (val == null || val == Undefined.instance)
                 return false;
             if (val instanceof CharSequence)
@@ -740,6 +740,16 @@ public class ScriptRuntime {
         }
 
         return cx.newArray(scope, args);
+    }
+
+    public static Object getNewTarget(Object constructor, Object thisObj) {
+        Scriptable obj = ScriptableObject.ensureScriptable(thisObj);
+
+        if (obj.has("new.target", obj)) {
+            return constructor;
+        }
+
+        return Undefined.instance;
     }
 
     /**
@@ -3970,8 +3980,7 @@ public class ScriptRuntime {
     }
 
     public static Object[] getArrayElements(Scriptable object) {
-        Context cx = Context.getContext();
-        long longLen = NativeArray.getLengthProperty(cx, object, false);
+        long longLen = NativeArray.getLengthProperty(object, false);
         if (longLen > Integer.MAX_VALUE) {
             // arrays beyond  MAX_INT is not in Java in any case
             throw new IllegalArgumentException();

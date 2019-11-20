@@ -947,8 +947,8 @@ final class NativeString extends IdScriptableObject {
     }
 
     /**
-     * @see https://www.ecma-international.org/ecma-262/8.0/#sec-string.prototype.padstart
-     * @see https://www.ecma-international.org/ecma-262/8.0/#sec-string.prototype.padend
+     * https://www.ecma-international.org/ecma-262/8.0/#sec-string.prototype.padstart
+     * https://www.ecma-international.org/ecma-262/8.0/#sec-string.prototype.padend
      */
     private static String js_pad(Context cx, Scriptable thisObj, IdFunctionObject f, Object[] args, Boolean atStart) {
         String pad = ScriptRuntime.toString(requireObjectCoercible(cx, thisObj, f));

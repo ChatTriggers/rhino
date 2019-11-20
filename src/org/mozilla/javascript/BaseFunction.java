@@ -394,7 +394,9 @@ public class BaseFunction extends IdScriptableObject implements Function {
     public Scriptable construct(Context cx, Scriptable scope, Object[] args) {
         Scriptable result = createObject(cx, scope);
         if (result != null) {
+            result.put("new.target", result, result);
             Object val = call(cx, scope, result, args);
+            result.delete("new.target");
             if (val instanceof Scriptable) {
                 result = (Scriptable) val;
             }
@@ -429,7 +431,7 @@ public class BaseFunction extends IdScriptableObject implements Function {
      * The default implementation of {@link #construct} uses the method to
      * to get the value for <tt>thisObj</tt> argument when invoking
      * {@link #call}.
-     * The methos is allowed to return <tt>null</tt> to indicate that
+     * The method is allowed to return <tt>null</tt> to indicate that
      * {@link #call} will create a new object itself. In this case
      * {@link #construct} will set scope and prototype on the result
      * {@link #call} unless they are already set.

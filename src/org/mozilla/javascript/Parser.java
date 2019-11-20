@@ -2641,6 +2641,22 @@ public class Parser {
             pn = primaryExpr();
         } else {
             consumeToken();
+
+            if (matchToken(Token.DOT, true)) {
+                mustMatchToken(Token.NAME, "Expected identifier", true);
+                Name name = createNameNode();
+
+                if (!name.getString().equals("target")) {
+                    reportError("msg.new.not.target");
+                }
+
+                if (!insideFunction()) {
+                    reportError("msg.new.target.not.within.function");
+                }
+
+                return new Name(ts.tokenBeg, "new.target");
+            }
+
             int pos = ts.tokenBeg;
             NewExpression nx = new NewExpression(pos);
 
@@ -2648,7 +2664,7 @@ public class Parser {
             int end = getNodeEnd(target);
             nx.setTarget(target);
 
-            int lp = -1;
+            int lp;
             if (matchToken(Token.LP, true)) {
                 lp = ts.tokenBeg;
                 List<AstNode> args = argumentList();

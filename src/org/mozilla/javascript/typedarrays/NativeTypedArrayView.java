@@ -232,9 +232,7 @@ public abstract class NativeTypedArrayView<T> extends NativeArrayBufferView impl
         int len = Math.max(0, (end - start));
         int byteOff = Math.min(start * getBytesPerElement(), arrayBuffer.getLength());
 
-        return
-                cx.newObject(scope, getClassName(),
-                        new Object[]{arrayBuffer, byteOff, len});
+        return cx.newObject(scope, getClassName(), new Object[]{ arrayBuffer, byteOff, len });
     }
 
     // Dispatcher
