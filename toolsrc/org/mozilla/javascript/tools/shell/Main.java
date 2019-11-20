@@ -136,6 +136,12 @@ public class Main
             ex.printStackTrace(System.err);
         }
 
+        for (int i = 0; i < args.length; i++) {
+            if ("-debug".equals(args[i])) {
+                Codegen.DEBUG_CODEGEN = true;
+            }
+        }
+
         if (Codegen.DEBUG_CODEGEN) {
             File root = new File("./out");
 
@@ -383,7 +389,7 @@ public class Main
                     break goodUsage;
                 }
                 if (modulePath == null) {
-                    modulePath = new ArrayList<String>();
+                    modulePath = new ArrayList<>();
                 }
                 modulePath.add(args[i]);
                 useRequire = true;
@@ -413,7 +419,6 @@ public class Main
             }
             if (arg.equals("-debug")) {
                 shellContextFactory.setGeneratingDebug(true);
-                Codegen.DEBUG_CODEGEN = true;
                 continue;
             }
             if (arg.equals("-?") ||
