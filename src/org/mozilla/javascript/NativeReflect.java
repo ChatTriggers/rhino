@@ -94,9 +94,9 @@ public class NativeReflect extends IdScriptableObject {
         switch (f.methodId()) {
             case Id_apply:
                 return js_apply(args, cx, scope);
-            case Id_construct:
-                // FIXME
-                return js_construct(args, cx, scope);
+            // case Id_construct:
+            //     // FIXME
+            //     return js_construct(args, cx, scope);
             // case Id_defineProperty:
             //     return js_defineProperty(args, cx, scope);
             default:
@@ -118,34 +118,34 @@ public class NativeReflect extends IdScriptableObject {
         return target.call(cx, scope, thisObj, targetArgs.toArray());
     }
 
-    private Object js_construct(Object[] args, Context cx, Scriptable scope) {
-        if (args.length > 0 && !(args[0] instanceof Function)) {
-            throw ScriptRuntime.typeError4("msg.reflect.bad.args", "target", "Reflect.construct", "function", args[0].getClass().getSimpleName());
-        } else if (args.length > 1 && !(args[1] instanceof NativeArray)) {
-            throw ScriptRuntime.typeError4("msg.reflect.bad.args", "argumentsList", "Reflect.construct", "array", args[2].getClass().getSimpleName());
-        }
-
-        Function target = (Function) args[0];
-        NativeArray targetArgs = (NativeArray) args[1];
-        Scriptable newTarget = null;
-
-        if (args.length > 2) {
-            if (args[2] instanceof Scriptable) {
-                newTarget = (Scriptable) args[2];
-            } else {
-                throw ScriptRuntime.typeError4("msg.reflect.bad.args", "newTarget", "Reflect.construct", "function", args[0].getClass().getSimpleName());
-            }
-        }
-
-        Scriptable obj = target.construct(cx, scope, targetArgs.toArray());
-
-        if (newTarget != null) {
-            obj.setParentScope(getParentScope());
-            obj.setPrototype(newTarget.getPrototype());
-        }
-
-        return obj;
-    }
+    // private Object js_construct(Object[] args, Context cx, Scriptable scope) {
+    //     if (args.length > 0 && !(args[0] instanceof Function)) {
+    //         throw ScriptRuntime.typeError4("msg.reflect.bad.args", "target", "Reflect.construct", "function", args[0].getClass().getSimpleName());
+    //     } else if (args.length > 1 && !(args[1] instanceof NativeArray)) {
+    //         throw ScriptRuntime.typeError4("msg.reflect.bad.args", "argumentsList", "Reflect.construct", "array", args[2].getClass().getSimpleName());
+    //     }
+    //
+    //     Function target = (Function) args[0];
+    //     NativeArray targetArgs = (NativeArray) args[1];
+    //     Scriptable newTarget = null;
+    //
+    //     if (args.length > 2) {
+    //         if (args[2] instanceof Scriptable) {
+    //             newTarget = (Scriptable) args[2];
+    //         } else {
+    //             throw ScriptRuntime.typeError4("msg.reflect.bad.args", "newTarget", "Reflect.construct", "function", args[0].getClass().getSimpleName());
+    //         }
+    //     }
+    //
+    //     Scriptable obj = target.construct(cx, scope, targetArgs.toArray());
+    //
+    //     if (newTarget != null) {
+    //         obj.setParentScope(getParentScope());
+    //         obj.setPrototype(newTarget.getPrototype());
+    //     }
+    //
+    //     return obj;
+    // }
 
     // private boolean js_defineProperty(Object[] args, Context cx, Scriptable scope) {
     //     if (args.length > 0 && !(args[0] instanceof ScriptableObject)) {
