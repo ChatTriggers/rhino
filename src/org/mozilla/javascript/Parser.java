@@ -722,7 +722,7 @@ public class Parser {
     // to be relative to the parent node.  All children of this block
     // node are given relative start positions and correct lengths.
 
-    private void parseFunctionParams(FunctionNode fnNode)
+    private void parseFunctionParams(FunctionNode fnNode, boolean isObjectSetterFunction)
             throws IOException {
         if (matchToken(Token.RP, true)) {
             fnNode.setRp(ts.tokenBeg - fnNode.getPosition());
@@ -730,7 +730,7 @@ public class Parser {
         }
         // Would prefer not to call createDestructuringAssignment until codegen,
         // but the symbol definitions have to happen now, before body is parsed.
-        final VariableDeclaration vd = variables(Token.LP, ts.tokenEnd, false, true);
+        final VariableDeclaration vd = variables(Token.LP, ts.tokenEnd, false, true, isObjectSetterFunction);
         fnNode.setParams(vd);
 
         List<VariableInitializer> variables = vd.getVariables();
@@ -771,8 +771,11 @@ public class Parser {
         }
     }
 
-    private FunctionNode function(int type)
-            throws IOException {
+    private FunctionNode function(int type) throws IOException {
+        return function(type, false);
+    }
+
+    private FunctionNode function(int type, boolean isObjectSetterFunction) throws IOException {
         int syntheticType = type;
         int baseLineno = ts.lineno;  // line number where source starts
         int functionSourceStart = ts.tokenBeg;  // start of "function" kwd
@@ -827,7 +830,7 @@ public class Parser {
 
         PerFunctionVariables savedVars = new PerFunctionVariables(fnNode);
         try {
-            parseFunctionParams(fnNode);
+            parseFunctionParams(fnNode, isObjectSetterFunction);
             fnNode.setBody(parseFunctionBody(type, fnNode));
             fnNode.setEncodedSourceBounds(functionSourceStart, ts.tokenEnd);
             fnNode.setLength(ts.tokenEnd - functionSourceStart);
@@ -1969,7 +1972,7 @@ public class Parser {
     }
 
     private VariableDeclaration variables(int declType, int pos, boolean isStatement) throws IOException {
-        return variables(declType, pos, isStatement, false);
+        return variables(declType, pos, isStatement, false, false);
     }
 
     /**
@@ -1983,8 +1986,7 @@ public class Parser {
      *                 token in the first variable declaration.
      * @return the parsed variable list
      */
-    private VariableDeclaration variables(int declType, int pos, boolean isStatement, boolean isFunctionParams)
-            throws IOException {
+    private VariableDeclaration variables(int declType, int pos, boolean isStatement, boolean isFunctionParams, boolean isObjectSetterFunction) throws IOException {
         int end;
         VariableDeclaration pn = new VariableDeclaration(pos);
         pn.setType(declType);
@@ -2012,6 +2014,9 @@ public class Parser {
                 markDestructuring(destructuring);
             } else {
                 if (matchToken(Token.SPREAD, true)) {
+                    if (isObjectSetterFunction) {
+                        reportError("msg.setter.rest");
+                    }
                     rest = true;
                 }
 
@@ -3624,7 +3629,7 @@ public class Parser {
 
     private ObjectProperty methodDefinition(int pos, AstNode propName, int entryKind)
             throws IOException {
-        FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION);
+        FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION, true);
         // We've already parsed the function name, so fn should be anonymous.
         Name name = fn.getFunctionName();
         if (name != null && name.length() != 0) {
