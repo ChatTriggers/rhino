@@ -192,6 +192,10 @@ public class Scope extends Jump {
         top.addSymbol(symbol);
     }
 
+    public void setHasRest() {
+        top.setHasRest();
+    }
+
     /**
      * Returns the symbol table for this scope.
      *

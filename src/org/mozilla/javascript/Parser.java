@@ -2022,6 +2022,7 @@ public class Parser {
 
                 if (rest) {
                     name.putProp(Node.SPREAD_PROP, true);
+                    currentScope.setHasRest();
                 }
 
                 if (inUseStrictDirective) {

@@ -902,7 +902,7 @@ public class Codegen implements Evaluator {
 
                     case Do_getParamCount:
                         // Push number of defined parameters
-                        cfw.addPush(n.getParamCount());
+                        cfw.addPush(n.getParamCount() - (n.hasRest() ? 1 : 0));
                         cfw.add(ByteCode.IRETURN);
                         break;
 
