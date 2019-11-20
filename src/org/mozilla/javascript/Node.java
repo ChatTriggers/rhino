@@ -60,7 +60,8 @@ public class Node implements Iterable<Node> {
             ARROW_FUNCTION_PROP = 27,
             COMPUTED_PROP = 28,
             SPREAD_PROP = 29,
-            LAST_PROP = 29;
+            CHAINING_PROP = 30,
+            LAST_PROP = 30;
 
     // values of ISNUMBER_PROP to specify
     // which of the children are Number types
@@ -398,7 +399,7 @@ public class Node implements Iterable<Node> {
     }
 
     private static final String propToString(int propType) {
-        if (Token.printTrees) {
+        if (Token.printTrees || Codegen.DEBUG_CODEGEN) {
             // If Context.printTrees is false, the compiler
             // can remove all these strings.
             switch (propType) {
@@ -450,6 +451,12 @@ public class Node implements Iterable<Node> {
                     return "destructuring_names";
                 case DESTRUCTURING_PARAMS:
                     return "destructuring_params";
+                case COMPUTED_PROP:
+                    return "computed_prop";
+                case SPREAD_PROP:
+                    return "spread_prop";
+                case CHAINING_PROP:
+                    return "chaining_prop";
 
                 default:
                     Kit.codeBug();

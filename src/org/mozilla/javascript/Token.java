@@ -593,6 +593,8 @@ public class Token {
                 return "METHOD";
             case ARROW:
                 return "ARROW";
+            case OPTIONAL_CHAINING:
+                return "OPTIONAL CHAINING";
         }
 
         // Token without name

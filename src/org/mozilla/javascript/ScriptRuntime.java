@@ -1102,8 +1102,7 @@ public class ScriptRuntime {
     /**
      * @param scope the scope that should be used to resolve primitive prototype
      */
-    public static Scriptable toObjectOrNull(Context cx, Object obj,
-                                            Scriptable scope) {
+    public static Scriptable toObjectOrNull(Context cx, Object obj, Scriptable scope) {
         if (obj instanceof Scriptable) {
             return (Scriptable) obj;
         } else if (obj != null && obj != Undefined.instance) {
@@ -1116,8 +1115,7 @@ public class ScriptRuntime {
      * @deprecated Use {@link #toObject(Scriptable, Object)} instead.
      */
     @Deprecated
-    public static Scriptable toObject(Scriptable scope, Object val,
-                                      Class<?> staticClass) {
+    public static Scriptable toObject(Scriptable scope, Object val, Class<?> staticClass) {
         if (val instanceof Scriptable) {
             return (Scriptable) val;
         }
@@ -4379,6 +4377,26 @@ public class ScriptRuntime {
             return right;
         }
         return left;
+    }
+
+    public static boolean dontContinueChaining(Object prop) {
+        return prop == null || prop == Undefined.instance;
+    }
+
+    public static Object optionalGetObjectProp(Object obj, String property, Context cx, Scriptable scope) {
+        if (dontContinueChaining(obj)) return Undefined.instance;
+
+        Scriptable sobj = toObjectOrNull(cx, obj, scope);
+        if (sobj == null) {
+            throw undefReadError(obj, property);
+        }
+        return optionalGetObjectProp(sobj, property, cx);
+    }
+
+    public static Object optionalGetObjectProp(Scriptable obj, String property, Context cx) {
+        if (dontContinueChaining(obj)) return Undefined.instance;
+
+        return getObjectProp(obj, property, cx);
     }
 
     private static RuntimeException errorWithClassName(String msg, Object val) {

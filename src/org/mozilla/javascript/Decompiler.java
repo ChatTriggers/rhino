@@ -458,6 +458,10 @@ public class Decompiler {
                     result.append('.');
                     break;
 
+                case Token.OPTIONAL_CHAINING:
+                    result.append("?.");
+                    break;
+
                 case Token.NEW:
                     result.append("new ");
                     break;

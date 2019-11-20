@@ -2708,10 +2708,22 @@ public class Parser {
         if (pn == null) codeBug();
         int pos = pn.getPosition();
         int lineno;
+
+
         tailLoop:
         for (; ; ) {
+            boolean chaining = false;
+
+            if (peekToken() == Token.OPTIONAL_CHAINING) {
+                consumeToken();
+                chaining = true;
+            }
+
             int tt = peekToken();
             switch (tt) {
+                case Token.NAME:
+                    if (!chaining) reportError("");
+                    tt = Token.OPTIONAL_CHAINING;
                 case Token.DOT:
                 case Token.DOTDOT:
                     lineno = ts.lineno;
@@ -2788,7 +2800,11 @@ public class Parser {
                 default:
                     break tailLoop;
             }
+            if (chaining) {
+                pn.putProp(Node.CHAINING_PROP, true);
+            }
         }
+
         return pn;
     }
 
@@ -2802,7 +2818,12 @@ public class Parser {
             throws IOException {
         if (pn == null) codeBug();
         int memberTypeFlags = 0, lineno = ts.lineno, dotPos = ts.tokenBeg;
-        consumeToken();
+
+        if (tt != Token.OPTIONAL_CHAINING) {
+            consumeToken();
+        } else {
+            tt = Token.DOT;
+        }
 
         if (tt == Token.DOTDOT) {
             mustHaveXML();

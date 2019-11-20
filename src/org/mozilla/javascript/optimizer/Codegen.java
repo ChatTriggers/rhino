@@ -5167,6 +5167,9 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                             + ")Ljava/lang/Object;");
             return;
         }
+
+        String methodName = node.getProp(Node.CHAINING_PROP) != null ? "optionalGetObjectProp" : "getObjectProp";
+
         /*
             for 'this.foo' we call getObjectProp(Scriptable...) which can
             skip some casting overhead.
@@ -5175,7 +5178,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         if (childType == Token.THIS && nameChild.getType() == Token.STRING) {
             cfw.addALoad(contextLocal);
             addScriptRuntimeInvoke(
-                    "getObjectProp",
+                    methodName,
                     "(Lorg/mozilla/javascript/Scriptable;"
                             + "Ljava/lang/String;"
                             + "Lorg/mozilla/javascript/Context;"
@@ -5184,7 +5187,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
             cfw.addALoad(contextLocal);
             cfw.addALoad(variableObjectLocal);
             addScriptRuntimeInvoke(
-                    "getObjectProp",
+                    methodName,
                     "(Ljava/lang/Object;"
                             + "Ljava/lang/String;"
                             + "Lorg/mozilla/javascript/Context;"

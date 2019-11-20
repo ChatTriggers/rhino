@@ -1000,9 +1000,13 @@ public final class IRFactory extends Parser {
     private Node transformPropertyGet(PropertyGet node) {
         Node target = transform(node.getTarget());
         String name = node.getProperty().getIdentifier();
-        decompiler.addToken(Token.DOT);
+        if (node.getProp(Node.CHAINING_PROP) != null) {
+            decompiler.addToken(Token.OPTIONAL_CHAINING);
+        } else {
+            decompiler.addToken(Token.DOT);
+        }
         decompiler.addName(name);
-        return createPropertyGet(target, null, name, 0);
+        return createPropertyGet(target, null, name, 0, node);
     }
 
     private Node transformRegExp(RegExpLiteral node) {
@@ -2002,10 +2006,14 @@ public final class IRFactory extends Parser {
             }
         }
         throw Kit.codeBug();
+
     }
 
-    private Node createPropertyGet(Node target, String namespace, String name,
-                                   int memberTypeFlags) {
+    private Node createPropertyGet(Node target, String namespace, String name, int memberTypeFlags) {
+        return createPropertyGet(target, namespace, name, memberTypeFlags, null);
+    }
+
+    private Node createPropertyGet(Node target, String namespace, String name, int memberTypeFlags, Node parent) {
         if (namespace == null && memberTypeFlags == 0) {
             if (target == null) {
                 return createName(name);
@@ -2016,7 +2024,14 @@ public final class IRFactory extends Parser {
                 ref.putProp(Node.NAME_PROP, name);
                 return new Node(Token.GET_REF, ref);
             }
-            return new Node(Token.GETPROP, target, Node.newString(name));
+
+            Node node = new Node(Token.GETPROP, target, Node.newString(name));
+
+            if (parent != null && parent.getProp(Node.CHAINING_PROP) != null) {
+                node.putProp(Node.CHAINING_PROP, true);
+            }
+
+            return node;
         }
         Node elem = Node.newString(name);
         memberTypeFlags |= Node.PROPERTY_FLAG;
