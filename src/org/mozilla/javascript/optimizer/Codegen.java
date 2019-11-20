@@ -902,7 +902,7 @@ public class Codegen implements Evaluator {
 
                     case Do_getParamCount:
                         // Push number of defined parameters
-                        cfw.addPush(n.getParamCount());
+                        cfw.addPush(n.getParamCount() - (n.hasRest() ? 1 : 0));
                         cfw.add(ByteCode.IRETURN);
                         break;
 
@@ -1594,6 +1594,7 @@ class BodyCodegen {
             int varCount = fnCurrent.fnode.getParamAndVarCount();
             boolean[] constDeclarations = fnCurrent.fnode.getParamAndVarConst();
 
+            List<AstNode> params = fnCurrent.fnode.getParams();
             Map<Integer, Node> defaultParams = fnCurrent.fnode.getDefaultParams();
 
             // REMIND - only need to initialize the vars that don't get a value
@@ -1604,27 +1605,39 @@ class BodyCodegen {
                 if (i < paramCount) {
                     if (!inDirectCallFunction) {
                         reg = getNewWordLocal();
-                        cfw.addALoad(argsLocal);
-                        cfw.addPush(i);
-                        cfw.add(ByteCode.AALOAD);
 
-                        if (defaultParams.containsKey(i)) {
-                            // TODO Default parameters can refer to themselves, resulting
-                            //  in some quite excellent class output:
-                            // private static Object _c_test2_1(_stdin__1 var0, Context var1, Scriptable var2, Scriptable var3, Object[] var4) {
-                            //     var2 = var0.getParentScope();
-                            //     if (var4.length < 1) {
-                            //         var4 = ScriptRuntime.padArguments(var4, 1);
-                            //     }
-                            //
-                            //     Object a = ScriptRuntime.mixDefaultArgument(var4[0], var0);
-                            //     return a;
-                            // }
-                            generateExpression(defaultParams.get(i), fnCurrent.fnode);
+                        if (params.get(i).getProp(Node.SPREAD_PROP) != null) {
+                            cfw.addALoad(argsLocal);
+                            cfw.addPush(i);
+                            cfw.addALoad(contextLocal);
+                            cfw.addALoad(variableObjectLocal);
                             addScriptRuntimeInvoke(
-                                    "mixDefaultArgument",
-                                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
+                                    "getRestParams",
+                                    "([Ljava/lang/Object;ILorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;"
                             );
+                        } else {
+                            cfw.addALoad(argsLocal);
+                            cfw.addPush(i);
+                            cfw.add(ByteCode.AALOAD);
+
+                            if (defaultParams.containsKey(i)) {
+                                // TODO Default parameters can refer to themselves, resulting
+                                //  in some quite excellent class output:
+                                // private static Object _c_test2_1(_stdin__1 var0, Context var1, Scriptable var2, Scriptable var3, Object[] var4) {
+                                //     var2 = var0.getParentScope();
+                                //     if (var4.length < 1) {
+                                //         var4 = ScriptRuntime.padArguments(var4, 1);
+                                //     }
+                                //
+                                //     Object a = ScriptRuntime.mixDefaultArgument(var4[0], var0);
+                                //     return a;
+                                // }
+                                generateExpression(defaultParams.get(i), fnCurrent.fnode);
+                                addScriptRuntimeInvoke(
+                                        "mixDefaultArgument",
+                                        "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
+                                );
+                            }
                         }
 
                         cfw.addAStore(reg);

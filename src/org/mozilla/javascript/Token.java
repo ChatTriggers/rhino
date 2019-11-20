@@ -164,76 +164,77 @@ public class Token {
             INC = 109, // increment/decrement (++ --)
             DEC = 110,
             DOT = 111, // member operator (.)
-            OPTIONAL_CHAINING = 112, // optional chaining member operator (?.) https://tc39.es/proposal-optional-chaining/
-            PIPELINE = 113, // pipeline operator (|>) https://tc39.es/proposal-pipeline-operator
-            NULLISH_COALESCING = 114, // pipeline operator (??) https://tc39.es/proposal-nullish-coalescing/
-            FUNCTION = 115, // function keyword
-            EXPORT = 116, // export keyword
-            IMPORT = 117, // import keyword
-            IF = 118, // if keyword
-            ELSE = 119, // else keyword
-            SWITCH = 120, // switch keyword
-            CASE = 121, // case keyword
-            DEFAULT = 122, // default keyword
-            WHILE = 123, // while keyword
-            DO = 124, // do keyword
-            FOR = 125, // for keyword
-            BREAK = 126, // break keyword
-            CONTINUE = 127, // continue keyword
-            VAR = 128, // var keyword
-            WITH = 129, // with keyword
-            CATCH = 130, // catch keyword
-            FINALLY = 131, // finally keyword
-            VOID = 132, // void keyword
-            RESERVED = 133, // reserved keywords
+            SPREAD = 112,
+            OPTIONAL_CHAINING = 113, // optional chaining member operator (?.) https://tc39.es/proposal-optional-chaining/
+            PIPELINE = 114, // pipeline operator (|>) https://tc39.es/proposal-pipeline-operator
+            NULLISH_COALESCING = 115, // pipeline operator (??) https://tc39.es/proposal-nullish-coalescing/
+            FUNCTION = 116, // function keyword
+            EXPORT = 117, // export keyword
+            IMPORT = 118, // import keyword
+            IF = 119, // if keyword
+            ELSE = 120, // else keyword
+            SWITCH = 121, // switch keyword
+            CASE = 122, // case keyword
+            DEFAULT = 123, // default keyword
+            WHILE = 124, // while keyword
+            DO = 125, // do keyword
+            FOR = 126, // for keyword
+            BREAK = 127, // break keyword
+            CONTINUE = 128, // continue keyword
+            VAR = 129, // var keyword
+            WITH = 130, // with keyword
+            CATCH = 131, // catch keyword
+            FINALLY = 132, // finally keyword
+            VOID = 133, // void keyword
+            RESERVED = 134, // reserved keywords
 
-            EMPTY = 134,
+            EMPTY = 135,
 
             /* types used for the parse tree - these never get returned
              * by the scanner.
              */
-            BLOCK = 135, // statement block
-            LABEL = 136, // label
-            TARGET = 137,
-            LOOP = 138,
-            EXPR_VOID = 139, // expression statement in functions
-            EXPR_RESULT = 140, // expression statement in scripts
-            JSR = 141,
-            SCRIPT = 142, // top-level node for entire script
-            TYPEOFNAME = 143, // for typeof(simple-name)
-            USE_STACK = 144,
-            SETPROP_OP = 145, // x.y op= something
-            SETELEM_OP = 146, // x[y] op= something
-            LOCAL_BLOCK = 147,
-            SET_REF_OP = 148, // *reference op= something
+            BLOCK = 136, // statement block
+            LABEL = 137, // label
+            TARGET = 138,
+            LOOP = 139,
+            EXPR_VOID = 140, // expression statement in functions
+            EXPR_RESULT = 141, // expression statement in scripts
+            JSR = 142,
+            SCRIPT = 143, // top-level node for entire script
+            TYPEOFNAME = 144, // for typeof(simple-name)
+            USE_STACK = 145,
+            SETPROP_OP = 146, // x.y op= something
+            SETELEM_OP = 147, // x[y] op= something
+            LOCAL_BLOCK = 148,
+            SET_REF_OP = 149, // *reference op= something
 
             // For XML support:
-            DOTDOT = 149,  // member operator (..)
-            COLONCOLON = 150,  // namespace::name
-            XML = 151,  // XML type
-            DOTQUERY = 152,  // .() -- e.g., x.emps.emp.(name == "terry")
-            XMLATTR = 153,  // @
-            XMLEND = 154,
+            DOTDOT = 150,  // member operator (..)
+            COLONCOLON = 151,  // namespace::name
+            XML = 152,  // XML type
+            DOTQUERY = 153,  // .() -- e.g., x.emps.emp.(name == "terry")
+            XMLATTR = 154,  // @
+            XMLEND = 155,
 
             // Optimizer-only-tokens
-            TO_OBJECT = 155,
-            TO_DOUBLE = 156,
+            TO_OBJECT = 156,
+            TO_DOUBLE = 157,
 
-            GET = 157,  // JS 1.5 get pseudo keyword
-            SET = 158,  // JS 1.5 set pseudo keyword
-            LET = 159,  // JS 1.7 let pseudo keyword
-            CONST = 160,
-            SETCONST = 161,
-            SETCONSTVAR = 162,
-            ARRAYCOMP = 163,  // array comprehension
-            LETEXPR = 164,
-            WITHEXPR = 165,
-            DEBUGGER = 166,
-            COMMENT = 167,
-            GENEXPR = 168,
-            METHOD = 169,  // ES6 MethodDefinition
-            ARROW = 170,  // ES6 ArrowFunction
-            LAST_TOKEN = 170;
+            GET = 158,  // JS 1.5 get pseudo keyword
+            SET = 159,  // JS 1.5 set pseudo keyword
+            LET = 160,  // JS 1.7 let pseudo keyword
+            CONST = 161,
+            SETCONST = 162,
+            SETCONSTVAR = 163,
+            ARRAYCOMP = 164,  // array comprehension
+            LETEXPR = 165,
+            WITHEXPR = 166,
+            DEBUGGER = 167,
+            COMMENT = 168,
+            GENEXPR = 169,
+            METHOD = 170, // ES6 MethodDefinition
+            ARROW = 171,  // ES6 ArrowFunction
+            LAST_TOKEN = 172;
 
     /**
      * Returns a name for the token.  If Rhino is compiled with certain

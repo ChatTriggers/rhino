@@ -59,7 +59,8 @@ public class Node implements Iterable<Node> {
             DESTRUCTURING_SHORTHAND = 26, // JS 1.8 destructuring shorthand
             ARROW_FUNCTION_PROP = 27,
             COMPUTED_PROP = 28,
-            LAST_PROP = 28;
+            SPREAD_PROP = 29,
+            LAST_PROP = 29;
 
     // values of ISNUMBER_PROP to specify
     // which of the children are Number types

@@ -72,6 +72,10 @@ final class NativeDate extends IdScriptableObject {
 
     @Override
     protected void initPrototypeId(int id) {
+        if (id == SymbolId_toPrimitive) {
+            initPrototypeMethod(DATE_TAG, id, SymbolKey.TO_PRIMITIVE, "[Symbol.toPrimitive]", 1);
+            return;
+        }
         String s;
         int arity;
         switch (id) {
@@ -270,8 +274,7 @@ final class NativeDate extends IdScriptableObject {
     }
 
     @Override
-    public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope,
-                             Scriptable thisObj, Object[] args) {
+    public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         if (!f.hasTag(DATE_TAG)) {
             return super.execIdCall(f, cx, scope, thisObj, args);
         }
@@ -327,6 +330,24 @@ final class NativeDate extends IdScriptableObject {
                 }
                 return result;
             }
+
+            case SymbolId_toPrimitive:
+                String method;
+                Object arg0 = args.length > 0 ? args[0] : null;
+
+                if ("string".equals(arg0) || arg0 == "default") {
+                    method = "toString";
+                } else if ("number".equals(arg0)) {
+                    method = "valueOf";
+                } else {
+                    throw ScriptRuntime.typeError0("msg.invalid.toprimitive.hint");
+                }
+
+                Object v = getProperty(thisObj, method);
+                if (!(v instanceof Function)) throw Kit.codeBug();
+
+                Function fn = (Function) v;
+                return fn.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
 
         }
 
@@ -1788,7 +1809,15 @@ final class NativeDate extends IdScriptableObject {
         return TimeClip(result);
     }
 
-// #string_id_map#
+    @Override
+    protected int findPrototypeId(Symbol key) {
+        if (SymbolKey.TO_PRIMITIVE.equals(key)) {
+            return SymbolId_toPrimitive;
+        }
+        return 0;
+    }
+
+    // #string_id_map#
 
     @Override
     protected int findPrototypeId(String s) {
@@ -2106,8 +2135,9 @@ final class NativeDate extends IdScriptableObject {
             Id_setYear = 45,
             Id_toISOString = 46,
             Id_toJSON = 47,
+            SymbolId_toPrimitive = 48,
 
-    MAX_PROTOTYPE_ID = Id_toJSON;
+    MAX_PROTOTYPE_ID = SymbolId_toPrimitive;
 
     private static final int
             Id_toGMTString = Id_toUTCString; // Alias, see Ecma B.2.6

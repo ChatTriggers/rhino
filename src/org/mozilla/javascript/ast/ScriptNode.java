@@ -31,6 +31,7 @@ public class ScriptNode extends Scope {
 
     private List<Symbol> symbols = new ArrayList<>(4);
     private int paramCount = 0;
+    private boolean hasRest = false;
     private String[] variableNames;
     private boolean[] isConsts;
 
@@ -259,6 +260,14 @@ public class ScriptNode extends Scope {
 
     public void setSymbols(List<Symbol> symbols) {
         this.symbols = symbols;
+    }
+
+    public void setHasRest() {
+        hasRest = true;
+    }
+
+    public boolean hasRest() {
+        return hasRest;
     }
 
     /**

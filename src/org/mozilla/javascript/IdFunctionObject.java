@@ -22,8 +22,7 @@ public class IdFunctionObject extends BaseFunction {
         this.arity = arity;
     }
 
-    public IdFunctionObject(IdFunctionCall idcall, Object tag, int id,
-                            String name, int arity, Scriptable scope) {
+    public IdFunctionObject(IdFunctionCall idcall, Object tag, int id, String name, int arity, Scriptable scope) {
         super(scope, null);
 
         if (arity < 0)
