@@ -190,6 +190,7 @@ public class ScriptRuntime {
         NativeDate.init(scope, sealed);
         NativeMath.init(scope, sealed);
         NativeJSON.init(scope, sealed);
+        NativeReflect.init(scope, sealed);
 
         NativeWith.init(scope, sealed);
         NativeCall.init(scope, sealed);
@@ -4132,6 +4133,11 @@ public class ScriptRuntime {
 
     public static EcmaError typeError3(String messageId, String arg1, String arg2, String arg3) {
         String msg = getMessage3(messageId, arg1, arg2, arg3);
+        return typeError(msg);
+    }
+
+    public static EcmaError typeError4(String messageId, String arg1, String arg2, String arg3, String arg4) {
+        String msg = getMessage4(messageId, arg1, arg2, arg3, arg4);
         return typeError(msg);
     }
 
