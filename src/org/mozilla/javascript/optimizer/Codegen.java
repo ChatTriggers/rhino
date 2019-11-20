@@ -2249,6 +2249,14 @@ class BodyCodegen {
                 break;
 
             case Token.NAME: {
+                if (node.getString().equals("new.target")) {
+                    if (scriptOrFn.getType() == Token.FUNCTION) {
+                        cfw.addLoadThis();
+                        cfw.addALoad(thisObjLocal);
+                        addScriptRuntimeInvoke("getNewTarget", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+                        break;
+                    }
+                }
                 cfw.addALoad(contextLocal);
                 cfw.addALoad(variableObjectLocal);
                 cfw.addPush(node.getString());

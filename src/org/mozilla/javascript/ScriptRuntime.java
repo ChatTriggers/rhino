@@ -742,6 +742,16 @@ public class ScriptRuntime {
         return cx.newArray(scope, args);
     }
 
+    public static Object getNewTarget(Object constructor, Object thisObj) {
+        Scriptable obj = ScriptableObject.ensureScriptable(thisObj);
+
+        if (obj.has("new.target", obj)) {
+            return constructor;
+        }
+
+        return Undefined.instance;
+    }
+
     /**
      * Helper function for builtin objects that use the varargs form.
      * ECMA function formal arguments are undefined if not supplied;
