@@ -36,7 +36,7 @@ final class NativeMath extends IdScriptableObject {
 
     @Override
     public String getClassName() {
-        return "Math";
+        return (String) MATH_TAG;
     }
 
     @Override
