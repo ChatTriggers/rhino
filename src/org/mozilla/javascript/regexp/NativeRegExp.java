@@ -33,6 +33,8 @@ public class NativeRegExp extends IdScriptableObject implements Function {
     public static final int JSREG_GLOB = 0x1;       // 'g' flag: global
     public static final int JSREG_FOLD = 0x2;       // 'i' flag: fold
     public static final int JSREG_MULTILINE = 0x4;  // 'm' flag: multiline
+    public static final int JSREG_STICKY = 0x8;  // 'y' flag: sticky
+    public static final int JSREG_UNICODE = 0x10;  // 'm' flag: unicode
 
     //type of match to perform
     public static final int TEST = 0;
@@ -194,6 +196,10 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             buf.append('i');
         if ((re.flags & JSREG_MULTILINE) != 0)
             buf.append('m');
+        if ((re.flags & JSREG_STICKY) != 0)
+            buf.append('y');
+        if ((re.flags & JSREG_UNICODE) != 0)
+            buf.append('u');
         return buf.toString();
     }
 
@@ -241,7 +247,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             str = ScriptRuntime.toString(args[0]);
         }
         double d = 0;
-        if ((re.flags & JSREG_GLOB) != 0) {
+        if ((re.flags & JSREG_GLOB) != 0 || (re.flags & JSREG_STICKY) != 0) {
             d = ScriptRuntime.toInteger(lastIndex);
         }
 
@@ -252,7 +258,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
         } else {
             int[] indexp = {(int) d};
             rval = executeRegExp(cx, scopeObj, reImpl, str, indexp, matchType);
-            if ((re.flags & JSREG_GLOB) != 0) {
+            if ((re.flags & JSREG_GLOB) != 0 || (re.flags & JSREG_STICKY) != 0) {
                 lastIndex = (rval == null || rval == Undefined.instance)
                         ? 0d : (double) indexp[0];
             }
@@ -274,6 +280,8 @@ public class NativeRegExp extends IdScriptableObject implements Function {
                     f = JSREG_FOLD;
                 } else if (c == 'm') {
                     f = JSREG_MULTILINE;
+                } else if (c == 'y') {
+                    f = JSREG_STICKY;
                 } else {
                     reportError("msg.invalid.re.flag", String.valueOf(c));
                 }
@@ -1856,8 +1864,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
     }
 
 
-    private static boolean
-    executeREBytecode(REGlobalData gData, String input, int end) {
+    private static boolean executeREBytecode(REGlobalData gData, String input, int end) {
         int pc = 0;
         byte[] program = gData.regexp.program;
         int continuationOp = REOP_END;
@@ -2471,8 +2478,9 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             Id_global = 3,
             Id_ignoreCase = 4,
             Id_multiline = 5,
+            Id_sticky = 6,
 
-    MAX_INSTANCE_ID = 5;
+    MAX_INSTANCE_ID = 6;
 
     @Override
     protected int getMaxInstanceId() {
@@ -2495,8 +2503,13 @@ public class NativeRegExp extends IdScriptableObject implements Function {
                     X = "global";
                     id = Id_global;
                 } else if (c == 's') {
-                    X = "source";
-                    id = Id_source;
+                    if (s.charAt(1) == 't') {
+                        X = "sticky";
+                        id = Id_sticky;
+                    } else {
+                        X = "source";
+                        id = Id_source;
+                    }
                 }
             } else if (s_length == 9) {
                 c = s.charAt(0);
@@ -2528,6 +2541,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             case Id_global:
             case Id_ignoreCase:
             case Id_multiline:
+            case Id_sticky:
                 attr = PERMANENT | READONLY | DONTENUM;
                 break;
             default:
@@ -2549,6 +2563,8 @@ public class NativeRegExp extends IdScriptableObject implements Function {
                 return "ignoreCase";
             case Id_multiline:
                 return "multiline";
+            case Id_sticky:
+                return "sticky";
         }
         return super.getInstanceIdName(id);
     }
@@ -2566,6 +2582,8 @@ public class NativeRegExp extends IdScriptableObject implements Function {
                 return ScriptRuntime.wrapBoolean((re.flags & JSREG_FOLD) != 0);
             case Id_multiline:
                 return ScriptRuntime.wrapBoolean((re.flags & JSREG_MULTILINE) != 0);
+            case Id_sticky:
+                return ScriptRuntime.wrapBoolean((re.flags & JSREG_STICKY) != 0);
         }
         return super.getInstanceIdValue(id);
     }
@@ -2580,6 +2598,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             case Id_global:
             case Id_ignoreCase:
             case Id_multiline:
+            case Id_sticky:
                 return;
         }
         super.setInstanceIdValue(id, value);
