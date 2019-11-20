@@ -113,26 +113,30 @@ final class Arguments extends IdScriptableObject {
     }
 
     private boolean sharedWithActivation(int index) {
-        Context cx = Context.getContext();
-        if (cx.isStrictMode()) {
-            return false;
-        }
-        NativeFunction f = activation.function;
-        int definedCount = f.getParamCount();
-        if (index < definedCount) {
-            // Check if argument is not hidden by later argument with the same
-            // name as hidden arguments are not shared with activation
-            if (index < definedCount - 1) {
-                String argName = f.getParamOrVarName(index);
-                for (int i = index + 1; i < definedCount; i++) {
-                    if (argName.equals(f.getParamOrVarName(i))) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
+        // Sharing turns out to break the arguments object. Perhaps
+        // there is a more elegant way to handle argument reassigning, but
+        // never sharing seems to work.
         return false;
+//        Context cx = Context.getContext();
+//        if (cx.isStrictMode()) {
+//            return false;
+//        }
+//        NativeFunction f = activation.function;
+//        int definedCount = f.getParamAndVarCount();
+//        if (index < definedCount) {
+//            // Check if argument is not hidden by later argument with the same
+//            // name as hidden arguments are not shared with activation
+//            if (index < definedCount - 1) {
+//                String argName = f.getParamOrVarName(index);
+//                for (int i = index + 1; i < definedCount; i++) {
+//                    if (argName.equals(f.getParamOrVarName(i))) {
+//                        return false;
+//                    }
+//                }
+//            }
+//            return true;
+//        }
+//        return false;
     }
 
     @Override
