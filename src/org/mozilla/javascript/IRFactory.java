@@ -476,10 +476,22 @@ public final class IRFactory extends Parser {
         // OPT: could optimize to createPropertyGet
         // iff elem is string that can not be number
         Node target = transform(node.getTarget());
+        boolean chained = node.getProp(Node.CHAINING_PROP) != null;
+
+        if (chained) {
+            decompiler.addToken(Token.OPTIONAL_CHAINING);
+        }
         decompiler.addToken(Token.LB);
         Node element = transform(node.getElement());
         decompiler.addToken(Token.RB);
-        return new Node(Token.GETELEM, target, element);
+
+        Node newNode = new Node(Token.GETELEM, target, element);
+
+        if (chained) {
+            newNode.putProp(Node.CHAINING_PROP, true);
+        }
+
+        return newNode;
     }
 
     private Node transformExprStmt(ExpressionStatement node) {

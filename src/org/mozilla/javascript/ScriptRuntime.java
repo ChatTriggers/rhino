@@ -4399,6 +4399,22 @@ public class ScriptRuntime {
         return getObjectProp(obj, property, cx);
     }
 
+    public static Object optionalGetObjectIndex(Object obj, double dblIndex, Context cx) {
+        if (dontContinueChaining(obj)) return Undefined.instance;
+
+        return getObjectIndex(obj, dblIndex, cx, getTopCallScope(cx));
+    }
+
+    public static Object optionalGetObjectElem(Object obj, Object elem, Context cx, Scriptable scope) {
+        if (dontContinueChaining(obj)) return Undefined.instance;
+
+        Scriptable sobj = toObjectOrNull(cx, obj, scope);
+        if (sobj == null) {
+            throw undefReadError(obj, elem);
+        }
+        return getObjectElem(sobj, elem, cx);
+    }
+
     private static RuntimeException errorWithClassName(String msg, Object val) {
         return Context.reportRuntimeError1(msg, val.getClass().getName());
     }

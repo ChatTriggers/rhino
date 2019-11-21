@@ -110,25 +110,25 @@ public class Codegen implements Evaluator {
                 e.printStackTrace();
             }
 
-            try (FileOutputStream fos = new FileOutputStream(outputTokens)) {
-                StringBuilder sb = new StringBuilder();
-
-                for (int i = 0; i < encodedSource.length(); i++) {
-                    int token = encodedSource.charAt(i);
-                    if (!Token.isValidToken(encodedSource.charAt(i))) continue;
-
-                    if (token == Token.NAME || token == Token.STRING || token == Token.REGEXP) {
-                        sb.append(Token.typeToName(token)).append(": ");
-                        i = Decompiler.printSourceString(encodedSource, i + 1, true, sb) - 1;
-                        sb.append("\n");
-                    } else {
-                        sb.append(Token.typeToName(token)).append("\n");
-                    }
-                }
-                fos.write(sb.toString().getBytes());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try (FileOutputStream fos = new FileOutputStream(outputTokens)) {
+//                StringBuilder sb = new StringBuilder();
+//
+//                for (int i = 0; i < encodedSource.length(); i++) {
+//                    int token = encodedSource.charAt(i);
+//                    if (!Token.isValidToken(encodedSource.charAt(i))) continue;
+//
+//                    if (token == Token.NAME || token == Token.STRING || token == Token.REGEXP) {
+//                        sb.append(Token.typeToName(token)).append(": ");
+//                        i = Decompiler.printSourceString(encodedSource, i + 1, true, sb) - 1;
+//                        sb.append("\n");
+//                    } else {
+//                        sb.append(Token.typeToName(token)).append("\n");
+//                    }
+//                }
+//                fos.write(sb.toString().getBytes());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
             new File("./out/nodes").mkdirs();
 
@@ -2617,16 +2617,19 @@ class BodyCodegen {
                 generateExpression(child, node); // object
                 generateExpression(child.getNext(), node);  // id
                 cfw.addALoad(contextLocal);
+
+                String prefix = node.getProp(Node.CHAINING_PROP) != null ? "optionalGet" : "get";
+
                 if (node.getIntProp(Node.ISNUMBER_PROP, -1) != -1) {
                     addScriptRuntimeInvoke(
-                            "getObjectIndex",
+                            prefix + "ObjectIndex",
                             "(Ljava/lang/Object;D"
                                     + "Lorg/mozilla/javascript/Context;"
                                     + ")Ljava/lang/Object;");
                 } else {
                     cfw.addALoad(variableObjectLocal);
                     addScriptRuntimeInvoke(
-                            "getObjectElem",
+                            prefix + "ObjectElem",
                             "(Ljava/lang/Object;"
                                     + "Ljava/lang/Object;"
                                     + "Lorg/mozilla/javascript/Context;"
@@ -3464,7 +3467,7 @@ class BodyCodegen {
                 Node id = propTarget.getNext();
                 String property = id.getString();
                 cfw.addPush(property);
-                methodName = "callProp0";
+                methodName = child.getProp(Node.CHAINING_PROP) != null ? "optionalCallProp0" : "callProp0";
                 signature = "(Ljava/lang/Object;"
                         + "Ljava/lang/String;"
                         + "Lorg/mozilla/javascript/Context;"

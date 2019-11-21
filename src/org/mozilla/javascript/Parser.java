@@ -2702,110 +2702,112 @@ public class Parser {
      * @return the outermost (lexically last occurring) expression,
      * which will have the passed parent node as a descendant
      */
-    private AstNode memberExprTail(boolean allowCallSyntax, AstNode pn)
-            throws IOException {
+    private AstNode memberExprTail(boolean allowCallSyntax, AstNode pn) throws IOException {
         // we no longer return null for errors, so this won't be null
         if (pn == null) codeBug();
-        int pos = pn.getPosition();
-        int lineno;
 
-
-        tailLoop:
         for (; ; ) {
-            boolean chaining = false;
-
             if (peekToken() == Token.OPTIONAL_CHAINING) {
                 consumeToken();
-                chaining = true;
-            }
 
-            int tt = peekToken();
-            switch (tt) {
-                case Token.NAME:
-                    if (!chaining) reportError("");
-                    tt = Token.OPTIONAL_CHAINING;
-                case Token.DOT:
-                case Token.DOTDOT:
-                    lineno = ts.lineno;
-                    pn = propertyAccess(tt, pn);
-                    pn.setLineno(lineno);
-                    break;
+                int nextToken = peekToken();
 
-                case Token.DOTQUERY:
-                    consumeToken();
-                    int opPos = ts.tokenBeg, rp = -1;
-                    lineno = ts.lineno;
-                    mustHaveXML();
-                    setRequiresActivation();
-                    AstNode filter = expr();
-                    int end = getNodeEnd(filter);
-                    if (mustMatchToken(Token.RP, "msg.no.paren", true)) {
-                        rp = ts.tokenBeg;
-                        end = ts.tokenEnd;
-                    }
-                    XmlDotQuery q = new XmlDotQuery(pos, end - pos);
-                    q.setLeft(pn);
-                    q.setRight(filter);
-                    q.setOperatorPosition(opPos);
-                    q.setRp(rp - pos);
-                    q.setLineno(lineno);
-                    pn = q;
-                    break;
-
-                case Token.LB:
-                    consumeToken();
-                    int lb = ts.tokenBeg, rb = -1;
-                    lineno = ts.lineno;
-                    AstNode expr = expr();
-                    end = getNodeEnd(expr);
-                    if (mustMatchToken(Token.RB, "msg.no.bracket.index", true)) {
-                        rb = ts.tokenBeg;
-                        end = ts.tokenEnd;
-                    }
-                    ElementGet g = new ElementGet(pos, end - pos);
-                    g.setTarget(pn);
-                    g.setElement(expr);
-                    g.setParens(lb, rb);
-                    g.setLineno(lineno);
-                    pn = g;
-                    break;
-
-                case Token.LP:
-                    if (!allowCallSyntax) {
-                        break tailLoop;
-                    }
-                    lineno = ts.lineno;
-                    consumeToken();
-                    checkCallRequiresActivation(pn);
-                    FunctionCall f = new FunctionCall(pos);
-                    f.setTarget(pn);
-                    // Assign the line number for the function call to where
-                    // the paren appeared, not where the name expression started.
-                    f.setLineno(lineno);
-                    f.setLp(ts.tokenBeg - pos);
-                    List<AstNode> args = argumentList();
-                    if (args != null && args.size() > ARGC_LIMIT)
-                        reportError("msg.too.many.function.args");
-                    f.setArguments(args);
-                    f.setRp(ts.tokenBeg - pos);
-                    f.setLength(ts.tokenEnd - pos);
-                    pn = f;
-                    break;
-                case Token.COMMENT:
+                if (nextToken == Token.LB) {
+                    pn = matchElementGet(pn);
+                } else if (nextToken == Token.LP) {
+                    AstNode returned = matchFunctionCall(pn, allowCallSyntax);
+                    if (returned == null) break;
+                    pn = returned;
+                } else if (nextToken == Token.NAME) {
+                    pn = matchPropertyAccess(pn, true);
+                } else if (nextToken == Token.COMMENT) {
                     //Ignoring all the comments, because previous statement may not be terminated properly.
-                    int currentFlagTOken = currentFlaggedToken;
-                    peekUntilNonComment(tt);
-                    currentFlaggedToken = (currentFlaggedToken & TI_AFTER_EOL) != 0 ? currentFlaggedToken : currentFlagTOken;
+                    int currentFlagToken = currentFlaggedToken;
+                    peekUntilNonComment(nextToken);
+                    currentFlaggedToken = (currentFlaggedToken & TI_AFTER_EOL) != 0 ? currentFlaggedToken : currentFlagToken;
+                } else {
                     break;
-                default:
-                    break tailLoop;
-            }
-            if (chaining) {
+                }
+
                 pn.putProp(Node.CHAINING_PROP, true);
+            } else {
+                int nextToken = peekToken();
+
+                if (nextToken == Token.LB) {
+                    pn = matchElementGet(pn);
+                } else if (nextToken == Token.LP) {
+                    AstNode returned = matchFunctionCall(pn, allowCallSyntax);
+                    if (returned == null) break;
+                    pn = returned;
+                } else if (nextToken == Token.DOT) {
+                    pn = matchPropertyAccess(pn, false);
+                } else if (nextToken == Token.COMMENT) {
+                    //Ignoring all the comments, because previous statement may not be terminated properly.
+                    int currentFlagToken = currentFlaggedToken;
+                    peekUntilNonComment(nextToken);
+                    currentFlaggedToken = (currentFlaggedToken & TI_AFTER_EOL) != 0 ? currentFlaggedToken : currentFlagToken;
+                } else {
+                    break;
+                }
             }
         }
 
         return pn;
+    }
+
+    private AstNode matchPropertyAccess(AstNode pn, boolean chaining) throws IOException {
+        int lineno;
+
+        lineno = ts.lineno;
+        pn = propertyAccess(chaining ? Token.OPTIONAL_CHAINING : Token.DOT, pn);
+        pn.setLineno(lineno);
+
+        return pn;
+    }
+
+    private AstNode matchElementGet(AstNode pn) throws IOException {
+        int pos = pn.getPosition();
+
+        consumeToken();
+        int lb = ts.tokenBeg, rb = -1;
+        int lineno = ts.lineno;
+        AstNode expr = expr();
+        int end = getNodeEnd(expr);
+        if (mustMatchToken(Token.RB, "msg.no.bracket.index", true)) {
+            rb = ts.tokenBeg;
+            end = ts.tokenEnd;
+        }
+        ElementGet g = new ElementGet(pos, end - pos);
+        g.setTarget(pn);
+        g.setElement(expr);
+        g.setParens(lb, rb);
+        g.setLineno(lineno);
+        return g;
+    }
+
+    private AstNode matchFunctionCall(AstNode pn, boolean allowCallSyntax) throws IOException {
+        if (!allowCallSyntax) {
+            return null;
+        }
+
+        int pos = pn.getPosition();
+        int lineno = ts.lineno;
+
+        consumeToken();
+        checkCallRequiresActivation(pn);
+        FunctionCall f = new FunctionCall(pos);
+        f.setTarget(pn);
+        // Assign the line number for the function call to where
+        // the paren appeared, not where the name expression started.
+        f.setLineno(lineno);
+        f.setLp(ts.tokenBeg - pos);
+        List<AstNode> args = argumentList();
+        if (args != null && args.size() > ARGC_LIMIT)
+            reportError("msg.too.many.function.args");
+        f.setArguments(args);
+        f.setRp(ts.tokenBeg - pos);
+        f.setLength(ts.tokenEnd - pos);
+        return f;
     }
 
     /**
