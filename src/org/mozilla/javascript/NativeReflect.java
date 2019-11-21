@@ -144,10 +144,20 @@ public class NativeReflect extends IdScriptableObject {
 
         Function target = (Function) args[0];
         NativeArray argumentsList = (NativeArray) args[1];
-        // TODO:
-        // Function newTarget = (Function) args[2];
+        Function newTarget = null;
 
-        return target.construct(cx, scope, argumentsList.toArray());
+        if (args.length > 2) {
+            newTarget = (Function) args[2];
+        }
+
+        Scriptable val = ScriptRuntime.newObject(target, cx, newTarget, argumentsList.toArray());
+
+        if (newTarget != null) {
+            Scriptable obj = newTarget.construct(cx, scope, new Object[]{});
+            val.setPrototype(obj.getPrototype());
+        }
+
+        return val;
     }
 
     private boolean js_defineProperty(Object[] args, Context cx) {

@@ -30,6 +30,7 @@ final class NativeNumber extends IdScriptableObject {
 
     static void init(Scriptable scope, boolean sealed) {
         NativeNumber obj = new NativeNumber(0.0);
+
         obj.exportAsJSClass(MAX_PROTOTYPE_ID, scope, sealed);
     }
 

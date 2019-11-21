@@ -74,8 +74,7 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
                 default:
                     throw Kit.codeBug();
             }
-            IdFunctionObject f = new IdFunctionObject(obj, FTAG, id, name,
-                    arity, scope);
+            IdFunctionObject f = new IdFunctionObject(obj, FTAG, id, name, arity, scope);
             if (sealed) {
                 f.sealObject();
             }
