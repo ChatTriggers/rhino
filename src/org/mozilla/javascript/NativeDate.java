@@ -335,7 +335,7 @@ final class NativeDate extends IdScriptableObject {
                 String method;
                 Object arg0 = args.length > 0 ? args[0] : null;
 
-                if ("string".equals(arg0) || arg0 == "default") {
+                if ("string".equals(arg0) || "default".equals(arg0)) {
                     method = "toString";
                 } else if ("number".equals(arg0)) {
                     method = "valueOf";
