@@ -3035,10 +3035,6 @@ public class Parser {
             spread = true;
             consumeToken();
             tt = nextToken();
-
-            if (!(tt == Token.LB || tt == Token.STRING || tt == Token.NAME)) { // TODO: Token.LC
-                reportError("msg.not.iterable", ts.getString());
-            }
         }
 
         AstNode pn = null;
