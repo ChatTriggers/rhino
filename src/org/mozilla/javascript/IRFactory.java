@@ -381,8 +381,7 @@ public final class IRFactory extends Parser {
             array.putProp(Node.SPREAD_PROP, true);
         }
         decompiler.addToken(Token.RB);
-        array.putIntProp(Node.DESTRUCTURING_ARRAY_LENGTH,
-                node.getDestructuringLength());
+        array.putIntProp(Node.DESTRUCTURING_ARRAY_LENGTH, node.getDestructuringLength());
         if (skipIndexes != null) {
             int[] skips = new int[skipIndexes.size()];
             for (int i = 0; i < skipIndexes.size(); i++)
@@ -1074,8 +1073,28 @@ public final class IRFactory extends Parser {
     }
 
     private Node transformString(StringLiteral node) {
+        boolean spread = node.getProp(Node.SPREAD_PROP) != null;
+
+        if (spread) {
+            decompiler.addToken(Token.SPREAD);
+        }
+
         decompiler.addString(node.getValue());
-        return Node.newString(node.getValue());
+
+        if (spread) {
+            Node array = new Node(Token.ARRAYLIT);
+            array.putProp(Node.SPREAD_PROP, true);
+
+            String str = node.getValue();
+            for (int i = 0; i < str.length(); i++) {
+                StringLiteral sl = new StringLiteral();
+                sl.setValue(String.valueOf(str.charAt(i)));
+                array.addChildToBack(transformString(sl));
+            }
+            return array;
+        } else {
+            return Node.newString(node.getValue());
+        }
     }
 
     private Node transformSwitch(SwitchStatement node) {

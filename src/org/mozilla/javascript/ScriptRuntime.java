@@ -772,6 +772,17 @@ public class ScriptRuntime {
 
                 args[i] = naArgs;
                 totalArgs += length;
+            } else if (arg instanceof String) {
+                String s = (String) arg;
+                int length = s.length();
+                Object[] sArgs = new Object[length];
+
+                for (int j = 0; j < length; j++) {
+                    sArgs[j] = String.valueOf(s.charAt(j));
+                }
+
+                args[i] = sArgs;
+                totalArgs += length;
             } else {
                 throw typeError1("msg.not.iterable", toString(arg));
             }
