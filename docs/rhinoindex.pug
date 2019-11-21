@@ -1,0 +1,83 @@
+doctype html
+html
+  head
+    title
+      block title
+      | Rhino ES2015/ES6, ES2016 and ES2017 support
+    meta(http-equiv="Content-Type",content="text/html; charset=utf-8")
+    link(href='https://fonts.googleapis.com/css?family=Raleway:400,700',rel='stylesheet',type='text/css')
+    link(href='favico.ico',rel='shortcut icon')
+    link(rel="stylesheet", href="style.css")
+body
+  if (flaggable)
+    input#flagged(type='checkbox', checked='checked')
+    label(for='flagged') requires&nbsp;VERSION_ES6&nbsp;or&nbsp;-version&nbsp200&nbspflag
+  #credits
+    | Created by&nbsp;
+    a(href='https://github.com/williamkapke', target="_blank") William Kapke
+    | &nbsp;and adapted for Rhino
+
+  header.global
+    #subheading
+      a(href='https://github.com/kangax/compat-table', target="_blank") kangax's compat-table
+      | &nbsp;applied to Rhino
+
+  mixin header(esVersion)
+    header
+      h1: a(href="#"+esVersion) Rhino #{esVersion} Support
+      table.headings
+        tr
+          each details, nodeVersion in headers
+            th.version(class='v' + details.version.split('.')[0])=details.version
+              .details
+                small (these versions have identical results)
+                each detail in details.includes
+                  table: tr
+                    td=detail.version
+                    td=detail.engine
+              if(details.super)
+                sup=details.super
+              if (flaggable)
+                sub.flagged=percent(nodeVersion, esVersion) + '% complete'
+              sub.unflagged=percent(nodeVersion, esVersion, true) + '% complete'
+
+  mixin article(esVersion)
+    article(id=esVersion)
+      +header(esVersion)
+      each obj1, category in testers[esVersion]
+        - category2 = esVersion+'-'+category.replace(/\W/g, '-')
+        table.results
+          caption
+            h2.category
+              .hash(id=category2)
+              a(href='#'+category2)=category
+          each obj2, subcategory in obj1
+            - subcategory2 = [category2,subcategory.replace(/\W/g, '-')].join('-')
+            tr
+              td.feature.sub(colspan=Object.keys(headers).length+1)
+                h3
+                  .hash(id=subcategory2)
+                  a(href='#'+subcategory2)=subcategory
+            each obj3, subsubcategory in obj2
+              - subsubcategory2 = [subcategory2,subsubcategory.replace(/\W/g, '-')].join('-')
+              tr
+                td.feature.subsub
+                  .hash(id=subsubcategory2)
+                  a(href='#'+subsubcategory2)=subsubcategory
+                  if obj3.code
+                    .info
+                      | ?
+                      .fn
+                        | function(){
+                        .code=obj3.code
+                        | }
+                each nodeVersion in Object.keys(headers)
+                  - classes = requiresFlag(nodeVersion, esVersion, obj3.path)? 'flag' : ''
+                  td.result(class=classes) !{results(nodeVersion, esVersion, obj3.path)}
+
+
+  +article('ES2015')
+  +article('ES2016')
+  +article('ES2017')
+  +article('ES2018')
+  +article('ESNEXT')
