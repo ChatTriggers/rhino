@@ -75,6 +75,10 @@ public class ArrowFunction extends BaseFunction {
         return super.decompile(indent, flags);
     }
 
+    public Callable getTargetFunction() {
+        return targetFunction;
+    }
+
     static boolean equalObjectGraphs(ArrowFunction f1, ArrowFunction f2, EqualObjectGraphs eq) {
         return eq.equalGraphs(f1.boundThis, f2.boundThis) && eq.equalGraphs(f1.targetFunction, f2.targetFunction);
     }

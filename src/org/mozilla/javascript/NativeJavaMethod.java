@@ -127,6 +127,12 @@ public class NativeJavaMethod extends BaseFunction {
             throw new RuntimeException("No methods defined for call");
         }
 
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] instanceof ArrowFunction) {
+                args[i] = ((ArrowFunction) args[i]).getTargetFunction();
+            }
+        }
+
         int index = findCachedFunction(cx, args);
         if (index < 0) {
             Class<?> c = methods[0].method().getDeclaringClass();
@@ -247,7 +253,7 @@ public class NativeJavaMethod extends BaseFunction {
                     }
                 }
             } else {
-                overloadCache = new CopyOnWriteArrayList<ResolvedOverload>();
+                overloadCache = new CopyOnWriteArrayList<>();
             }
             int index = findFunction(cx, methods, args);
             // As a sanity measure, don't let the lookup cache grow longer
@@ -270,8 +276,7 @@ public class NativeJavaMethod extends BaseFunction {
      * or constructors and the arguments.
      * If no function can be found to call, return -1.
      */
-    static int findFunction(Context cx,
-                            MemberBox[] methodsOrCtors, Object[] args) {
+    static int findFunction(Context cx, MemberBox[] methodsOrCtors, Object[] args) {
         if (methodsOrCtors.length == 0) {
             return -1;
         } else if (methodsOrCtors.length == 1) {
