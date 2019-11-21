@@ -457,6 +457,8 @@ public class Node implements Iterable<Node> {
                     return "spread_prop";
                 case CHAINING_PROP:
                     return "chaining_prop";
+                case EXPRESSION_CLOSURE_PROP:
+                    return "expression_closure";
 
                 default:
                     Kit.codeBug();
