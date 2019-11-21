@@ -150,7 +150,7 @@ public class NativeReflect extends IdScriptableObject {
             newTarget = (Function) args[2];
         }
 
-        Scriptable val = ScriptRuntime.newObject(target, cx, newTarget, argumentsList.toArray());
+        Scriptable val = target.construct(cx, scope, argumentsList.toArray());
 
         if (newTarget != null) {
             Scriptable obj = newTarget.construct(cx, scope, new Object[]{});

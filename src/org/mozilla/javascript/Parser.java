@@ -2234,6 +2234,14 @@ public class Parser {
             markDestructuring(pn);
             int opPos = ts.tokenBeg;
 
+            if (pn instanceof Name) {
+                Name lhs = (Name) pn;
+
+                if (lhs.getString().equals("new.target")) {
+                    reportError("msg.bad.assign.left");
+                }
+            }
+
             pn = new Assignment(tt, pn, assignExpr(), opPos);
 
             if (jsdocNode != null) {
