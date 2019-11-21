@@ -215,8 +215,19 @@ public final class OptRuntime extends ScriptRuntime {
                                              int skipCount,
                                              Context cx,
                                              Scriptable scope) {
-        int[] skipIndexces = decodeIntArray(encodedInts, skipCount);
-        return newArrayLiteral(objects, skipIndexces, cx, scope);
+        int[] skipIndices = null;
+
+        if (objects == emptyArgs && skipCount > 0) {
+            objects = new Object[skipCount];
+
+            for (int i = 0; i < skipCount; i++) {
+                objects[i] = Undefined.instance;
+            }
+        } else {
+            skipIndices = decodeIntArray(encodedInts, skipCount);
+        }
+
+        return newArrayLiteral(objects, skipIndices, cx, scope);
     }
 
     public static void main(final Script script, final String[] args) {

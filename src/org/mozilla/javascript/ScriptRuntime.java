@@ -761,8 +761,17 @@ public class ScriptRuntime {
             if (arg instanceof Object[]) {
                 totalArgs += ((Object[]) arg).length;
             } else if (arg instanceof NativeArray) {
-                args[i] = ((NativeArray) arg).toArray();
-                totalArgs += ((Object[]) args[i]).length;
+                NativeArray na = (NativeArray) arg;
+
+                int length = (int) na.getLength();
+                Object[] naArgs = new Object[length];
+
+                for (int j = 0; j < length; j++) {
+                    naArgs[j] = na.get(j, na);
+                }
+
+                args[i] = naArgs;
+                totalArgs += length;
             } else {
                 throw typeError1("msg.not.iterable", toString(arg));
             }

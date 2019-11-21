@@ -3170,7 +3170,7 @@ class BodyCodegen {
         if (!topLevel && (count > 10 || cfw.getCurrentCodeOffset() > 30000)
                 && !hasVarsInRegs && !isGenerator && !inLocalBlock) {
             if (literals == null) {
-                literals = new LinkedList<Node>();
+                literals = new LinkedList<>();
             }
             literals.add(node);
             String methodName = codegen.getBodyMethodName(scriptOrFn) + "_literal" + literals.size();
@@ -3205,13 +3205,21 @@ class BodyCodegen {
                 cfw.add(ByteCode.AASTORE);
             }
         } else {
-            addNewObjectArray(count);
-            for (int i = 0; i != count; ++i) {
-                cfw.add(ByteCode.DUP);
-                cfw.addPush(i);
-                generateExpression(child, node);
-                cfw.add(ByteCode.AASTORE);
-                child = child.getNext();
+            ArgGroups groups = populateArgGroups(child);
+
+            if (groups.isSpread.size() > 0) {
+                addNewObjectArray(groups.groupCount());
+                generateArgArray(node, groups);
+            } else {
+                addNewObjectArray(count);
+
+                for (int i = 0; i != count; ++i) {
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(i);
+                    generateExpression(child, node);
+                    cfw.add(ByteCode.AASTORE);
+                    child = child.getNext();
+                }
             }
         }
         int[] skipIndexes = (int[]) node.getProp(Node.SKIP_INDEXES_PROP);
@@ -3707,67 +3715,76 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         }
     }
 
-    private void generateCallArgArray(Node node, Node argChild, boolean directCall) {
-        ArgGroups boundaries = new ArgGroups();
+    private ArgGroups populateArgGroups(Node argChild) {
+        ArgGroups groups = new ArgGroups();
         boolean wasSpread = false;
 
         for (Node child = argChild; child != null; child = child.getNext()) {
             boolean isSpread = child.getProp(Node.SPREAD_PROP) != null;
 
             if ((isSpread || (!isSpread && wasSpread)) && (child != argChild)) {
-                boundaries.crossBoundary();
+                groups.crossBoundary();
             }
 
             wasSpread = isSpread;
-            boundaries.put(child, isSpread);
+            groups.put(child, isSpread);
         }
 
-        // load array object to set arguments
-        if (boundaries.totalArgs == 1 && itsOneArgArray >= 0) {
-            cfw.addALoad(itsOneArgArray);
-        } else if (boundaries.isSpread.size() > 0) {
-            addNewObjectArray(boundaries.groupCount());
-        } else {
-            addNewObjectArray(boundaries.totalArgs);
-        }
+        return groups;
+    }
 
-        if (boundaries.isSpread.size() > 0) {
-            for (int i = 0; i < boundaries.groupCount(); i++) {
-                List<Node> group = boundaries.groups.get(i);
-                boolean isSpread = boundaries.isSpread.contains(i);
+    private void generateArgArray(Node parent, ArgGroups groups) {
+        for (int i = 0; i < groups.groupCount(); i++) {
+            List<Node> group = groups.groups.get(i);
+            boolean isSpread = groups.isSpread.contains(i);
 
-                cfw.add(ByteCode.DUP);
-                cfw.addPush(i);
+            cfw.add(ByteCode.DUP);
+            cfw.addPush(i);
 
-                if (isSpread) {
-                    if (group.size() != 1) throw Kit.codeBug();
+            if (isSpread) {
+                if (group.size() != 1) throw Kit.codeBug();
 
-                    generateExpression(group.get(0), node);
-                } else {
-                    addNewObjectArray(group.size());
-                    for (int i1 = 0; i1 < group.size(); i1++) {
-                        cfw.add(ByteCode.DUP);
-                        cfw.addPush(i1);
+                generateExpression(group.get(0), parent);
+            } else {
+                addNewObjectArray(group.size());
+                for (int i1 = 0; i1 < group.size(); i1++) {
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(i1);
 
-                        Node groupChild = group.get(i1);
-                        generateExpression(groupChild, node);
-                        cfw.add(ByteCode.AASTORE);
-                    }
+                    Node groupChild = group.get(i1);
+                    generateExpression(groupChild, parent);
+                    cfw.add(ByteCode.AASTORE);
                 }
-
-                cfw.add(ByteCode.AASTORE);
             }
 
-            addScriptRuntimeInvoke(
-                    "combineSpreadArgs",
-                    "([Ljava/lang/Object;)[Ljava/lang/Object;"
-            );
+            cfw.add(ByteCode.AASTORE);
+        }
 
+        addScriptRuntimeInvoke(
+                "combineSpreadArgs",
+                "([Ljava/lang/Object;)[Ljava/lang/Object;"
+        );
+    }
+
+    private void generateCallArgArray(Node node, Node argChild, boolean directCall) {
+        ArgGroups groups = populateArgGroups(argChild);
+
+        // load array object to set arguments
+        if (groups.totalArgs == 1 && itsOneArgArray >= 0) {
+            cfw.addALoad(itsOneArgArray);
+        } else if (groups.isSpread.size() > 0) {
+            addNewObjectArray(groups.groupCount());
+        } else {
+            addNewObjectArray(groups.totalArgs);
+        }
+
+        if (groups.isSpread.size() > 0) {
+            generateArgArray(node, groups);
             return;
         }
 
         // Copy arguments into it
-        for (int i = 0; i != boundaries.totalArgs; ++i) {
+        for (int i = 0; i != groups.totalArgs; ++i) {
             // If we are compiling a generator an argument could be the result
             // of a yield. In that case we will have an immediate on the stack
             // which we need to avoid
