@@ -3457,7 +3457,15 @@ class BodyCodegen {
                 Node id = propTarget.getNext();
                 String property = id.getString();
                 cfw.addPush(property);
-                methodName = child.getProp(Node.CHAINING_PROP) != null ? "optionalCallProp0" : "callProp0";
+
+                if (node.getProp(Node.CHAINING_PROP) != null) {
+                    methodName = "optionalCallProp0";
+                } else if (child.getProp(Node.CHAINING_PROP) != null) {
+                    methodName = "optionalAccessCallProp0";
+                } else {
+                    methodName = "callProp0";
+                }
+
                 signature = "(Ljava/lang/Object;"
                         + "Ljava/lang/String;"
                         + "Lorg/mozilla/javascript/Context;"

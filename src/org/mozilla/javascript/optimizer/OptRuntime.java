@@ -60,8 +60,7 @@ public final class OptRuntime extends ScriptRuntime {
     /**
      * Implement name() call shrinking optimizer code.
      */
-    public static Object callName0(String name,
-                                   Context cx, Scriptable scope) {
+    public static Object callName0(String name, Context cx, Scriptable scope) {
         Callable f = getNameFunctionAndThis(name, cx, scope);
         Scriptable thisObj = lastStoredScriptable(cx);
         return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
@@ -70,19 +69,31 @@ public final class OptRuntime extends ScriptRuntime {
     /**
      * Implement x.property() call shrinking optimizer code.
      */
-    public static Object callProp0(Object value, String property,
-                                   Context cx, Scriptable scope) {
+    public static Object callProp0(Object value, String property, Context cx, Scriptable scope) {
         Callable f = getPropFunctionAndThis(value, property, cx, scope);
         Scriptable thisObj = lastStoredScriptable(cx);
         return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
     }
 
-    public static Object optionalCallProp0(Object value, String property,
-                                           Context cx, Scriptable scope) {
+    public static Object optionalAccessCallProp0(Object value, String property, Context cx, Scriptable scope) {
         if (ScriptRuntime.dontContinueChaining(value)) return Undefined.instance;
 
         Callable f = getPropFunctionAndThis(value, property, cx, scope);
         Scriptable thisObj = lastStoredScriptable(cx);
+        return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
+    }
+
+    public static Object optionalCallProp0(Object value, String property, Context cx, Scriptable scope) {
+        Scriptable thisObj = toObjectOrNull(cx, value, scope);
+        if (thisObj == null) {
+            throw undefCallError(thisObj, property);
+        }
+        if (dontContinueChaining(ScriptableObject.getProperty(thisObj, property))) {
+            return Undefined.instance;
+        }
+
+        Callable f = getPropFunctionAndThis(value, property, cx, scope);
+        thisObj = lastStoredScriptable(cx);
         return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
     }
 

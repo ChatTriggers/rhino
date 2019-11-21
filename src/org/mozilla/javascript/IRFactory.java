@@ -630,6 +630,11 @@ public final class IRFactory extends Parser {
 
     private Node transformFunctionCall(FunctionCall node) {
         Node call = createCallOrNew(Token.CALL, transform(node.getTarget()));
+
+        if (node.getProp(Node.CHAINING_PROP) != null) {
+            call.putProp(Node.CHAINING_PROP, true);
+        }
+
         call.setLineno(node.getLineno());
         decompiler.addToken(Token.LP);
         List<AstNode> args = node.getArguments();
