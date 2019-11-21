@@ -72,6 +72,10 @@ public class NativeObject extends IdScriptableObject implements Map {
                 "assign", 2);
         addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_is,
                 "is", 2);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_values,
+                "values", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_entries,
+                "entries", 1);
         super.fillConstructorProperties(ctor);
     }
 
@@ -561,6 +565,30 @@ public class NativeObject extends IdScriptableObject implements Map {
                 return ScriptRuntime.wrapBoolean(ScriptRuntime.same(a1, a2));
             }
 
+            case ConstructorId_values: {
+                Object arg = args.length < 1 ? Undefined.instance : args[0];
+                Scriptable obj = getCompatibleObject(cx, scope, arg);
+                Object[] ids = obj.getIds();
+
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = ScriptableObject.getProperty(obj, ids[i]);
+                }
+
+                return cx.newArray(scope, ids);
+            }
+
+            case ConstructorId_entries: {
+                Object arg = args.length < 1 ? Undefined.instance : args[0];
+                Scriptable obj = getCompatibleObject(cx, scope, arg);
+                Object[] ids = obj.getIds();
+
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = cx.newArray(scope, new Object[]{ ids[i], ScriptableObject.getProperty(obj, ids[i]) });
+                }
+
+                return cx.newArray(scope, ids);
+            }
+
 
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
@@ -875,6 +903,7 @@ public class NativeObject extends IdScriptableObject implements Map {
         return id;
     }
 
+
     private static final int
             ConstructorId_getPrototypeOf = -1,
             ConstructorId_keys = -2,
@@ -893,6 +922,8 @@ public class NativeObject extends IdScriptableObject implements Map {
             ConstructorId_assign = -15,
             ConstructorId_is = -16,
             ConstructorId_setPrototypeOf = -17,
+            ConstructorId_values = -18,
+            ConstructorId_entries = -19,
 
     Id_constructor = 1,
             Id_toString = 2,
