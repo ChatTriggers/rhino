@@ -462,6 +462,18 @@ public class Decompiler {
                     result.append("?.");
                     break;
 
+                case Token.SPREAD:
+                    result.append("...");
+                    break;
+
+                case Token.NULLISH_COALESCING:
+                    result.append(" ?? ");
+                    break;
+
+                case Token.PIPELINE:
+                    result.append(" |> ");
+                    break;
+
                 case Token.NEW:
                     result.append("new ");
                     break;
@@ -820,8 +832,8 @@ public class Decompiler {
     }
 
     public static int printSourceString(String source, int offset,
-                                         boolean asQuotedString,
-                                         StringBuilder sb) {
+                                        boolean asQuotedString,
+                                        StringBuilder sb) {
         int length = source.charAt(offset);
         ++offset;
         if ((0x8000 & length) != 0) {

@@ -303,7 +303,7 @@ final class EqualObjectGraphs {
         if (id instanceof Symbol) {
             return ScriptableObject.getProperty(s, (Symbol) id);
         } else if (id instanceof Integer) {
-            return ScriptableObject.getProperty(s, (Integer) id);
+            return ScriptableObject.getProperty(s, id);
         } else if (id instanceof String) {
             return ScriptableObject.getProperty(s, (String) id);
         } else {

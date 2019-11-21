@@ -8,8 +8,6 @@ package org.mozilla.javascript;
 
 import org.mozilla.javascript.optimizer.Codegen;
 
-import java.util.Map;
-
 /**
  * The base class for Function objects
  * See ECMA 15.3.

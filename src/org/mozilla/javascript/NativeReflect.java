@@ -1,8 +1,5 @@
 package org.mozilla.javascript;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class NativeReflect extends IdScriptableObject {
     private static final Object REFLECT_TAG = "Reflect";
 
@@ -194,7 +191,7 @@ public class NativeReflect extends IdScriptableObject {
         if (key instanceof String) {
             return ScriptableObject.getProperty(target, (String) key);
         } else if (key instanceof Integer) {
-            return ScriptableObject.getProperty(target, (Integer) key);
+            return ScriptableObject.getProperty(target, key);
         } else if (key instanceof Double) {
             return ScriptableObject.getProperty(target, ((Double) key).intValue());
         } else {
@@ -202,7 +199,7 @@ public class NativeReflect extends IdScriptableObject {
         }
     }
 
-    private Object js_getOwnPropertyDescriptor(Object args[], Context cx, Scriptable scope) {
+    private Object js_getOwnPropertyDescriptor(Object[] args, Context cx, Scriptable scope) {
         Object arg = args.length < 1 ? Undefined.instance : args[0];
         // TODO(norris): There's a deeper issue here if
         // arg instanceof Scriptable. Should we create a new
@@ -214,18 +211,18 @@ public class NativeReflect extends IdScriptableObject {
         return desc == null ? Undefined.instance : desc;
     }
 
-    private Object js_getPrototypeOf(Object args[], Context cx, Scriptable scope) {
+    private Object js_getPrototypeOf(Object[] args, Context cx, Scriptable scope) {
         if (args.length < 1) return null;
         return NativeObject.getCompatibleObject(cx, scope, args[0]).getPrototype();
     }
 
-    private boolean js_has(Object args[], Context cx) {
+    private boolean js_has(Object[] args, Context cx) {
         if (args.length < 2) Kit.codeBug(); // TODO: Error msg
 
         return ScriptRuntime.in(args[1], args[0], cx);
     }
 
-    private boolean js_isExtensible(Object args[], Context cx, Scriptable scope) {
+    private boolean js_isExtensible(Object[] args, Context cx, Scriptable scope) {
         if (args.length < 1 || !(args[0] instanceof ScriptableObject)) {
             throw ScriptRuntime.typeError1("msg.not.obj", args.length < 1 ? Undefined.instance : args[0]);
         }
@@ -234,7 +231,7 @@ public class NativeReflect extends IdScriptableObject {
         return obj.isExtensible();
     }
 
-    private Object js_ownKeys(Object args[], Context cx, Scriptable scope) {
+    private Object js_ownKeys(Object[] args, Context cx, Scriptable scope) {
         if (args.length < 1 || !(args[0] instanceof ScriptableObject)) {
             throw ScriptRuntime.typeError1("msg.not.obj", args.length < 1 ? Undefined.instance : args[0]);
         }
@@ -252,7 +249,7 @@ public class NativeReflect extends IdScriptableObject {
         return cx.newArray(scope, ownKeys);
     }
 
-    private Object js_preventExtensions(Object args[]) {
+    private Object js_preventExtensions(Object[] args) {
         if (args.length < 1 || !(args[0] instanceof ScriptableObject)) {
             throw ScriptRuntime.typeError1("msg.not.obj", args.length < 1 ? Undefined.instance : args[0]);
         }
@@ -332,30 +329,77 @@ public class NativeReflect extends IdScriptableObject {
     protected int findPrototypeId(String s) {
         int id;
 // #generated# Last update: 2019-11-19 22:24:21 CST
-        L0: { id = 0; String X = null; int c;
-            L: switch (s.length()) {
-            case 3: c=s.charAt(0);
-                if (c=='g') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_get; break L0;} }
-                else if (c=='h') { if (s.charAt(2)=='s' && s.charAt(1)=='a') {id=Id_has; break L0;} }
-                else if (c=='s') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_set; break L0;} }
-                break L;
-            case 5: X="apply";id=Id_apply; break L;
-            case 7: X="ownKeys";id=Id_ownKeys; break L;
-            case 9: X="construct";id=Id_construct; break L;
-            case 12: X="isExtensible";id=Id_isExtensible; break L;
-            case 14: c=s.charAt(0);
-                if (c=='d') {
-                    c=s.charAt(2);
-                    if (c=='f') { X="defineProperty";id=Id_defineProperty; }
-                    else if (c=='l') { X="deleteProperty";id=Id_deleteProperty; }
-                }
-                else if (c=='g') { X="getPrototypeOf";id=Id_getPrototypeOf; }
-                else if (c=='s') { X="setPrototypeOf";id=Id_setPrototypeOf; }
-                break L;
-            case 17: X="preventExtensions";id=Id_preventExtensions; break L;
-            case 24: X="getOwnPropertyDescriptor";id=Id_getOwnPropertyDescriptor; break L;
+        L0:
+        {
+            id = 0;
+            String X = null;
+            int c;
+            L:
+            switch (s.length()) {
+                case 3:
+                    c = s.charAt(0);
+                    if (c == 'g') {
+                        if (s.charAt(2) == 't' && s.charAt(1) == 'e') {
+                            id = Id_get;
+                            break L0;
+                        }
+                    } else if (c == 'h') {
+                        if (s.charAt(2) == 's' && s.charAt(1) == 'a') {
+                            id = Id_has;
+                            break L0;
+                        }
+                    } else if (c == 's') {
+                        if (s.charAt(2) == 't' && s.charAt(1) == 'e') {
+                            id = Id_set;
+                            break L0;
+                        }
+                    }
+                    break L;
+                case 5:
+                    X = "apply";
+                    id = Id_apply;
+                    break L;
+                case 7:
+                    X = "ownKeys";
+                    id = Id_ownKeys;
+                    break L;
+                case 9:
+                    X = "construct";
+                    id = Id_construct;
+                    break L;
+                case 12:
+                    X = "isExtensible";
+                    id = Id_isExtensible;
+                    break L;
+                case 14:
+                    c = s.charAt(0);
+                    if (c == 'd') {
+                        c = s.charAt(2);
+                        if (c == 'f') {
+                            X = "defineProperty";
+                            id = Id_defineProperty;
+                        } else if (c == 'l') {
+                            X = "deleteProperty";
+                            id = Id_deleteProperty;
+                        }
+                    } else if (c == 'g') {
+                        X = "getPrototypeOf";
+                        id = Id_getPrototypeOf;
+                    } else if (c == 's') {
+                        X = "setPrototypeOf";
+                        id = Id_setPrototypeOf;
+                    }
+                    break L;
+                case 17:
+                    X = "preventExtensions";
+                    id = Id_preventExtensions;
+                    break L;
+                case 24:
+                    X = "getOwnPropertyDescriptor";
+                    id = Id_getOwnPropertyDescriptor;
+                    break L;
             }
-            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            if (X != null && X != s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -363,20 +407,20 @@ public class NativeReflect extends IdScriptableObject {
     }
 
     private static final int
-        Id_apply = 1,
-        Id_construct = 2,
-        Id_defineProperty = 3,
-        Id_deleteProperty = 4,
-        Id_get = 5,
-        Id_getOwnPropertyDescriptor = 6,
-        Id_getPrototypeOf = 7,
-        Id_has = 8,
-        Id_isExtensible = 9,
-        Id_ownKeys = 10,
-        Id_preventExtensions = 11,
-        Id_set = 12,
-        Id_setPrototypeOf = 13,
-        LAST_METHOD_ID = Id_setPrototypeOf;
+            Id_apply = 1,
+            Id_construct = 2,
+            Id_defineProperty = 3,
+            Id_deleteProperty = 4,
+            Id_get = 5,
+            Id_getOwnPropertyDescriptor = 6,
+            Id_getPrototypeOf = 7,
+            Id_has = 8,
+            Id_isExtensible = 9,
+            Id_ownKeys = 10,
+            Id_preventExtensions = 11,
+            Id_set = 12,
+            Id_setPrototypeOf = 13,
+            LAST_METHOD_ID = Id_setPrototypeOf;
 
 // #/string_id_map#
 }

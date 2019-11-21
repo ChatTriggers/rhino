@@ -752,6 +752,34 @@ public class ScriptRuntime {
         return Undefined.instance;
     }
 
+    public static Object[] combineSpreadArgs(Object[] args) {
+        int totalArgs = 0;
+
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+
+            if (arg instanceof Object[]) {
+                totalArgs += ((Object[]) arg).length;
+            } else if (arg instanceof NativeArray) {
+                args[i] = ((NativeArray) arg).toArray();
+                totalArgs += ((Object[]) args[i]).length;
+            } else {
+                throw typeError1("msg.not.iterable", toString(arg));
+            }
+        }
+
+        Object[] targetArgs = new Object[totalArgs];
+
+        int abs = 0;
+        for (Object o : args) {
+            Object[] arg = (Object[]) o;
+            System.arraycopy(arg, 0, targetArgs, abs, arg.length);
+            abs += arg.length;
+        }
+
+        return targetArgs;
+    }
+
     /**
      * Helper function for builtin objects that use the varargs form.
      * ECMA function formal arguments are undefined if not supplied;

@@ -13,7 +13,6 @@ import org.mozilla.javascript.optimizer.Codegen;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -377,6 +376,10 @@ public final class IRFactory extends Parser {
             if (i < elems.size() - 1)
                 decompiler.addToken(Token.COMMA);
         }
+        if (node.getProp(Node.SPREAD_PROP) != null) {
+            decompiler.addToken(Token.SPREAD);
+            array.putProp(Node.SPREAD_PROP, true);
+        }
         decompiler.addToken(Token.RB);
         array.putIntProp(Node.DESTRUCTURING_ARRAY_LENGTH,
                 node.getDestructuringLength());
@@ -632,7 +635,11 @@ public final class IRFactory extends Parser {
         List<AstNode> args = node.getArguments();
         for (int i = 0; i < args.size(); i++) {
             AstNode arg = args.get(i);
-            call.addChildToBack(transform(arg));
+            Node child = transform(arg);
+            if (arg.getProp(Node.SPREAD_PROP) != null) {
+                child.putProp(Node.SPREAD_PROP, true);
+            }
+            call.addChildToBack(child);
             if (i < args.size() - 1) {
                 decompiler.addToken(Token.COMMA);
             }
@@ -2447,7 +2454,7 @@ public final class IRFactory extends Parser {
             case Token.THIS:
                 decompiler.addToken(node.getType());
                 break;
-             default:
+            default:
 //                 Kit.codeBug("unexpected token: "
 //                         + Token.typeToName(node.getType()));
         }

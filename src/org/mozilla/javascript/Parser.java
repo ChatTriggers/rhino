@@ -2596,20 +2596,21 @@ public class Parser {
         if (matchToken(Token.RP, true))
             return null;
 
-        List<AstNode> result = new ArrayList<AstNode>();
+        List<AstNode> result = new ArrayList<>();
         boolean wasInForInit = inForInit;
         inForInit = false;
         try {
             do {
-                if (peekToken() == Token.RP) {
+                int tt = peekToken();
+                if (tt == Token.RP) {
                     //Quick fix to handle scenario like f1(a,); but not f1(a,b
                     break;
                 }
-                if (peekToken() == Token.YIELD) {
+                if (tt == Token.YIELD) {
                     reportError("msg.yield.parenthesized");
                 }
                 AstNode en = assignExpr();
-                if (peekToken() == Token.FOR) {
+                if (tt == Token.FOR) {
                     try {
                         result.add(generatorExpression(en, 0, true));
                     } catch (IOException ex) {
@@ -2816,8 +2817,7 @@ public class Parser {
      * @param pn the left-hand side (target) of the operator.  Never null.
      * @return a PropertyGet, XmlMemberGet, or ErrorNode
      */
-    private AstNode propertyAccess(int tt, AstNode pn)
-            throws IOException {
+    private AstNode propertyAccess(int tt, AstNode pn) throws IOException {
         if (pn == null) codeBug();
         int memberTypeFlags = 0, lineno = ts.lineno, dotPos = ts.tokenBeg;
 
@@ -2915,8 +2915,7 @@ public class Parser {
      * {@code @*::[expr]}, {@code @[expr]} <p>
      * Called if we peeked an '@' token.
      */
-    private AstNode attributeAccess()
-            throws IOException {
+    private AstNode attributeAccess() throws IOException {
         int tt = nextToken(), atPos = ts.tokenBeg;
 
         switch (tt) {
@@ -2951,8 +2950,7 @@ public class Parser {
      * returns a Name node.  Returns an ErrorNode for malformed XML
      * expressions.  (For now - might change to return a partial XmlRef.)
      */
-    private AstNode propertyName(int atPos, String s, int memberTypeFlags)
-            throws IOException {
+    private AstNode propertyName(int atPos, String s, int memberTypeFlags) throws IOException {
         int pos = atPos != -1 ? atPos : ts.tokenBeg, lineno = ts.lineno;
         int colonPos = -1;
         Name name = createNameNode(true, currentToken);
@@ -3002,8 +3000,7 @@ public class Parser {
      *
      * @[expr], @*::[expr], or ns::[expr].
      */
-    private XmlElemRef xmlElemRef(int atPos, Name namespace, int colonPos)
-            throws IOException {
+    private XmlElemRef xmlElemRef(int atPos, Name namespace, int colonPos) throws IOException {
         int lb = ts.tokenBeg, rb = -1, pos = atPos != -1 ? atPos : lb;
         AstNode expr = expr();
         int end = getNodeEnd(expr);
@@ -3020,8 +3017,7 @@ public class Parser {
         return ref;
     }
 
-    private AstNode destructuringPrimaryExpr()
-            throws IOException, ParserException {
+    private AstNode destructuringPrimaryExpr() throws IOException, ParserException {
         try {
             inDestructuringAssignment = true;
             return primaryExpr();
@@ -3030,40 +3026,59 @@ public class Parser {
         }
     }
 
-    private AstNode primaryExpr()
-            throws IOException {
+    private AstNode primaryExpr() throws IOException {
         int ttFlagged = peekFlaggedToken();
         int tt = ttFlagged & CLEAR_TI_MASK;
+
+        boolean spread = false;
+        if (tt == Token.SPREAD) {
+            spread = true;
+            consumeToken();
+            tt = nextToken();
+
+            if (!(tt == Token.LB || tt == Token.STRING || tt == Token.NAME)) { // TODO: Token.LC
+                reportError("msg.not.iterable", ts.getString());
+            }
+        }
+
+        AstNode pn = null;
 
         switch (tt) {
             case Token.FUNCTION:
                 consumeToken();
-                return function(FunctionNode.FUNCTION_EXPRESSION);
+                pn = function(FunctionNode.FUNCTION_EXPRESSION);
+                break;
 
             case Token.LB:
                 consumeToken();
-                return arrayLiteral();
+                pn = arrayLiteral();
+                break;
 
             case Token.LC:
                 consumeToken();
-                return objectLiteral();
+                pn = objectLiteral();
+                break;
 
             case Token.LET:
                 consumeToken();
-                return let(false, ts.tokenBeg);
+                pn = let(false, ts.tokenBeg);
+                break;
 
             case Token.LP:
                 consumeToken();
-                return parenExpr();
+                pn = parenExpr();
+                break;
 
             case Token.XMLATTR:
                 consumeToken();
                 mustHaveXML();
-                return attributeAccess();
+                pn = attributeAccess();
+                break;
 
             case Token.NAME:
                 consumeToken();
-                return name(ttFlagged, tt);
+                pn = name(ttFlagged, tt);
+                break;
 
             case Token.NUMBER: {
                 consumeToken();
@@ -3083,14 +3098,16 @@ public class Parser {
                 if (ts.isNumberHex()) {
                     s = "0x" + s;
                 }
-                return new NumberLiteral(ts.tokenBeg,
+                pn = new NumberLiteral(ts.tokenBeg,
                         s,
                         ts.getNumber());
+                break;
             }
 
             case Token.STRING:
                 consumeToken();
-                return createStringLiteral();
+                pn = createStringLiteral();
+                break;
 
             case Token.DIV:
             case Token.ASSIGN_DIV:
@@ -3101,7 +3118,8 @@ public class Parser {
                 RegExpLiteral re = new RegExpLiteral(pos, end - pos);
                 re.setValue(ts.getString());
                 re.setFlags(ts.readAndClearRegExpFlags());
-                return re;
+                pn = re;
+                break;
 
             case Token.NULL:
             case Token.THIS:
@@ -3110,7 +3128,8 @@ public class Parser {
                 consumeToken();
                 pos = ts.tokenBeg;
                 end = ts.tokenEnd;
-                return new KeywordLiteral(pos, end - pos, tt);
+                pn = new KeywordLiteral(pos, end - pos, tt);
+                break;
 
             case Token.RESERVED:
                 consumeToken();
@@ -3132,9 +3151,18 @@ public class Parser {
                 reportError("msg.syntax");
                 break;
         }
-        // should only be reachable in IDE/error-recovery mode
-        consumeToken();
-        return makeErrorNode();
+
+        if (spread) {
+            if (pn == null) throw Kit.codeBug();
+
+            pn.putProp(Node.SPREAD_PROP, true);
+        }
+
+        return pn;
+
+        // // should only be reachable in IDE/error-recovery mode
+        // consumeToken();
+        // return makeErrorNode();
     }
 
     private AstNode parenExpr() throws IOException {
@@ -3991,7 +4019,7 @@ public class Parser {
                     destructuringNames.add(name);
                 }
             } else {
-                parent.addChildToBack(destructuringAssignmentHelper (
+                parent.addChildToBack(destructuringAssignmentHelper(
                         variableType, n, rightElem, currentScriptOrFn.getNextTempName())
                 );
             }
@@ -4057,7 +4085,7 @@ public class Parser {
                 }
             } else {
                 parent.addChildToBack(destructuringAssignmentHelper(
-                        variableType, value, rightElem,currentScriptOrFn.getNextTempName()
+                        variableType, value, rightElem, currentScriptOrFn.getNextTempName()
                 ));
             }
             empty = false;

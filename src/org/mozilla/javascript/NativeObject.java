@@ -583,7 +583,7 @@ public class NativeObject extends IdScriptableObject implements Map {
                 Object[] ids = obj.getIds();
 
                 for (int i = 0; i < ids.length; i++) {
-                    ids[i] = cx.newArray(scope, new Object[]{ ids[i], ScriptableObject.getProperty(obj, ids[i]) });
+                    ids[i] = cx.newArray(scope, new Object[]{ids[i], ScriptableObject.getProperty(obj, ids[i])});
                 }
 
                 return cx.newArray(scope, ids);

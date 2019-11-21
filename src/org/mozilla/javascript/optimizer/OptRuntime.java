@@ -6,7 +6,6 @@
 package org.mozilla.javascript.optimizer;
 
 import org.mozilla.javascript.*;
-import sun.font.ScriptRun;
 
 public final class OptRuntime extends ScriptRuntime {
 
@@ -79,7 +78,7 @@ public final class OptRuntime extends ScriptRuntime {
     }
 
     public static Object optionalCallProp0(Object value, String property,
-                                   Context cx, Scriptable scope) {
+                                           Context cx, Scriptable scope) {
         if (ScriptRuntime.dontContinueChaining(value)) return Undefined.instance;
 
         Callable f = getPropFunctionAndThis(value, property, cx, scope);

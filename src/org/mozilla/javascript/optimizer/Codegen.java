@@ -7,26 +7,17 @@
 
 package org.mozilla.javascript.optimizer;
 
-import static org.mozilla.classfile.ClassFileWriter.ACC_FINAL;
-import static org.mozilla.classfile.ClassFileWriter.ACC_PRIVATE;
-import static org.mozilla.classfile.ClassFileWriter.ACC_PUBLIC;
-import static org.mozilla.classfile.ClassFileWriter.ACC_STATIC;
-import static org.mozilla.classfile.ClassFileWriter.ACC_VOLATILE;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
 import org.mozilla.classfile.ByteCode;
 import org.mozilla.classfile.ClassFileWriter;
 import org.mozilla.javascript.*;
 import org.mozilla.javascript.ast.*;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.lang.reflect.Constructor;
+import java.util.*;
+
+import static org.mozilla.classfile.ClassFileWriter.*;
 
 /**
  * This class generates code for a given IR tree.
@@ -2271,8 +2262,7 @@ class BodyCodegen {
 
             case Token.CALL:
             case Token.NEW: {
-                int specialType = node.getIntProp(Node.SPECIALCALL_PROP,
-                        Node.NON_SPECIALCALL);
+                int specialType = node.getIntProp(Node.SPECIALCALL_PROP, Node.NON_SPECIALCALL);
                 if (specialType == Node.NON_SPECIALCALL) {
                     OptFunctionNode target;
                     target = (OptFunctionNode) node.getProp(
@@ -3502,6 +3492,10 @@ class BodyCodegen {
         } else {
             int argCount = 0;
             for (Node arg = firstArgChild; arg != null; arg = arg.getNext()) {
+                if (arg.getProp(Node.SPREAD_PROP) != null) {
+                    argCount = -1;
+                    break;
+                }
                 ++argCount;
             }
             generateFunctionAndThisObj(child, node);
@@ -3676,19 +3670,96 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         cfw.markLabel(beyond);
     }
 
+    class ArgGroups {
+        public List<List<Node>> groups = new ArrayList<>();
+        public Set<Integer> isSpread = new HashSet<>();
+        public int totalArgs;
+
+        private int cursor = 0;
+
+        {
+            groups.add(new ArrayList<>());
+        }
+
+        public void put(Node node, boolean isSpread) {
+            totalArgs++;
+            groups.get(cursor).add(node);
+            if (isSpread) {
+                this.isSpread.add(cursor);
+            }
+        }
+
+        public void crossBoundary() {
+            cursor++;
+            groups.add(new ArrayList<>());
+        }
+
+        public int groupCount() {
+            return groups.size();
+        }
+    }
+
     private void generateCallArgArray(Node node, Node argChild, boolean directCall) {
-        int argCount = 0;
+        ArgGroups boundaries = new ArgGroups();
+        boolean wasSpread = false;
+
         for (Node child = argChild; child != null; child = child.getNext()) {
-            ++argCount;
+            boolean isSpread = child.getProp(Node.SPREAD_PROP) != null;
+
+            if ((isSpread || (!isSpread && wasSpread)) && (child != argChild)) {
+                boundaries.crossBoundary();
+            }
+
+            wasSpread = isSpread;
+            boundaries.put(child, isSpread);
         }
+
         // load array object to set arguments
-        if (argCount == 1 && itsOneArgArray >= 0) {
+        if (boundaries.totalArgs == 1 && itsOneArgArray >= 0) {
             cfw.addALoad(itsOneArgArray);
+        } else if (boundaries.isSpread.size() > 0) {
+            addNewObjectArray(boundaries.groupCount());
         } else {
-            addNewObjectArray(argCount);
+            addNewObjectArray(boundaries.totalArgs);
         }
+
+        if (boundaries.isSpread.size() > 0) {
+            for (int i = 0; i < boundaries.groupCount(); i++) {
+                List<Node> group = boundaries.groups.get(i);
+                boolean isSpread = boundaries.isSpread.contains(i);
+
+                cfw.add(ByteCode.DUP);
+                cfw.addPush(i);
+
+                if (isSpread) {
+                    if (group.size() != 1) throw Kit.codeBug();
+
+                    generateExpression(group.get(0), node);
+                } else {
+                    addNewObjectArray(group.size());
+                    for (int i1 = 0; i1 < group.size(); i1++) {
+                        cfw.add(ByteCode.DUP);
+                        cfw.addPush(i1);
+
+                        Node groupChild = group.get(i1);
+                        generateExpression(groupChild, node);
+                        cfw.add(ByteCode.AASTORE);
+                    }
+                }
+
+                cfw.add(ByteCode.AASTORE);
+            }
+
+            addScriptRuntimeInvoke(
+                    "combineSpreadArgs",
+                    "([Ljava/lang/Object;)[Ljava/lang/Object;"
+            );
+
+            return;
+        }
+
         // Copy arguments into it
-        for (int i = 0; i != argCount; ++i) {
+        for (int i = 0; i != boundaries.totalArgs; ++i) {
             // If we are compiling a generator an argument could be the result
             // of a yield. In that case we will have an immediate on the stack
             // which we need to avoid
@@ -4648,7 +4719,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     }
 
     private void visitExponentiation(Node node, Node child,
-                                 Node parent) {
+                                     Node parent) {
         int childNumberFlag = node.getIntProp(Node.ISNUMBER_PROP, -1);
 
         if (childNumberFlag != -1) {
