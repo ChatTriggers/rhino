@@ -586,18 +586,24 @@ public class Node implements Iterable<Node> {
      * Can only be called when node has String context.
      */
     public Scope getScope() {
-        return this.getScope();
+        if (this instanceof Name) {
+            return ((Name) this).getScope();
+        }
+
+        throw Kit.codeBug();
     }
 
     /**
      * Can only be called when node has String context.
      */
     public void setScope(Scope s) {
-        if (s == null) Kit.codeBug();
-        if (!(this instanceof Name)) {
+        if (s == null) throw Kit.codeBug();
+
+        if (this instanceof Name) {
+            this.setScope(s);
+        } else {
             throw Kit.codeBug();
         }
-        this.setScope(s);
     }
 
     public static Node newTarget() {

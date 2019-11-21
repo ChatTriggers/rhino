@@ -84,7 +84,7 @@ public class Codegen implements Evaluator {
             new File("./out/tokens").mkdirs();
             File output = new File("./out/class/" + mainClassName + ".class");
             File outputDecomp = new File("./out/js/" + mainClassName + ".js");
-            File outputTokens = new File("./out/tokens/" + mainClassName + ".tokens");
+//            File outputTokens = new File("./out/tokens/" + mainClassName + ".tokens");
 
             try (FileOutputStream fos = new FileOutputStream(output)) {
                 fos.write(mainClassBytes);

@@ -278,7 +278,7 @@ public class NativeReflect extends IdScriptableObject {
             throw ScriptRuntime.typeError1("msg.not.obj", args.length < 1 ? Undefined.instance : args[0]);
         }
 
-        Scriptable target = args.length > 0 ? ensureScriptable(args[0]) : null;
+        Scriptable target = ensureScriptable(args[0]);
         Object key = args.length > 1 ? args[1] : Undefined.instance;
         Object value = args.length > 2 ? args[2] : Undefined.instance;
 
