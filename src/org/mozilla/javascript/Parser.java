@@ -3173,6 +3173,9 @@ public class Parser {
                 return generatorExpression(e, begin);
             }
             mustMatchToken(Token.RP, "msg.no.paren", true);
+            if (peekToken() == Token.ASSIGN) {
+                reportError("msg.bad.assign.left");
+            }
             if (e.getType() == Token.EMPTY && peekToken() != Token.ARROW) {
                 reportError("msg.syntax");
                 return makeErrorNode();
