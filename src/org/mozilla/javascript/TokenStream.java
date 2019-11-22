@@ -890,13 +890,12 @@ class TokenStream {
                 stringBufferTop = 0;
 
                 while (character != '`') {
+                    if (character == -1) {
+                        throw new EvaluatorException("Unfinished template literal");
+                    }
+
                     if (character == '$' && !wasJustEscape) {
                         int aChar = getChar(false);
-
-                        if (aChar == -1) {
-                            // EOF
-                            throw new EvaluatorException("Unfinished template literal");
-                        }
 
                         if (aChar == '{') {
                             justBeganTemplateExpr = true;

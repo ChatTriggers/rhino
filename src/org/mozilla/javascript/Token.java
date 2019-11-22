@@ -6,7 +6,6 @@
 
 package org.mozilla.javascript;
 
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 import org.mozilla.javascript.optimizer.Codegen;
 
 /**
