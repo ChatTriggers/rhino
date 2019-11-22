@@ -343,7 +343,7 @@ final class Arguments extends IdScriptableObject {
     }
 
     @Override
-    protected ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {
+    public ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {
         if (id instanceof Scriptable) {
             return super.getOwnPropertyDescriptor(cx, id);
         }

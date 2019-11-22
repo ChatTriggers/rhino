@@ -2953,7 +2953,7 @@ public abstract class ScriptableObject implements Scriptable,
         }
     }
 
-    protected ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {
+    public ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {
         Slot slot = getSlot(cx, id, SlotAccess.QUERY);
         if (slot == null) return null;
         Scriptable scope = getParentScope();

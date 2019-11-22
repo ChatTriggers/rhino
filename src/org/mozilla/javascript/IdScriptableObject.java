@@ -927,7 +927,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
 
 
     @Override
-    protected ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {
+    public ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {
         ScriptableObject desc = super.getOwnPropertyDescriptor(cx, id);
         if (desc == null) {
             if (id instanceof String) {

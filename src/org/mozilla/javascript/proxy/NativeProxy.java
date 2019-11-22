@@ -68,7 +68,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("get")) {
-            return super.get(name, start);
+            return target.get(name, target);
         }
 
         Object get = handler.get("get");
@@ -103,7 +103,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("get")) {
-            return super.get(key, start);
+            return target.get(key, target);
         }
 
         Object get = handler.get("get");
@@ -138,35 +138,35 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("set")) {
-            super.put(name, start, value);
-        } else {
-            if (hasProperty(target, name)) {
-                int attributes = target.getAttributes(name);
-
-                Object getter = target.getGetterOrSetter(name, 0, false);
-
-                if ((attributes & PERMANENT) != 0 && (getter != null || getter != Undefined.instance) && ScriptableObject.hasProperty(target, "set")) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.set.accessor", name);
-                } else if ((attributes & PERMANENT) != 0 && (attributes & READONLY) != 0) {
-                    Object oldVal = target.get(name);
-
-                    if (oldVal != value) {
-                        throw ScriptRuntime.typeError1("msg.proxy.invariant.set.property", name);
-                    }
-                }
-            }
-
-            Object setter = handler.get("set");
-
-            if (setter == null) {
-                return;
-            } else if (!(setter instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "set");
-            }
-
-            ((Function) setter).call(Context.getContext(), this, start, new Object[]{target, name, value, start});
+            target.put(name, target, value);
+            return;
         }
 
+        if (hasProperty(target, name)) {
+            int attributes = target.getAttributes(name);
+
+            Object getter = target.getGetterOrSetter(name, 0, false);
+
+            if ((attributes & PERMANENT) != 0 && (getter != null || getter != Undefined.instance) && ScriptableObject.hasProperty(target, "set")) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.set.accessor", name);
+            } else if ((attributes & PERMANENT) != 0 && (attributes & READONLY) != 0) {
+                Object oldVal = target.get(name);
+
+                if (oldVal != value) {
+                    throw ScriptRuntime.typeError1("msg.proxy.invariant.set.property", name);
+                }
+            }
+        }
+
+        Object setter = handler.get("set");
+
+        if (setter == null) {
+            return;
+        } else if (!(setter instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "set");
+        }
+
+        ((Function) setter).call(Context.getContext(), this, start, new Object[]{target, name, value, start});
     }
 
     @Override
@@ -174,35 +174,34 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("set")) {
-            super.put(key, start, value);
-        } else {
-            if (hasProperty(target, key)) {
-                int attributes = target.getAttributes(key);
-
-                Object getter = target.getGetterOrSetter(key, 0, false);
-
-                if ((attributes & PERMANENT) != 0 && (getter != null || getter != Undefined.instance) && ScriptableObject.hasProperty(target, "set")) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.set.accessor", key);
-                } else if ((attributes & PERMANENT) != 0 && (attributes & READONLY) != 0) {
-                    Object oldVal = target.get(key);
-
-                    if (oldVal != value) {
-                        throw ScriptRuntime.typeError1("msg.proxy.invariant.set.property", key);
-                    }
-                }
-            }
-
-            Object setter = handler.get("set");
-
-            if (setter == null) {
-                return;
-            } else if (!(setter instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "put");
-            }
-
-            ((Function) setter).call(Context.getContext(), this, start, new Object[]{target, key, value, start});
+            target.put(key, target, value);
         }
 
+        if (hasProperty(target, key)) {
+            int attributes = target.getAttributes(key);
+
+            Object getter = target.getGetterOrSetter(key, 0, false);
+
+            if ((attributes & PERMANENT) != 0 && (getter != null || getter != Undefined.instance) && ScriptableObject.hasProperty(target, "set")) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.set.accessor", key);
+            } else if ((attributes & PERMANENT) != 0 && (attributes & READONLY) != 0) {
+                Object oldVal = target.get(key);
+
+                if (oldVal != value) {
+                    throw ScriptRuntime.typeError1("msg.proxy.invariant.set.property", key);
+                }
+            }
+        }
+
+        Object setter = handler.get("set");
+
+        if (setter == null) {
+            return;
+        } else if (!(setter instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "put");
+        }
+
+        ((Function) setter).call(Context.getContext(), this, start, new Object[]{target, key, value, start});
     }
 
     @Override
@@ -210,7 +209,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("has")) {
-            return super.has(name, start);
+            return target.has(name, target);
         }
 
         Object handlerHas = handler.get("has");
@@ -249,7 +248,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("has")) {
-            return super.has(key, start);
+            return target.has(key, target);
         } else {
             Object handlerHas = handler.get("has");
 
@@ -288,30 +287,31 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("deleteProperty")) {
-            super.delete(name);
-        } else {
-            Object deleteProperty = handler.get("deleteProperty");
+            target.delete(name);
+            return;
+        }
 
-            if (deleteProperty == null) {
-                return;
-            } else if (!(deleteProperty instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "deleteProperty");
-            }
+        Object deleteProperty = handler.get("deleteProperty");
 
-            Object _result = ((Function) deleteProperty).call(Context.getContext(), this, this, new Object[]{ target, name });
+        if (deleteProperty == null) {
+            return;
+        } else if (!(deleteProperty instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "deleteProperty");
+        }
 
-            if (!(_result instanceof Boolean) && _result != Undefined.instance) {
-                // TODO: error
-                throw Kit.codeBug();
-            }
-            boolean result = _result != Undefined.instance && (boolean) _result;
+        Object _result = ((Function) deleteProperty).call(Context.getContext(), this, this, new Object[]{ target, name });
 
-            if (result && hasProperty(target, name)) {
-                int attributes = target.getAttributes(name);
+        if (!(_result instanceof Boolean) && _result != Undefined.instance) {
+            // TODO: error
+            throw Kit.codeBug();
+        }
+        boolean result = _result != Undefined.instance && (boolean) _result;
 
-                if ((attributes & PERMANENT) != 0) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.delete", name);
-                }
+        if (result && hasProperty(target, name)) {
+            int attributes = target.getAttributes(name);
+
+            if ((attributes & PERMANENT) != 0) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.delete", name);
             }
         }
     }
@@ -321,112 +321,114 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("deleteProperty")) {
-            super.delete(key);
-        } else {
-            Object deleteProperty = handler.get("deleteProperty");
+            target.delete(key);
+            return;
+        }
 
-            if (deleteProperty == null) {
-                return;
-            } else if (!(deleteProperty instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "deleteProperty");
-            }
 
-            Object _result = ((Function) deleteProperty).call(Context.getContext(), this, this, new Object[]{ target, key });
+        Object deleteProperty = handler.get("deleteProperty");
 
-            if (!(_result instanceof Boolean) && _result != Undefined.instance) {
-                // TODO: error
-                throw Kit.codeBug();
-            }
-            boolean result = _result != Undefined.instance && (boolean) _result;
+        if (deleteProperty == null) {
+            return;
+        } else if (!(deleteProperty instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "deleteProperty");
+        }
 
-            if (result && hasProperty(target, key)) {
-                int attributes = target.getAttributes(key);
+        Object _result = ((Function) deleteProperty).call(Context.getContext(), this, this, new Object[]{ target, key });
 
-                if ((attributes & PERMANENT) != 0) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.delete", key);
-                }
+        if (!(_result instanceof Boolean) && _result != Undefined.instance) {
+            // TODO: error
+            throw Kit.codeBug();
+        }
+        boolean result = _result != Undefined.instance && (boolean) _result;
+
+        if (result && hasProperty(target, key)) {
+            int attributes = target.getAttributes(key);
+
+            if ((attributes & PERMANENT) != 0) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.delete", key);
             }
         }
     }
 
     @Override
-    protected ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {
+    public ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {
         ensureNotRevoked();
 
         if (!handlerIds.contains("getOwnPropertyDescriptor")) {
-            return super.getOwnPropertyDescriptor(cx, id);
-        } else {
-            Object getOwnPropertyDescriptor = handler.get("getOwnPropertyDescriptor");
-
-            if (getOwnPropertyDescriptor == null) {
-                return null;
-            } else if (!(getOwnPropertyDescriptor instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "getOwnPropertyDescriptor");
-            }
-
-            Object _result = ((Function) getOwnPropertyDescriptor).call(cx, this, this, new Object[]{ target, id });
-
-            // Invariant 1
-            if (_result != Undefined.instance && !(_result instanceof ScriptableObject)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv1", ScriptRuntime.toString(id));
-            }
-
-            int targetDesc;
-            boolean exists;
-
-            if (id instanceof String) {
-                exists = hasProperty(target, (String) id);
-                targetDesc = exists ? target.getAttributes((String) id) : -1;
-            } else if (ScriptRuntime.isSymbol(id)) {
-                exists = hasProperty(target, (Symbol) id);
-                targetDesc = exists ? target.getAttributes((Symbol) id) : -1;
-            } else {
-                throw Kit.codeBug();
-            }
-
-            // invariant 2
-            if (_result == Undefined.instance && exists && (targetDesc & PERMANENT) != 0) {
-                throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv2", ScriptRuntime.toString(id));
-            }
-
-            // invariant 3
-            if (_result == Undefined.instance && exists && !target.isExtensible()) {
-                throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv3", ScriptRuntime.toString(id));
-            }
-
-            if (_result == Undefined.instance) {
-                return null;
-            }
-
-            // Invariant 4
-            if (!exists && !target.isExtensible()) {
-                throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv4", ScriptRuntime.toString(id));
-            }
-
-            ScriptableObject handlerDesc = (ScriptableObject) _result;
-            boolean configurable = isConfigurable(handlerDesc);
-
-            // Invariant 5
-            if (!configurable) {
-                if (!exists) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv5.non.existant", ScriptRuntime.toString(id));
-                } else if ((targetDesc & PERMANENT) == 0) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv5.existant", ScriptRuntime.toString(id));
-                }
-            }
-
-            if (!hasProperty(handlerDesc, "configurable")) {
-                putProperty(handlerDesc, "configurable", false);
-            }
-            if (!hasProperty(handlerDesc, "writable")) {
-                putProperty(handlerDesc, "writable", false);
-            }
-            if (!hasProperty(handlerDesc, "enumerable")) {
-                putProperty(handlerDesc, "enumerable", false);
-            }
-
-            return handlerDesc;
+            return target.getOwnPropertyDescriptor(cx, id);
         }
+
+        Object getOwnPropertyDescriptor = handler.get("getOwnPropertyDescriptor");
+
+        if (getOwnPropertyDescriptor == null) {
+            return null;
+        } else if (!(getOwnPropertyDescriptor instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "getOwnPropertyDescriptor");
+        }
+
+        Object _result = ((Function) getOwnPropertyDescriptor).call(cx, this, this, new Object[]{ target, id });
+
+        // Invariant 1
+        if (_result != Undefined.instance && !(_result instanceof ScriptableObject)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv1", ScriptRuntime.toString(id));
+        }
+
+        int targetDesc;
+        boolean exists;
+
+        if (id instanceof String) {
+            exists = hasProperty(target, (String) id);
+            targetDesc = exists ? target.getAttributes((String) id) : -1;
+        } else if (ScriptRuntime.isSymbol(id)) {
+            exists = hasProperty(target, (Symbol) id);
+            targetDesc = exists ? target.getAttributes((Symbol) id) : -1;
+        } else {
+            throw Kit.codeBug();
+        }
+
+        // invariant 2
+        if (_result == Undefined.instance && exists && (targetDesc & PERMANENT) != 0) {
+            throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv2", ScriptRuntime.toString(id));
+        }
+
+        // invariant 3
+        if (_result == Undefined.instance && exists && !target.isExtensible()) {
+            throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv3", ScriptRuntime.toString(id));
+        }
+
+        if (_result == Undefined.instance) {
+            return null;
+        }
+
+        // Invariant 4
+        if (!exists && !target.isExtensible()) {
+            throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv4", ScriptRuntime.toString(id));
+        }
+
+        ScriptableObject handlerDesc = (ScriptableObject) _result;
+        boolean configurable = isConfigurable(handlerDesc);
+
+        // Invariant 5
+        if (!configurable) {
+            if (!exists) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv5.non.existant", ScriptRuntime.toString(id));
+            } else if ((targetDesc & PERMANENT) == 0) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.getdescriptor.inv5.existant", ScriptRuntime.toString(id));
+            }
+        }
+
+        if (!hasProperty(handlerDesc, "configurable")) {
+            putProperty(handlerDesc, "configurable", false);
+        }
+        if (!hasProperty(handlerDesc, "writable")) {
+            putProperty(handlerDesc, "writable", false);
+        }
+        if (!hasProperty(handlerDesc, "enumerable")) {
+            putProperty(handlerDesc, "enumerable", false);
+        }
+
+        return handlerDesc;
     }
 
     @Override
@@ -434,36 +436,37 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("defineProperty")) {
-            super.defineOwnProperty(cx, id, desc);
-        } else {
-            Object defineProperty = handler.get("defineProperty");
+            target.defineOwnProperty(cx, id, desc);
+            return;
+        }
 
-            if (defineProperty == null) {
-                return;
-            } else if (!(defineProperty instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "defineOwnProperty");
-            }
+        Object defineProperty = handler.get("defineProperty");
 
-            Object result = ((Function) defineProperty).call(cx, this, this, new Object[]{ target, id, desc });
+        if (defineProperty == null) {
+            return;
+        } else if (!(defineProperty instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "defineOwnProperty");
+        }
 
-            if (result instanceof Boolean && !((boolean) result)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invariant.defineprop.returned.false", ScriptRuntime.toString(id));
-            }
+        Object result = ((Function) defineProperty).call(cx, this, this, new Object[]{ target, id, desc });
 
-            // Invariant 1
-            if (!target.isExtensible()) {
-                throw ScriptRuntime.typeError1("msg.proxy.invariant.defineprop.not.extensible", ScriptRuntime.toString(id));
-            }
+        if (result instanceof Boolean && !((boolean) result)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invariant.defineprop.returned.false", ScriptRuntime.toString(id));
+        }
 
-            // Invariant 2
-            boolean isConfigurable = isConfigurable(desc);
+        // Invariant 1
+        if (!target.isExtensible()) {
+            throw ScriptRuntime.typeError1("msg.proxy.invariant.defineprop.not.extensible", ScriptRuntime.toString(id));
+        }
 
-            if (!isConfigurable) {
-                int attributes = getAttributes(target, id);
+        // Invariant 2
+        boolean isConfigurable = isConfigurable(desc);
 
-                if (attributes != -1 && (attributes & PERMANENT) == 0) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.defineprop.non.configurable", ScriptRuntime.toString(id));
-                }
+        if (!isConfigurable) {
+            int attributes = getAttributes(target, id);
+
+            if (attributes != -1 && (attributes & PERMANENT) == 0) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.defineprop.non.configurable", ScriptRuntime.toString(id));
             }
         }
     }
@@ -473,26 +476,26 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("getPrototypeOf")) {
-            return super.getPrototype();
-        } else {
-            Object getPrototypeOf = handler.get("getPrototypeOf");
-
-            if (getPrototypeOf == null) {
-                return null;
-            } else if (!(getPrototypeOf instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "getPrototypeOf");
-            }
-
-            Object result = ((Function) getPrototypeOf).call(Context.getContext(), this, this, new Object[]{ target });
-
-            if (result != null && !(result instanceof ScriptableObject)) {
-                throw ScriptRuntime.typeError0("msg.proxy.invariant.getproto.invalid.return");
-            } else if (!target.isExtensible() && result != target.getPrototype()) {
-                throw ScriptRuntime.typeError0("msg.proxy.invariant.getproto.non.extensible");
-            }
-
-            return (ScriptableObject) result;
+            return target.getPrototype();
         }
+
+        Object getPrototypeOf = handler.get("getPrototypeOf");
+
+        if (getPrototypeOf == null) {
+            return null;
+        } else if (!(getPrototypeOf instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "getPrototypeOf");
+        }
+
+        Object result = ((Function) getPrototypeOf).call(Context.getContext(), this, this, new Object[]{ target });
+
+        if (result != null && !(result instanceof ScriptableObject)) {
+            throw ScriptRuntime.typeError0("msg.proxy.invariant.getproto.invalid.return");
+        } else if (!target.isExtensible() && result != target.getPrototype()) {
+            throw ScriptRuntime.typeError0("msg.proxy.invariant.getproto.non.extensible");
+        }
+
+        return (ScriptableObject) result;
     }
 
     @Override
@@ -500,21 +503,22 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("setPrototypeOf")) {
-            super.setPrototype(m);
-        } else {
-            Object setPrototypeOf = handler.get("setPrototypeOf");
+            target.setPrototype(m);
+            return;
+        }
 
-            if (setPrototypeOf == null) {
-                return;
-            } else if (!(setPrototypeOf instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "setPrototypeOf");
-            }
+        Object setPrototypeOf = handler.get("setPrototypeOf");
 
-            Object result = ((Function) setPrototypeOf).call(Context.getContext(), this, this, new Object[]{ target, m });
+        if (setPrototypeOf == null) {
+            return;
+        } else if (!(setPrototypeOf instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "setPrototypeOf");
+        }
 
-            if (result instanceof Boolean && (boolean) result && !target.isExtensible() && m != target.getPrototype()) {
-                throw ScriptRuntime.typeError0("msg.proxy.invariant.setproto.invalid.parameter");
-            }
+        Object result = ((Function) setPrototypeOf).call(Context.getContext(), this, this, new Object[]{ target, m });
+
+        if (result instanceof Boolean && (boolean) result && !target.isExtensible() && m != target.getPrototype()) {
+            throw ScriptRuntime.typeError0("msg.proxy.invariant.setproto.invalid.parameter");
         }
     }
 
@@ -523,24 +527,24 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("isExtensible")) {
-            return super.isExtensible();
-        } else {
-            Object isExtensible = handler.get("isExtensible");
-
-            if (isExtensible == null) {
-                return false;
-            } else if (!(isExtensible instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "isExtensible");
-            }
-
-            Object result = ((Function) isExtensible).call(Context.getContext(), this, this, new Object[]{ target });
-
-            if (!(result instanceof Boolean) || ((boolean) result) != target.isExtensible()) {
-                throw ScriptRuntime.typeError0("msg.proxy.invariant.isextensible");
-            }
-
-            return (boolean) result;
+            return target.isExtensible();
         }
+
+        Object isExtensible = handler.get("isExtensible");
+
+        if (isExtensible == null) {
+            return false;
+        } else if (!(isExtensible instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "isExtensible");
+        }
+
+        Object result = ((Function) isExtensible).call(Context.getContext(), this, this, new Object[]{ target });
+
+        if (!(result instanceof Boolean) || ((boolean) result) != target.isExtensible()) {
+            throw ScriptRuntime.typeError0("msg.proxy.invariant.isextensible");
+        }
+
+        return (boolean) result;
     }
 
     @Override
@@ -548,21 +552,21 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("preventExtensions")) {
-            super.preventExtensions();
-        } else {
-            Object preventExtensions = handler.get("preventExtensions");
+            target.preventExtensions();
+        }
 
-            if (preventExtensions == null) {
-                return;
-            } else if (!(preventExtensions instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "preventExtensions");
-            }
+        Object preventExtensions = handler.get("preventExtensions");
 
-            Object result = ((Function) preventExtensions).call(Context.getContext(), this, this, new Object[]{ target });
+        if (preventExtensions == null) {
+            return;
+        } else if (!(preventExtensions instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "preventExtensions");
+        }
 
-            if (result instanceof Boolean && (boolean) result && this.isExtensible()) {
-                throw ScriptRuntime.typeError0("msg.proxy.invariant.prevent.extensible");
-            }
+        Object result = ((Function) preventExtensions).call(Context.getContext(), this, this, new Object[]{ target });
+
+        if (result instanceof Boolean && (boolean) result && this.isExtensible()) {
+            throw ScriptRuntime.typeError0("msg.proxy.invariant.prevent.extensible");
         }
     }
 
@@ -571,46 +575,46 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("ownKeys")) {
-            return super.getIds();
-        } else {
-            Object ownKeys = handler.get("ownKeys");
+            return target.getIds();
+        }
 
-            if (!(ownKeys instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "setPrototypeOf");
-            }
+        Object ownKeys = handler.get("ownKeys");
 
-            Object result = ((Function) ownKeys).call(Context.getContext(), this, this, new Object[]{ target });
+        if (!(ownKeys instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "setPrototypeOf");
+        }
 
-            if (!(result instanceof NativeArray)) {
+        Object result = ((Function) ownKeys).call(Context.getContext(), this, this, new Object[]{ target });
+
+        if (!(result instanceof NativeArray)) {
+            throw ScriptRuntime.typeError0("msg.proxy.invariant.ownkeys.invalid.array");
+        }
+
+        Object[] resultIds = ((NativeArray) result).toArray();
+        boolean extensible = target.isExtensible();
+        List<Object> targetIds = Arrays.asList(target.getIds());
+
+        for (Object resultId : resultIds) {
+            if (!(resultId instanceof String) && !ScriptRuntime.isSymbol(resultId)) {
                 throw ScriptRuntime.typeError0("msg.proxy.invariant.ownkeys.invalid.array");
             }
 
-            Object[] resultIds = ((NativeArray) result).toArray();
-            boolean extensible = target.isExtensible();
-            List<Object> targetIds = Arrays.asList(target.getIds());
-
-            for (Object resultId : resultIds) {
-                if (!(resultId instanceof String) && !ScriptRuntime.isSymbol(resultId)) {
-                    throw ScriptRuntime.typeError0("msg.proxy.invariant.ownkeys.invalid.array");
-                }
-
-                if (!extensible && !targetIds.contains(resultId)) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.ownkeys.invalid.element", ScriptRuntime.toString(resultId));
-                }
-
-                targetIds.remove(resultId);
+            if (!extensible && !targetIds.contains(resultId)) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.ownkeys.invalid.element", ScriptRuntime.toString(resultId));
             }
 
-            for (Object targetId : targetIds) {
-                int attributes = getAttributes(target, targetId);
-
-                if (attributes != -1 && (attributes & PERMANENT) != 0) {
-                    throw ScriptRuntime.typeError1("msg.proxy.invariant.ownkeys.skip.prop", ScriptRuntime.toString(targetId));
-                }
-            }
-
-            return resultIds;
+            targetIds.remove(resultId);
         }
+
+        for (Object targetId : targetIds) {
+            int attributes = getAttributes(target, targetId);
+
+            if (attributes != -1 && (attributes & PERMANENT) != 0) {
+                throw ScriptRuntime.typeError1("msg.proxy.invariant.ownkeys.skip.prop", ScriptRuntime.toString(targetId));
+            }
+        }
+
+        return resultIds;
     }
 
     @Override
@@ -618,20 +622,22 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("apply")) {
+            if (target instanceof Callable)
+                return ((Callable) target).call(cx, scope, target, args);
             throw ScriptRuntime.typeError0("msg.proxy.not.callable");
-        } else {
-            if (!(target instanceof Callable)) {
-                throw ScriptRuntime.typeError0("msg.proxy.target.not.callable");
-            }
-
-            Object apply = handler.get("apply");
-
-            if (!(apply instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "call");
-            }
-
-            return ((Function) apply).call(cx, scope, thisObj, new Object[]{ target, thisObj, cx.newArray(scope, args) });
         }
+
+        if (!(target instanceof Callable)) {
+            throw ScriptRuntime.typeError0("msg.proxy.target.not.callable");
+        }
+
+        Object apply = handler.get("apply");
+
+        if (!(apply instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "call");
+        }
+
+        return ((Function) apply).call(cx, scope, thisObj, new Object[]{ target, thisObj, cx.newArray(scope, args) });
     }
 
     @Override
@@ -639,28 +645,30 @@ public class NativeProxy extends IdScriptableObject implements Function {
         ensureNotRevoked();
 
         if (!handlerIds.contains("construct")) {
+            if (target instanceof BaseFunction)
+                return ((BaseFunction) target).construct(cx, scope, args);
             throw ScriptRuntime.typeError0("msg.proxy.not.constructable");
-        } else {
-            if (!(target instanceof Function)) {
-                throw ScriptRuntime.typeError0("msg.proxy.target.not.constructable");
-            }
-
-            Object construct = handler.get("construct");
-
-            if (construct == null) {
-                return null;
-            } else if (!(construct instanceof Function)) {
-                throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "preventExtensions");
-            }
-
-            Object result = ((Function) construct).call(cx, scope, this, new Object[]{ target, cx.newArray(scope, args), this });
-
-            if (!(result instanceof ScriptableObject)) {
-                throw ScriptRuntime.typeError0("msg.proxy.result.not.constructable");
-            }
-
-            return (ScriptableObject) result;
         }
+
+        if (!(target instanceof Function)) {
+            throw ScriptRuntime.typeError0("msg.proxy.target.not.constructable");
+        }
+
+        Object construct = handler.get("construct");
+
+        if (construct == null) {
+            return null;
+        } else if (!(construct instanceof Function)) {
+            throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "preventExtensions");
+        }
+
+        Object result = ((Function) construct).call(cx, scope, this, new Object[]{ target, cx.newArray(scope, args), this });
+
+        if (!(result instanceof ScriptableObject)) {
+            throw ScriptRuntime.typeError0("msg.proxy.result.not.constructable");
+        }
+
+        return (ScriptableObject) result;
     }
 
     public int getArity() {
@@ -670,9 +678,11 @@ public class NativeProxy extends IdScriptableObject implements Function {
             return ((BaseFunction) handler.get("construct")).getArity();
         } else if (handlerIds.contains("apply")) {
             return ((BaseFunction) handler.get("apply")).getArity();
+        } else if (target instanceof BaseFunction) {
+            return ((BaseFunction) target).getArity();
         }
 
-        throw ScriptRuntime.typeError0("msg.proxy.not.constructable");
+        throw ScriptRuntime.typeError0("msg.proxy.not.callable");
     }
 
     private static int getAttributes(ScriptableObject obj, Object id) {

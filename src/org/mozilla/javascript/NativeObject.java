@@ -6,6 +6,8 @@
 
 package org.mozilla.javascript;
 
+import org.mozilla.javascript.proxy.NativeProxy;
+
 import java.util.*;
 
 /**
@@ -337,7 +339,7 @@ public class NativeObject extends IdScriptableObject implements Map {
                     return args[0];
                 }
                 ScriptableObject obj = (ScriptableObject) args[0];
-                if (!obj.isExtensible()) {
+                if (!obj.isExtensible() && !(obj instanceof NativeProxy)) {
                     throw ScriptRuntime.typeError0("msg.not.extensible");
                 }
 
