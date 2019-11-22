@@ -301,9 +301,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": false
   },
   "ES2015": {
-    "_successful": 334,
+    "_successful": 335,
     "_count": 689,
-    "_percent": 0.4847605224963715,
+    "_percent": 0.4862119013062409,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -684,7 +684,7 @@
     "built-ins›Proxy›\"construct\" handler invariants": true,
     "built-ins›Proxy›Proxy.revocable": true,
     "built-ins›Proxy›Array.isArray support": true,
-    "built-ins›Proxy›JSON.stringify support": false,
+    "built-ins›Proxy›JSON.stringify support": true,
     "built-ins›Reflect›Reflect.get": true,
     "built-ins›Reflect›Reflect.set": true,
     "built-ins›Reflect›Reflect.has": true,

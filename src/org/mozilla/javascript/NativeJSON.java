@@ -7,6 +7,7 @@
 package org.mozilla.javascript;
 
 import org.mozilla.javascript.json.JsonParser;
+import org.mozilla.javascript.proxy.NativeProxy;
 
 import java.util.*;
 
@@ -226,6 +227,10 @@ public final class NativeJSON extends IdScriptableObject {
 
         List<Object> propertyList = null;
         Callable replacerFunction = null;
+
+        if (value instanceof NativeProxy) {
+            return stringify(cx, scope, ((NativeProxy) value).getTarget(), replacer, space);
+        }
 
         if (replacer instanceof Callable) {
             replacerFunction = (Callable) replacer;

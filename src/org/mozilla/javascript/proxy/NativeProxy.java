@@ -38,6 +38,10 @@ public class NativeProxy extends IdScriptableObject implements Function {
         this.handlerIds = handler == null ? Collections.emptyList() : Arrays.asList(handler.getIds());
     }
 
+    public ScriptableObject getTarget() {
+        return target;
+    }
+
     void revoke() {
         this.revoked = true;
     }
@@ -57,6 +61,8 @@ public class NativeProxy extends IdScriptableObject implements Function {
     protected void initPrototypeId(int id) {
         throw new IllegalArgumentException(String.valueOf(id));
     }
+
+
 
     @Override
     public Object get(String name, Scriptable start) {
