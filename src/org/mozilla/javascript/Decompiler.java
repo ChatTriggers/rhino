@@ -474,6 +474,14 @@ public class Decompiler {
                     result.append(" |> ");
                     break;
 
+                case Token.TEMPLATE:
+                    result.append("`");
+                    break;
+
+                case Token.TEMPLATE_EXPR:
+                    result.append("${");
+                    break;
+
                 case Token.NEW:
                     result.append("new ");
                     break;

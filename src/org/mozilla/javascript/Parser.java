@@ -1889,7 +1889,7 @@ public class Parser {
         consumeToken();
         String name = label.getName();
         if (labelSet == null) {
-            labelSet = new HashMap<String, LabeledStatement>();
+            labelSet = new HashMap<>();
         } else {
             LabeledStatement ls = labelSet.get(name);
             if (ls != null) {
@@ -3125,6 +3125,11 @@ public class Parser {
                 pn = re;
                 break;
 
+            case Token.TEMPLATE:
+                consumeToken();
+                pn = templateLiteral();
+                break;
+
             case Token.NULL:
             case Token.THIS:
             case Token.FALSE:
@@ -3167,6 +3172,33 @@ public class Parser {
         // // should only be reachable in IDE/error-recovery mode
         // consumeToken();
         // return makeErrorNode();
+    }
+
+    private AstNode templateLiteral() throws IOException {
+        int token = peekToken();
+        TemplateLiteral lit = new TemplateLiteral();
+
+        while (token != Token.TEMPLATE) {
+            if (token == Token.STRING) {
+                lit.addString(ts.getString());
+
+                consumeToken();
+            } else if (token == Token.TEMPLATE_EXPR) {
+                consumeToken();
+
+                lit.addExpr(expr());
+            } else if (token == Token.RC) {
+                ts.setTemplateExprFinished();
+                consumeToken();
+            } else {
+                throw Kit.codeBug();
+            }
+
+            token = peekToken();
+        }
+
+        consumeToken(); // Consume trailing '`'
+        return lit;
     }
 
     private AstNode parenExpr() throws IOException {

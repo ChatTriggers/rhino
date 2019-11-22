@@ -802,6 +802,19 @@ public class ScriptRuntime {
         return targetArgs;
     }
 
+    public static Object templateConcat(Object[] elements) {
+        if (elements.length == 0) return Undefined.instance;
+        if (elements.length == 1) return toString(elements[0]);
+
+        ConsString str = new ConsString(toString(elements[0]), toString(elements[1]));
+
+        for (int i = 2; i < elements.length; i++) {
+            str = new ConsString(str, toString(elements[2]));
+        }
+
+        return str;
+    }
+
     /**
      * Helper function for builtin objects that use the varargs form.
      * ECMA function formal arguments are undefined if not supplied;

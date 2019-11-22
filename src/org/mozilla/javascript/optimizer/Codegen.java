@@ -84,7 +84,7 @@ public class Codegen implements Evaluator {
             new File("./out/tokens").mkdirs();
             File output = new File("./out/class/" + mainClassName + ".class");
             File outputDecomp = new File("./out/js/" + mainClassName + ".js");
-//            File outputTokens = new File("./out/tokens/" + mainClassName + ".tokens");
+            File outputTokens = new File("./out/tokens/" + mainClassName + ".tokens");
 
             try (FileOutputStream fos = new FileOutputStream(output)) {
                 fos.write(mainClassBytes);
@@ -101,25 +101,25 @@ public class Codegen implements Evaluator {
                 e.printStackTrace();
             }
 
-//            try (FileOutputStream fos = new FileOutputStream(outputTokens)) {
-//                StringBuilder sb = new StringBuilder();
-//
-//                for (int i = 0; i < encodedSource.length(); i++) {
-//                    int token = encodedSource.charAt(i);
-//                    if (!Token.isValidToken(encodedSource.charAt(i))) continue;
-//
-//                    if (token == Token.NAME || token == Token.STRING || token == Token.REGEXP) {
-//                        sb.append(Token.typeToName(token)).append(": ");
-//                        i = Decompiler.printSourceString(encodedSource, i + 1, true, sb) - 1;
-//                        sb.append("\n");
-//                    } else {
-//                        sb.append(Token.typeToName(token)).append("\n");
-//                    }
-//                }
-//                fos.write(sb.toString().getBytes());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+            try (FileOutputStream fos = new FileOutputStream(outputTokens)) {
+                StringBuilder sb = new StringBuilder();
+
+                for (int i = 0; i < encodedSource.length(); i++) {
+                    int token = encodedSource.charAt(i);
+                    if (!Token.isValidToken(encodedSource.charAt(i))) continue;
+
+                    if (token == Token.NAME || token == Token.STRING || token == Token.REGEXP) {
+                        sb.append(Token.typeToName(token)).append(": ");
+                        i = Decompiler.printSourceString(encodedSource, i + 1, true, sb) - 1;
+                        sb.append("\n");
+                    } else {
+                        sb.append(Token.typeToName(token)).append("\n");
+                    }
+                }
+                fos.write(sb.toString().getBytes());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             new File("./out/nodes").mkdirs();
 
@@ -273,7 +273,7 @@ public class Codegen implements Evaluator {
                         String name = ofn.fnode.getName();
                         if (name.length() != 0) {
                             if (possibleDirectCalls == null) {
-                                possibleDirectCalls = new HashMap<String, OptFunctionNode>();
+                                possibleDirectCalls = new HashMap<>();
                             }
                             possibleDirectCalls.put(name, ofn);
                         }
@@ -2304,8 +2304,32 @@ class BodyCodegen {
                 } else {
                     codegen.pushNumberAsObject(cfw, num);
                 }
+
+                break;
             }
-            break;
+
+            case Token.TEMPLATE: {
+                TemplateLiteral lit = ((TemplateLiteral) node);
+
+                cfw.addPush(lit.getElements().size());
+                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+
+                int index = 0;
+                for (Node element : node) {
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(index);
+
+                    generateExpression(element, node);
+
+                    cfw.add(ByteCode.AASTORE);
+
+                    index++;
+                }
+
+                addScriptRuntimeInvoke("templateConcat", "([Ljava/lang/Object;)Ljava/lang/Object;");
+
+                break;
+            }
 
             case Token.STRING:
                 cfw.addPush(node.getString());

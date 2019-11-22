@@ -884,6 +884,52 @@ class TokenStream {
 
         retry:
         for (; ; ) {
+            if (inTemplateLiteral && !inTemplateExpr && !endOfTemplate) {
+                int character = getChar(false);
+                boolean wasJustEscape = false;
+                stringBufferTop = 0;
+
+                while (character != '`') {
+                    if (character == '$' && !wasJustEscape) {
+                        int aChar = getChar(false);
+
+                        if (aChar == -1) {
+                            // EOF
+                            throw new EvaluatorException("Unfinished template literal");
+                        }
+
+                        if (aChar == '{') {
+                            justBeganTemplateExpr = true;
+                            inTemplateExpr = true;
+                            ungetChar(aChar);
+                            ungetChar(character);
+                            break;
+                        } else {
+                            ungetChar(aChar);
+                        }
+                    }
+
+                    wasJustEscape = character == '\\';
+
+                    addToString(character);
+                    character = getChar(false);
+                }
+
+                if (character == '`') {
+                    ungetChar('`');
+                    endOfTemplate = true;
+                }
+
+                String str = getStringFromBuffer();
+                this.string = (String) allStrings.intern(str);
+                return Token.STRING;
+            } else if (justBeganTemplateExpr) {
+                justBeganTemplateExpr = false;
+                getChar();
+                getChar();
+                return Token.TEMPLATE_EXPR;
+            }
+
             // Eat whitespace, possibly sensitive to newlines.
             for (; ; ) {
                 c = getChar();
@@ -1163,8 +1209,14 @@ class TokenStream {
                 return Token.NUMBER;
             }
 
+            if (c == '`') {
+                inTemplateLiteral = !inTemplateLiteral;
+                endOfTemplate = false;
+                return Token.TEMPLATE;
+            }
+
             // is it a string?
-            if (c == '"' || c == '\'' || c == '`') {
+            if (c == '"' || c == '\'') {
                 // We attempt to accumulate a string the fast way, by
                 // building it directly out of the reader.  But if there
                 // are any escaped characters in the string, we revert to
@@ -2179,6 +2231,10 @@ class TokenStream {
         return true;
     }
 
+    public void setTemplateExprFinished() {
+        this.inTemplateExpr = false;
+    }
+
     /**
      * Return the current position of the scanner cursor.
      */
@@ -2272,6 +2328,11 @@ class TokenStream {
     private boolean isOldOctal;
     private boolean isOctal;
     private boolean isHex;
+
+    private boolean inTemplateLiteral = false;
+    private boolean inTemplateExpr = false;
+    private boolean endOfTemplate = false;
+    private boolean justBeganTemplateExpr = false;
 
     // delimiter for last string literal scanned
     private int quoteChar;

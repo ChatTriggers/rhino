@@ -6,6 +6,7 @@
 
 package org.mozilla.javascript;
 
+import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 import org.mozilla.javascript.optimizer.Codegen;
 
 /**
@@ -84,6 +85,8 @@ public class Token {
             NAME = 40,
             NUMBER = 41,
             STRING = 42,
+            TEMPLATE = 172,
+            TEMPLATE_EXPR = 173,
             NULL = 43,
             THIS = 44,
             FALSE = 45,
@@ -234,7 +237,7 @@ public class Token {
             GENEXPR = 169,
             METHOD = 170, // ES6 MethodDefinition
             ARROW = 171,  // ES6 ArrowFunction
-            LAST_TOKEN = 172;
+            LAST_TOKEN = 174;
 
     /**
      * Returns a name for the token.  If Rhino is compiled with certain
@@ -601,7 +604,10 @@ public class Token {
                 return "NULLISH_COALESCING";
             case PIPELINE:
                 return "PIPELINE";
-
+            case TEMPLATE:
+                return "TEMPLATE";
+            case TEMPLATE_EXPR:
+                return "TEMPLATE_EXPR";
         }
 
         // Token without name

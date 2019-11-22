@@ -161,6 +161,8 @@ public final class IRFactory extends Parser {
                 return transformScript((ScriptNode) node);
             case Token.STRING:
                 return transformString((StringLiteral) node);
+            case Token.TEMPLATE:
+                return transformTemplate((TemplateLiteral) node);
             case Token.SWITCH:
                 return transformSwitch((SwitchStatement) node);
             case Token.THROW:
@@ -1095,6 +1097,14 @@ public final class IRFactory extends Parser {
         } else {
             return Node.newString(node.getValue());
         }
+    }
+
+    private Node transformTemplate(TemplateLiteral lit) {
+        for (AstNode part : lit.getElements()) {
+            lit.addChildToBack(transform(part));
+        }
+
+        return lit;
     }
 
     private Node transformSwitch(SwitchStatement node) {
