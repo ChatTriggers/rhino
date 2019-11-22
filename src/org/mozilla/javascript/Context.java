@@ -2411,7 +2411,7 @@ public class Context {
      * Internal method that reports an error for missing calls to
      * enter().
      */
-    static Context getContext() {
+    public static Context getContext() {
         Context cx = getCurrentContext();
         if (cx == null) {
             throw new RuntimeException(

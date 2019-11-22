@@ -838,6 +838,33 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     /**
+     * Get the getter or setter for a given Symbol property. Used by __lookupGetter__
+     * and __lookupSetter__.
+     *
+     * @param name     Name of the object. If nonnull, index must be 0.
+     * @param index    Index of the object. If nonzero, name must be null.
+     * @param isSetter If true, return the setter, otherwise return the getter.
+     * @return Null if the property does not exist. Otherwise returns either
+     * the getter or the setter for the property, depending on
+     * the value of isSetter (may be undefined if unset).
+     * @throws IllegalArgumentException if both name and index are nonnull
+     *                                  and nonzero respectively.
+     */
+    public Object getGetterOrSetter(Symbol key, int index, boolean isSetter) {
+        if (key != null && index != 0)
+            throw new IllegalArgumentException(ScriptRuntime.toString(key));
+        Slot slot = slotMap.query(key, index);
+        if (slot == null)
+            return null;
+        if (slot instanceof GetterSlot) {
+            GetterSlot gslot = (GetterSlot) slot;
+            Object result = isSetter ? gslot.setter : gslot.getter;
+            return result != null ? result : Undefined.instance;
+        }
+        return Undefined.instance;
+    }
+
+    /**
      * Returns whether a property is a getter or a setter
      *
      * @param name   property name
@@ -2141,8 +2168,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @return the prototype for the named class, or null if it
      * cannot be found.
      */
-    public static Scriptable getClassPrototype(Scriptable scope,
-                                               String className) {
+    public static Scriptable getClassPrototype(Scriptable scope, String className) {
         scope = getTopLevelScope(scope);
         Object ctor = getProperty(scope, className);
         Object proto;

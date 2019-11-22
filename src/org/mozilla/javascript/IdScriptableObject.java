@@ -724,11 +724,22 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
         throw f.unknown();
     }
 
+
     public final IdFunctionObject exportAsJSClass(int maxPrototypeId, Scriptable scope, boolean sealed) {
+        return exportAsJSClass(maxPrototypeId, scope, sealed, true);
+    }
+
+    public final IdFunctionObject exportAsJSClass(int maxPrototypeId, Scriptable scope, boolean sealed, boolean initPrototype) {
         // Set scope and prototype unless this is top level scope itself
         if (scope != this && scope != null) {
             setParentScope(scope);
-            setPrototype(getObjectPrototype(scope));
+
+            if (initPrototype) {
+                setPrototype(getObjectPrototype(scope));
+            } else {
+                // setPrototype(null);
+                // ScriptableObject.putProperty(this, "prototype", Undefined.instance);
+            }
         }
 
         activatePrototypeMap(maxPrototypeId);

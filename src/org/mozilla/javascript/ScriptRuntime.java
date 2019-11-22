@@ -8,6 +8,7 @@ package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.optimizer.Codegen;
+import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
 import org.mozilla.javascript.v8dtoa.FastDtoa;
 import org.mozilla.javascript.xml.XMLLib;
@@ -191,6 +192,7 @@ public class ScriptRuntime {
         NativeMath.init(scope, sealed);
         NativeJSON.init(scope, sealed);
         NativeReflect.init(scope, sealed);
+        NativeProxy.init(scope, sealed);
 
         NativeWith.init(scope, sealed);
         NativeCall.init(scope, sealed);
@@ -3869,14 +3871,12 @@ public class ScriptRuntime {
         return nw.getParentScope();
     }
 
-    public static void setFunctionProtoAndParent(BaseFunction fn,
-                                                 Scriptable scope) {
+    public static void setFunctionProtoAndParent(BaseFunction fn, Scriptable scope) {
         fn.setParentScope(scope);
         fn.setPrototype(ScriptableObject.getFunctionPrototype(scope));
     }
 
-    public static void setObjectProtoAndParent(ScriptableObject object,
-                                               Scriptable scope) {
+    public static void setObjectProtoAndParent(ScriptableObject object, Scriptable scope) {
         // Compared with function it always sets the scope to top scope
         scope = ScriptableObject.getTopLevelScope(scope);
         object.setParentScope(scope);
@@ -4415,7 +4415,7 @@ public class ScriptRuntime {
      * Not all "NativeSymbol" instances are actually symbols. So account for that here rather than just
      * by using an "instanceof" check.
      */
-    static boolean isSymbol(Object obj) {
+    public static boolean isSymbol(Object obj) {
         return (((obj instanceof NativeSymbol) &&
                 ((NativeSymbol) obj).isSymbol())) || (obj instanceof SymbolKey);
     }

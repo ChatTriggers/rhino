@@ -102,7 +102,6 @@ public class NativeRegExp extends IdScriptableObject implements Function {
 
 
     public static void init(Context cx, Scriptable scope, boolean sealed) {
-
         NativeRegExp proto = new NativeRegExp();
         proto.re = compileRE(cx, "", null, false);
         proto.activatePrototypeMap(MAX_PROTOTYPE_ID);
