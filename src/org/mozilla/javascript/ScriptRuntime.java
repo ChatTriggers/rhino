@@ -825,7 +825,7 @@ public class ScriptRuntime {
         Callable fn = (Callable) target;
 
         // NativeArray parts = new NativeArray(Arrays.copyOfRange(args, 0, boundary));
-        Scriptable parts = cx.newArray(scope, Arrays.copyOfRange(args, 0, boundary));
+        ScriptableObject parts = ScriptableObject.ensureScriptableObject(cx.newArray(scope, Arrays.copyOfRange(args, 0, boundary)));
         Object[] rawArgs = new Object[boundary];
 
         for (int i = 0; i < boundary; i++) {
@@ -833,13 +833,30 @@ public class ScriptRuntime {
             rawArgs[i] = ScriptRuntime.escapeString((String) args[i]);
         }
 
-        ScriptableObject.putProperty(parts, "raw", cx.newArray(scope, rawArgs));
+        ScriptableObject raw = ScriptableObject.ensureScriptableObject(cx.newArray(scope, rawArgs));
+        freeze(raw, cx);
+
+        ScriptableObject.putProperty(parts, "raw", raw);
+
+        freeze(parts, cx);
 
         Object[] fnArgs = new Object[args.length - boundary + 1];
         fnArgs[0] = parts;
         System.arraycopy(args, boundary, fnArgs, 1, fnArgs.length - 1);
 
         return fn.call(cx, scope, thisObj, fnArgs);
+    }
+
+    private static void freeze(ScriptableObject obj, Context cx) {
+        for (Object name : obj.getAllIds()) {
+            ScriptableObject desc = obj.getOwnPropertyDescriptor(cx, name);
+            if (desc.isDataDescriptor(desc) && Boolean.TRUE.equals(desc.get("writable")))
+                desc.put("writable", desc, Boolean.FALSE);
+            if (Boolean.TRUE.equals(desc.get("configurable")))
+                desc.put("configurable", desc, Boolean.FALSE);
+            obj.defineOwnProperty(cx, name, desc, false);
+        }
+        obj.preventExtensions();
     }
 
     /**

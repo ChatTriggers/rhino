@@ -2057,7 +2057,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param desc a property descriptor
      * @return true if this is a data descriptor.
      */
-    protected boolean isDataDescriptor(ScriptableObject desc) {
+    boolean isDataDescriptor(ScriptableObject desc) {
         return hasProperty(desc, "value") || hasProperty(desc, "writable");
     }
 
