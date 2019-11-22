@@ -11,7 +11,6 @@ import static org.mozilla.javascript.ScriptableObject.*;
 @SuppressWarnings("DuplicatedCode")
 public class NativeProxy extends IdScriptableObject implements Function {
     private static final long serialVersionUID = -5164128569432516845L;
-    private static final Object PROXY_TAG = "Proxy";
 
     private ScriptableObject target;
     private ScriptableObject handler;
@@ -22,8 +21,8 @@ public class NativeProxy extends IdScriptableObject implements Function {
         NativeProxyCtor ctor = new NativeProxyCtor();
 
         ctor.setParentScope(scope);
-        ctor.setPrototype(null);
-        ctor.defineProperty("prototype", Undefined.instance, ScriptableObject.DONTENUM);
+        ctor.setPrototype(getObjectPrototype(scope));
+        ScriptableObject.deleteProperty(ctor, "prototype");
 
         if (sealed) {
             ctor.sealObject();

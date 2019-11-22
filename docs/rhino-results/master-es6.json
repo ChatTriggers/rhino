@@ -301,9 +301,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": false
   },
   "ES2015": {
-    "_successful": 335,
+    "_successful": 336,
     "_count": 689,
-    "_percent": 0.4862119013062409,
+    "_percent": 0.4876632801161103,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -652,7 +652,7 @@
     "built-ins›WeakSet›.has and .delete methods accept primitives": true,
     "built-ins›WeakSet›WeakSet.prototype isn't an instance": true,
     "built-ins›Proxy›constructor requires new": true,
-    "built-ins›Proxy›no \"prototype\" property": "Cannot find default value for object.",
+    "built-ins›Proxy›no \"prototype\" property": true,
     "built-ins›Proxy›\"get\" handler": true,
     "built-ins›Proxy›\"get\" handler, instances of proxies": true,
     "built-ins›Proxy›\"get\" handler invariants": true,
