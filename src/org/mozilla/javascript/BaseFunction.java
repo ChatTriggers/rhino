@@ -134,6 +134,8 @@ public class BaseFunction extends IdScriptableObject implements Function {
         int attr;
         switch (id) {
             case Id_length:
+                attr = DONTENUM | READONLY;
+                break;
             case Id_arity:
             case Id_name:
                 attr = DONTENUM | READONLY | PERMANENT;
@@ -210,7 +212,9 @@ public class BaseFunction extends IdScriptableObject implements Function {
                 return;
             case Id_name:
             case Id_arity:
+                return;
             case Id_length:
+                defaultPut("length", value);
                 return;
         }
         super.setInstanceIdValue(id, value);

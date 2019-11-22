@@ -646,8 +646,7 @@ final class NativeString extends IdScriptableObject {
     /*
      * HTML composition aids.
      */
-    private static String tagify(Object thisObj, String tag,
-                                 String attribute, Object[] args) {
+    private static String tagify(Object thisObj, String tag, String attribute, Object[] args) {
         String str = ScriptRuntime.toString(thisObj);
         StringBuilder result = new StringBuilder();
         result.append('<');
@@ -656,7 +655,7 @@ final class NativeString extends IdScriptableObject {
             result.append(' ');
             result.append(attribute);
             result.append("=\"");
-            result.append(ScriptRuntime.toString(args, 0));
+            result.append(ScriptRuntime.toString(args, 0).replace("\"", "&quot;"));
             result.append('"');
         }
         result.append('>');
