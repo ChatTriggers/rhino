@@ -57,7 +57,7 @@ final class NativeString extends IdScriptableObject {
 
     @Override
     protected int findInstanceIdInfo(String s) {
-        if (s.equals("length")) {
+        if ("length".equals(s)) {
             return instanceIdInfo(DONTENUM | READONLY | PERMANENT, Id_length);
         }
         return super.findInstanceIdInfo(s);
