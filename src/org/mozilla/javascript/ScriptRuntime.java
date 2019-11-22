@@ -809,7 +809,7 @@ public class ScriptRuntime {
         ConsString str = new ConsString(toString(elements[0]), toString(elements[1]));
 
         for (int i = 2; i < elements.length; i++) {
-            str = new ConsString(str, toString(elements[2]));
+            str = new ConsString(str, toString(elements[i]));
         }
 
         return str;

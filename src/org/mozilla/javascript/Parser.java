@@ -3180,7 +3180,10 @@ public class Parser {
 
         while (token != Token.TEMPLATE) {
             if (token == Token.STRING) {
-                lit.addString(ts.getString());
+                String str = ts.getString();
+                if (!str.equals("")) {
+                    lit.addString(str);
+                }
 
                 consumeToken();
             } else if (token == Token.TEMPLATE_EXPR) {
