@@ -3363,6 +3363,21 @@ public class ScriptRuntime {
      * @return a instanceof b
      */
     public static boolean instanceOf(Object a, Object b, Context cx) {
+        // Prioritize b's Symbol.hasInstance property, if applicable
+        // and present
+        if (b instanceof Scriptable) {
+            Scriptable sb = (Scriptable) b;
+            if (ScriptableObject.hasProperty(sb, SymbolKey.HAS_INSTANCE)) {
+                Object hasInstance = ScriptableObject.getProperty(sb, SymbolKey.HAS_INSTANCE);
+                if (!(hasInstance instanceof Callable)) {
+                    throw ScriptRuntime.typeError1("msg.object.not.callable", ScriptRuntime.toString(hasInstance));
+                }
+                Object result = ((Callable) hasInstance).call(cx, ScriptRuntime.getTopCallScope(cx), (Scriptable) b, new Object[]{ a });
+
+                return result != null && result != Undefined.instance && !((result instanceof Boolean) && !((boolean) result));
+            }
+        }
+
         // Check RHS is an object
         if (!(b instanceof Scriptable)) {
             throw typeError0("msg.instanceof.not.object");
