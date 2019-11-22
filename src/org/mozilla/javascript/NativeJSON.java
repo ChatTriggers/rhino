@@ -230,7 +230,7 @@ public final class NativeJSON extends IdScriptableObject {
         if (replacer instanceof Callable) {
             replacerFunction = (Callable) replacer;
         } else if (replacer instanceof NativeArray) {
-            propertyList = new LinkedList<Object>();
+            propertyList = new LinkedList<>();
             NativeArray replacerArray = (NativeArray) replacer;
             for (int i : replacerArray.getIndexIds()) {
                 Object v = replacerArray.get(i, replacerArray);
@@ -276,11 +276,15 @@ public final class NativeJSON extends IdScriptableObject {
 
     private static Object str(Object key, Scriptable holder,
                               StringifyState state) {
-        Object value = null;
+        Object value;
         if (key instanceof String) {
             value = getProperty(holder, (String) key);
         } else {
             value = getProperty(holder, ((Number) key).intValue());
+        }
+
+        if (ScriptRuntime.isSymbol(value)) {
+            return Undefined.instance;
         }
 
         if (value instanceof Scriptable && hasProperty((Scriptable) value, "toJSON")) {
@@ -353,14 +357,14 @@ public final class NativeJSON extends IdScriptableObject {
 
         String stepback = state.indent;
         state.indent = state.indent + state.gap;
-        Object[] k = null;
+        Object[] k;
         if (state.propertyList != null) {
             k = state.propertyList.toArray();
         } else {
             k = value.getIds();
         }
 
-        List<Object> partial = new LinkedList<Object>();
+        List<Object> partial = new LinkedList<>();
 
         for (Object p : k) {
             Object strP = str(p, value, state);

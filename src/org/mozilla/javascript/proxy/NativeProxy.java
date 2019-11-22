@@ -70,7 +70,7 @@ public class NativeProxy extends IdScriptableObject {
         }
 
         Function fn = (Function) get;
-        Object result = fn.call(Context.getContext(), this, this, new Object[]{ target, name, this });
+        Object result = fn.call(Context.getContext(), this, start, new Object[]{ target, name, start });
 
         if (ScriptableObject.hasProperty(target, name)) {
             int attributes = target.getAttributes(name);
@@ -103,7 +103,7 @@ public class NativeProxy extends IdScriptableObject {
         }
 
         Function fn = (Function) get;
-        Object result = fn.call(Context.getContext(), this, this, new Object[]{ target, key, this });
+        Object result = fn.call(Context.getContext(), this, start, new Object[]{ target, key, start });
 
         if (ScriptableObject.hasProperty(target, key)) {
             int attributes = target.getAttributes(key);
@@ -150,7 +150,7 @@ public class NativeProxy extends IdScriptableObject {
                 throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", name);
             }
 
-            ((Function) setter).call(Context.getContext(), this, this, new Object[]{target, name, value, this});
+            ((Function) setter).call(Context.getContext(), this, start, new Object[]{target, name, value, start});
         }
 
     }
@@ -184,7 +184,7 @@ public class NativeProxy extends IdScriptableObject {
                 throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", ScriptRuntime.toString(key));
             }
 
-            ((Function) setter).call(Context.getContext(), this, this, new Object[]{target, key, value, this});
+            ((Function) setter).call(Context.getContext(), this, start, new Object[]{target, key, value, start});
         }
 
     }
