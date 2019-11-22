@@ -301,9 +301,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": false
   },
   "ES2015": {
-    "_successful": 336,
+    "_successful": 337,
     "_count": 689,
-    "_percent": 0.4876632801161103,
+    "_percent": 0.48911465892597966,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -721,7 +721,7 @@
     "built-ins›Symbol›cannot coerce to string or number": true,
     "built-ins›Symbol›can convert with String()": true,
     "built-ins›Symbol›new Symbol() throws": true,
-    "built-ins›Symbol›Object(symbol)": false,
+    "built-ins›Symbol›Object(symbol)": true,
     "built-ins›Symbol›JSON.stringify ignores symbol primitives": true,
     "built-ins›Symbol›JSON.stringify ignores symbol objects": true,
     "built-ins›Symbol›global symbol registry": true,

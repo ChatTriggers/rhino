@@ -3146,8 +3146,16 @@ public class ScriptRuntime {
                 }
             }
             return eqNumber(b ? 1.0 : 0.0, y);
-        } else if (x instanceof Scriptable) {
-            if (y instanceof Scriptable) {
+        } else if (isSymbol(x)) {
+          if (y instanceof Scriptable) {
+              if (!isSymbol(y)) return false;
+              return toPrimitive(x) == y;
+          }
+          return false;
+        } else if (x instanceof Scriptable && !isSymbol(x)) {
+            if (isSymbol(y)) {
+                return toPrimitive(x) == y;
+            } else if (y instanceof Scriptable) {
                 if (x instanceof ScriptableObject) {
                     Object test = ((ScriptableObject) x).equivalentValues(y);
                     if (test != Scriptable.NOT_FOUND) {
@@ -3184,6 +3192,8 @@ public class ScriptRuntime {
                 return eqNumber(((Number) y).doubleValue(), x);
             } else if (y instanceof CharSequence) {
                 return eqString((CharSequence) y, x);
+            } else if (isSymbol(y)) {
+                return toPrimitive(x) == y;
             }
             // covers the case when y == Undefined.instance as well
             return false;

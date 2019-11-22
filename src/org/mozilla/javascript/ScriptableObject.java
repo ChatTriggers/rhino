@@ -1041,6 +1041,7 @@ public abstract class ScriptableObject implements Scriptable,
             }
             v = fun.call(cx, fun.getParentScope(), object, ScriptRuntime.emptyArgs);
             if (v != null) {
+                if (ScriptRuntime.isSymbol(v)) return v;
                 if (!(v instanceof Scriptable)) {
                     return v;
                 }
