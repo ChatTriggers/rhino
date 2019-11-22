@@ -49,7 +49,9 @@ public class NativeProxy extends IdScriptableObject implements Function {
     }
 
     @Override
-    public String getClassName() { return (String) PROXY_TAG; }
+    public String getClassName() {
+        return target.getClassName();
+    }
 
     @Override
     protected void initPrototypeId(int id) {
