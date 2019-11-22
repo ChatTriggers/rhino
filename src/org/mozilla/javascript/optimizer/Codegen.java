@@ -2311,22 +2311,65 @@ class BodyCodegen {
             case Token.TEMPLATE: {
                 TemplateLiteral lit = ((TemplateLiteral) node);
 
-                cfw.addPush(lit.getElements().size());
-                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+                Node target = lit.getTransformedTarget();
+                if (target == null) {
+                    cfw.addPush(lit.getElements().size());
+                    cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
 
-                int index = 0;
-                for (Node element : node) {
-                    cfw.add(ByteCode.DUP);
-                    cfw.addPush(index);
+                    int index = 0;
+                    for (Node element : node) {
+                        cfw.add(ByteCode.DUP);
+                        cfw.addPush(index);
 
-                    generateExpression(element, node);
+                        generateExpression(element, node);
 
-                    cfw.add(ByteCode.AASTORE);
+                        cfw.add(ByteCode.AASTORE);
 
-                    index++;
+                        index++;
+                    }
+
+                    addScriptRuntimeInvoke("templateConcat", "([Ljava/lang/Object;)Ljava/lang/Object;");
+                } else {
+                    cfw.addPush(lit.getElements().size());
+                    cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+                    int arrayIndex = 0;
+
+                    List<Node> exprs = new ArrayList<>();
+
+                    int i = 0;
+                    for (Node element : lit) {
+                        if (lit.isExpr(i)) {
+                            exprs.add(element);
+                        } else {
+                            cfw.add(ByteCode.DUP);
+                            cfw.addPush(arrayIndex++);
+                            generateExpression(element, node);
+                            cfw.add(ByteCode.AASTORE);
+                        }
+
+                        i++;
+                    }
+
+                    int boundary = arrayIndex;
+
+                    for (Node element : exprs) {
+                        cfw.add(ByteCode.DUP);
+                        cfw.addPush(arrayIndex++);
+                        generateExpression(element, node);
+                        cfw.add(ByteCode.AASTORE);
+                    }
+
+                    cfw.addPush(boundary);
+                    generateExpression(target, node);
+                    cfw.addALoad(contextLocal);
+                    cfw.addALoad(variableObjectLocal);
+                    cfw.addALoad(thisObjLocal);
+                    // Object[] args, int boundary, Object target, Context cx, Scriptable scope, Scriptable thisObj
+                    addScriptRuntimeInvoke(
+                            "callWithTemplateLiteral",
+                            "([Ljava/lang/Object;ILjava/lang/Object;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;"
+                    );
                 }
-
-                addScriptRuntimeInvoke("templateConcat", "([Ljava/lang/Object;)Ljava/lang/Object;");
 
                 break;
             }

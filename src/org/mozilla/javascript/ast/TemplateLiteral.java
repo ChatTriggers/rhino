@@ -1,12 +1,18 @@
 package org.mozilla.javascript.ast;
 
+import org.mozilla.javascript.Node;
 import org.mozilla.javascript.Token;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TemplateLiteral extends AstNode {
     private List<AstNode> elements = new ArrayList<>();
+    private Set<Integer> isExpr = new HashSet<>();
+    private AstNode target = null;
+    private Node transformedTarget = null;
 
     {
         this.type = Token.TEMPLATE;
@@ -19,11 +25,16 @@ public class TemplateLiteral extends AstNode {
     }
 
     public void addExpr(AstNode expr) {
+        isExpr.add(elements.size());
         elements.add(expr);
     }
 
     public List<AstNode> getElements() {
         return elements;
+    }
+
+    public boolean isExpr(int index) {
+        return isExpr.contains(index);
     }
 
     @Override
@@ -38,5 +49,21 @@ public class TemplateLiteral extends AstNode {
                 e.visit(v);
             }
         }
+    }
+
+    public void setTarget(AstNode target) {
+        this.target = target;
+    }
+
+    public AstNode getTarget() {
+        return target;
+    }
+
+    public void setTransformedTarget(Node transformedTarget) {
+        this.transformedTarget = transformedTarget;
+    }
+
+    public Node getTransformedTarget() {
+        return transformedTarget;
     }
 }

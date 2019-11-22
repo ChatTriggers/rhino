@@ -1100,6 +1100,12 @@ public final class IRFactory extends Parser {
     }
 
     private Node transformTemplate(TemplateLiteral lit) {
+        AstNode target = lit.getTarget();
+
+        if (target != null) {
+            lit.setTransformedTarget(transform(target));
+        }
+
         for (AstNode part : lit.getElements()) {
             lit.addChildToBack(transform(part));
         }

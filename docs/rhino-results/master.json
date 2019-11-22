@@ -42,7 +42,7 @@
     "draft (stage 2)›ArrayBuffer.prototype.transfer›ArrayBuffer.prototype.realloc()": "Cannot find function realloc in object [object ArrayBuffer].",
     "draft (stage 2)›Map.prototype.upsert›Map.prototype.upsert": "\"Map\" is not defined.",
     "draft (stage 2)›Map.prototype.upsert›WeakMap.prototype.upsert": "\"WeakMap\" is not defined.",
-    "draft (stage 2)›Array.isTemplateObject": "missing ) after argument list",
+    "draft (stage 2)›Array.isTemplateObject": "Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }\n.",
     "draft (stage 2)›Iterator Helpers›instanceof Iterator": false,
     "draft (stage 2)›Iterator Helpers›extends Iterator": "missing ; before statement",
     "draft (stage 2)›Iterator Helpers›Iterator.from, iterable": "Cannot find function from in object function Iterator() { [native code for Iterator.Iterator, arity=2] }\n.",
@@ -211,7 +211,7 @@
     "features›Asynchronous Iterators›async generators": "missing ; before statement",
     "features›Asynchronous Iterators›for-await-of loops": "missing ) in parenthetical",
     "misc›Proxy \"ownKeys\" handler, duplicate keys for non-extensible targets": false,
-    "misc›template literal revision": "missing ; before statement"
+    "misc›template literal revision": false
   },
   "ES2017": {
     "_successful": 14,
@@ -301,9 +301,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": false
   },
   "ES2015": {
-    "_successful": 238,
+    "_successful": 239,
     "_count": 689,
-    "_percent": 0.3454281567489115,
+    "_percent": 0.3468795355587808,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -354,11 +354,11 @@
     "syntax›octal and binary literals›binary supported by Number()": false,
     "syntax›template literals›basic functionality": true,
     "syntax›template literals›toString conversion": true,
-    "syntax›template literals›tagged template literals": "missing ; before statement",
-    "syntax›template literals›passed array is frozen": "missing ; before statement",
+    "syntax›template literals›tagged template literals": true,
+    "syntax›template literals›passed array is frozen": false,
     "syntax›template literals›line break normalisation": true,
-    "syntax›template literals›TemplateStrings call site caching": "missing ; before statement",
-    "syntax›template literals›TemplateStrings permanent caching": "missing ; before statement",
+    "syntax›template literals›TemplateStrings call site caching": false,
+    "syntax›template literals›TemplateStrings permanent caching": false,
     "syntax›RegExp \"y\" and \"u\" flags›\"y\" flag": true,
     "syntax›RegExp \"y\" and \"u\" flags›\"y\" flag, lastIndex": true,
     "syntax›RegExp \"y\" and \"u\" flags›\"u\" flag": "invalid flag after regular expression",

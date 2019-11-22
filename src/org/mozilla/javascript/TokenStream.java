@@ -894,6 +894,101 @@ class TokenStream {
                         throw new EvaluatorException("Unfinished template literal");
                     }
 
+                    if (character == '\\') {
+                        // We've hit an escaped character
+                        int escapeVal;
+
+                        character = getChar();
+                        switch (character) {
+                            case 'b':
+                                character = '\b';
+                                break;
+                            case 'f':
+                                character = '\f';
+                                break;
+                            case 'n':
+                                character = '\n';
+                                break;
+                            case 'r':
+                                character = '\r';
+                                break;
+                            case 't':
+                                character = '\t';
+                                break;
+
+                            // \v a late addition to the ECMA spec,
+                            // it is not in Java, so use 0xb
+                            case 'v':
+                                character = 0xb;
+                                break;
+
+                            case 'u':
+                                // Get 4 hex digits; if the u escape is not
+                                // followed by 4 hex digits, use 'u' + the
+                                // literal character sequence that follows.
+                                int escapeStart = stringBufferTop;
+                                addToString('u');
+                                escapeVal = 0;
+                                for (int i = 0; i != 4; ++i) {
+                                    character = getChar();
+                                    escapeVal = Kit.xDigitToInt(character, escapeVal);
+                                    if (escapeVal < 0) {
+                                        continue;
+                                    }
+                                    addToString(character);
+                                }
+                                // prepare for replace of stored 'u' sequence
+                                // by escape value
+                                stringBufferTop = escapeStart;
+                                character = escapeVal;
+                                break;
+                            case 'x':
+                                // Get 2 hex digits, defaulting to 'x'+literal
+                                // sequence, as above.
+                                character = getChar();
+                                escapeVal = Kit.xDigitToInt(character, 0);
+                                if (escapeVal < 0) {
+                                    addToString('x');
+                                    continue;
+                                }
+                                int c1 = character;
+                                character = getChar();
+                                escapeVal = Kit.xDigitToInt(character, escapeVal);
+                                if (escapeVal < 0) {
+                                    addToString('x');
+                                    addToString(c1);
+                                    continue;
+                                }
+                                // got 2 hex digits
+                                character = escapeVal;
+                                break;
+
+                            case '\n':
+                                // Remove line terminator after escape to follow
+                                // SpiderMonkey and C/C++
+                                character = getChar();
+                                continue;
+
+                            default:
+                                if ('0' <= character && character < '8') {
+                                    int val = character - '0';
+                                    character = getChar();
+                                    if ('0' <= character && character < '8') {
+                                        val = 8 * val + character - '0';
+                                        character = getChar();
+                                        if ('0' <= character && character < '8' && val <= 037) {
+                                            // c is 3rd char of octal sequence only
+                                            // if the resulting val <= 0377
+                                            val = 8 * val + character - '0';
+                                            character = getChar();
+                                        }
+                                    }
+                                    ungetChar(character);
+                                    character = val;
+                                }
+                        }
+                    }
+
                     if (character == '$' && !wasJustEscape) {
                         int aChar = getChar(false);
 

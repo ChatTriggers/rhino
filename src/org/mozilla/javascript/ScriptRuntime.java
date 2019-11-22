@@ -17,6 +17,7 @@ import org.mozilla.javascript.xml.XMLObject;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -815,6 +816,32 @@ public class ScriptRuntime {
         return str;
     }
 
+    public static Object callWithTemplateLiteral(Object[] args, int boundary, Object target, Context cx, Scriptable scope, Scriptable thisObj) {
+        if (!(target instanceof Callable)) {
+            // TODO: Error
+            throw Kit.codeBug();
+        }
+
+        Callable fn = (Callable) target;
+
+        // NativeArray parts = new NativeArray(Arrays.copyOfRange(args, 0, boundary));
+        Scriptable parts = cx.newArray(scope, Arrays.copyOfRange(args, 0, boundary));
+        Object[] rawArgs = new Object[boundary];
+
+        for (int i = 0; i < boundary; i++) {
+
+            rawArgs[i] = ScriptRuntime.escapeString((String) args[i]);
+        }
+
+        ScriptableObject.putProperty(parts, "raw", cx.newArray(scope, rawArgs));
+
+        Object[] fnArgs = new Object[args.length - boundary + 1];
+        fnArgs[0] = parts;
+        System.arraycopy(args, boundary, fnArgs, 1, fnArgs.length - 1);
+
+        return fn.call(cx, scope, thisObj, fnArgs);
+    }
+
     /**
      * Helper function for builtin objects that use the varargs form.
      * ECMA function formal arguments are undefined if not supplied;
@@ -861,6 +888,7 @@ public class ScriptRuntime {
                 }
                 continue;
             }
+
             if (sb == null) {
                 sb = new StringBuilder(L + 3);
                 sb.append(s);

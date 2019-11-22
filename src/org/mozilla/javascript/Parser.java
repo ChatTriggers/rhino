@@ -2742,7 +2742,10 @@ public class Parser {
             } else {
                 int nextToken = peekToken();
 
-                if (nextToken == Token.LB) {
+                if (nextToken == Token.TEMPLATE) {
+                    consumeToken();
+                    pn = templateLiteral(pn);
+                } else if (nextToken == Token.LB) {
                     pn = matchElementGet(pn);
                 } else if (nextToken == Token.LP) {
                     AstNode returned = matchFunctionCall(pn, allowCallSyntax);
@@ -3127,7 +3130,7 @@ public class Parser {
 
             case Token.TEMPLATE:
                 consumeToken();
-                pn = templateLiteral();
+                pn = templateLiteral(null);
                 break;
 
             case Token.NULL:
@@ -3174,7 +3177,7 @@ public class Parser {
         // return makeErrorNode();
     }
 
-    private AstNode templateLiteral() throws IOException {
+    private AstNode templateLiteral(AstNode target) throws IOException {
         int token = peekToken();
         TemplateLiteral lit = new TemplateLiteral();
 
@@ -3201,6 +3204,8 @@ public class Parser {
         }
 
         consumeToken(); // Consume trailing '`'
+
+        lit.setTarget(target);
         return lit;
     }
 
