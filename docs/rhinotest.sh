@@ -7,7 +7,7 @@
 # 4) Edit "rhinoversions.js" to add your new version to the list
 # 5) Run this script!
 
-rhinoJar=../buildGradle/libs/rhino-1.7.14-SNAPSHOT.jar
+rhinoJar=../buildGradle/libs/rhino-1.7.15-SNAPSHOT.jar
 rhinoVersion=master
 
 # curl https://raw.githubusercontent.com/kangax/compat-table/gh-pages/data-es6.js > data-es6.js
