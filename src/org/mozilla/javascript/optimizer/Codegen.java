@@ -2964,6 +2964,15 @@ class BodyCodegen {
                 break;
             }
 
+            case Token.EMPTY: {
+                if (parent.getType() != Token.ARRAYLIT && parent.getProp(Node.SPREAD_PROP) == null) {
+                    throw new RuntimeException("Unexpected node type " + type);
+                }
+
+                Codegen.pushUndefined(cfw);
+                break;
+            }
+
             default:
                 throw new RuntimeException("Unexpected node type " + type);
         }

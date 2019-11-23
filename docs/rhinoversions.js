@@ -10,6 +10,6 @@ module.exports = {
   '1.7.11': true,
   // '1.7.12': true,
   // '1.7.13': true,
-  // '1.7.14': true,
+  '1.7.14': true,
   'master': true,
 };

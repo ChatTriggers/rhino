@@ -365,11 +365,17 @@ public final class IRFactory extends Parser {
         List<AstNode> elems = node.getElements();
         Node array = new Node(Token.ARRAYLIT);
         List<Integer> skipIndexes = null;
+        boolean spreading = node.getProp(Node.SPREAD_PROP) != null;
         for (int i = 0; i < elems.size(); ++i) {
             AstNode elem = elems.get(i);
             if (elem.getType() != Token.EMPTY) {
                 array.addChildToBack(transform(elem));
             } else {
+                if (spreading) {
+                    array.addChildToBack(elem);
+                    continue;
+                }
+
                 if (skipIndexes == null) {
                     skipIndexes = new ArrayList<>();
                 }
