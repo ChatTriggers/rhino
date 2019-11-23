@@ -77,6 +77,13 @@ final class NativeNumber extends IdScriptableObject {
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isInteger, "isInteger", 1);
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isSafeInteger, "isSafeInteger", 1);
 
+        Scriptable global = ScriptableObject.getTopLevelScope(this);
+
+        Object parseFloat = ScriptableObject.getProperty(global, "parseFloat");
+        Object parseInt = ScriptableObject.getProperty(global, "parseInt");
+        ScriptableObject.putProperty(ctor, "parseFloat", parseFloat);
+        ScriptableObject.putProperty(ctor, "parseInt", parseInt);
+
         super.fillConstructorProperties(ctor);
     }
 
