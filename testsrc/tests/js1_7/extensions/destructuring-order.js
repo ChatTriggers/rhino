@@ -31,7 +31,7 @@ function partialEvalObj()
 {
   try
   {
-    ({a:a, b:b}) = exceptObj();
+    ({a:a, b:b} = exceptObj());
     throw "FAILED";
   }
   catch (ex)
@@ -115,7 +115,7 @@ function objWithGetters()
 
 function partialEvalObj2()
 {
-  ({g: g, h: h, i: i, j: j, k: k}) = objWithGetters();
+  ({g: g, h: h, i: i, j: j, k: k} = objWithGetters());
 }
 
 try

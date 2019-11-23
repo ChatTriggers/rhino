@@ -55,7 +55,7 @@ dependencies {
 }
 
 test {
-    exclude '**/*'
+//    exclude '**/*'
     useJUnit()
     exclude "**/benchmarks/**"
 

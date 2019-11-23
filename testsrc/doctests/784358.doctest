@@ -75,7 +75,7 @@ true
 js> delete v1
 false
 js> delete v2
-true
+false
 js> delete c1
 false
 js> delete c2

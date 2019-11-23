@@ -1,12 +1,3 @@
-e4x/GC/regress-324278.js
-e4x/Regress/regress-308111.js
-e4x/Regress/regress-319872.js
-e4x/Regress/regress-473709.js
-e4x/Regress/regress-474319.js
-e4x/extensions/regress-352846-01.js
-e4x/extensions/regress-352846-02.js
-e4x/extensions/regress-352846-03.js
-e4x/extensions/regress-393874.js
 ecma/Date/15.9.5.10-2.js
 ecma_3/Array/regress-322135-02.js
 ecma_3/Array/regress-322135-03.js
@@ -59,4 +50,3 @@ js1_7/extensions/regress-458288.js
 js1_7/extensions/regress-458679.js
 js1_7/iterable/regress-341815.js
 js1_7/iterable/regress-341821.js
-js1_7/regress/regress-474771.js
