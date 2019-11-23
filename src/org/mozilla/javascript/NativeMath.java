@@ -18,6 +18,8 @@ final class NativeMath extends IdScriptableObject {
 
     private static final Object MATH_TAG = "Math";
     private static final double LOG2E = 1.4426950408889634;
+    private static final double DEG_PER_RAD = 0.017453292519943295;
+    private static final double RAD_PER_DEG = 57.29577951308232;
 
     static void init(Scriptable scope, boolean sealed) {
         NativeMath obj = new NativeMath();
@@ -189,6 +191,26 @@ final class NativeMath extends IdScriptableObject {
                     arity = 1;
                     name = "trunc";
                     break;
+                case Id_clamp:
+                    arity = 3;
+                    name = "clamp";
+                    break;
+                case Id_fscale:
+                    arity = 5;
+                    name = "fscale";
+                    break;
+                case Id_scale:
+                    arity = 5;
+                    name = "scale";
+                    break;
+                case Id_degrees:
+                    arity = 1;
+                    name = "degrees";
+                    break;
+                case Id_radians:
+                    arity = 1;
+                    name = "radians";
+                    break;
                 default:
                     throw new IllegalStateException(String.valueOf(id));
             }
@@ -228,6 +250,14 @@ final class NativeMath extends IdScriptableObject {
                 case Id_SQRT2:
                     x = 1.4142135623730951;
                     name = "SQRT2";
+                    break;
+                case Id_RAD_PER_DEG:
+                    x = RAD_PER_DEG;
+                    name = "RAD_PER_DEG";
+                    break;
+                case Id_DEG_PER_RAD:
+                    x = DEG_PER_RAD;
+                    name = "DEG_PER_RAD";
                     break;
                 default:
                     throw new IllegalStateException(String.valueOf(id));
@@ -493,10 +523,105 @@ final class NativeMath extends IdScriptableObject {
                 x = js_trunc(x);
                 break;
 
+            case Id_scale:
+                x = js_scale(
+                        ScriptRuntime.toNumber(args, 0),
+                        ScriptRuntime.toNumber(args, 1),
+                        ScriptRuntime.toNumber(args, 2),
+                        ScriptRuntime.toNumber(args, 3),
+                        ScriptRuntime.toNumber(args, 4)
+                );
+                break;
+
+            case Id_fscale:
+                x = js_fscale(
+                        ScriptRuntime.toNumber(args, 0),
+                        ScriptRuntime.toNumber(args, 1),
+                        ScriptRuntime.toNumber(args, 2),
+                        ScriptRuntime.toNumber(args, 3),
+                        ScriptRuntime.toNumber(args, 4)
+                );
+                break;
+
+            case Id_degrees:
+                x = ScriptRuntime.toNumber(args, 0);
+                x = js_degrees(x);
+                break;
+
+            case Id_radians:
+                x = ScriptRuntime.toNumber(args, 0);
+                x = js_radians(x);
+                break;
+
+            case Id_clamp:
+                x = js_clamp(
+                        ScriptRuntime.toNumber(args, 0),
+                        ScriptRuntime.toNumber(args, 1),
+                        ScriptRuntime.toNumber(args, 2)
+                );
+                break;
+
             default:
                 throw new IllegalStateException(String.valueOf(methodId));
         }
         return ScriptRuntime.wrapNumber(x);
+    }
+
+    private static double js_fscale(double x, double inLow, double inHigh, double outLow, double outHigh) {
+        if (Double.isNaN(x) || Double.isNaN(inLow) || Double.isNaN(inHigh) || Double.isNaN(outLow) || Double.isNaN(outHigh)) {
+            return Double.NaN;
+        }
+
+        if (Double.isInfinite(x)) {
+            return x;
+        }
+
+
+
+        return (float) ((x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow);
+    }
+
+    @SuppressWarnings("IntegerDivisionInFloatingPointContext")
+    private static double js_scale(double x, double inLow, double inHigh, double outLow, double outHigh) {
+        if (Double.isNaN(x) || Double.isNaN(inLow) || Double.isNaN(inHigh) || Double.isNaN(outLow) || Double.isNaN(outHigh)) {
+            return Double.NaN;
+        }
+
+        if (Double.isInfinite(x)) {
+            return x;
+        }
+
+        int ix = (int) x;
+        int iinLow = (int) inLow;
+        int iinHigh = (int) inHigh;
+        int ioutLow = (int) outLow;
+        int ioutHigh = (int) outHigh;
+
+        return (ix - iinLow) * (ioutHigh - ioutLow) / (iinHigh - iinLow) + ioutLow;
+    }
+
+    private static double js_degrees(double x) {
+        if (Double.isNaN(x) || Double.isInfinite(x)) {
+            return x;
+        }
+
+        return x * RAD_PER_DEG;
+    }
+
+    private static double js_radians(double x) {
+        if (Double.isNaN(x) || Double.isInfinite(x)) {
+            return x;
+        }
+
+        return x * DEG_PER_RAD;
+    }
+
+    private static double js_clamp(double x, double lower, double upper) {
+        if (Double.isNaN(x) || Double.isNaN(lower) || Double.isNaN(upper)) {
+            return Double.NaN;
+        }
+
+        return Math.min(Math.max(x, lower), upper);
     }
 
     // See Ecma 15.8.2.13
@@ -594,252 +719,89 @@ final class NativeMath extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2018-07-02 19:08:32 MESZ
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            L:
-            switch (s.length()) {
-                case 1:
-                    if (s.charAt(0) == 'E') {
-                        id = Id_E;
-                        break L0;
+// #generated# Last update: 2019-11-23 15:34:36 CST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 1: if (s.charAt(0)=='E') {id=Id_E; break L0;} break L;
+            case 2: if (s.charAt(0)=='P' && s.charAt(1)=='I') {id=Id_PI; break L0;} break L;
+            case 3: switch (s.charAt(0)) {
+                case 'L': if (s.charAt(2)=='2' && s.charAt(1)=='N') {id=Id_LN2; break L0;} break L;
+                case 'a': if (s.charAt(2)=='s' && s.charAt(1)=='b') {id=Id_abs; break L0;} break L;
+                case 'c': if (s.charAt(2)=='s' && s.charAt(1)=='o') {id=Id_cos; break L0;} break L;
+                case 'e': if (s.charAt(2)=='p' && s.charAt(1)=='x') {id=Id_exp; break L0;} break L;
+                case 'l': if (s.charAt(2)=='g' && s.charAt(1)=='o') {id=Id_log; break L0;} break L;
+                case 'm': c=s.charAt(2);
+                    if (c=='n') { if (s.charAt(1)=='i') {id=Id_min; break L0;} }
+                    else if (c=='x') { if (s.charAt(1)=='a') {id=Id_max; break L0;} }
+                    break L;
+                case 'p': if (s.charAt(2)=='w' && s.charAt(1)=='o') {id=Id_pow; break L0;} break L;
+                case 's': if (s.charAt(2)=='n' && s.charAt(1)=='i') {id=Id_sin; break L0;} break L;
+                case 't': if (s.charAt(2)=='n' && s.charAt(1)=='a') {id=Id_tan; break L0;} break L;
+                } break L;
+            case 4: switch (s.charAt(1)) {
+                case 'N': X="LN10";id=Id_LN10; break L;
+                case 'a': X="tanh";id=Id_tanh; break L;
+                case 'b': X="cbrt";id=Id_cbrt; break L;
+                case 'c': X="acos";id=Id_acos; break L;
+                case 'e': X="ceil";id=Id_ceil; break L;
+                case 'i': c=s.charAt(3);
+                    if (c=='h') { if (s.charAt(0)=='s' && s.charAt(2)=='n') {id=Id_sinh; break L0;} }
+                    else if (c=='n') { if (s.charAt(0)=='s' && s.charAt(2)=='g') {id=Id_sign; break L0;} }
+                    break L;
+                case 'm': X="imul";id=Id_imul; break L;
+                case 'o': c=s.charAt(0);
+                    if (c=='c') { if (s.charAt(2)=='s' && s.charAt(3)=='h') {id=Id_cosh; break L0;} }
+                    else if (c=='l') { if (s.charAt(2)=='g' && s.charAt(3)=='2') {id=Id_log2; break L0;} }
+                    break L;
+                case 'q': X="sqrt";id=Id_sqrt; break L;
+                case 's': X="asin";id=Id_asin; break L;
+                case 't': X="atan";id=Id_atan; break L;
+                } break L;
+            case 5: switch (s.charAt(0)) {
+                case 'L': X="LOG2E";id=Id_LOG2E; break L;
+                case 'S': X="SQRT2";id=Id_SQRT2; break L;
+                case 'a': c=s.charAt(1);
+                    if (c=='c') { X="acosh";id=Id_acosh; }
+                    else if (c=='s') { X="asinh";id=Id_asinh; }
+                    else if (c=='t') {
+                        c=s.charAt(4);
+                        if (c=='2') { if (s.charAt(2)=='a' && s.charAt(3)=='n') {id=Id_atan2; break L0;} }
+                        else if (c=='h') { if (s.charAt(2)=='a' && s.charAt(3)=='n') {id=Id_atanh; break L0;} }
                     }
                     break L;
-                case 2:
-                    if (s.charAt(0) == 'P' && s.charAt(1) == 'I') {
-                        id = Id_PI;
-                        break L0;
-                    }
+                case 'c': c=s.charAt(4);
+                    if (c=='2') { X="clz32";id=Id_clz32; }
+                    else if (c=='p') { X="clamp";id=Id_clamp; }
                     break L;
-                case 3:
-                    switch (s.charAt(0)) {
-                        case 'L':
-                            if (s.charAt(2) == '2' && s.charAt(1) == 'N') {
-                                id = Id_LN2;
-                                break L0;
-                            }
-                            break L;
-                        case 'a':
-                            if (s.charAt(2) == 's' && s.charAt(1) == 'b') {
-                                id = Id_abs;
-                                break L0;
-                            }
-                            break L;
-                        case 'c':
-                            if (s.charAt(2) == 's' && s.charAt(1) == 'o') {
-                                id = Id_cos;
-                                break L0;
-                            }
-                            break L;
-                        case 'e':
-                            if (s.charAt(2) == 'p' && s.charAt(1) == 'x') {
-                                id = Id_exp;
-                                break L0;
-                            }
-                            break L;
-                        case 'l':
-                            if (s.charAt(2) == 'g' && s.charAt(1) == 'o') {
-                                id = Id_log;
-                                break L0;
-                            }
-                            break L;
-                        case 'm':
-                            c = s.charAt(2);
-                            if (c == 'n') {
-                                if (s.charAt(1) == 'i') {
-                                    id = Id_min;
-                                    break L0;
-                                }
-                            } else if (c == 'x') {
-                                if (s.charAt(1) == 'a') {
-                                    id = Id_max;
-                                    break L0;
-                                }
-                            }
-                            break L;
-                        case 'p':
-                            if (s.charAt(2) == 'w' && s.charAt(1) == 'o') {
-                                id = Id_pow;
-                                break L0;
-                            }
-                            break L;
-                        case 's':
-                            if (s.charAt(2) == 'n' && s.charAt(1) == 'i') {
-                                id = Id_sin;
-                                break L0;
-                            }
-                            break L;
-                        case 't':
-                            if (s.charAt(2) == 'n' && s.charAt(1) == 'a') {
-                                id = Id_tan;
-                                break L0;
-                            }
-                            break L;
-                    }
+                case 'e': X="expm1";id=Id_expm1; break L;
+                case 'f': X="floor";id=Id_floor; break L;
+                case 'h': X="hypot";id=Id_hypot; break L;
+                case 'l': c=s.charAt(4);
+                    if (c=='0') { X="log10";id=Id_log10; }
+                    else if (c=='p') { X="log1p";id=Id_log1p; }
                     break L;
-                case 4:
-                    switch (s.charAt(1)) {
-                        case 'N':
-                            X = "LN10";
-                            id = Id_LN10;
-                            break L;
-                        case 'a':
-                            X = "tanh";
-                            id = Id_tanh;
-                            break L;
-                        case 'b':
-                            X = "cbrt";
-                            id = Id_cbrt;
-                            break L;
-                        case 'c':
-                            X = "acos";
-                            id = Id_acos;
-                            break L;
-                        case 'e':
-                            X = "ceil";
-                            id = Id_ceil;
-                            break L;
-                        case 'i':
-                            c = s.charAt(3);
-                            if (c == 'h') {
-                                if (s.charAt(0) == 's' && s.charAt(2) == 'n') {
-                                    id = Id_sinh;
-                                    break L0;
-                                }
-                            } else if (c == 'n') {
-                                if (s.charAt(0) == 's' && s.charAt(2) == 'g') {
-                                    id = Id_sign;
-                                    break L0;
-                                }
-                            }
-                            break L;
-                        case 'm':
-                            X = "imul";
-                            id = Id_imul;
-                            break L;
-                        case 'o':
-                            c = s.charAt(0);
-                            if (c == 'c') {
-                                if (s.charAt(2) == 's' && s.charAt(3) == 'h') {
-                                    id = Id_cosh;
-                                    break L0;
-                                }
-                            } else if (c == 'l') {
-                                if (s.charAt(2) == 'g' && s.charAt(3) == '2') {
-                                    id = Id_log2;
-                                    break L0;
-                                }
-                            }
-                            break L;
-                        case 'q':
-                            X = "sqrt";
-                            id = Id_sqrt;
-                            break L;
-                        case 's':
-                            X = "asin";
-                            id = Id_asin;
-                            break L;
-                        case 't':
-                            X = "atan";
-                            id = Id_atan;
-                            break L;
-                    }
-                    break L;
-                case 5:
-                    switch (s.charAt(0)) {
-                        case 'L':
-                            X = "LOG2E";
-                            id = Id_LOG2E;
-                            break L;
-                        case 'S':
-                            X = "SQRT2";
-                            id = Id_SQRT2;
-                            break L;
-                        case 'a':
-                            c = s.charAt(1);
-                            if (c == 'c') {
-                                X = "acosh";
-                                id = Id_acosh;
-                            } else if (c == 's') {
-                                X = "asinh";
-                                id = Id_asinh;
-                            } else if (c == 't') {
-                                c = s.charAt(4);
-                                if (c == '2') {
-                                    if (s.charAt(2) == 'a' && s.charAt(3) == 'n') {
-                                        id = Id_atan2;
-                                        break L0;
-                                    }
-                                } else if (c == 'h') {
-                                    if (s.charAt(2) == 'a' && s.charAt(3) == 'n') {
-                                        id = Id_atanh;
-                                        break L0;
-                                    }
-                                }
-                            }
-                            break L;
-                        case 'c':
-                            X = "clz32";
-                            id = Id_clz32;
-                            break L;
-                        case 'e':
-                            X = "expm1";
-                            id = Id_expm1;
-                            break L;
-                        case 'f':
-                            X = "floor";
-                            id = Id_floor;
-                            break L;
-                        case 'h':
-                            X = "hypot";
-                            id = Id_hypot;
-                            break L;
-                        case 'l':
-                            c = s.charAt(4);
-                            if (c == '0') {
-                                X = "log10";
-                                id = Id_log10;
-                            } else if (c == 'p') {
-                                X = "log1p";
-                                id = Id_log1p;
-                            }
-                            break L;
-                        case 'r':
-                            X = "round";
-                            id = Id_round;
-                            break L;
-                        case 't':
-                            X = "trunc";
-                            id = Id_trunc;
-                            break L;
-                    }
-                    break L;
-                case 6:
-                    c = s.charAt(0);
-                    if (c == 'L') {
-                        X = "LOG10E";
-                        id = Id_LOG10E;
-                    } else if (c == 'f') {
-                        X = "fround";
-                        id = Id_fround;
-                    } else if (c == 'r') {
-                        X = "random";
-                        id = Id_random;
-                    }
-                    break L;
-                case 7:
-                    X = "SQRT1_2";
-                    id = Id_SQRT1_2;
-                    break L;
-                case 8:
-                    X = "toSource";
-                    id = Id_toSource;
-                    break L;
+                case 'r': X="round";id=Id_round; break L;
+                case 's': X="scale";id=Id_scale; break L;
+                case 't': X="trunc";id=Id_trunc; break L;
+                } break L;
+            case 6: switch (s.charAt(1)) {
+                case 'O': X="LOG10E";id=Id_LOG10E; break L;
+                case 'a': X="random";id=Id_random; break L;
+                case 'r': X="fround";id=Id_fround; break L;
+                case 's': X="fscale";id=Id_fscale; break L;
+                } break L;
+            case 7: c=s.charAt(0);
+                if (c=='S') { X="SQRT1_2";id=Id_SQRT1_2; }
+                else if (c=='d') { X="degrees";id=Id_degrees; }
+                else if (c=='r') { X="radians";id=Id_radians; }
+                break L;
+            case 8: X="toSource";id=Id_toSource; break L;
+            case 11: c=s.charAt(0);
+                if (c=='D') { X="DEG_PER_RAD";id=Id_DEG_PER_RAD; }
+                else if (c=='R') { X="RAD_PER_DEG";id=Id_RAD_PER_DEG; }
+                break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -883,8 +845,13 @@ final class NativeMath extends IdScriptableObject {
             Id_log2 = 34,
             Id_fround = 35,
             Id_clz32 = 36,
+            Id_clamp = 37,
+            Id_degrees = 38,
+            Id_fscale = 39,
+            Id_radians = 40,
+            Id_scale = 41,
 
-    LAST_METHOD_ID = Id_clz32;
+    LAST_METHOD_ID = Id_scale;
 
 /* Missing from ES6:
     clz32
@@ -901,8 +868,10 @@ final class NativeMath extends IdScriptableObject {
             Id_LOG10E = LAST_METHOD_ID + 6,
             Id_SQRT1_2 = LAST_METHOD_ID + 7,
             Id_SQRT2 = LAST_METHOD_ID + 8,
+            Id_DEG_PER_RAD = LAST_METHOD_ID + 9,
+            Id_RAD_PER_DEG = LAST_METHOD_ID + 10,
 
-    MAX_ID = LAST_METHOD_ID + 8;
+    MAX_ID = Id_RAD_PER_DEG;
 
 // #/string_id_map#
 }
