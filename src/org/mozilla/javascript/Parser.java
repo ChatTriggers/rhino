@@ -2474,6 +2474,10 @@ public class Parser {
         for (; ; ) {
             int tt = peekToken(), opPos = ts.tokenBeg;
             if (tt == Token.EXP) {
+                if (pn instanceof UnaryExpression) {
+                    reportError("msg.exp.unparenthesized");
+                    return makeErrorNode();
+                }
                 consumeToken();
                 pn = new InfixExpression(tt, pn, unaryExpr(), opPos);
                 continue;
