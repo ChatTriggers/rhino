@@ -211,6 +211,10 @@ final class NativeMath extends IdScriptableObject {
                     arity = 1;
                     name = "radians";
                     break;
+                case Id_signbit:
+                    arity = 1;
+                    name = "signbit";
+                    break;
                 default:
                     throw new IllegalStateException(String.valueOf(id));
             }
@@ -561,67 +565,13 @@ final class NativeMath extends IdScriptableObject {
                 );
                 break;
 
+            case Id_signbit:
+                return js_signbit(ScriptRuntime.toNumber(args, 0));
+
             default:
                 throw new IllegalStateException(String.valueOf(methodId));
         }
         return ScriptRuntime.wrapNumber(x);
-    }
-
-    private static double js_fscale(double x, double inLow, double inHigh, double outLow, double outHigh) {
-        if (Double.isNaN(x) || Double.isNaN(inLow) || Double.isNaN(inHigh) || Double.isNaN(outLow) || Double.isNaN(outHigh)) {
-            return Double.NaN;
-        }
-
-        if (Double.isInfinite(x)) {
-            return x;
-        }
-
-
-
-        return (float) ((x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow);
-    }
-
-    @SuppressWarnings("IntegerDivisionInFloatingPointContext")
-    private static double js_scale(double x, double inLow, double inHigh, double outLow, double outHigh) {
-        if (Double.isNaN(x) || Double.isNaN(inLow) || Double.isNaN(inHigh) || Double.isNaN(outLow) || Double.isNaN(outHigh)) {
-            return Double.NaN;
-        }
-
-        if (Double.isInfinite(x)) {
-            return x;
-        }
-
-        int ix = (int) x;
-        int iinLow = (int) inLow;
-        int iinHigh = (int) inHigh;
-        int ioutLow = (int) outLow;
-        int ioutHigh = (int) outHigh;
-
-        return (ix - iinLow) * (ioutHigh - ioutLow) / (iinHigh - iinLow) + ioutLow;
-    }
-
-    private static double js_degrees(double x) {
-        if (Double.isNaN(x) || Double.isInfinite(x)) {
-            return x;
-        }
-
-        return x * RAD_PER_DEG;
-    }
-
-    private static double js_radians(double x) {
-        if (Double.isNaN(x) || Double.isInfinite(x)) {
-            return x;
-        }
-
-        return x * DEG_PER_RAD;
-    }
-
-    private static double js_clamp(double x, double lower, double upper) {
-        if (Double.isNaN(x) || Double.isNaN(lower) || Double.isNaN(upper)) {
-            return Double.NaN;
-        }
-
-        return Math.min(Math.max(x, lower), upper);
     }
 
     // See Ecma 15.8.2.13
@@ -714,12 +664,69 @@ final class NativeMath extends IdScriptableObject {
         return x * y;
     }
 
+    private static double js_fscale(double x, double inLow, double inHigh, double outLow, double outHigh) {
+        if (Double.isNaN(x) || Double.isNaN(inLow) || Double.isNaN(inHigh) || Double.isNaN(outLow) || Double.isNaN(outHigh)) {
+            return Double.NaN;
+        } else if (Double.isInfinite(x)) {
+            return x;
+        }
+
+        return (float) ((x - inLow) * (outHigh - outLow) / (inHigh - inLow) + outLow);
+    }
+
+    @SuppressWarnings("IntegerDivisionInFloatingPointContext")
+    private static double js_scale(double x, double inLow, double inHigh, double outLow, double outHigh) {
+        if (Double.isNaN(x) || Double.isNaN(inLow) || Double.isNaN(inHigh) || Double.isNaN(outLow) || Double.isNaN(outHigh)) {
+            return Double.NaN;
+        }
+
+        if (Double.isInfinite(x)) {
+            return x;
+        }
+
+        int ix = (int) x;
+        int iinLow = (int) inLow;
+        int iinHigh = (int) inHigh;
+        int ioutLow = (int) outLow;
+        int ioutHigh = (int) outHigh;
+
+        return (ix - iinLow) * (ioutHigh - ioutLow) / (iinHigh - iinLow) + ioutLow;
+    }
+
+    private static double js_degrees(double x) {
+        if (Double.isNaN(x) || Double.isInfinite(x)) {
+            return x;
+        }
+
+        return x * RAD_PER_DEG;
+    }
+
+    private static double js_radians(double x) {
+        if (Double.isNaN(x) || Double.isInfinite(x)) {
+            return x;
+        }
+
+        return x * DEG_PER_RAD;
+    }
+
+    private static double js_clamp(double x, double lower, double upper) {
+        if (Double.isNaN(x) || Double.isNaN(lower) || Double.isNaN(upper)) {
+            return Double.NaN;
+        }
+
+        return Math.min(Math.max(x, lower), upper);
+    }
+
+    private static boolean js_signbit(double x) {
+        return !Double.isNaN(x) && (x < 0 || ScriptRuntime.same(x, -0.0D));
+    }
+
 // #string_id_map#
 
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-11-23 15:34:36 CST
+// #generated# Last update: 2019-11-23 15:47:29 CST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 1: if (s.charAt(0)=='E') {id=Id_E; break L0;} break L;
@@ -790,11 +797,12 @@ final class NativeMath extends IdScriptableObject {
                 case 'r': X="fround";id=Id_fround; break L;
                 case 's': X="fscale";id=Id_fscale; break L;
                 } break L;
-            case 7: c=s.charAt(0);
-                if (c=='S') { X="SQRT1_2";id=Id_SQRT1_2; }
-                else if (c=='d') { X="degrees";id=Id_degrees; }
-                else if (c=='r') { X="radians";id=Id_radians; }
-                break L;
+            case 7: switch (s.charAt(0)) {
+                case 'S': X="SQRT1_2";id=Id_SQRT1_2; break L;
+                case 'd': X="degrees";id=Id_degrees; break L;
+                case 'r': X="radians";id=Id_radians; break L;
+                case 's': X="signbit";id=Id_signbit; break L;
+                } break L;
             case 8: X="toSource";id=Id_toSource; break L;
             case 11: c=s.charAt(0);
                 if (c=='D') { X="DEG_PER_RAD";id=Id_DEG_PER_RAD; }
@@ -850,8 +858,9 @@ final class NativeMath extends IdScriptableObject {
             Id_fscale = 39,
             Id_radians = 40,
             Id_scale = 41,
+            Id_signbit = 42,
 
-    LAST_METHOD_ID = Id_scale;
+    LAST_METHOD_ID = Id_signbit;
 
 /* Missing from ES6:
     clz32
