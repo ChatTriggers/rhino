@@ -203,6 +203,7 @@ public class ScriptRuntime {
 
         NativeArrayIterator.init(scope, sealed);
         NativeStringIterator.init(scope, sealed);
+        NativeGeneratorIterator.init(scope, sealed);
 
         boolean withXml = cx.hasFeature(Context.FEATURE_E4X) &&
                 cx.getE4xImplementationFactory() != null;
@@ -755,10 +756,6 @@ public class ScriptRuntime {
         return Undefined.instance;
     }
 
-    private static boolean isIterable(Scriptable obj) {
-        return ScriptableObject.hasProperty(obj, SymbolKey.ITERATOR);
-    }
-
     public static Object[] combineSpreadArgs(Object[] args, Context cx, Scriptable scope) {
         int totalArgs = 0;
 
@@ -791,28 +788,17 @@ public class ScriptRuntime {
                 args[i] = sArgs;
                 totalArgs += length;
             } else if (arg instanceof NativeGenerator) {
-                NativeGeneratorIterator it = new NativeGeneratorIterator(scope, (NativeGenerator) arg);
+                NativeGeneratorIterator it = (NativeGeneratorIterator) toIterator(cx, scope, (Scriptable) arg, true);
 
                 List<Object> ll = new LinkedList<>();
 
                 while (!it.isDone(cx, scope)) {
-                    ll.add(ScriptableObject.getProperty((Scriptable) it.nextValue(cx, scope), "value"));
+                    ll.add(it.nextValue(cx, scope));
                 }
 
-                // We'll always get an extra undefined value from the generator,
-                // as the last value it produces (the function return value) is
-                // not considered part of the iterable
-                int size = ll.size() - 1;
-
-                Object[] gArgs = new Object[size];
-
-                for (int j = 0; j < size; j++) {
-                    Object el = ll.get(j);
-                    gArgs[j] = el;
-                }
-
+                Object[] gArgs = ll.toArray();
                 args[i] = gArgs;
-                totalArgs += size;
+                totalArgs += ll.size();
             } else{
                 throw typeError1("msg.not.iterable", toString(arg));
             }
@@ -2287,18 +2273,14 @@ public class ScriptRuntime {
         Scriptable iterator;
     }
 
-    public static Scriptable toIterator(Context cx, Scriptable scope,
-                                        Scriptable obj, boolean keyOnly) {
-        if (ScriptableObject.hasProperty(obj,
-                NativeIterator.ITERATOR_PROPERTY_NAME)) {
-            Object v = ScriptableObject.getProperty(obj,
-                    NativeIterator.ITERATOR_PROPERTY_NAME);
+    public static Scriptable toIterator(Context cx, Scriptable scope, Scriptable obj, boolean keyOnly) {
+        if (ScriptableObject.hasProperty(obj, NativeIterator.ITERATOR_PROPERTY_NAME)) {
+            Object v = ScriptableObject.getProperty(obj, NativeIterator.ITERATOR_PROPERTY_NAME);
             if (!(v instanceof Callable)) {
                 throw typeError0("msg.invalid.iterator");
             }
             Callable f = (Callable) v;
-            Object[] args = new Object[]{keyOnly ? Boolean.TRUE
-                    : Boolean.FALSE};
+            Object[] args = new Object[]{keyOnly ? Boolean.TRUE : Boolean.FALSE};
             v = f.call(cx, scope, obj, args);
             if (!(v instanceof Scriptable)) {
                 throw typeError0("msg.iterator.primitive");
@@ -2315,8 +2297,7 @@ public class ScriptRuntime {
      */
     @Deprecated
     public static Object enumInit(Object value, Context cx, boolean enumValues) {
-        return enumInit(value, cx, enumValues ? ENUMERATE_VALUES
-                : ENUMERATE_KEYS);
+        return enumInit(value, cx, enumValues ? ENUMERATE_VALUES : ENUMERATE_KEYS);
     }
 
     public static final int ENUMERATE_KEYS = 0;
@@ -2335,8 +2316,7 @@ public class ScriptRuntime {
         return enumInit(value, cx, getTopCallScope(cx), enumType);
     }
 
-    public static Object enumInit(Object value, Context cx, Scriptable scope,
-                                  int enumType) {
+    public static Object enumInit(Object value, Context cx, Scriptable scope, int enumType) {
         IdEnumeration x = new IdEnumeration();
         x.obj = toObjectOrNull(cx, value, scope);
         // "for of" loop

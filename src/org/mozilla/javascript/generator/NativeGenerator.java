@@ -137,10 +137,10 @@ public final class NativeGenerator extends IdScriptableObject {
             }
 
             case SymbolId_iterator:
-                return new NativeGeneratorIterator(scope, (NativeGenerator) thisObj);
-
             case Id___iterator__:
-                return thisObj;
+                return new NativeGeneratorIterator(cx, scope, (NativeGenerator) thisObj);
+
+                // return thisObj;
 
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
@@ -152,10 +152,6 @@ public final class NativeGenerator extends IdScriptableObject {
             throw new JavaScriptException(value, lineSource, lineNumber);
         }
 
-        if (operation == GENERATOR_CLOSE) {
-            done = true;
-        }
-
         try {
             synchronized (this) {
                 // generator execution is necessarily single-threaded and
@@ -165,13 +161,8 @@ public final class NativeGenerator extends IdScriptableObject {
                     throw ScriptRuntime.typeError0("msg.already.exec.gen");
                 locked = true;
             }
-            Object ret = function.resumeGenerator(cx, scope, operation, savedState, value);
 
-            if (ret instanceof NativeObject && ScriptableObject.hasProperty((Scriptable) ret, "done")) {
-                done = (Boolean) ScriptableObject.getProperty((Scriptable) ret, "done");
-            }
-
-            return ret;
+            return function.resumeGenerator(cx, scope, operation, savedState, value);
         } catch (GeneratorClosedException e) {
             // On closing a generator in the compile path, the generator
             // throws a special exception. This ensures execution of all pending
@@ -233,7 +224,6 @@ public final class NativeGenerator extends IdScriptableObject {
     private int lineNumber;
     private boolean firstTime = true;
     private boolean locked;
-    boolean done = false;
 
     public static class GeneratorClosedException extends RuntimeException {
         private static final long serialVersionUID = 2561315658662379681L;
