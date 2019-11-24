@@ -1774,7 +1774,7 @@ class BodyCodegen {
                 OptRuntime.GeneratorState.resumptionPoint_TYPE);
     }
 
-    private void generateGetGeneratorStackState() {
+    private void generateGenGetStack() {
         cfw.addALoad(generatorStateLocal);
         addOptRuntimeInvoke("getGeneratorStackState",
                 "(Ljava/lang/Object;)[Ljava/lang/Object;");
@@ -3030,8 +3030,8 @@ class BodyCodegen {
         // save stack state
         int top = cfw.getStackTop();
         maxStack = Math.max(maxStack, top);
-        if (cfw.getStackTop() != 0) {
-            generateGetGeneratorStackState();
+        if (top != 0) {
+            generateGenGetStack();
             for (int i = 0; i < top; i++) {
                 cfw.add(ByteCode.DUP_X1);
                 cfw.add(ByteCode.SWAP);
@@ -3059,7 +3059,7 @@ class BodyCodegen {
 
         // reconstruct the stack
         if (top != 0) {
-            generateGetGeneratorStackState();
+            generateGenGetStack();
             for (int i = 0; i < top; i++) {
                 cfw.add(ByteCode.DUP);
                 cfw.addLoadConstant(top - i - 1);

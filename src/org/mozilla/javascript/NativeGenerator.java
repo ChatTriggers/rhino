@@ -85,10 +85,6 @@ public final class NativeGenerator extends IdScriptableObject {
                 arity = 1;
                 s = "next";
                 break;
-            case Id_send:
-                arity = 0;
-                s = "send";
-                break;
             case Id_throw:
                 arity = 0;
                 s = "throw";
@@ -124,18 +120,9 @@ public final class NativeGenerator extends IdScriptableObject {
                         new GeneratorClosedException());
 
             case Id_next:
-                // arguments to next() are ignored
                 generator.firstTime = false;
-                return generator.resume(cx, scope, GENERATOR_SEND,
-                        Undefined.instance);
-
-            case Id_send: {
                 Object arg = args.length > 0 ? args[0] : Undefined.instance;
-                if (generator.firstTime && !arg.equals(Undefined.instance)) {
-                    throw ScriptRuntime.typeError0("msg.send.newborn");
-                }
                 return generator.resume(cx, scope, GENERATOR_SEND, arg);
-            }
 
             case Id_throw:
                 return generator.resume(cx, scope, GENERATOR_THROW,
@@ -197,36 +184,17 @@ public final class NativeGenerator extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2007-06-14 13:13:03 EDT
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
+// #generated# Last update: 2019-11-24 13:30:37 CST
+        L0: { id = 0; String X = null; int c;
             int s_length = s.length();
-            if (s_length == 4) {
-                c = s.charAt(0);
-                if (c == 'n') {
-                    X = "next";
-                    id = Id_next;
-                } else if (c == 's') {
-                    X = "send";
-                    id = Id_send;
-                }
-            } else if (s_length == 5) {
-                c = s.charAt(0);
-                if (c == 'c') {
-                    X = "close";
-                    id = Id_close;
-                } else if (c == 't') {
-                    X = "throw";
-                    id = Id_throw;
-                }
-            } else if (s_length == 12) {
-                X = "__iterator__";
-                id = Id___iterator__;
+            if (s_length==4) { X="next";id=Id_next; }
+            else if (s_length==5) {
+                c=s.charAt(0);
+                if (c=='c') { X="close";id=Id_close; }
+                else if (c=='t') { X="throw";id=Id_throw; }
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            else if (s_length==12) { X="__iterator__";id=Id___iterator__; }
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -236,10 +204,9 @@ public final class NativeGenerator extends IdScriptableObject {
     private static final int
             Id_close = 1,
             Id_next = 2,
-            Id_send = 3,
-            Id_throw = 4,
-            Id___iterator__ = 5,
-            MAX_PROTOTYPE_ID = 5;
+            Id_throw = 3,
+            Id___iterator__ = 4,
+            MAX_PROTOTYPE_ID = 4;
 
     // #/string_id_map#
     private NativeFunction function;

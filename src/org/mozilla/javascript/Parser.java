@@ -2189,8 +2189,7 @@ public class Parser {
         }
     }
 
-    private AstNode expr()
-            throws IOException {
+    private AstNode expr() throws IOException {
         AstNode pn = assignExpr();
         int pos = pn.getPosition();
         while (matchToken(Token.COMMA, true)) {
@@ -2208,7 +2207,8 @@ public class Parser {
     private AstNode assignExpr() throws IOException {
         int tt = peekToken();
         if (tt == Token.YIELD) {
-            return returnOrYield(tt, true);
+            consumeToken();
+            return new Yield(ts.tokenBeg, ts.tokenEnd - ts.tokenBeg, assignExpr());
         }
         AstNode pn = condExpr();
         boolean hasEOL = false;
@@ -3276,7 +3276,7 @@ public class Parser {
             throws IOException {
         if (currentToken != Token.LB) codeBug();
         int pos = ts.tokenBeg, end = ts.tokenEnd;
-        List<AstNode> elements = new ArrayList<AstNode>();
+        List<AstNode> elements = new ArrayList<>();
         ArrayLiteral pn = new ArrayLiteral(pos);
         boolean after_lb_or_comma = true;
         int afterComma = -1;
