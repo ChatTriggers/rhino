@@ -140,8 +140,6 @@ public final class NativeGenerator extends IdScriptableObject {
             case Id___iterator__:
                 return new NativeGeneratorIterator(cx, scope, (NativeGenerator) thisObj);
 
-                // return thisObj;
-
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
