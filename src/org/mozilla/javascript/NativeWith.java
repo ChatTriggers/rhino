@@ -7,6 +7,7 @@
 package org.mozilla.javascript;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * This class implements the object lookup required for the
@@ -37,6 +38,28 @@ public class NativeWith implements Scriptable, SymbolScriptable, IdFunctionCall,
 
     protected NativeWith(Scriptable parent, Scriptable prototype) {
         this.parent = parent;
+
+        if (ScriptableObject.hasProperty(prototype, SymbolKey.UNSCOPABLES)) {
+            Object unscopables = ScriptableObject.getProperty(prototype, SymbolKey.UNSCOPABLES);
+
+            if (unscopables instanceof NativeObject) {
+                NativeObject obj = (NativeObject) unscopables;
+
+                for (Map.Entry<Object, Object> element : obj.entrySet()) {
+                    Object k = element.getKey();
+                    Object v = element.getValue();
+
+                    if (v instanceof Boolean && (boolean) v) {
+                        if (k instanceof String) {
+                            ScriptableObject.deleteProperty(prototype, (String) k);
+                        } else if (k instanceof Integer) {
+                            ScriptableObject.deleteProperty(prototype, (int) k);
+                        }
+                    }
+                }
+            }
+        }
+
         this.prototype = prototype;
     }
 
