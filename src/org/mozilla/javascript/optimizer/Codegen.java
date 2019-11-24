@@ -808,7 +808,8 @@ public class Codegen implements Evaluator {
         final int Do_getParamOrVarName = 3;
         final int Do_getEncodedSource = 4;
         final int Do_getParamOrVarConst = 5;
-        final int SWITCH_COUNT = 6;
+        final int Do_construct = 6;
+        final int SWITCH_COUNT = 7;
 
         for (int methodIndex = 0; methodIndex != SWITCH_COUNT; ++methodIndex) {
             if (methodIndex == Do_getEncodedSource && encodedSource == null) {
@@ -846,6 +847,14 @@ public class Codegen implements Evaluator {
                     methodLocals = 1; // Only this
                     cfw.startMethod("getEncodedSource", "()Ljava/lang/String;", ACC_PUBLIC);
                     cfw.addPush(encodedSource);
+                    break;
+                case Do_construct:
+                    methodLocals = 4;
+                    cfw.startMethod(
+                            "construct",
+                            "(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Lorg/mozilla/javascript/Scriptable;",
+                            ACC_PUBLIC
+                    );
                     break;
                 default:
                     throw Kit.codeBug();
@@ -987,6 +996,32 @@ public class Codegen implements Evaluator {
                                 "substring",
                                 "(II)Ljava/lang/String;");
                         cfw.add(ByteCode.ARETURN);
+                        break;
+
+                    case Do_construct:
+                        if (n instanceof FunctionNode && ((FunctionNode) n).isGenerator()) {
+                            cfw.addPush("msg.not.ctor");
+                            cfw.addPush(((FunctionNode) n).getName());
+                            cfw.addInvoke(
+                                    ByteCode.INVOKESTATIC,
+                                    "org.mozilla.javascript.ScriptRuntime",
+                                    "typeError1",
+                                    "(Ljava/lang/String;Ljava/lang/Object;)Lorg/mozilla/javascript/EcmaError;"
+                            );
+                            cfw.add(ByteCode.ATHROW);
+                        } else {
+                            cfw.addALoad(0);
+                            cfw.addALoad(1);
+                            cfw.addALoad(2);
+                            cfw.addALoad(3);
+                            cfw.addInvoke(
+                                    ByteCode.INVOKESPECIAL,
+                                    "org.mozilla.javascript.BaseFunction",
+                                    "construct",
+                                    "(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Lorg/mozilla/javascript/Scriptable;"
+                            );
+                            cfw.add(ByteCode.ARETURN);
+                        }
                         break;
 
                     default:
