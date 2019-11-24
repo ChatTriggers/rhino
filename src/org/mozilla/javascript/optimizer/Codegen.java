@@ -1839,7 +1839,7 @@ class BodyCodegen {
             cfw.markLabel(epilogueLabel);
         }
 
-        if (hasVarsInRegs) {
+        if (hasVarsInRegs && !isGenerator) {
             cfw.add(ByteCode.ARETURN);
             return;
         } else if (isGenerator) {
@@ -2982,7 +2982,7 @@ class BodyCodegen {
     private void generateYieldPoint(Node node, boolean exprContext) {
         // save stack state
         int top = cfw.getStackTop();
-        maxStack = maxStack > top ? maxStack : top;
+        maxStack = Math.max(maxStack, top);
         if (cfw.getStackTop() != 0) {
             generateGetGeneratorStackState();
             for (int i = 0; i < top; i++) {
@@ -2996,15 +2996,59 @@ class BodyCodegen {
             cfw.add(ByteCode.POP);
         }
 
+        int nextState = getNextGeneratorState(node);
+
+        // generate return object
+
+        // keys array
+        cfw.addPush(2);
+        cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(0);
+        cfw.addPush("value");
+        cfw.add(ByteCode.AASTORE);
+
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(1);
+        cfw.addPush("done");
+        cfw.add(ByteCode.AASTORE);
+
+        // values array
+        cfw.addPush(2);
+        cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+
         // generate the yield argument
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(0);
         Node child = node.getFirstChild();
         if (child != null)
             generateExpression(child, node);
         else
             Codegen.pushUndefined(cfw);
+        cfw.add(ByteCode.AASTORE);
+
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(1);
+        int resPoints = ((FunctionNode) scriptOrFn).getResumptionPoints().size();
+        if (nextState == resPoints) {
+            cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "TRUE", "Ljava/lang/Boolean;");
+        } else {
+            cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
+        }
+        cfw.add(ByteCode.AASTORE);
+
+        cfw.addALoad(contextLocal);
+        cfw.addALoad(variableObjectLocal);
+        addScriptRuntimeInvoke("newObjectLiteral",
+                "([Ljava/lang/Object;"
+                        + "[Ljava/lang/Object;"
+                        + "Lorg/mozilla/javascript/Context;"
+                        + "Lorg/mozilla/javascript/Scriptable;"
+                        + ")Lorg/mozilla/javascript/Scriptable;"
+        );
 
         // change the resumption state
-        int nextState = getNextGeneratorState(node);
         generateSetGeneratorResumptionPoint(nextState);
 
         boolean hasLocals = generateSaveLocals(node);

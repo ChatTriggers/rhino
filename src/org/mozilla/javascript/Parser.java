@@ -781,6 +781,11 @@ public class Parser {
         int functionSourceStart = ts.tokenBeg;  // start of "function" kwd
         Name name = null;
         AstNode memberExprNode = null;
+        boolean generator = false;
+
+        if (matchToken(Token.MUL, true)) {
+            generator = true;
+        }
 
         if (matchToken(Token.NAME, true)) {
             name = createNameNode(true, Token.NAME);
@@ -823,6 +828,9 @@ public class Parser {
 
         FunctionNode fnNode = new FunctionNode(functionSourceStart, name);
         fnNode.setFunctionType(type);
+        if (generator) {
+            fnNode.setIsGenerator();
+        }
         if (lpPos != -1)
             fnNode.setLp(lpPos - functionSourceStart);
 
@@ -1775,8 +1783,7 @@ public class Parser {
     private AstNode returnOrYield(int tt, boolean exprContext)
             throws IOException {
         if (!insideFunction()) {
-            reportError(tt == Token.RETURN ? "msg.bad.return"
-                    : "msg.bad.yield");
+            reportError(tt == Token.RETURN ? "msg.bad.return" : "msg.bad.yield");
         }
         consumeToken();
         int lineno = ts.lineno, pos = ts.tokenBeg, end = ts.tokenEnd;
@@ -1812,10 +1819,14 @@ public class Parser {
         } else {
             if (!insideFunction())
                 reportError("msg.bad.yield");
+            if (!(currentScriptOrFn instanceof FunctionNode) || !((FunctionNode) currentScriptOrFn).isGenerator()) {
+                reportError("msg.bad.yield.fn.type");
+                return makeErrorNode();
+            }
             endFlags |= Node.END_YIELDS;
             ret = new Yield(pos, end - pos, e);
             setRequiresActivation();
-            setIsGenerator();
+            // setIsGenerator();
             if (!exprContext) {
                 ret = new ExpressionStatement(ret);
             }

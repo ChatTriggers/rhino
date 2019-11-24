@@ -64,7 +64,7 @@ public class FunctionNode extends ScriptNode {
     public enum Form {FUNCTION, GETTER, SETTER, METHOD}
 
     private static final List<AstNode> NO_PARAMS =
-            Collections.unmodifiableList(new ArrayList<AstNode>());
+            Collections.unmodifiableList(new ArrayList<>());
 
     private static final Map<Integer, Node> NO_DEFAULT_PARAMS =
             Collections.unmodifiableMap(new HashMap<>());
@@ -337,7 +337,7 @@ public class FunctionNode extends ScriptNode {
 
     public void addLiveLocals(Node node, int[] locals) {
         if (liveLocals == null)
-            liveLocals = new HashMap<Node, int[]>();
+            liveLocals = new HashMap<>();
         liveLocals.put(node, locals);
     }
 
