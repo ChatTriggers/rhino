@@ -1832,17 +1832,6 @@ public class Parser {
             }
         }
 
-        // see if we are mixing yields and value returns.
-        if (insideFunction()
-                && nowAllSet(before, endFlags,
-                Node.END_YIELDS | Node.END_RETURNS_VALUE)) {
-            Name name = ((FunctionNode) currentScriptOrFn).getFunctionName();
-            if (name == null || name.length() == 0)
-                addError("msg.anon.generator.returns", "");
-            else
-                addError("msg.generator.returns", name.getIdentifier());
-        }
-
         ret.setLineno(lineno);
         return ret;
     }

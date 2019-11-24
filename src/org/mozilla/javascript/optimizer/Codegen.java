@@ -1542,8 +1542,7 @@ class BodyCodegen {
                 generateGetGeneratorResumptionPoint();
 
                 // generate dispatch table
-                generatorSwitch = cfw.addTableSwitch(0,
-                        targets.size() + GENERATOR_START);
+                generatorSwitch = cfw.addTableSwitch(0, targets.size() + GENERATOR_START);
                 generateCheckForThrowOrClose(-1, false, GENERATOR_START);
             }
         }
@@ -1795,8 +1794,7 @@ class BodyCodegen {
                     Node node = nodes.get(i);
                     int[] live = liveLocals.get(node);
                     if (live != null) {
-                        cfw.markTableSwitchCase(generatorSwitch,
-                                getNextGeneratorState(node));
+                        cfw.markTableSwitchCase(generatorSwitch, getNextGeneratorState(node));
                         generateGetGeneratorLocalsState();
                         for (int j = 0; j < live.length; j++) {
                             cfw.add(ByteCode.DUP);
@@ -1843,21 +1841,26 @@ class BodyCodegen {
             cfw.add(ByteCode.ARETURN);
             return;
         } else if (isGenerator) {
-            if (((FunctionNode) scriptOrFn).getResumptionPoints() != null) {
-                cfw.markTableSwitchDefault(generatorSwitch);
-            }
+            // Generate final yield point, which returns the function's
+            // return value, and "done" and true
+            int state = ((FunctionNode) scriptOrFn).getResumptionPoints().size();
+            // cfw.markTableSwitchCase(generatorSwitch, state);
+            generateGeneratorReturnObject(generatorReturnNode, true);
 
-            // change state for re-entry
-            generateSetGeneratorResumptionPoint(GENERATOR_TERMINATE);
+            generateSetGeneratorResumptionPoint(state + 1);
 
-            // throw StopIteration
-            cfw.addALoad(variableObjectLocal);
-            addOptRuntimeInvoke("throwStopIteration",
-                    "(Ljava/lang/Object;)V");
-
-            Codegen.pushUndefined(cfw);
             cfw.add(ByteCode.ARETURN);
 
+            if (((FunctionNode) scriptOrFn).getResumptionPoints() != null) {
+                generateCheckForThrowOrClose(-1, false, null);
+            }
+
+            generateGeneratorReturnObject(null, true);
+
+            // change state for re-entry
+            generateSetGeneratorResumptionPoint(3);
+
+            cfw.add(ByteCode.ARETURN);
         } else if (fnCurrent == null) {
             cfw.addALoad(popvLocal);
             cfw.add(ByteCode.ARETURN);
@@ -1886,6 +1889,52 @@ class BodyCodegen {
             cfw.addExceptionHandler(enterAreaStartLabel, epilogueLabel,
                     finallyHandler, null); // catch any
         }
+    }
+
+    private void generateGeneratorReturnObject(Node node, boolean isDone) {
+        cfw.addPush(2);
+        cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(0);
+        cfw.addPush("value");
+        cfw.add(ByteCode.AASTORE);
+
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(1);
+        cfw.addPush("done");
+        cfw.add(ByteCode.AASTORE);
+
+        cfw.addPush(2);
+        cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(0);
+        Node returnVal = node == null ? null : node.getFirstChild();
+        if (returnVal == null) {
+            Codegen.pushUndefined(cfw);
+        } else {
+            generateExpression(returnVal, node);
+        }
+        cfw.add(ByteCode.AASTORE);
+
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(1);
+        if (isDone) {
+            cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "TRUE", "Ljava/lang/Boolean;");
+        } else {
+            cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
+        }
+        cfw.add(ByteCode.AASTORE);
+
+        cfw.add(ByteCode.ACONST_NULL);
+        cfw.addALoad(contextLocal);
+        cfw.addALoad(variableObjectLocal);
+        addScriptRuntimeInvoke("newObjectLiteral",
+                "([Ljava/lang/Object;"
+                        + "[Ljava/lang/Object;"
+                        + "[I"
+                        + "Lorg/mozilla/javascript/Context;"
+                        + "Lorg/mozilla/javascript/Scriptable;"
+                        + ")Lorg/mozilla/javascript/Scriptable;");
     }
 
     private void generateGetGeneratorLocalsState() {
@@ -2020,6 +2069,7 @@ class BodyCodegen {
                         cfw.addALoad(popvLocal);
                     }
                 }
+                generatorReturnNode = node;
                 if (compilerEnv.isGenerateObserverCount())
                     addInstructionCount();
                 if (epilogueLabel == -1) {
@@ -2999,64 +3049,16 @@ class BodyCodegen {
         int nextState = getNextGeneratorState(node);
 
         // generate return object
-
-        // keys array
-        cfw.addPush(2);
-        cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
-
-        cfw.add(ByteCode.DUP);
-        cfw.addPush(0);
-        cfw.addPush("value");
-        cfw.add(ByteCode.AASTORE);
-
-        cfw.add(ByteCode.DUP);
-        cfw.addPush(1);
-        cfw.addPush("done");
-        cfw.add(ByteCode.AASTORE);
-
-        // values array
-        cfw.addPush(2);
-        cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
-
-        // generate the yield argument
-        cfw.add(ByteCode.DUP);
-        cfw.addPush(0);
-        Node child = node.getFirstChild();
-        if (child != null)
-            generateExpression(child, node);
-        else
-            Codegen.pushUndefined(cfw);
-        cfw.add(ByteCode.AASTORE);
-
-        cfw.add(ByteCode.DUP);
-        cfw.addPush(1);
-        int resPoints = ((FunctionNode) scriptOrFn).getResumptionPoints().size();
-        if (nextState == resPoints) {
-            cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "TRUE", "Ljava/lang/Boolean;");
-        } else {
-            cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
-        }
-        cfw.add(ByteCode.AASTORE);
-
-        cfw.addALoad(contextLocal);
-        cfw.addALoad(variableObjectLocal);
-        addScriptRuntimeInvoke("newObjectLiteral",
-                "([Ljava/lang/Object;"
-                        + "[Ljava/lang/Object;"
-                        + "Lorg/mozilla/javascript/Context;"
-                        + "Lorg/mozilla/javascript/Scriptable;"
-                        + ")Lorg/mozilla/javascript/Scriptable;"
-        );
+        generateGeneratorReturnObject(node, false);
 
         // change the resumption state
         generateSetGeneratorResumptionPoint(nextState);
-
         boolean hasLocals = generateSaveLocals(node);
 
         cfw.add(ByteCode.ARETURN);
 
-        generateCheckForThrowOrClose(getTargetLabel(node),
-                hasLocals, nextState);
+        if (nextState != ((FunctionNode) scriptOrFn).getResumptionPoints().size() + GENERATOR_YIELD_START)
+            generateCheckForThrowOrClose(getTargetLabel(node), hasLocals, nextState);
 
         // reconstruct the stack
         if (top != 0) {
@@ -3076,9 +3078,7 @@ class BodyCodegen {
         }
     }
 
-    private void generateCheckForThrowOrClose(int label,
-                                              boolean hasLocals,
-                                              int nextState) {
+    private void generateCheckForThrowOrClose(int label, boolean hasLocals, Object nextState) {
         int throwLabel = cfw.acquireLabel();
         int closeLabel = cfw.acquireLabel();
 
@@ -3095,11 +3095,15 @@ class BodyCodegen {
 
         // mark the re-entry point
         // jump here after initializing the locals
+        if (nextState == null) {
+            cfw.markTableSwitchDefault(generatorSwitch);
+        }
+
         if (label != -1)
             cfw.markLabel(label);
-        if (!hasLocals) {
+        if (!hasLocals && nextState != null) {
             // jump here directly if there are no locals
-            cfw.markTableSwitchCase(generatorSwitch, nextState);
+            cfw.markTableSwitchCase(generatorSwitch, (int) nextState);
         }
 
         // see if we need to dispatch for .close() or .throw()
@@ -5784,6 +5788,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
 
     private boolean isGenerator;
     private int generatorSwitch;
+    private Node generatorReturnNode;
     private int maxLocals = 0;
     private int maxStack = 0;
 
