@@ -1537,14 +1537,12 @@ class BodyCodegen {
             }
 
             List<Node> targets = ((FunctionNode) scriptOrFn).getResumptionPoints();
-            if (targets != null) {
-                // get resumption point
-                generateGetGeneratorResumptionPoint();
+            // get resumption point
+            generateGetGeneratorResumptionPoint();
 
-                // generate dispatch table
-                generatorSwitch = cfw.addTableSwitch(0, targets.size() + GENERATOR_START);
-                generateCheckForThrowOrClose(-1, false, GENERATOR_START);
-            }
+            // generate dispatch table
+            generatorSwitch = cfw.addTableSwitch(0, targets.size() + GENERATOR_START);
+            generateCheckForThrowOrClose(-1, false, GENERATOR_START);
         }
 
         // Compile RegExp literals if this is a script. For functions
@@ -1842,7 +1840,8 @@ class BodyCodegen {
             return;
         } else if (isGenerator) {
             // Generate final yield point, which returns the function's
-            // return value, and "done" and true
+            // return value of the form:
+            // { value: <RETURN VALUE>, done: true }
             int state = ((FunctionNode) scriptOrFn).getResumptionPoints().size();
             // cfw.markTableSwitchCase(generatorSwitch, state);
             generateGeneratorReturnObject(generatorReturnNode, true);
@@ -1851,14 +1850,13 @@ class BodyCodegen {
 
             cfw.add(ByteCode.ARETURN);
 
-            if (((FunctionNode) scriptOrFn).getResumptionPoints() != null) {
-                generateCheckForThrowOrClose(-1, false, null);
-            }
-
+            // Generate the default case, which is of the form:
+            // { value: undefined, done: true }
+            generateCheckForThrowOrClose(-1, false, null);
             generateGeneratorReturnObject(null, true);
 
             // change state for re-entry
-            generateSetGeneratorResumptionPoint(3);
+            generateSetGeneratorResumptionPoint(GENERATOR_TERMINATE);
 
             cfw.add(ByteCode.ARETURN);
         } else if (fnCurrent == null) {
@@ -2263,8 +2261,7 @@ class BodyCodegen {
     }
 
     private int getNextGeneratorState(Node node) {
-        int nodeIndex = ((FunctionNode) scriptOrFn).getResumptionPoints()
-                .indexOf(node);
+        int nodeIndex = ((FunctionNode) scriptOrFn).getResumptionPoints() .indexOf(node);
         return nodeIndex + GENERATOR_YIELD_START;
     }
 

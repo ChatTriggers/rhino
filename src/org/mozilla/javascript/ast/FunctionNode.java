@@ -85,7 +85,7 @@ public class FunctionNode extends ScriptNode {
     private int functionType;
     private boolean needsActivation;
     private boolean isGenerator;
-    private List<Node> generatorResumePoints;
+    private List<Node> generatorResumePoints = new ArrayList<>();
     private Map<Node, int[]> liveLocals;
     private AstNode memberExprNode;
 
@@ -322,8 +322,6 @@ public class FunctionNode extends ScriptNode {
     }
 
     public void addResumptionPoint(Node target) {
-        if (generatorResumePoints == null)
-            generatorResumePoints = new ArrayList<Node>();
         generatorResumePoints.add(target);
     }
 
