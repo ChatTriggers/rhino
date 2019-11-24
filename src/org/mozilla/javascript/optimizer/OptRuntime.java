@@ -6,6 +6,7 @@
 package org.mozilla.javascript.optimizer;
 
 import org.mozilla.javascript.*;
+import org.mozilla.javascript.generator.NativeGenerator;
 
 public final class OptRuntime extends ScriptRuntime {
 

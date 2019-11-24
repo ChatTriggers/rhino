@@ -42,12 +42,12 @@ public final class NativeArrayIterator extends ES6Iterator {
     }
 
     @Override
-    protected boolean isDone(Context cx, Scriptable scope) {
+    public boolean isDone(Context cx, Scriptable scope) {
         return index >= NativeArray.getLengthProperty(arrayLike, false);
     }
 
     @Override
-    protected Object nextValue(Context cx, Scriptable scope) {
+    public Object nextValue(Context cx, Scriptable scope) {
         if (type == ARRAY_ITERATOR_TYPE.KEYS) {
             return index++;
         }

@@ -7,6 +7,8 @@
 package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.generator.NativeGenerator;
+import org.mozilla.javascript.generator.NativeGeneratorIterator;
 import org.mozilla.javascript.optimizer.Codegen;
 import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
@@ -17,9 +19,7 @@ import org.mozilla.javascript.xml.XMLObject;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * This is the class that implements the runtime.
@@ -755,7 +755,11 @@ public class ScriptRuntime {
         return Undefined.instance;
     }
 
-    public static Object[] combineSpreadArgs(Object[] args) {
+    private static boolean isIterable(Scriptable obj) {
+        return ScriptableObject.hasProperty(obj, SymbolKey.ITERATOR);
+    }
+
+    public static Object[] combineSpreadArgs(Object[] args, Context cx, Scriptable scope) {
         int totalArgs = 0;
 
         for (int i = 0; i < args.length; i++) {
@@ -786,7 +790,30 @@ public class ScriptRuntime {
 
                 args[i] = sArgs;
                 totalArgs += length;
-            } else {
+            } else if (arg instanceof NativeGenerator) {
+                NativeGeneratorIterator it = new NativeGeneratorIterator(scope, (NativeGenerator) arg);
+
+                List<Object> ll = new LinkedList<>();
+
+                while (!it.isDone(cx, scope)) {
+                    ll.add(ScriptableObject.getProperty((Scriptable) it.nextValue(cx, scope), "value"));
+                }
+
+                // We'll always get an extra undefined value from the generator,
+                // as the last value it produces (the function return value) is
+                // not considered part of the iterable
+                int size = ll.size() - 1;
+
+                Object[] gArgs = new Object[size];
+
+                for (int j = 0; j < size; j++) {
+                    Object el = ll.get(j);
+                    gArgs[j] = el;
+                }
+
+                args[i] = gArgs;
+                totalArgs += size;
+            } else{
                 throw typeError1("msg.not.iterable", toString(arg));
             }
         }

@@ -6,6 +6,8 @@
 
 package org.mozilla.javascript;
 
+import org.mozilla.javascript.generator.NativeGenerator;
+
 import java.util.Iterator;
 
 /**

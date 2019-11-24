@@ -33,12 +33,12 @@ public final class NativeStringIterator extends ES6Iterator {
     }
 
     @Override
-    protected boolean isDone(Context cx, Scriptable scope) {
+    public boolean isDone(Context cx, Scriptable scope) {
         return index >= string.length();
     }
 
     @Override
-    protected Object nextValue(Context cx, Scriptable scope) {
+    public Object nextValue(Context cx, Scriptable scope) {
         int newIndex = string.offsetByCodePoints(index, 1);
         Object value = string.substring(index, newIndex);
         index = newIndex;

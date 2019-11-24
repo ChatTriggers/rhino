@@ -10,6 +10,7 @@ import org.mozilla.javascript.ScriptRuntime.NoSuchMethodShim;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.debug.DebugFrame;
+import org.mozilla.javascript.generator.NativeGenerator;
 
 import java.io.PrintStream;
 import java.io.Serializable;

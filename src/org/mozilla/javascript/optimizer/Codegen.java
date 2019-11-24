@@ -11,6 +11,7 @@ import org.mozilla.classfile.ByteCode;
 import org.mozilla.classfile.ClassFileWriter;
 import org.mozilla.javascript.*;
 import org.mozilla.javascript.ast.*;
+import org.mozilla.javascript.generator.NativeGenerator;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1000,6 +1001,7 @@ public class Codegen implements Evaluator {
 
                     case Do_construct:
                         if (n instanceof FunctionNode && ((FunctionNode) n).isGenerator()) {
+                            // Throw a type error, as generators are not constructable
                             cfw.addPush("msg.not.ctor");
                             cfw.addPush(((FunctionNode) n).getName());
                             cfw.addInvoke(
@@ -1010,6 +1012,7 @@ public class Codegen implements Evaluator {
                             );
                             cfw.add(ByteCode.ATHROW);
                         } else {
+                            // Not a generator => delegate to super class
                             cfw.addALoad(0);
                             cfw.addALoad(1);
                             cfw.addALoad(2);
@@ -1888,7 +1891,7 @@ class BodyCodegen {
             // Generate the default case, which is of the form:
             // { value: undefined, done: true }
             generateCheckForThrowOrClose(-1, false, null);
-            generateGeneratorReturnObject(null, true);
+            generateGeneratorReturnObject((Node) null, true);
 
             // change state for re-entry
             generateSetGeneratorResumptionPoint(GENERATOR_TERMINATE);
@@ -1924,7 +1927,7 @@ class BodyCodegen {
         }
     }
 
-    private void generateGeneratorReturnObject(Node node, boolean isDone) {
+    private void generateGeneratorReturnObject(Runnable value, boolean isDone) {
         cfw.addPush(2);
         cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
         cfw.add(ByteCode.DUP);
@@ -1941,12 +1944,7 @@ class BodyCodegen {
         cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
         cfw.add(ByteCode.DUP);
         cfw.addPush(0);
-        Node returnVal = node == null ? null : node.getFirstChild();
-        if (returnVal == null) {
-            Codegen.pushUndefined(cfw);
-        } else {
-            generateExpression(returnVal, node);
-        }
+        value.run();
         cfw.add(ByteCode.AASTORE);
 
         cfw.add(ByteCode.DUP);
@@ -1961,13 +1959,26 @@ class BodyCodegen {
         cfw.add(ByteCode.ACONST_NULL);
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
-        addScriptRuntimeInvoke("newObjectLiteral",
+        addScriptRuntimeInvoke(
+                "newObjectLiteral",
                 "([Ljava/lang/Object;"
                         + "[Ljava/lang/Object;"
                         + "[I"
                         + "Lorg/mozilla/javascript/Context;"
                         + "Lorg/mozilla/javascript/Scriptable;"
-                        + ")Lorg/mozilla/javascript/Scriptable;");
+                        + ")Lorg/mozilla/javascript/Scriptable;"
+        );
+    }
+
+    private void generateGeneratorReturnObject(Node node, boolean isDone) {
+        generateGeneratorReturnObject(() -> {
+            Node returnVal = node == null ? null : node.getFirstChild();
+            if (returnVal == null) {
+                Codegen.pushUndefined(cfw);
+            } else {
+                generateExpression(returnVal, node);
+            }
+        }, isDone);
     }
 
     private void generateGetGeneratorLocalsState() {
@@ -3119,11 +3130,14 @@ class BodyCodegen {
         cfw.addALoad(argsLocal);
         generateThrowJavaScriptException();
 
-        // throw our special internal exception if the generator is being closed
+        // If the generator is being closed, immediately set it to the end state
         cfw.markLabel(closeLabel);
-        cfw.addALoad(argsLocal);
-        cfw.add(ByteCode.CHECKCAST, "java/lang/Throwable");
-        cfw.add(ByteCode.ATHROW);
+        generateGeneratorReturnObject(() -> {
+            cfw.addALoad(argsLocal);
+        }, true);
+
+        generateSetGeneratorResumptionPoint(GENERATOR_TERMINATE);
+        cfw.add(ByteCode.ARETURN);
 
         // mark the re-entry point
         // jump here after initializing the locals
@@ -3916,9 +3930,11 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
             cfw.add(ByteCode.AASTORE);
         }
 
+        cfw.addALoad(contextLocal);
+        cfw.addALoad(variableObjectLocal);
         addScriptRuntimeInvoke(
                 "combineSpreadArgs",
-                "([Ljava/lang/Object;)[Ljava/lang/Object;"
+                "([Ljava/lang/Object;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;)[Ljava/lang/Object;"
         );
     }
 

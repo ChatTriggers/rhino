@@ -32,10 +32,10 @@ public abstract class ES6Iterator extends IdScriptableObject {
     protected boolean exhausted = false;
     private String tag;
 
-    ES6Iterator() {
+    public ES6Iterator() {
     }
 
-    ES6Iterator(Scriptable scope, String tag) {
+    public ES6Iterator(Scriptable scope, String tag) {
         // Set parent and prototype properties. Since we don't have a
         // "Iterator" constructor in the top scope, we stash the
         // prototype in the top scope's associated value.
@@ -105,9 +105,9 @@ public abstract class ES6Iterator extends IdScriptableObject {
         return 0;
     }
 
-    abstract protected boolean isDone(Context cx, Scriptable scope);
+    abstract public boolean isDone(Context cx, Scriptable scope);
 
-    abstract protected Object nextValue(Context cx, Scriptable scope);
+    abstract public Object nextValue(Context cx, Scriptable scope);
 
     protected Object next(Context cx, Scriptable scope) {
         Object value = Undefined.instance;
