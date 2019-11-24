@@ -841,7 +841,7 @@ public abstract class ScriptableObject implements Scriptable,
      * Get the getter or setter for a given Symbol property. Used by __lookupGetter__
      * and __lookupSetter__.
      *
-     * @param name     Name of the object. If nonnull, index must be 0.
+     * @param key     Name of the object. If nonnull, index must be 0.
      * @param index    Index of the object. If nonzero, name must be null.
      * @param isSetter If true, return the setter, otherwise return the getter.
      * @return Null if the property does not exist. Otherwise returns either
@@ -1018,6 +1018,27 @@ public abstract class ScriptableObject implements Scriptable,
 
     public static Object getDefaultValue(Scriptable object, Class<?> typeHint) {
         Context cx = null;
+
+        if (ScriptableObject.hasProperty(object, SymbolKey.TO_PRIMITIVE)) {
+            Object toPrimitive = ScriptableObject.getProperty(object, SymbolKey.TO_PRIMITIVE);
+
+            if (!(toPrimitive instanceof Callable)) {
+                // TODO: Error
+                throw Kit.codeBug();
+            }
+
+            String hint = "default";
+
+            if (typeHint == String.class) {
+                hint = "string";
+            } else if (typeHint == Number.class) {
+                hint = "number";
+            }
+
+            Context _cx = Context.getContext();
+            return ((Callable) toPrimitive).call(_cx, _cx.topCallScope, object, new Object[]{ hint });
+        }
+
         for (int i = 0; i < 2; i++) {
             boolean tryToString;
             if (typeHint == ScriptRuntime.StringClass) {

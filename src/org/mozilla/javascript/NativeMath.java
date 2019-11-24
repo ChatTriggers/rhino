@@ -43,6 +43,11 @@ final class NativeMath extends IdScriptableObject {
 
     @Override
     protected void initPrototypeId(int id) {
+        if (id == SymbolId_toStringTag) {
+            initPrototypeValue(id, SymbolKey.TO_STRING_TAG, MATH_TAG, 0);
+            return;
+        }
+
         if (id <= LAST_METHOD_ID) {
             String name;
             int arity;
@@ -721,12 +726,21 @@ final class NativeMath extends IdScriptableObject {
         return !Double.isNaN(x) && (x < 0 || ScriptRuntime.same(x, -0.0D));
     }
 
-// #string_id_map#
+    @Override
+    protected int findPrototypeId(Symbol key) {
+        if (SymbolKey.TO_STRING_TAG.equals(key)) {
+            return SymbolId_toStringTag;
+        }
+
+        return 0;
+    }
+
+    // #string_id_map#
 
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-11-23 15:47:29 CST
+// #generated# Last update: 2019-11-23 18:20:03 CST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 1: if (s.charAt(0)=='E') {id=Id_E; break L0;} break L;
@@ -879,8 +893,9 @@ final class NativeMath extends IdScriptableObject {
             Id_SQRT2 = LAST_METHOD_ID + 8,
             Id_DEG_PER_RAD = LAST_METHOD_ID + 9,
             Id_RAD_PER_DEG = LAST_METHOD_ID + 10,
+            SymbolId_toStringTag = LAST_METHOD_ID + 11,
 
-    MAX_ID = Id_RAD_PER_DEG;
+    MAX_ID = SymbolId_toStringTag;
 
 // #/string_id_map#
 }

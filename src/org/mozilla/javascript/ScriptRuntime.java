@@ -1031,6 +1031,15 @@ public class ScriptRuntime {
             return "[object Null]";
         if (Undefined.isUndefined(obj))
             return "[object Undefined]";
+
+        if (ScriptableObject.hasProperty(obj, SymbolKey.TO_STRING_TAG)) {
+            Object toStringTag = ScriptableObject.getProperty(obj, SymbolKey.TO_STRING_TAG);
+
+            if (toStringTag instanceof String) {
+                return "[object " + toStringTag + "]";
+            }
+        }
+
         return "[object " + obj.getClassName() + ']';
     }
 

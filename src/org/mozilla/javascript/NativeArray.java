@@ -1460,6 +1460,9 @@ public class NativeArray extends IdScriptableObject implements List {
 
         /* If there are elements to remove, put them into the return value. */
         Object result;
+
+        BaseFunction species = getSpecies(thisObj);
+
         if (count != 0) {
             if (count == 1
                     && (cx.getLanguageVersion() == Context.VERSION_1_2)) {
@@ -1480,9 +1483,15 @@ public class NativeArray extends IdScriptableObject implements List {
                     int intLen = (int) (end - begin);
                     Object[] copy = new Object[intLen];
                     System.arraycopy(na.dense, (int) begin, copy, 0, intLen);
-                    result = cx.newArray(scope, copy);
+
+                    if (species == null) {
+                        result = cx.newArray(scope, copy);
+                    } else {
+                        result = species.construct(cx, scope, copy);
+                    }
                 } else {
-                    Scriptable resultArray = cx.newArray(scope, 0);
+
+                    Scriptable resultArray = species == null ? cx.newArray(scope, 0) : species.construct(cx, scope, new Object[]{});
                     for (long last = begin; last != end; last++) {
                         Object temp = getRawElem(thisObj, last);
                         if (temp != NOT_FOUND) {
@@ -1499,7 +1508,7 @@ public class NativeArray extends IdScriptableObject implements List {
                 /* Emulate C JS1.2; if no elements are removed, return undefined. */
                 result = Undefined.instance;
             } else {
-                result = cx.newArray(scope, 0);
+                result = species == null ? cx.newArray(scope, 0) : species.construct(cx, scope, new Object[]{});
             }
         }
 
@@ -1618,14 +1627,40 @@ public class NativeArray extends IdScriptableObject implements List {
         return offset + 1;
     }
 
+    private static BaseFunction getSpecies(Scriptable obj) {
+        if (ScriptableObject.hasProperty(obj, "constructor")) {
+            Scriptable constructor = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(obj, "constructor"));
+
+            if (ScriptableObject.hasProperty(constructor, SymbolKey.SPECIES)) {
+                Object species = ScriptableObject.getProperty(constructor, SymbolKey.SPECIES);
+
+                if (!(species instanceof BaseFunction)) {
+                    // TODO: Error
+                    throw Kit.codeBug();
+                }
+
+                return (BaseFunction) species;
+            }
+        }
+
+        return null;
+    }
+
     /*
      * See Ecma 262v3 15.4.4.4
      */
-    private static Scriptable js_concat(Context cx, Scriptable scope,
-                                        Scriptable thisObj, Object[] args) {
+    private static Scriptable js_concat(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         // create an empty Array to return.
-        scope = getTopLevelScope(scope);
-        final Scriptable result = cx.newArray(scope, 0);
+        BaseFunction species = getSpecies(thisObj);
+
+        final Scriptable result;
+
+        if (species == null) {
+            scope = getTopLevelScope(scope);
+            result = cx.newArray(scope, 0);
+        } else {
+            result = species.construct(cx, scope, args);
+        }
 
         long length = doConcat(cx, scope, result, thisObj, 0);
         for (Object arg : args) {
@@ -1638,7 +1673,18 @@ public class NativeArray extends IdScriptableObject implements List {
 
     private Scriptable js_slice(Context cx, Scriptable thisObj, Object[] args) {
         Scriptable scope = getTopLevelScope(this);
-        Scriptable result = cx.newArray(scope, 0);
+
+        BaseFunction species = getSpecies(thisObj);
+
+        final Scriptable result;
+
+        if (species == null) {
+            scope = getTopLevelScope(scope);
+            result = cx.newArray(scope, 0);
+        } else {
+            result = species.construct(cx, scope, args);
+        }
+
         long len = getLengthProperty(thisObj, false);
 
         long begin, end;
@@ -1950,8 +1996,7 @@ public class NativeArray extends IdScriptableObject implements List {
     /**
      * Implements the methods "every", "filter", "forEach", "map", and "some".
      */
-    private static Object iterativeMethod(Context cx, IdFunctionObject idFunctionObject, Scriptable scope,
-                                          Scriptable thisObj, Object[] args) {
+    private static Object iterativeMethod(Context cx, IdFunctionObject idFunctionObject, Scriptable scope, Scriptable thisObj, Object[] args) {
         Scriptable o = ScriptRuntime.toObject(cx, scope, thisObj);
 
         // execIdCall(..) uses a trick for all the ConstructorId_xxx calls
@@ -1963,7 +2008,7 @@ public class NativeArray extends IdScriptableObject implements List {
 
         long length = getLengthProperty(o, id == Id_map);
         Object callbackArg = args.length > 0 ? args[0] : Undefined.instance;
-        if (callbackArg == null || !(callbackArg instanceof Function)) {
+        if (!(callbackArg instanceof Function)) {
             throw ScriptRuntime.notFunctionError(callbackArg);
         }
         if (cx.getLanguageVersion() >= Context.VERSION_ES6 && (callbackArg instanceof NativeRegExp)) {
@@ -1987,7 +2032,15 @@ public class NativeArray extends IdScriptableObject implements List {
         Scriptable array = null;
         if (id == Id_filter || id == Id_map) {
             int resultLength = id == Id_map ? (int) length : 0;
-            array = cx.newArray(scope, resultLength);
+
+            BaseFunction species = getSpecies(thisObj);
+
+            if (species == null) {
+                scope = getTopLevelScope(scope);
+                array = cx.newArray(scope, resultLength);
+            } else {
+                array = species.construct(cx, scope, args);
+            }
         }
         long j = 0;
         for (long i = 0; i < length; i++) {

@@ -46,6 +46,11 @@ public final class NativeJSON extends IdScriptableObject {
 
     @Override
     protected void initPrototypeId(int id) {
+        if (id == SymbolId_toStringTag) {
+            initPrototypeValue(id, SymbolKey.TO_STRING_TAG, JSON_TAG, 0);
+            return;
+        }
+
         if (id <= LAST_METHOD_ID) {
             String name;
             int arity;
@@ -490,31 +495,28 @@ public final class NativeJSON extends IdScriptableObject {
         return product.toString();
     }
 
-// #string_id_map#
+    @Override
+    protected int findPrototypeId(Symbol key) {
+        if (SymbolKey.TO_STRING_TAG.equals(key)) {
+            return SymbolId_toStringTag;
+        }
+
+        return 0;
+    }
+
+    // #string_id_map#
 
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2009-05-25 16:01:00 EDT
-        {
-            id = 0;
-            String X = null;
-            L:
-            switch (s.length()) {
-                case 5:
-                    X = "parse";
-                    id = Id_parse;
-                    break L;
-                case 8:
-                    X = "toSource";
-                    id = Id_toSource;
-                    break L;
-                case 9:
-                    X = "stringify";
-                    id = Id_stringify;
-                    break L;
-            }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+// #generated# Last update: 2019-11-23 18:20:15 CST
+        L0: { id = 0; String X = null;
+            int s_length = s.length();
+            if (s_length==5) { X="parse";id=Id_parse; }
+            else if (s_length==8) { X="toSource";id=Id_toSource; }
+            else if (s_length==9) { X="stringify";id=Id_stringify; }
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            break L0;
         }
 // #/generated#
         return id;
@@ -524,8 +526,11 @@ public final class NativeJSON extends IdScriptableObject {
             Id_toSource = 1,
             Id_parse = 2,
             Id_stringify = 3,
-            LAST_METHOD_ID = 3,
-            MAX_ID = 3;
+            LAST_METHOD_ID = 3;
+
+    private static final int
+            SymbolId_toStringTag = LAST_METHOD_ID + 1,
+            MAX_ID = SymbolId_toStringTag;
 
 // #/string_id_map#
 }
