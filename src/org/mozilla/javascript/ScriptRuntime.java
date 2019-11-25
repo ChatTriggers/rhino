@@ -4066,18 +4066,14 @@ public class ScriptRuntime {
      * @deprecated Use {@link #newObjectLiteral(Object[], Object[], int[], Context, Scriptable)} instead
      */
     @Deprecated
-    public static Scriptable newObjectLiteral(Object[] propertyIds,
-                                              Object[] propertyValues,
-                                              Context cx, Scriptable scope) {
+    public static Scriptable newObjectLiteral(Object[] propertyIds, Object[] propertyValues, Context cx, Scriptable scope) {
         // Passing null for getterSetters means no getters or setters
         return newObjectLiteral(propertyIds, propertyValues, null, cx, scope);
     }
 
-    public static Scriptable newObjectLiteral(Object[] propertyIds,
-                                              Object[] propertyValues,
-                                              int[] getterSetters,
-                                              Context cx, Scriptable scope) {
+    public static Scriptable newObjectLiteral(Object[] propertyIds, Object[] propertyValues, int[] getterSetters, Context cx, Scriptable scope) {
         Scriptable object = cx.newObject(scope);
+
         for (int i = 0, end = propertyIds.length; i != end; ++i) {
             Object id = propertyIds[i];
             int getterSetter = getterSetters == null ? 0 : getterSetters[i];

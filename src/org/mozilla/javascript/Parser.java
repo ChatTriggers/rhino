@@ -3536,6 +3536,7 @@ public class Parser {
         List<ObjectProperty> elems = new ArrayList<>();
         Set<String> getterNames = null;
         Set<String> setterNames = null;
+        boolean seenProto = false;
         if (this.inUseStrictDirective) {
             getterNames = new HashSet<>();
             setterNames = new HashSet<>();
@@ -3562,6 +3563,15 @@ public class Parser {
                 reportError("msg.bad.prop");
             } else {
                 propertyName = ts.getString();
+
+                if ("__proto__".equals(propertyName)) {
+                    if (seenProto) {
+                        reportError("msg.object.multiple.proto");
+                    } else {
+                        seenProto = true;
+                    }
+                }
+
                 int ppos = ts.tokenBeg;
                 consumeToken();
 
@@ -3574,10 +3584,7 @@ public class Parser {
                 // first case. (Because of keywords, the second case may be
                 // many tokens.)
                 int peeked = peekToken();
-                if (peeked != Token.COMMA
-                        && peeked != Token.COLON
-                        && peeked != Token.RC
-                        && peeked != Token.ASSIGN) {
+                if (peeked != Token.COMMA && peeked != Token.COLON && peeked != Token.RC && peeked != Token.ASSIGN) {
                     if (peeked == Token.LP) {
                         entryKind = METHOD_ENTRY;
                     } else if (pname.getType() == Token.NAME) {
@@ -3598,8 +3605,7 @@ public class Parser {
                         propertyName = null;
                     } else {
                         propertyName = ts.getString();
-                        ObjectProperty objectProp = methodDefinition(
-                                ppos, pname, entryKind);
+                        ObjectProperty objectProp = methodDefinition( ppos, pname, entryKind);
                         pname.setJsDocNode(jsdocNode);
                         elems.add(objectProp);
                     }

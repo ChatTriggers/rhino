@@ -421,8 +421,7 @@ public class NodeTransformer {
     protected void visitCall(Node node, ScriptNode tree) {
     }
 
-    protected Node visitLet(boolean createWith, Node parent, Node previous,
-                            Node scopeNode) {
+    protected Node visitLet(boolean createWith, Node parent, Node previous, Node scopeNode) {
         Node vars = scopeNode.getFirstChild();
         Node body = vars.getNext();
         scopeNode.removeChild(vars);
