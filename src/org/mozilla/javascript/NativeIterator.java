@@ -147,8 +147,7 @@ public final class NativeIterator extends IdScriptableObject {
     }
 
     /* The JavaScript constructor */
-    private static Object jsConstructor(Context cx, Scriptable scope,
-                                        Scriptable thisObj, Object[] args) {
+    private static Object jsConstructor(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         if (args.length == 0 || args[0] == null ||
                 args[0] == Undefined.instance) {
             Object argument = args.length == 0 ? Undefined.instance : args[0];

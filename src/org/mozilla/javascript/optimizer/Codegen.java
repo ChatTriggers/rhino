@@ -2358,8 +2358,7 @@ class BodyCodegen {
                 int specialType = node.getIntProp(Node.SPECIALCALL_PROP, Node.NON_SPECIALCALL);
                 if (specialType == Node.NON_SPECIALCALL) {
                     OptFunctionNode target;
-                    target = (OptFunctionNode) node.getProp(
-                            Node.DIRECTCALL_PROP);
+                    target = (OptFunctionNode) node.getProp( Node.DIRECTCALL_PROP);
 
                     if (target != null) {
                         visitOptimizedCall(node, target, type, child);

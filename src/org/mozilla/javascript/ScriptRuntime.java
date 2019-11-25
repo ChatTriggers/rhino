@@ -27,6 +27,7 @@ import java.util.*;
  * @author Norris Boyd
  */
 
+@SuppressWarnings("unused")
 public class ScriptRuntime {
 
     /**
@@ -764,43 +765,20 @@ public class ScriptRuntime {
 
             if (arg instanceof Object[]) {
                 totalArgs += ((Object[]) arg).length;
-            } else if (arg instanceof NativeArray) {
-                NativeArray na = (NativeArray) arg;
-
-                int length = (int) na.getLength();
-                Object[] naArgs = new Object[length];
-
-                for (int j = 0; j < length; j++) {
-                    naArgs[j] = na.get(j, na);
+            } else if (arg instanceof Scriptable) {
+                ES6Iterator it = toIterator(cx, scope, (Scriptable) arg, true);
+                if (it == null) {
+                    throw typeError0("msg.invalid.iterator");
                 }
 
-                args[i] = naArgs;
-                totalArgs += length;
-            } else if (arg instanceof String) {
-                String s = (String) arg;
-                int length = s.length();
-                Object[] sArgs = new Object[length];
-
-                for (int j = 0; j < length; j++) {
-                    sArgs[j] = String.valueOf(s.charAt(j));
-                }
-
-                args[i] = sArgs;
-                totalArgs += length;
-            } else if (arg instanceof NativeGenerator) {
-                NativeGeneratorIterator it = (NativeGeneratorIterator) toIterator(cx, scope, (Scriptable) arg, true);
-
-                List<Object> ll = new LinkedList<>();
+                LinkedList<Object> ll = new LinkedList<>();
 
                 while (!it.isDone(cx, scope)) {
                     ll.add(it.nextValue(cx, scope));
                 }
 
-                Object[] gArgs = ll.toArray();
-                args[i] = gArgs;
+                args[i] = ll.toArray();
                 totalArgs += ll.size();
-            } else{
-                throw typeError1("msg.not.iterable", toString(arg));
             }
         }
 
@@ -2273,20 +2251,28 @@ public class ScriptRuntime {
         Scriptable iterator;
     }
 
-    public static Scriptable toIterator(Context cx, Scriptable scope, Scriptable obj, boolean keyOnly) {
-        if (ScriptableObject.hasProperty(obj, NativeIterator.ITERATOR_PROPERTY_NAME)) {
-            Object v = ScriptableObject.getProperty(obj, NativeIterator.ITERATOR_PROPERTY_NAME);
+    public static ES6Iterator toIterator(Context cx, Scriptable scope, Scriptable obj, boolean keyOnly) {
+        Object key = null;
+        if (ScriptableObject.hasProperty(obj, SymbolKey.ITERATOR)) {
+            key = SymbolKey.ITERATOR;
+        } else if (ScriptableObject.hasProperty(obj, NativeIterator.ITERATOR_PROPERTY_NAME)) {
+            key = NativeIterator.ITERATOR_PROPERTY_NAME;
+        }
+
+        if (key != null) {
+            Object v = ScriptableObject.getProperty(obj, key);
             if (!(v instanceof Callable)) {
                 throw typeError0("msg.invalid.iterator");
             }
             Callable f = (Callable) v;
             Object[] args = new Object[]{keyOnly ? Boolean.TRUE : Boolean.FALSE};
             v = f.call(cx, scope, obj, args);
-            if (!(v instanceof Scriptable)) {
+            if (!(v instanceof ES6Iterator)) {
                 throw typeError0("msg.iterator.primitive");
             }
-            return (Scriptable) v;
+            return (ES6Iterator) v;
         }
+
         return null;
     }
 
