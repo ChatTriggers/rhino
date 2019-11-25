@@ -779,6 +779,8 @@ public class ScriptRuntime {
 
                 args[i] = ll.toArray();
                 totalArgs += ll.size();
+            } else {
+                throw typeError1("msg.not.iterable", toString(arg));
             }
         }
 

@@ -101,6 +101,8 @@ function runAsync (script, cb) {
 
 function runSync (script) {
   try {
+    // print('==================');
+    // print(script);
     var fn = new Function(script)
     return fn() || false
   } catch (e) {
