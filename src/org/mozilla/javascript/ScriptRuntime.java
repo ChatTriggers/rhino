@@ -200,7 +200,8 @@ public class ScriptRuntime {
         NativeCall.init(scope, sealed);
         NativeScript.init(scope, sealed);
 
-        NativeIterator.init(scope, sealed); // Also initializes NativeGenerator
+        NativeIterator.init(scope, sealed);
+        NativeGenerator.init(scope, sealed);
 
         NativeArrayIterator.init(scope, sealed);
         NativeStringIterator.init(scope, sealed);
@@ -4318,7 +4319,7 @@ public class ScriptRuntime {
         if (value == Scriptable.NOT_FOUND) {
             return typeError1("msg.function.not.found", msg);
         }
-        return typeError2("msg.isnt.function", msg, typeof(value));
+        return typeError2("msg.isnt.function.it.is", msg, typeof(value));
     }
 
     public static RuntimeException notFunctionError(Object obj, Object value,

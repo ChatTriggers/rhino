@@ -2780,7 +2780,7 @@ public abstract class ScriptableObject implements Scriptable,
         if (value == null) throw new IllegalArgumentException();
         Map<Object, Object> h = associatedValues;
         if (h == null) {
-            h = new HashMap<Object, Object>();
+            h = new HashMap<>();
             associatedValues = h;
         }
         return Kit.initHash(h, key, value);

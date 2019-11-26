@@ -16,8 +16,7 @@ import org.mozilla.javascript.Undefined;
  * NativeArrayBuffer. Many views may simultaneously share the same buffer, and changes to one will affect all.
  */
 
-public abstract class NativeArrayBufferView
-        extends IdScriptableObject {
+public abstract class NativeArrayBufferView extends IdScriptableObject {
     private static final long serialVersionUID = 6884475582973958419L;
 
     private static Boolean useLittleEndian = null;

@@ -25,9 +25,6 @@ public final class NativeIterator extends IdScriptableObject {
         NativeIterator iterator = new NativeIterator();
         iterator.exportAsJSClass(MAX_PROTOTYPE_ID, scope, sealed);
 
-        // Generator
-        NativeGenerator.init(scope, sealed);
-
         // StopIteration
         NativeObject obj = new StopIteration();
         obj.setPrototype(getObjectPrototype(scope));
@@ -35,8 +32,7 @@ public final class NativeIterator extends IdScriptableObject {
         if (sealed) {
             obj.sealObject();
         }
-        ScriptableObject.defineProperty(scope, STOP_ITERATION, obj,
-                ScriptableObject.DONTENUM);
+        ScriptableObject.defineProperty(scope, STOP_ITERATION, obj, ScriptableObject.DONTENUM);
         // Use "associateValue" so that generators can continue to
         // throw StopIteration even if the property of the global
         // scope is replaced or deleted.
@@ -193,7 +189,7 @@ public final class NativeIterator extends IdScriptableObject {
 
     private Object next(Context cx, Scriptable scope) {
         Boolean b = ScriptRuntime.enumNext(this.objectIterator);
-        if (!b.booleanValue()) {
+        if (!b) {
             // Out of values. Throw StopIteration.
             throw new JavaScriptException(
                     NativeIterator.getStopIterationObject(scope), null, 0);

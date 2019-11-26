@@ -134,7 +134,7 @@ public class NativeMap extends IdScriptableObject {
 
     private Object js_forEach(Context cx, Scriptable scope, Object arg1, Object arg2) {
         if (!(arg1 instanceof Callable)) {
-            throw ScriptRuntime.typeError2("msg.isnt.function", arg1, ScriptRuntime.typeof(arg1));
+            throw ScriptRuntime.typeError2("msg.isnt.function.it.is", arg1, ScriptRuntime.typeof(arg1));
         }
         final Callable f = (Callable) arg1;
 

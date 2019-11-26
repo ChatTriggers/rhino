@@ -257,8 +257,7 @@ public final class IRFactory extends Parser {
         }
     }
 
-    private Node arrayCompTransformHelper(ArrayComprehension node,
-                                          String arrayName) {
+    private Node arrayCompTransformHelper(ArrayComprehension node, String arrayName) {
         decompiler.addToken(Token.LB);
         int lineno = node.getLineno();
         Node expr = transform(node.getResult());
@@ -749,11 +748,10 @@ public final class IRFactory extends Parser {
                 decompile(iter);
                 name = currentScriptOrFn.getNextTempName();
                 defineSymbol(Token.LP, name, false);
-                expr = createBinary(Token.COMMA,
-                        createAssignment(Token.ASSIGN,
-                                iter,
-                                createName(name)),
-                        expr);
+                expr = createBinary(
+                        Token.COMMA,
+                        createAssignment(Token.ASSIGN, iter, createName(name)), expr
+                );
             }
             Node init = createName(name);
             // Define as a let since we want the scope of the variable to

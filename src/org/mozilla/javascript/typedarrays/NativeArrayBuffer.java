@@ -13,8 +13,7 @@ import org.mozilla.javascript.*;
  * it implements the ArrayBuffer interface. Used directly from Java, it simply holds a byte array.
  */
 
-public class NativeArrayBuffer
-        extends IdScriptableObject {
+public class NativeArrayBuffer extends IdScriptableObject {
     private static final long serialVersionUID = 3110411773054879549L;
 
     public static final String CLASS_NAME = "ArrayBuffer";
