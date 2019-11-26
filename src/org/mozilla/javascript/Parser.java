@@ -2300,7 +2300,12 @@ public class Parser {
         if (matchToken(Token.PIPELINE, true)) {
             int opPos = ts.tokenBeg;
             FunctionCall fc = new FunctionCall(opPos);
-            fc.setTarget(orExpr());
+            AstNode target = expr();
+            if (!(target instanceof FunctionNode) && !(target instanceof Name)) {
+                reportError("msg.bad.pipeline");
+                return makeErrorNode();
+            }
+            fc.setTarget(target);
             fc.setArguments(Collections.singletonList(pn));
             pn = pipelineExpr(fc);
         }
@@ -2502,6 +2507,8 @@ public class Parser {
             case Token.NOT:
             case Token.BITNOT:
             case Token.TYPEOF:
+
+            case Token.DELPROP:
                 consumeToken();
                 node = new UnaryExpression(tt, ts.tokenBeg, unaryExpr());
                 node.setLineno(line);
@@ -2524,17 +2531,10 @@ public class Parser {
             case Token.INC:
             case Token.DEC:
                 consumeToken();
-                UnaryExpression expr = new UnaryExpression(tt, ts.tokenBeg,
-                        memberExpr(true));
+                UnaryExpression expr = new UnaryExpression(tt, ts.tokenBeg, memberExpr(true));
                 expr.setLineno(line);
                 checkBadIncDec(expr);
                 return expr;
-
-            case Token.DELPROP:
-                consumeToken();
-                node = new UnaryExpression(tt, ts.tokenBeg, unaryExpr());
-                node.setLineno(line);
-                return node;
 
             case Token.ERROR:
                 consumeToken();
