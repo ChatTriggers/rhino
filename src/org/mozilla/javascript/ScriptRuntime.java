@@ -1649,6 +1649,10 @@ public class ScriptRuntime {
             result = ((XMLObject) obj).get(cx, elem);
         } else if (isSymbol(elem)) {
             result = ScriptableObject.getProperty(obj, (Symbol) elem);
+        } else if (obj instanceof NativeGenerator) {
+            NativeGenerator gen = (NativeGenerator) obj;
+            Object o = ScriptableObject.callMethod(gen, "next", new Object[]{});
+            return ScriptableObject.getProperty(ScriptableObject.ensureScriptable(o), "value");
         } else {
             String s = toStringIdOrIndex(cx, elem);
             if (s == null) {
