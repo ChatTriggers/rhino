@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.generator.NativeGenerator;
 import org.mozilla.javascript.generator.NativeGeneratorIterator;
 import org.mozilla.javascript.optimizer.Codegen;
+import org.mozilla.javascript.optimizer.OptRuntime;
 import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
 import org.mozilla.javascript.v8dtoa.FastDtoa;
@@ -727,6 +728,16 @@ public class ScriptRuntime {
             return Double.parseDouble(sub);
         } catch (NumberFormatException ex) {
             return NaN;
+        }
+    }
+
+    public static Object handleRestDestructure(Context cx, Scriptable scope, int startIndex, Object right) {
+        if (right instanceof NativeArray) {
+            Object[] target = new Object[((NativeArray) right).size() - startIndex];
+            System.arraycopy(((NativeArray) right).toArray(), startIndex, target, 0, target.length);
+            return cx.newArray(scope, target);
+        } else {
+            throw Kit.codeBug("TODO Handle rest destructure with non-arrays");
         }
     }
 

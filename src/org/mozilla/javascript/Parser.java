@@ -3302,15 +3302,24 @@ public class Parser {
                 // array literal contexts. So we calculate a special
                 // length value just for destructuring assignment.
                 end = ts.tokenEnd;
-                pn.setDestructuringLength(elements.size() +
-                        (after_lb_or_comma ? 1 : 0));
+                pn.setDestructuringLength(elements.size() + (after_lb_or_comma ? 1 : 0));
                 pn.setSkipCount(skipCount);
                 if (afterComma != -1)
                     warnTrailingComma(pos, elements, afterComma);
                 break;
-            } else if (tt == Token.FOR && !after_lb_or_comma
-                    && elements.size() == 1) {
+            } else if (tt == Token.FOR && !after_lb_or_comma && elements.size() == 1) {
                 return arrayComprehension(elements.get(0), pos);
+            } else if (tt == Token.SPREAD) {
+                if (!inDestructuringAssignment) {
+                    reportError("msg.invalid.destruct.rest");
+                    return makeErrorNode();
+                }
+                consumeToken();
+                AstNode expr = assignExpr();
+                expr.putProp(Node.SPREAD_PROP, true);
+                elements.add(expr);
+                after_lb_or_comma = false;
+                afterComma = -1;
             } else if (tt == Token.EOF) {
                 reportError("msg.no.bracket.arg");
                 break;
@@ -4007,9 +4016,7 @@ public class Parser {
         boolean empty = true;
         switch (left.getType()) {
             case Token.ARRAYLIT:
-                empty = destructuringArray((ArrayLiteral) left,
-                        variableType, tempName, comma,
-                        destructuringNames);
+                empty = destructuringArray((ArrayLiteral) left, right, variableType, tempName, comma, destructuringNames);
                 break;
             case Token.OBJECTLIT:
                 empty = destructuringObject((ObjectLiteral) left,
@@ -4039,21 +4046,20 @@ public class Parser {
         return result;
     }
 
-    boolean destructuringArray(ArrayLiteral array,
-                               int variableType,
-                               String tempName,
-                               Node parent,
-                               List<String> destructuringNames) {
+    boolean destructuringArray(ArrayLiteral left, Node right, int variableType, String tempName, Node parent, List<String> destructuringNames) {
         boolean empty = true;
-        int setOp = variableType == Token.CONST
-                ? Token.SETCONST : Token.SETNAME;
+        int setOp = variableType == Token.CONST ? Token.SETCONST : Token.SETNAME;
         int index = 0;
-        for (AstNode n : array.getElements()) {
+
+        for (AstNode n : left.getElements()) {
             if (n.getType() == Token.EMPTY) {
                 index++;
                 continue;
             }
             Node rightElem = new Node(Token.GETELEM, createName(tempName), createNumber(index));
+            if (n.getProp(Node.SPREAD_PROP) != null) {
+                rightElem.putProp(Node.SPREAD_PROP, new Object[]{ index, right });
+            }
             if (n.getType() == Token.NAME) {
                 String name = n.getString();
                 parent.addChildToBack(new Node(setOp, createName(Token.BINDNAME, name, null), rightElem));

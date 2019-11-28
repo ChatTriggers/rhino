@@ -2763,7 +2763,26 @@ class BodyCodegen {
                 break;
 
             case Token.GETELEM: {
+                Object spread = node.getProp(Node.SPREAD_PROP);
+
+                if (spread != null) {
+                    int startIndex = (int) ((Object[]) spread)[0];
+                    Node right = (Node) ((Object[] ) spread)[1];
+
+                    cfw.addALoad(contextLocal);
+                    cfw.addALoad(variableObjectLocal);
+                    cfw.addPush(startIndex);
+                    generateExpression(right, node);
+                    addScriptRuntimeInvoke(
+                            "handleRestDestructure",
+                            "(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;ILjava/lang/Object;)Ljava/lang/Object;"
+                    );
+                    break;
+                }
+
                 generateExpression(child, node); // object
+
+
                 generateExpression(child.getNext(), node);  // id
                 cfw.addALoad(contextLocal);
 
