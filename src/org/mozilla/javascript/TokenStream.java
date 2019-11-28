@@ -923,9 +923,6 @@ class TokenStream {
                                 break;
 
                             case 'u':
-                                // Get 4 hex digits; if the u escape is not
-                                // followed by 4 hex digits, use 'u' + the
-                                // literal character sequence that follows.
                                 int escapeStart = stringBufferTop;
                                 addToString('u');
                                 escapeVal = 0;
@@ -933,7 +930,8 @@ class TokenStream {
                                     character = getChar();
                                     escapeVal = Kit.xDigitToInt(character, escapeVal);
                                     if (escapeVal < 0) {
-                                        continue;
+                                        parser.addError("msg.invalid.escape");
+                                        return Token.ERROR;
                                     }
                                     addToString(character);
                                 }
@@ -1368,7 +1366,8 @@ class TokenStream {
                                     c = getChar();
                                     escapeVal = Kit.xDigitToInt(c, escapeVal);
                                     if (escapeVal < 0) {
-                                        continue strLoop;
+                                        parser.addError("msg.invalid.escape");
+                                        return Token.ERROR;
                                     }
                                     addToString(c);
                                 }

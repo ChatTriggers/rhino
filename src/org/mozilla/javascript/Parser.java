@@ -3706,8 +3706,7 @@ public class Parser {
         return pname;
     }
 
-    private ObjectProperty plainProperty(AstNode property, int ptt)
-            throws IOException {
+    private ObjectProperty plainProperty(AstNode property, int ptt) throws IOException {
         // Support, e.g., |var {x, y} = o| as destructuring shorthand
         // for |var {x: x, y: y} = o|, as implemented in spidermonkey JS 1.8.
         int tt = peekToken();
