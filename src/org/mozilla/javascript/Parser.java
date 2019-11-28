@@ -3310,10 +3310,6 @@ public class Parser {
             } else if (tt == Token.FOR && !after_lb_or_comma && elements.size() == 1) {
                 return arrayComprehension(elements.get(0), pos);
             } else if (tt == Token.SPREAD) {
-                if (!inDestructuringAssignment) {
-                    reportError("msg.invalid.destruct.rest");
-                    return makeErrorNode();
-                }
                 consumeToken();
                 AstNode expr = assignExpr();
                 expr.putProp(Node.SPREAD_PROP, true);
