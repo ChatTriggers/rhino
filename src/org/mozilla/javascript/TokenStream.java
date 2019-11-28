@@ -1109,6 +1109,30 @@ class TokenStream {
                         // escape sequence in an identifier, we can report
                         // an error here.
                         int escapeVal = 0;
+
+                        if (matchChar('{')) {
+                            for (int i = 0; i < 6; ++i) {
+                                c = getChar();
+                                if (c == '}') {
+                                    ungetChar(c);
+                                    break;
+                                }
+                                escapeVal = Kit.xDigitToInt(c, escapeVal);
+                                if (escapeVal < 0) {
+                                    break;
+                                }
+                            }
+                            c = getChar();
+                            if (c != '}') {
+                                parser.addError("msg.invalid.escape");
+                                return Token.ERROR;
+                            }
+                            addToString((escapeVal - 0x10000) / 0x400 + 0xD800); // high
+                            addToString((escapeVal - 0x10000) % 0x400 + 0xDC00); // low
+                            isUnicodeEscapeStart = false;
+                            break;
+                        }
+
                         for (int i = 0; i != 4; ++i) {
                             c = getChar();
                             escapeVal = Kit.xDigitToInt(c, escapeVal);
@@ -1143,7 +1167,9 @@ class TokenStream {
                         }
                     }
                 }
-                ungetChar(c);
+
+                if (!containsEscape)
+                    ungetChar(c);
 
                 String str = getStringFromBuffer();
                 if (!containsEscape) {
