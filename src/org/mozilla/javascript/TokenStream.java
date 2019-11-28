@@ -923,22 +923,49 @@ class TokenStream {
                                 break;
 
                             case 'u':
+                                // Get 4 hex digits; if the u escape is not
+                                // followed by 4 hex digits, use 'u' + the
+                                // literal character sequence that follows.
                                 int escapeStart = stringBufferTop;
-                                addToString('u');
                                 escapeVal = 0;
-                                for (int i = 0; i != 4; ++i) {
-                                    character = getChar();
-                                    escapeVal = Kit.xDigitToInt(character, escapeVal);
-                                    if (escapeVal < 0) {
+
+                                if (matchChar('{')) {
+                                    for (int i = 0; i < 6; ++i) {
+                                        c = getChar();
+                                        if (c == '}') {
+                                            ungetChar(c);
+                                            break;
+                                        }
+                                        escapeVal = Kit.xDigitToInt(c, escapeVal);
+                                        if (escapeVal < 0) {
+                                            break;
+                                        }
+                                    }
+                                    c = getChar();
+                                    if (c != '}') {
                                         parser.addError("msg.invalid.escape");
                                         return Token.ERROR;
                                     }
-                                    addToString(character);
+                                    int high = (escapeVal - 0x10000) / 0x400 + 0xD800;
+                                    addToString(high);
+                                    c = (char) (escapeVal - 0x10000) % 0x400 + 0xDC00; // low
+                                    break;
+                                } else {
+                                    addToString('u');
+                                    for (int i = 0; i != 4; ++i) {
+                                        c = getChar();
+                                        escapeVal = Kit.xDigitToInt(c, escapeVal);
+                                        if (escapeVal < 0) {
+                                            parser.addError("msg.invalid.escape");
+                                            return Token.ERROR;
+                                        }
+                                        addToString(c);
+                                    }
+                                    c = escapeVal;
                                 }
                                 // prepare for replace of stored 'u' sequence
                                 // by escape value
                                 stringBufferTop = escapeStart;
-                                character = escapeVal;
                                 break;
                             case 'x':
                                 // Get 2 hex digits, defaulting to 'x'+literal
@@ -1360,21 +1387,45 @@ class TokenStream {
                                 // followed by 4 hex digits, use 'u' + the
                                 // literal character sequence that follows.
                                 int escapeStart = stringBufferTop;
-                                addToString('u');
                                 escapeVal = 0;
-                                for (int i = 0; i != 4; ++i) {
+
+                                if (matchChar('{')) {
+                                    for (int i = 0; i < 6; ++i) {
+                                        c = getChar();
+                                        if (c == '}') {
+                                            ungetChar(c);
+                                            break;
+                                        }
+                                        escapeVal = Kit.xDigitToInt(c, escapeVal);
+                                        if (escapeVal < 0) {
+                                            break;
+                                        }
+                                    }
                                     c = getChar();
-                                    escapeVal = Kit.xDigitToInt(c, escapeVal);
-                                    if (escapeVal < 0) {
+                                    if (c != '}') {
                                         parser.addError("msg.invalid.escape");
                                         return Token.ERROR;
                                     }
-                                    addToString(c);
+                                    int high = (escapeVal - 0x10000) / 0x400 + 0xD800;
+                                    addToString(high);
+                                    c = (char) (escapeVal - 0x10000) % 0x400 + 0xDC00; // low
+                                    break;
+                                } else {
+                                    addToString('u');
+                                    for (int i = 0; i != 4; ++i) {
+                                        c = getChar();
+                                        escapeVal = Kit.xDigitToInt(c, escapeVal);
+                                        if (escapeVal < 0) {
+                                            parser.addError("msg.invalid.escape");
+                                            return Token.ERROR;
+                                        }
+                                        addToString(c);
+                                    }
+                                    c = escapeVal;
                                 }
                                 // prepare for replace of stored 'u' sequence
                                 // by escape value
                                 stringBufferTop = escapeStart;
-                                c = escapeVal;
                                 break;
                             case 'x':
                                 // Get 2 hex digits, defaulting to 'x'+literal
