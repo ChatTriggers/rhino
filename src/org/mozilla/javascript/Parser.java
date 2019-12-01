@@ -1392,10 +1392,10 @@ public class Parser {
         int forPos = ts.tokenBeg, lineno = ts.lineno;
         boolean isForEach = false, isForIn = false, isForOf = false;
         int eachPos = -1, inPos = -1, lp = -1, rp = -1;
-        AstNode init = null;  // init is also foo in 'foo in object'
-        AstNode cond = null;  // cond is also object in 'foo in object'
+        AstNode init;  // init is also foo in 'foo in object'
+        AstNode cond;  // cond is also object in 'foo in object'
         AstNode incr = null;
-        Loop pn = null;
+        Loop pn;
 
         Scope tempScope = new Scope();
         pushScope(tempScope);  // decide below what AST class to use
@@ -1508,7 +1508,7 @@ public class Parser {
     private AstNode forLoopInit(int tt) throws IOException {
         try {
             inForInit = true;  // checked by variables() and relExpr()
-            AstNode init = null;
+            AstNode init;
             if (tt == Token.SEMI) {
                 init = new EmptyExpression(ts.tokenBeg, 1);
                 init.setLineno(ts.lineno);
@@ -1995,6 +1995,7 @@ public class Parser {
         if (varjsdocNode != null) {
             pn.setJsDocNode(varjsdocNode);
         }
+
         // Example:
         // var foo = {a: 1, b: 2}, bar = [3, 4];
         // var {b: s2, a: s1} = foo, x = 6, y, [s3, s4] = bar;
@@ -2123,7 +2124,7 @@ public class Parser {
         return pn;
     }
 
-    void defineSymbol(int declType, String name) {
+    private void defineSymbol(int declType, String name) {
         defineSymbol(declType, name, false);
     }
 
@@ -2141,8 +2142,8 @@ public class Parser {
         int symDeclType = symbol != null ? symbol.getDeclType() : -1;
         if (symbol != null
                 && (definingScope == currentScope
-                && (symDeclType == Token.CONST || symDeclType == Token.LET)
-        )
+                    && (symDeclType == Token.CONST || symDeclType == Token.LET)
+                )
         ) {
             addError(symDeclType == Token.CONST ? "msg.const.redecl" : "msg.let.redecl", name);
             return;
@@ -2236,9 +2237,22 @@ public class Parser {
 
             if (pn instanceof Name) {
                 Name lhs = (Name) pn;
+                String name = lhs.getString();
 
-                if (lhs.getString().equals("new.target")) {
+                if (name.equals("new.target")) {
                     reportError("msg.bad.assign.left");
+                }
+
+                Scope definingScope = currentScope.getDefiningScope(name);
+
+                if (definingScope != null) {
+                    Symbol definedSymbol = definingScope.getSymbol(name);
+
+                    if (definedSymbol != null) {
+                        if (definedSymbol.getDeclType() == Token.CONST) {
+                            reportError("msg.const.inval.assign", name);
+                        }
+                    }
                 }
             }
 
