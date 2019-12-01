@@ -1095,9 +1095,14 @@ public final class IRFactory extends Parser {
             array.putProp(Node.SPREAD_PROP, true);
 
             String str = node.getValue();
-            for (int i = 0; i < str.length(); i++) {
+            int index = 0;
+            while (index < str.length()) {
+                int newIndex = str.offsetByCodePoints(index, 1);
+                String value = str.substring(index, newIndex);
+                index = newIndex;
+
                 StringLiteral sl = new StringLiteral();
-                sl.setValue(String.valueOf(str.charAt(i)));
+                sl.setValue(value);
                 array.addChildToBack(transformString(sl));
             }
             return array;

@@ -301,9 +301,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": false
   },
   "ES2015": {
-    "_successful": 286,
+    "_successful": 288,
     "_count": 689,
-    "_percent": 0.41509433962264153,
+    "_percent": 0.41799709724238027,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -324,8 +324,8 @@
     "syntax›spread syntax for iterable objects›with sparse arrays, in array literals": true,
     "syntax›spread syntax for iterable objects›with strings, in function calls": true,
     "syntax›spread syntax for iterable objects›with strings, in array literals": true,
-    "syntax›spread syntax for iterable objects›with astral plane strings, in function calls": false,
-    "syntax›spread syntax for iterable objects›with astral plane strings, in array literals": false,
+    "syntax›spread syntax for iterable objects›with astral plane strings, in function calls": true,
+    "syntax›spread syntax for iterable objects›with astral plane strings, in array literals": true,
     "syntax›spread syntax for iterable objects›with generator instances, in calls": true,
     "syntax›spread syntax for iterable objects›with generator instances, in arrays": true,
     "syntax›spread syntax for iterable objects›with generic iterables, in calls": "Invalid iterator value",
