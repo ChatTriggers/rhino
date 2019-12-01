@@ -2300,11 +2300,17 @@ public class Parser {
         if (matchToken(Token.PIPELINE, true)) {
             int opPos = ts.tokenBeg;
             FunctionCall fc = new FunctionCall(opPos);
-            AstNode target = expr();
-            if (!(target instanceof FunctionNode) && !(target instanceof Name)) {
-                reportError("msg.bad.pipeline");
-                return makeErrorNode();
+            AstNode target = orExpr();
+
+            // Workaround for arrow functions in pipeline expressions.
+            // The spec says the target of a pipeline is an orExpr, which,
+            // as far as I can tell, should never parse an arrow function.
+            // So I have added a hacky fix.
+            if (peekToken() == Token.ARROW) {
+                consumeToken();
+                target = arrowFunction(target);
             }
+
             fc.setTarget(target);
             fc.setArguments(Collections.singletonList(pn));
             pn = pipelineExpr(fc);
@@ -2507,7 +2513,6 @@ public class Parser {
             case Token.NOT:
             case Token.BITNOT:
             case Token.TYPEOF:
-
             case Token.DELPROP:
                 consumeToken();
                 node = new UnaryExpression(tt, ts.tokenBeg, unaryExpr());
