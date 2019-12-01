@@ -841,7 +841,7 @@ public abstract class ScriptableObject implements Scriptable,
      * Get the getter or setter for a given Symbol property. Used by __lookupGetter__
      * and __lookupSetter__.
      *
-     * @param key     Name of the object. If nonnull, index must be 0.
+     * @param key      Name of the object. If nonnull, index must be 0.
      * @param index    Index of the object. If nonzero, name must be null.
      * @param isSetter If true, return the setter, otherwise return the getter.
      * @return Null if the property does not exist. Otherwise returns either
@@ -1036,7 +1036,7 @@ public abstract class ScriptableObject implements Scriptable,
             }
 
             Context _cx = Context.getContext();
-            return ((Callable) toPrimitive).call(_cx, _cx.topCallScope, object, new Object[]{ hint });
+            return ((Callable) toPrimitive).call(_cx, _cx.topCallScope, object, new Object[]{hint});
         }
 
         for (int i = 0; i < 2; i++) {
@@ -2801,14 +2801,14 @@ public abstract class ScriptableObject implements Scriptable,
         Slot slot;
         if (this != start) {
             slot = slotMap.query(key, index);
-            if(!isExtensible && Context.getContext().isStrictMode() && (slot == null || !(slot instanceof GetterSlot)))
+            if (!isExtensible && Context.getContext().isStrictMode() && (slot == null || !(slot instanceof GetterSlot)))
                 throw ScriptRuntime.typeError0("msg.not.extensible");
             if (slot == null) {
                 return false;
             }
         } else if (!isExtensible) {
             slot = slotMap.query(key, index);
-            if(Context.getContext().isStrictMode() && (slot == null || !(slot instanceof GetterSlot)))
+            if (Context.getContext().isStrictMode() && (slot == null || !(slot instanceof GetterSlot)))
                 throw ScriptRuntime.typeError0("msg.not.extensible");
             if (slot == null) {
                 return true;

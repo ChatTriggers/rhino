@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mozilla.javascript.ScriptableObject.*;
-
 @SuppressWarnings("DuplicatedCode")
 public class NativeProxy extends IdScriptableObject implements Function {
     private static final long serialVersionUID = -5164128569432516845L;
@@ -62,7 +60,6 @@ public class NativeProxy extends IdScriptableObject implements Function {
     }
 
 
-
     @Override
     public Object get(String name, Scriptable start) {
         ensureNotRevoked();
@@ -80,7 +77,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
 
         Function fn = (Function) get;
-        Object result = fn.call(Context.getContext(), this, start, new Object[]{ target, name, start });
+        Object result = fn.call(Context.getContext(), this, start, new Object[]{target, name, start});
 
         if (hasProperty(target, name)) {
             int attributes = target.getAttributes(name);
@@ -115,7 +112,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
 
         Function fn = (Function) get;
-        Object result = fn.call(Context.getContext(), this, start, new Object[]{ target, key, start });
+        Object result = fn.call(Context.getContext(), this, start, new Object[]{target, key, start});
 
         if (hasProperty(target, key)) {
             int attributes = target.getAttributes(key);
@@ -221,7 +218,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
 
         Function fn = (Function) handlerHas;
-        Object _handlerResult = fn.call(Context.getContext(), this, this, new Object[]{ target, name });
+        Object _handlerResult = fn.call(Context.getContext(), this, this, new Object[]{target, name});
 
         if (!(_handlerResult instanceof Boolean) && _handlerResult != Undefined.instance) {
             // TODO: error
@@ -299,7 +296,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "deleteProperty");
         }
 
-        Object _result = ((Function) deleteProperty).call(Context.getContext(), this, this, new Object[]{ target, name });
+        Object _result = ((Function) deleteProperty).call(Context.getContext(), this, this, new Object[]{target, name});
 
         if (!(_result instanceof Boolean) && _result != Undefined.instance) {
             // TODO: error
@@ -334,7 +331,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "deleteProperty");
         }
 
-        Object _result = ((Function) deleteProperty).call(Context.getContext(), this, this, new Object[]{ target, key });
+        Object _result = ((Function) deleteProperty).call(Context.getContext(), this, this, new Object[]{target, key});
 
         if (!(_result instanceof Boolean) && _result != Undefined.instance) {
             // TODO: error
@@ -367,7 +364,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "getOwnPropertyDescriptor");
         }
 
-        Object _result = ((Function) getOwnPropertyDescriptor).call(cx, this, this, new Object[]{ target, id });
+        Object _result = ((Function) getOwnPropertyDescriptor).call(cx, this, this, new Object[]{target, id});
 
         // Invariant 1
         if (_result != Undefined.instance && !(_result instanceof ScriptableObject)) {
@@ -448,7 +445,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "defineOwnProperty");
         }
 
-        Object result = ((Function) defineProperty).call(cx, this, this, new Object[]{ target, id, desc });
+        Object result = ((Function) defineProperty).call(cx, this, this, new Object[]{target, id, desc});
 
         if (result instanceof Boolean && !((boolean) result)) {
             throw ScriptRuntime.typeError1("msg.proxy.invariant.defineprop.returned.false", ScriptRuntime.toString(id));
@@ -487,7 +484,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "getPrototypeOf");
         }
 
-        Object result = ((Function) getPrototypeOf).call(Context.getContext(), this, this, new Object[]{ target });
+        Object result = ((Function) getPrototypeOf).call(Context.getContext(), this, this, new Object[]{target});
 
         if (result != null && !(result instanceof ScriptableObject)) {
             throw ScriptRuntime.typeError0("msg.proxy.invariant.getproto.invalid.return");
@@ -515,7 +512,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "setPrototypeOf");
         }
 
-        Object result = ((Function) setPrototypeOf).call(Context.getContext(), this, this, new Object[]{ target, m });
+        Object result = ((Function) setPrototypeOf).call(Context.getContext(), this, this, new Object[]{target, m});
 
         if (result instanceof Boolean && (boolean) result && !target.isExtensible() && m != target.getPrototype()) {
             throw ScriptRuntime.typeError0("msg.proxy.invariant.setproto.invalid.parameter");
@@ -538,7 +535,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "isExtensible");
         }
 
-        Object result = ((Function) isExtensible).call(Context.getContext(), this, this, new Object[]{ target });
+        Object result = ((Function) isExtensible).call(Context.getContext(), this, this, new Object[]{target});
 
         if (!(result instanceof Boolean) || ((boolean) result) != target.isExtensible()) {
             throw ScriptRuntime.typeError0("msg.proxy.invariant.isextensible");
@@ -563,7 +560,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "preventExtensions");
         }
 
-        Object result = ((Function) preventExtensions).call(Context.getContext(), this, this, new Object[]{ target });
+        Object result = ((Function) preventExtensions).call(Context.getContext(), this, this, new Object[]{target});
 
         if (result instanceof Boolean && (boolean) result && this.isExtensible()) {
             throw ScriptRuntime.typeError0("msg.proxy.invariant.prevent.extensible");
@@ -584,7 +581,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "setPrototypeOf");
         }
 
-        Object result = ((Function) ownKeys).call(Context.getContext(), this, this, new Object[]{ target });
+        Object result = ((Function) ownKeys).call(Context.getContext(), this, this, new Object[]{target});
 
         if (!(result instanceof NativeArray)) {
             throw ScriptRuntime.typeError0("msg.proxy.invariant.ownkeys.invalid.array");
@@ -637,7 +634,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "call");
         }
 
-        return ((Function) apply).call(cx, scope, thisObj, new Object[]{ target, thisObj, cx.newArray(scope, args) });
+        return ((Function) apply).call(cx, scope, thisObj, new Object[]{target, thisObj, cx.newArray(scope, args)});
     }
 
     @Override
@@ -662,7 +659,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             throw ScriptRuntime.typeError1("msg.proxy.invalid.handler", "preventExtensions");
         }
 
-        Object result = ((Function) construct).call(cx, scope, this, new Object[]{ target, cx.newArray(scope, args), this });
+        Object result = ((Function) construct).call(cx, scope, this, new Object[]{target, cx.newArray(scope, args), this});
 
         if (!(result instanceof ScriptableObject)) {
             throw ScriptRuntime.typeError0("msg.proxy.result.not.constructable");

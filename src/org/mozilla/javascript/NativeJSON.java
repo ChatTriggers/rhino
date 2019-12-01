@@ -510,12 +510,22 @@ public final class NativeJSON extends IdScriptableObject {
     protected int findPrototypeId(String s) {
         int id;
 // #generated# Last update: 2019-11-23 18:20:15 CST
-        L0: { id = 0; String X = null;
+        L0:
+        {
+            id = 0;
+            String X = null;
             int s_length = s.length();
-            if (s_length==5) { X="parse";id=Id_parse; }
-            else if (s_length==8) { X="toSource";id=Id_toSource; }
-            else if (s_length==9) { X="stringify";id=Id_stringify; }
-            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            if (s_length == 5) {
+                X = "parse";
+                id = Id_parse;
+            } else if (s_length == 8) {
+                X = "toSource";
+                id = Id_toSource;
+            } else if (s_length == 9) {
+                X = "stringify";
+                id = Id_stringify;
+            }
+            if (X != null && X != s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#

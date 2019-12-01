@@ -10,7 +10,6 @@ import org.mozilla.javascript.regexp.NativeRegExp;
 
 import java.text.Collator;
 import java.text.Normalizer;
-import java.util.LinkedList;
 
 import static org.mozilla.javascript.ScriptRuntime.rangeError;
 import static org.mozilla.javascript.ScriptRuntimeES6.requireObjectCoercible;
@@ -1026,79 +1025,241 @@ final class NativeString extends IdScriptableObject {
     protected int findPrototypeId(String s) {
         int id;
 // #generated# Last update: 2019-11-25 21:30:43 CST
-        L0: { id = 0; String X = null; int c;
-            L: switch (s.length()) {
-            case 3: c=s.charAt(2);
-                if (c=='b') { if (s.charAt(0)=='s' && s.charAt(1)=='u') {id=Id_sub; break L0;} }
-                else if (c=='g') { if (s.charAt(0)=='b' && s.charAt(1)=='i') {id=Id_big; break L0;} }
-                else if (c=='p') { if (s.charAt(0)=='s' && s.charAt(1)=='u') {id=Id_sup; break L0;} }
-                break L;
-            case 4: c=s.charAt(0);
-                if (c=='b') { X="bold";id=Id_bold; }
-                else if (c=='l') { X="link";id=Id_link; }
-                else if (c=='t') { X="trim";id=Id_trim; }
-                break L;
-            case 5: switch (s.charAt(4)) {
-                case 'd': X="fixed";id=Id_fixed; break L;
-                case 'e': X="slice";id=Id_slice; break L;
-                case 'h': X="match";id=Id_match; break L;
-                case 'k': X="blink";id=Id_blink; break L;
-                case 'l': X="small";id=Id_small; break L;
-                case 't': X="split";id=Id_split; break L;
-                } break L;
-            case 6: switch (s.charAt(1)) {
-                case 'a': X="padEnd";id=Id_padEnd; break L;
-                case 'e': c=s.charAt(0);
-                    if (c=='r') { X="repeat";id=Id_repeat; }
-                    else if (c=='s') { X="search";id=Id_search; }
+        L0:
+        {
+            id = 0;
+            String X = null;
+            int c;
+            L:
+            switch (s.length()) {
+                case 3:
+                    c = s.charAt(2);
+                    if (c == 'b') {
+                        if (s.charAt(0) == 's' && s.charAt(1) == 'u') {
+                            id = Id_sub;
+                            break L0;
+                        }
+                    } else if (c == 'g') {
+                        if (s.charAt(0) == 'b' && s.charAt(1) == 'i') {
+                            id = Id_big;
+                            break L0;
+                        }
+                    } else if (c == 'p') {
+                        if (s.charAt(0) == 's' && s.charAt(1) == 'u') {
+                            id = Id_sup;
+                            break L0;
+                        }
+                    }
                     break L;
-                case 'h': X="charAt";id=Id_charAt; break L;
-                case 'n': X="anchor";id=Id_anchor; break L;
-                case 'o': X="concat";id=Id_concat; break L;
-                case 'q': X="equals";id=Id_equals; break L;
-                case 't': X="strike";id=Id_strike; break L;
-                case 'u': X="substr";id=Id_substr; break L;
-                } break L;
-            case 7: switch (s.charAt(1)) {
-                case 'a': X="valueOf";id=Id_valueOf; break L;
-                case 'e': X="replace";id=Id_replace; break L;
-                case 'n': X="indexOf";id=Id_indexOf; break L;
-                case 't': X="italics";id=Id_italics; break L;
-                } break L;
-            case 8: switch (s.charAt(6)) {
-                case 'c': X="toSource";id=Id_toSource; break L;
-                case 'e': X="includes";id=Id_includes; break L;
-                case 'f': X="trimLeft";id=Id_trimLeft; break L;
-                case 'n': X="toString";id=Id_toString; break L;
-                case 'r': X="padStart";id=Id_padStart; break L;
-                case 't': X="endsWith";id=Id_endsWith; break L;
-                case 'z': X="fontsize";id=Id_fontsize; break L;
-                } break L;
-            case 9: switch (s.charAt(0)) {
-                case 'f': X="fontcolor";id=Id_fontcolor; break L;
-                case 'n': X="normalize";id=Id_normalize; break L;
-                case 's': X="substring";id=Id_substring; break L;
-                case 't': X="trimRight";id=Id_trimRight; break L;
-                } break L;
-            case 10: c=s.charAt(0);
-                if (c=='c') { X="charCodeAt";id=Id_charCodeAt; }
-                else if (c=='s') { X="startsWith";id=Id_startsWith; }
-                break L;
-            case 11: switch (s.charAt(2)) {
-                case 'L': X="toLowerCase";id=Id_toLowerCase; break L;
-                case 'U': X="toUpperCase";id=Id_toUpperCase; break L;
-                case 'd': X="codePointAt";id=Id_codePointAt; break L;
-                case 'n': X="constructor";id=Id_constructor; break L;
-                case 's': X="lastIndexOf";id=Id_lastIndexOf; break L;
-                } break L;
-            case 13: X="localeCompare";id=Id_localeCompare; break L;
-            case 16: X="equalsIgnoreCase";id=Id_equalsIgnoreCase; break L;
-            case 17: c=s.charAt(8);
-                if (c=='L') { X="toLocaleLowerCase";id=Id_toLocaleLowerCase; }
-                else if (c=='U') { X="toLocaleUpperCase";id=Id_toLocaleUpperCase; }
-                break L;
+                case 4:
+                    c = s.charAt(0);
+                    if (c == 'b') {
+                        X = "bold";
+                        id = Id_bold;
+                    } else if (c == 'l') {
+                        X = "link";
+                        id = Id_link;
+                    } else if (c == 't') {
+                        X = "trim";
+                        id = Id_trim;
+                    }
+                    break L;
+                case 5:
+                    switch (s.charAt(4)) {
+                        case 'd':
+                            X = "fixed";
+                            id = Id_fixed;
+                            break L;
+                        case 'e':
+                            X = "slice";
+                            id = Id_slice;
+                            break L;
+                        case 'h':
+                            X = "match";
+                            id = Id_match;
+                            break L;
+                        case 'k':
+                            X = "blink";
+                            id = Id_blink;
+                            break L;
+                        case 'l':
+                            X = "small";
+                            id = Id_small;
+                            break L;
+                        case 't':
+                            X = "split";
+                            id = Id_split;
+                            break L;
+                    }
+                    break L;
+                case 6:
+                    switch (s.charAt(1)) {
+                        case 'a':
+                            X = "padEnd";
+                            id = Id_padEnd;
+                            break L;
+                        case 'e':
+                            c = s.charAt(0);
+                            if (c == 'r') {
+                                X = "repeat";
+                                id = Id_repeat;
+                            } else if (c == 's') {
+                                X = "search";
+                                id = Id_search;
+                            }
+                            break L;
+                        case 'h':
+                            X = "charAt";
+                            id = Id_charAt;
+                            break L;
+                        case 'n':
+                            X = "anchor";
+                            id = Id_anchor;
+                            break L;
+                        case 'o':
+                            X = "concat";
+                            id = Id_concat;
+                            break L;
+                        case 'q':
+                            X = "equals";
+                            id = Id_equals;
+                            break L;
+                        case 't':
+                            X = "strike";
+                            id = Id_strike;
+                            break L;
+                        case 'u':
+                            X = "substr";
+                            id = Id_substr;
+                            break L;
+                    }
+                    break L;
+                case 7:
+                    switch (s.charAt(1)) {
+                        case 'a':
+                            X = "valueOf";
+                            id = Id_valueOf;
+                            break L;
+                        case 'e':
+                            X = "replace";
+                            id = Id_replace;
+                            break L;
+                        case 'n':
+                            X = "indexOf";
+                            id = Id_indexOf;
+                            break L;
+                        case 't':
+                            X = "italics";
+                            id = Id_italics;
+                            break L;
+                    }
+                    break L;
+                case 8:
+                    switch (s.charAt(6)) {
+                        case 'c':
+                            X = "toSource";
+                            id = Id_toSource;
+                            break L;
+                        case 'e':
+                            X = "includes";
+                            id = Id_includes;
+                            break L;
+                        case 'f':
+                            X = "trimLeft";
+                            id = Id_trimLeft;
+                            break L;
+                        case 'n':
+                            X = "toString";
+                            id = Id_toString;
+                            break L;
+                        case 'r':
+                            X = "padStart";
+                            id = Id_padStart;
+                            break L;
+                        case 't':
+                            X = "endsWith";
+                            id = Id_endsWith;
+                            break L;
+                        case 'z':
+                            X = "fontsize";
+                            id = Id_fontsize;
+                            break L;
+                    }
+                    break L;
+                case 9:
+                    switch (s.charAt(0)) {
+                        case 'f':
+                            X = "fontcolor";
+                            id = Id_fontcolor;
+                            break L;
+                        case 'n':
+                            X = "normalize";
+                            id = Id_normalize;
+                            break L;
+                        case 's':
+                            X = "substring";
+                            id = Id_substring;
+                            break L;
+                        case 't':
+                            X = "trimRight";
+                            id = Id_trimRight;
+                            break L;
+                    }
+                    break L;
+                case 10:
+                    c = s.charAt(0);
+                    if (c == 'c') {
+                        X = "charCodeAt";
+                        id = Id_charCodeAt;
+                    } else if (c == 's') {
+                        X = "startsWith";
+                        id = Id_startsWith;
+                    }
+                    break L;
+                case 11:
+                    switch (s.charAt(2)) {
+                        case 'L':
+                            X = "toLowerCase";
+                            id = Id_toLowerCase;
+                            break L;
+                        case 'U':
+                            X = "toUpperCase";
+                            id = Id_toUpperCase;
+                            break L;
+                        case 'd':
+                            X = "codePointAt";
+                            id = Id_codePointAt;
+                            break L;
+                        case 'n':
+                            X = "constructor";
+                            id = Id_constructor;
+                            break L;
+                        case 's':
+                            X = "lastIndexOf";
+                            id = Id_lastIndexOf;
+                            break L;
+                    }
+                    break L;
+                case 13:
+                    X = "localeCompare";
+                    id = Id_localeCompare;
+                    break L;
+                case 16:
+                    X = "equalsIgnoreCase";
+                    id = Id_equalsIgnoreCase;
+                    break L;
+                case 17:
+                    c = s.charAt(8);
+                    if (c == 'L') {
+                        X = "toLocaleLowerCase";
+                        id = Id_toLocaleLowerCase;
+                    } else if (c == 'U') {
+                        X = "toLocaleUpperCase";
+                        id = Id_toLocaleUpperCase;
+                    }
+                    break L;
             }
-            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            if (X != null && X != s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#

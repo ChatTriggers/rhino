@@ -55,7 +55,7 @@ public class NativeProxyCtor extends BaseFunction {
             };
 
             NativeProxyRevocableObject obj = new NativeProxyRevocableObject(proxy, revoke);
-            
+
             ScriptableObject.putProperty(obj, "proxy", proxy);
             ScriptableObject.putProperty(obj, "revoke", revoke);
 

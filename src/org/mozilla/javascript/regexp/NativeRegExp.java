@@ -2513,21 +2513,46 @@ public class NativeRegExp extends IdScriptableObject implements Function {
     protected int findInstanceIdInfo(String s) {
         int id;
 // #generated# Last update: 2019-11-21 20:32:35 EST
-        L0: { id = 0; String X = null; int c;
-            L: switch (s.length()) {
-            case 5: X="flags";id=Id_flags; break L;
-            case 6: c=s.charAt(1);
-                if (c=='l') { X="global";id=Id_global; }
-                else if (c=='o') { X="source";id=Id_source; }
-                else if (c=='t') { X="sticky";id=Id_sticky; }
-                break L;
-            case 9: c=s.charAt(0);
-                if (c=='l') { X="lastIndex";id=Id_lastIndex; }
-                else if (c=='m') { X="multiline";id=Id_multiline; }
-                break L;
-            case 10: X="ignoreCase";id=Id_ignoreCase; break L;
+        L0:
+        {
+            id = 0;
+            String X = null;
+            int c;
+            L:
+            switch (s.length()) {
+                case 5:
+                    X = "flags";
+                    id = Id_flags;
+                    break L;
+                case 6:
+                    c = s.charAt(1);
+                    if (c == 'l') {
+                        X = "global";
+                        id = Id_global;
+                    } else if (c == 'o') {
+                        X = "source";
+                        id = Id_source;
+                    } else if (c == 't') {
+                        X = "sticky";
+                        id = Id_sticky;
+                    }
+                    break L;
+                case 9:
+                    c = s.charAt(0);
+                    if (c == 'l') {
+                        X = "lastIndex";
+                        id = Id_lastIndex;
+                    } else if (c == 'm') {
+                        X = "multiline";
+                        id = Id_multiline;
+                    }
+                    break L;
+                case 10:
+                    X = "ignoreCase";
+                    id = Id_ignoreCase;
+                    break L;
             }
-            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            if (X != null && X != s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -2702,20 +2727,43 @@ public class NativeRegExp extends IdScriptableObject implements Function {
     protected int findPrototypeId(String s) {
         int id;
 // #generated# Last update: 2019-11-21 20:32:35 EST
-        L0: { id = 0; String X = null; int c;
-            L: switch (s.length()) {
-            case 4: c=s.charAt(0);
-                if (c=='e') { X="exec";id=Id_exec; }
-                else if (c=='t') { X="test";id=Id_test; }
-                break L;
-            case 6: X="prefix";id=Id_prefix; break L;
-            case 7: X="compile";id=Id_compile; break L;
-            case 8: c=s.charAt(3);
-                if (c=='o') { X="toSource";id=Id_toSource; }
-                else if (c=='t') { X="toString";id=Id_toString; }
-                break L;
+        L0:
+        {
+            id = 0;
+            String X = null;
+            int c;
+            L:
+            switch (s.length()) {
+                case 4:
+                    c = s.charAt(0);
+                    if (c == 'e') {
+                        X = "exec";
+                        id = Id_exec;
+                    } else if (c == 't') {
+                        X = "test";
+                        id = Id_test;
+                    }
+                    break L;
+                case 6:
+                    X = "prefix";
+                    id = Id_prefix;
+                    break L;
+                case 7:
+                    X = "compile";
+                    id = Id_compile;
+                    break L;
+                case 8:
+                    c = s.charAt(3);
+                    if (c == 'o') {
+                        X = "toSource";
+                        id = Id_toSource;
+                    } else if (c == 't') {
+                        X = "toString";
+                        id = Id_toString;
+                    }
+                    break L;
             }
-            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            if (X != null && X != s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#

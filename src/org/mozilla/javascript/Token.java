@@ -40,10 +40,10 @@ public class Token {
             EOF = 0,  // end of file token - (not EOF_CHAR)
             EOL = 1,  // end of line
 
-            // Interpreter reuses the following as bytecodes
-            FIRST_BYTECODE_TOKEN = 2,
+    // Interpreter reuses the following as bytecodes
+    FIRST_BYTECODE_TOKEN = 2,
 
-            ENTERWITH = 2,
+    ENTERWITH = 2,
             LEAVEWITH = 3,
             RETURN = 4,
             GOTO = 5,
@@ -120,8 +120,8 @@ public class Token {
             YIELD = 74,  // JS 1.7 yield pseudo keyword
             STRICT_SETNAME = 75,
 
-            // For XML support:
-            DEFAULTNAMESPACE = 76, // default xml namespace =
+    // For XML support:
+    DEFAULTNAMESPACE = 76, // default xml namespace =
             ESCXMLATTR = 77,
             ESCXMLTEXT = 78,
             REF_MEMBER = 79, // Reference for x.@y, x..y etc.
@@ -129,10 +129,10 @@ public class Token {
             REF_NAME = 81, // Reference for @y, @[y] etc.
             REF_NS_NAME = 82, // Reference for ns::y, @ns::y@[y] etc.
 
-            // End of interpreter bytecodes
-            LAST_BYTECODE_TOKEN = REF_NS_NAME,
+    // End of interpreter bytecodes
+    LAST_BYTECODE_TOKEN = REF_NS_NAME,
 
-            TRY = 83,
+    TRY = 83,
             SEMI = 84,  // semicolon
             LB = 85,  // left and right brackets
             RB = 86,
@@ -142,7 +142,7 @@ public class Token {
             RP = 90,
             COMMA = 91,  // comma operator
 
-            ASSIGN = 92,  // simple assignment  (=)
+    ASSIGN = 92,  // simple assignment  (=)
             ASSIGN_BITOR = 93,  // |=
             ASSIGN_BITXOR = 94,  // ^=
             ASSIGN_BITAND = 95,  // |=
@@ -156,10 +156,10 @@ public class Token {
             ASSIGN_MOD = 103,  // %=
             ASSIGN_EXP = 104,  // **=
 
-            FIRST_ASSIGN = ASSIGN,
+    FIRST_ASSIGN = ASSIGN,
             LAST_ASSIGN = ASSIGN_EXP,
 
-            HOOK = 105, // conditional (?:)
+    HOOK = 105, // conditional (?:)
             COLON = 106,
             OR = 107, // logical or (||)
             AND = 108, // logical and (&&)
@@ -190,12 +190,12 @@ public class Token {
             VOID = 133, // void keyword
             RESERVED = 134, // reserved keywords
 
-            EMPTY = 135,
+    EMPTY = 135,
 
-            /* types used for the parse tree - these never get returned
-             * by the scanner.
-             */
-            BLOCK = 136, // statement block
+    /* types used for the parse tree - these never get returned
+     * by the scanner.
+     */
+    BLOCK = 136, // statement block
             LABEL = 137, // label
             TARGET = 138,
             LOOP = 139,
@@ -210,19 +210,19 @@ public class Token {
             LOCAL_BLOCK = 148,
             SET_REF_OP = 149, // *reference op= something
 
-            // For XML support:
-            DOTDOT = 150,  // member operator (..)
+    // For XML support:
+    DOTDOT = 150,  // member operator (..)
             COLONCOLON = 151,  // namespace::name
             XML = 152,  // XML type
             DOTQUERY = 153,  // .() -- e.g., x.emps.emp.(name == "terry")
             XMLATTR = 154,  // @
             XMLEND = 155,
 
-            // Optimizer-only-tokens
-            TO_OBJECT = 156,
+    // Optimizer-only-tokens
+    TO_OBJECT = 156,
             TO_DOUBLE = 157,
 
-            GET = 158,  // JS 1.5 get pseudo keyword
+    GET = 158,  // JS 1.5 get pseudo keyword
             SET = 159,  // JS 1.5 set pseudo keyword
             LET = 160,  // JS 1.7 let pseudo keyword
             CONST = 161,

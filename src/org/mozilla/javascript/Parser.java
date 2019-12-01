@@ -2143,8 +2143,8 @@ public class Parser {
         int symDeclType = symbol != null ? symbol.getDeclType() : -1;
         if (symbol != null
                 && (definingScope == currentScope
-                    && (symDeclType == Token.CONST || symDeclType == Token.LET)
-                )
+                && (symDeclType == Token.CONST || symDeclType == Token.LET)
+        )
         ) {
             addError(symDeclType == Token.CONST ? "msg.const.redecl" : "msg.let.redecl", name);
             return;
@@ -4078,7 +4078,7 @@ public class Parser {
             }
             Node rightElem = new Node(Token.GETELEM, createName(tempName), createNumber(index));
             if (n.getProp(Node.SPREAD_PROP) != null) {
-                rightElem.putProp(Node.SPREAD_PROP, new Object[]{ index, right });
+                rightElem.putProp(Node.SPREAD_PROP, new Object[]{index, right});
             }
             if (n.getType() == Token.NAME) {
                 String name = n.getString();

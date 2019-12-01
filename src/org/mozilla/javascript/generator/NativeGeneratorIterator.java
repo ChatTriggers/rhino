@@ -2,8 +2,6 @@ package org.mozilla.javascript.generator;
 
 import org.mozilla.javascript.*;
 
-import java.util.Iterator;
-
 public class NativeGeneratorIterator extends ES6Iterator {
     private static final String GEN_ITERATOR_TAG = "GeneratorIterator";
     private NativeGenerator generator;
@@ -14,7 +12,9 @@ public class NativeGeneratorIterator extends ES6Iterator {
         ES6Iterator.init(scope, sealed, new NativeGeneratorIterator(), GEN_ITERATOR_TAG);
     }
 
-    private NativeGeneratorIterator() { super(); }
+    private NativeGeneratorIterator() {
+        super();
+    }
 
     public NativeGeneratorIterator(Context cx, Scriptable scope, NativeGenerator generator) {
         super(scope, GEN_ITERATOR_TAG);

@@ -46,11 +46,19 @@ public class NativeProxyRevocableObject extends BaseFunction {
     protected int findPrototypeId(String s) {
         int id;
 // #generated# Last update: 2019-11-21 23:30:39 CST
-        L0: { id = 0; String X = null;
+        L0:
+        {
+            id = 0;
+            String X = null;
             int s_length = s.length();
-            if (s_length==5) { X="proxy";id=Id_proxy; }
-            else if (s_length==6) { X="revoke";id=Id_revoke; }
-            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            if (s_length == 5) {
+                X = "proxy";
+                id = Id_proxy;
+            } else if (s_length == 6) {
+                X = "revoke";
+                id = Id_revoke;
+            }
+            if (X != null && X != s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#

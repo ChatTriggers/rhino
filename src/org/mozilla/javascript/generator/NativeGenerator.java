@@ -193,14 +193,30 @@ public final class NativeGenerator extends IdScriptableObject {
     protected int findPrototypeId(String s) {
         int id;
 // #generated# Last update: 2019-11-24 16:11:10 CST
-        L0: { id = 0; String X = null;
-            L: switch (s.length()) {
-            case 4: X="next";id=Id_next; break L;
-            case 5: X="throw";id=Id_throw; break L;
-            case 6: X="return";id=Id_return; break L;
-            case 12: X="__iterator__";id=Id___iterator__; break L;
+        L0:
+        {
+            id = 0;
+            String X = null;
+            L:
+            switch (s.length()) {
+                case 4:
+                    X = "next";
+                    id = Id_next;
+                    break L;
+                case 5:
+                    X = "throw";
+                    id = Id_throw;
+                    break L;
+                case 6:
+                    X = "return";
+                    id = Id_return;
+                    break L;
+                case 12:
+                    X = "__iterator__";
+                    id = Id___iterator__;
+                    break L;
             }
-            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            if (X != null && X != s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#

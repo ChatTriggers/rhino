@@ -2307,7 +2307,7 @@ class BodyCodegen {
     }
 
     private int getNextGeneratorState(Node node) {
-        int nodeIndex = ((FunctionNode) scriptOrFn).getResumptionPoints() .indexOf(node);
+        int nodeIndex = ((FunctionNode) scriptOrFn).getResumptionPoints().indexOf(node);
         return nodeIndex + GENERATOR_YIELD_START;
     }
 
@@ -2358,7 +2358,7 @@ class BodyCodegen {
                 int specialType = node.getIntProp(Node.SPECIALCALL_PROP, Node.NON_SPECIALCALL);
                 if (specialType == Node.NON_SPECIALCALL) {
                     OptFunctionNode target;
-                    target = (OptFunctionNode) node.getProp( Node.DIRECTCALL_PROP);
+                    target = (OptFunctionNode) node.getProp(Node.DIRECTCALL_PROP);
 
                     if (target != null) {
                         visitOptimizedCall(node, target, type, child);
@@ -2767,7 +2767,7 @@ class BodyCodegen {
 
                 if (spread != null) {
                     int startIndex = (int) ((Object[]) spread)[0];
-                    Node right = (Node) ((Object[] ) spread)[1];
+                    Node right = (Node) ((Object[]) spread)[1];
 
                     cfw.addALoad(contextLocal);
                     cfw.addALoad(variableObjectLocal);

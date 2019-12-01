@@ -10,7 +10,6 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.generator.NativeGenerator;
 import org.mozilla.javascript.generator.NativeGeneratorIterator;
 import org.mozilla.javascript.optimizer.Codegen;
-import org.mozilla.javascript.optimizer.OptRuntime;
 import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
 import org.mozilla.javascript.v8dtoa.FastDtoa;
@@ -20,7 +19,10 @@ import org.mozilla.javascript.xml.XMLObject;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * This is the class that implements the runtime.
@@ -3225,11 +3227,11 @@ public class ScriptRuntime {
             }
             return eqNumber(b ? 1.0 : 0.0, y);
         } else if (isSymbol(x)) {
-          if (y instanceof Scriptable) {
-              if (!isSymbol(y)) return false;
-              return toPrimitive(x) == y;
-          }
-          return false;
+            if (y instanceof Scriptable) {
+                if (!isSymbol(y)) return false;
+                return toPrimitive(x) == y;
+            }
+            return false;
         } else if (x instanceof Scriptable && !isSymbol(x)) {
             if (isSymbol(y)) {
                 return toPrimitive(x) == y;
@@ -3450,7 +3452,7 @@ public class ScriptRuntime {
                 if (!(hasInstance instanceof Callable)) {
                     throw ScriptRuntime.typeError1("msg.object.not.callable", ScriptRuntime.toString(hasInstance));
                 }
-                Object result = ((Callable) hasInstance).call(cx, ScriptRuntime.getTopCallScope(cx), (Scriptable) b, new Object[]{ a });
+                Object result = ((Callable) hasInstance).call(cx, ScriptRuntime.getTopCallScope(cx), (Scriptable) b, new Object[]{a});
 
                 return result != null && result != Undefined.instance && !((result instanceof Boolean) && !((boolean) result));
             }
