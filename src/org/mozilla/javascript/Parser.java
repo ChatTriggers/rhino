@@ -2076,6 +2076,9 @@ public class Parser {
                 reportError("msg.rest.not.last");
             }
 
+            if (peekToken() == Token.RP && isFunctionParams) {
+                break;
+            }
         }
         pn.setLength(end - pos);
         pn.setIsStatement(isStatement);
@@ -3583,6 +3586,7 @@ public class Parser {
                     warnTrailingComma(pos, elems, afterComma);
                 break commaLoop;
             }
+
             AstNode pname = objliteralProperty();
             if (pname == null && peekToken() != Token.MUL) {
                 reportError("msg.bad.prop");
