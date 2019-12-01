@@ -48,6 +48,7 @@ public class Parser {
     private static final int GET_ENTRY = 2;
     private static final int SET_ENTRY = 4;
     private static final int METHOD_ENTRY = 8;
+    private static final int GENERATOR_ENTRY = 0x10;
     protected int nestingOfFunction;
     protected boolean inUseStrictDirective;
     CompilerEnvirons compilerEnv;
@@ -772,16 +773,16 @@ public class Parser {
     }
 
     private FunctionNode function(int type) throws IOException {
-        return function(type, false);
+        return function(type, 0);
     }
 
-    private FunctionNode function(int type, boolean isObjectSetterFunction) throws IOException {
+    private FunctionNode function(int type, int objEntryKind) throws IOException {
         int syntheticType = type;
         int baseLineno = ts.lineno;  // line number where source starts
         int functionSourceStart = ts.tokenBeg;  // start of "function" kwd
         Name name = null;
         AstNode memberExprNode = null;
-        boolean generator = false;
+        boolean generator = objEntryKind == GENERATOR_ENTRY;
 
         if (matchToken(Token.MUL, true)) {
             generator = true;
@@ -838,7 +839,7 @@ public class Parser {
 
         PerFunctionVariables savedVars = new PerFunctionVariables(fnNode);
         try {
-            parseFunctionParams(fnNode, isObjectSetterFunction);
+            parseFunctionParams(fnNode, objEntryKind != 0);
             fnNode.setBody(parseFunctionBody(type, fnNode));
             fnNode.setEncodedSourceBounds(functionSourceStart, ts.tokenEnd);
             fnNode.setLength(ts.tokenEnd - functionSourceStart);
@@ -3583,7 +3584,7 @@ public class Parser {
                 break commaLoop;
             }
             AstNode pname = objliteralProperty();
-            if (pname == null) {
+            if (pname == null && peekToken() != Token.MUL) {
                 reportError("msg.bad.prop");
             } else {
                 propertyName = ts.getString();
@@ -3597,7 +3598,6 @@ public class Parser {
                 }
 
                 int ppos = ts.tokenBeg;
-                consumeToken();
 
                 // This code path needs to handle both destructuring object
                 // literals like:
@@ -3611,6 +3611,9 @@ public class Parser {
                 if (peeked != Token.COMMA && peeked != Token.COLON && peeked != Token.RC && peeked != Token.ASSIGN) {
                     if (peeked == Token.LP) {
                         entryKind = METHOD_ENTRY;
+                    } else if (peeked == Token.MUL) {
+                        entryKind = GENERATOR_ENTRY;
+                        consumeToken();
                     } else if (pname.getType() == Token.NAME) {
                         if ("get".equals(propertyName)) {
                             entryKind = GET_ENTRY;
@@ -3618,7 +3621,7 @@ public class Parser {
                             entryKind = SET_ENTRY;
                         }
                     }
-                    if (entryKind == GET_ENTRY || entryKind == SET_ENTRY) {
+                    if (entryKind == GET_ENTRY || entryKind == SET_ENTRY || entryKind == GENERATOR_ENTRY) {
                         pname = objliteralProperty();
                         if (pname == null) {
                             reportError("msg.bad.prop");
@@ -3629,7 +3632,7 @@ public class Parser {
                         propertyName = null;
                     } else {
                         propertyName = ts.getString();
-                        ObjectProperty objectProp = methodDefinition( ppos, pname, entryKind);
+                        ObjectProperty objectProp = methodDefinition(ppos, pname, entryKind);
                         pname.setJsDocNode(jsdocNode);
                         elems.add(objectProp);
                     }
@@ -3691,15 +3694,18 @@ public class Parser {
         switch (tt) {
             case Token.NAME:
                 pname = createNameNode();
+                consumeToken();
                 break;
 
             case Token.STRING:
                 pname = createStringLiteral();
+                consumeToken();
                 break;
 
             case Token.NUMBER:
                 pname = new NumberLiteral(
                         ts.tokenBeg, ts.getString(), ts.getNumber());
+                consumeToken();
                 break;
 
             case Token.LB:
@@ -3717,6 +3723,7 @@ public class Parser {
                         && TokenStream.isKeyword(ts.getString(), compilerEnv.getLanguageVersion(), inUseStrictDirective)) {
                     // convert keyword to property name, e.g. ({if: 1})
                     pname = createNameNode();
+                    consumeToken();
                     break;
                 }
                 return null;
@@ -3776,7 +3783,7 @@ public class Parser {
 
     private ObjectProperty methodDefinition(int pos, AstNode propName, int entryKind)
             throws IOException {
-        FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION, true);
+        FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION, entryKind);
         // We've already parsed the function name, so fn should be anonymous.
         Name name = fn.getFunctionName();
         if (name != null && name.length() != 0) {
@@ -3795,7 +3802,6 @@ public class Parser {
             case METHOD_ENTRY:
                 pn.setIsNormalMethod();
                 fn.setFunctionIsNormalMethod();
-                break;
         }
         int end = getNodeEnd(fn);
         pn.setLeft(propName);
