@@ -24,3 +24,4 @@ target/
 test262
 bin/
 .settings/
+docs/yarn.lock
