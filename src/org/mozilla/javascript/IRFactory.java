@@ -572,6 +572,9 @@ public final class IRFactory extends Parser {
             if (child.type == Token.DEFAULT) {
                 Node newChild = transform((AstNode) (child.last));
                 child.replaceChild(child.last, newChild);
+            } else if (child.getProp(Node.COMPUTED_PROP) != null) {
+                Node newChild = transform((AstNode) child);
+                root.replaceChild(child, newChild);
             } else {
                 transformDestructuringParams(child);
             }

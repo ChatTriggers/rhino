@@ -4111,9 +4111,18 @@ public class Parser {
             }
             AstNode id = prop.getLeft();
             Node rightElem;
-            if (id.getProp(Node.COMPUTED_PROP) != null && this instanceof IRFactory) {
-                Node s = ((IRFactory) this).transform(id);
-                rightElem = new Node(Token.GETELEM, createName(tempName), s);
+            if (id.getProp(Node.COMPUTED_PROP) != null) {
+                if (this instanceof IRFactory) {
+                    // If we're already undergoing IR, do the computed property transformation
+                    // right away.
+
+                    Node s = ((IRFactory) this).transform(id);
+                    rightElem = new Node(Token.GETELEM, createName(tempName), s);
+                } else {
+                    // Otherwise, we're probably a function parameter.
+                    // We're going to need to store ourselves and wait for IR.
+                    rightElem = new Node(Token.GETELEM, createName(tempName), id);
+                }
             } else if (id instanceof Name) {
                 Node s = Node.newString(((Name) id).getIdentifier());
                 rightElem = new Node(Token.GETPROP, createName(tempName), s);

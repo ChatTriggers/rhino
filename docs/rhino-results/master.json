@@ -301,9 +301,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": false
   },
   "ES2015": {
-    "_successful": 285,
+    "_successful": 286,
     "_count": 689,
-    "_percent": 0.41364296081277213,
+    "_percent": 0.41509433962264153,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -424,7 +424,7 @@
     "syntax›destructuring, parameters›object destructuring with primitives": true,
     "syntax›destructuring, parameters›trailing commas in object patterns": true,
     "syntax›destructuring, parameters›throws on null and undefined": true,
-    "syntax›destructuring, parameters›computed properties": false,
+    "syntax›destructuring, parameters›computed properties": true,
     "syntax›destructuring, parameters›nested": true,
     "syntax›destructuring, parameters›'arguments' interaction": true,
     "syntax›destructuring, parameters›new Function() support": true,
