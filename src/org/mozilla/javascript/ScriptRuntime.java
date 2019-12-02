@@ -772,26 +772,31 @@ public class ScriptRuntime {
     }
 
     public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter) {
-        Scriptable clazz = ScriptableObject.ensureScriptable(clazzObj);
+        ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
 
         if (instance) {
-            clazz = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(clazz, "prototype"));
+            clazz = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(clazz, "prototype"));
         }
 
         if (name instanceof String) {
+            String nameString = ((String) name);
             if (getterSetter == 0) {
-                clazz.put((String) name, clazz, method);
+                clazz.put(nameString, clazz, method);
+                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.DONTENUM);
             } else {
-                ScriptableObject so = (ScriptableObject) clazz;
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
-                so.setGetterOrSetter((String) name, 0, getterOrSetter, isSetter);
+                clazz.setGetterOrSetter(nameString, 0, getterOrSetter, isSetter);
+                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.DONTENUM);
             }
         } else if (name instanceof Integer) {
             int index = (Integer) name;
             clazz.put(index, clazz, method);
+            clazz.setAttributes(index, clazz.getAttributes(index) | ScriptableObject.DONTENUM);
         } else if (isSymbol(name)) {
-            ScriptableObject.putProperty(clazz, (Symbol) name, method);
+            Symbol symbolName = (Symbol) name;
+            ScriptableObject.putProperty(clazz, symbolName, method);
+            clazz.setAttributes(symbolName, clazz.getAttributes(symbolName) | ScriptableObject.DONTENUM);
         } else {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }

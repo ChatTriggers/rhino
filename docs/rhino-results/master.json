@@ -301,9 +301,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": false
   },
   "ES2015": {
-    "_successful": 313,
+    "_successful": 314,
     "_count": 689,
-    "_percent": 0.45428156748911463,
+    "_percent": 0.45573294629898403,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -502,7 +502,7 @@
     "functions›class›computed static accessor properties": true,
     "functions›class›class name is lexically scoped": false,
     "functions›class›computed names, temporal dead zone": true,
-    "functions›class›methods aren't enumerable": false,
+    "functions›class›methods aren't enumerable": true,
     "functions›class›implicit strict mode": false,
     "functions›class›constructor requires new": false,
     "functions›class›extends": false,
