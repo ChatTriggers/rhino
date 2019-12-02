@@ -6,6 +6,7 @@ public class ClassMethod extends InfixExpression {
     private boolean isStatic = false;
     private AstNode name;
     private FunctionNode function;
+    private Object nameKey;
 
     {
         type = Token.METHOD;
@@ -47,5 +48,13 @@ public class ClassMethod extends InfixExpression {
 
     public boolean isSetterMethod() {
         return type == Token.SET;
+    }
+
+    public Object getNameKey() {
+        return nameKey;
+    }
+
+    public void setNameKey(Object nameKey) {
+        this.nameKey = nameKey;
     }
 }

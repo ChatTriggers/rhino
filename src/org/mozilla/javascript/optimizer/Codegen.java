@@ -3249,23 +3249,45 @@ class BodyCodegen {
 
         while (child != null) {
             ClassMethod cm = (ClassMethod) child;
-            Node name = cm.getFirstChild();
-            FunctionNode fn = (FunctionNode) name.getNext();
+            Node method = cm.getFirstChild();
+            Object name = cm.getNameKey();
 
-            cfw.add(ByteCode.DUP);
-            generateExpression(name, cls);
-            generateExpression(fn, cls);
+            if (name instanceof String) {
+                cfw.addPush((String) name);
+            } else if (name instanceof Node) {
+                Node node = (Node) name;
+                generateExpression(node, cls);
+            } else {
+                cfw.addPush((Integer) name);
+                addScriptRuntimeInvoke("wrapInt", "(I)Ljava/lang/Integer;");
+            }
+
+            generateExpression(method, cls);
             cfw.addALoad(contextLocal);
+            cfw.addPush(!cm.isStatic());
+            cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
 
-            // Object setObjectElem(Scriptable obj, Object elem, Object value, Context cx) {
+            // Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter)
             addScriptRuntimeInvoke(
-                    "setObjectElem",
-                    "(Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;Ljava/lang/Object;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                    "addClassMethod",
+                    "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lorg/mozilla/javascript/Context;ZI)Ljava/lang/Object;"
             );
-            cfw.add(ByteCode.POP);
 
             child = child.getNext();
         }
+
+        // TODO: Only when a statement
+        cfw.add(ByteCode.DUP);
+        cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/NativeFunction");
+        cfw.addPush(FunctionNode.FUNCTION_STATEMENT);
+        cfw.addALoad(variableObjectLocal);
+        cfw.addALoad(contextLocal);           // load 'cx'
+        addOptRuntimeInvoke("initFunction",
+                "(Lorg/mozilla/javascript/NativeFunction;"
+                        + "I"
+                        + "Lorg/mozilla/javascript/Scriptable;"
+                        + "Lorg/mozilla/javascript/Context;"
+                        + ")V");
     }
 
     private void visitFunction(OptFunctionNode ofn, int functionType) {

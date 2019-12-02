@@ -771,6 +771,34 @@ public class ScriptRuntime {
         return Undefined.instance;
     }
 
+    public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter) {
+        Scriptable clazz = ScriptableObject.ensureScriptable(clazzObj);
+
+        if (instance) {
+            clazz = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(clazz, "prototype"));
+        }
+
+        if (name instanceof String) {
+            if (getterSetter == 0) {
+                clazz.put((String) name, clazz, method);
+            } else {
+                ScriptableObject so = (ScriptableObject) clazz;
+                Callable getterOrSetter = (Callable) method;
+                boolean isSetter = getterSetter == 1;
+                so.setGetterOrSetter((String) name, 0, getterOrSetter, isSetter);
+            }
+        } else if (name instanceof Integer) {
+            int index = (Integer) name;
+            clazz.put(index, clazz, method);
+        } else if (isSymbol(name)) {
+            ScriptableObject.putProperty(clazz, (Symbol) name, method);
+        } else {
+            throw throwError(cx, clazz, "msg.object.invalid.key.type");
+        }
+
+        return clazzObj;
+    }
+
     public static Object[] combineSpreadArgs(Object[] args, Context cx, Scriptable scope) {
         int totalArgs = 0;
 

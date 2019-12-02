@@ -813,7 +813,7 @@ public class Parser {
                     if ("constructor".equals(propertyName)) {
                         if (entryKind != METHOD_ENTRY) {
                             // TODO: Error
-                            throw Kit.codeBug();
+                            reportError("msg.class.bad.method.definition");
                         }
                         cls.setConstructor(fn);
                     } else {

@@ -654,7 +654,7 @@ public final class IRFactory extends Parser {
         node.setParentFn(transformedFn);
 
         for (ClassMethod cm : node.getClassMethods()) {
-            cm.addChildToBack(transform(cm.getName()));
+            cm.setNameKey(getPropKey(cm.getName()));
             cm.addChildToBack(transform(cm.getFunction()));
             node.addChildToBack(cm);
         }
