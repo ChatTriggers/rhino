@@ -2050,6 +2050,11 @@ class BodyCodegen {
                 break;
             }
 
+            case Token.CLASS: {
+                visitClass((ClassNode) node);
+                break;
+            }
+
             case Token.TRY:
                 visitTryCatchFinally((Jump) node, child);
                 break;
@@ -2331,6 +2336,11 @@ class BodyCodegen {
                     visitFunction(ofn, t);
                 }
                 break;
+
+            case Token.CLASS: {
+                visitClass((ClassNode) node);
+                break;
+            }
 
             case Token.NAME: {
                 if (node.getString().equals("new.target")) {
@@ -3227,6 +3237,34 @@ class BodyCodegen {
                 addScriptRuntimeInvoke("toBoolean", "(Ljava/lang/Object;)Z");
                 cfw.add(ByteCode.IFNE, trueLabel);
                 cfw.add(ByteCode.GOTO, falseLabel);
+        }
+    }
+
+    private void visitClass(ClassNode cls) {
+        Node child = cls.getFirstChild();
+
+        generateExpression(child, cls);
+
+        child = child.getNext();
+
+        while (child != null) {
+            ClassMethod cm = (ClassMethod) child;
+            Node name = cm.getFirstChild();
+            FunctionNode fn = (FunctionNode) name.getNext();
+
+            cfw.add(ByteCode.DUP);
+            generateExpression(name, cls);
+            generateExpression(fn, cls);
+            cfw.addALoad(contextLocal);
+
+            // Object setObjectElem(Scriptable obj, Object elem, Object value, Context cx) {
+            addScriptRuntimeInvoke(
+                    "setObjectElem",
+                    "(Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;Ljava/lang/Object;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+            );
+            cfw.add(ByteCode.POP);
+
+            child = child.getNext();
         }
     }
 

@@ -109,6 +109,8 @@ public final class IRFactory extends Parser {
                 return transformBreak((BreakStatement) node);
             case Token.CALL:
                 return transformFunctionCall((FunctionCall) node);
+            case Token.CLASS:
+                return transformClass((ClassNode) node);
             case Token.CONTINUE:
                 return transformContinue((ContinueStatement) node);
             case Token.DEFAULT:
@@ -635,6 +637,29 @@ public final class IRFactory extends Parser {
             --nestingOfFunction;
             savedVars.restore();
         }
+    }
+
+    private Node transformClass(ClassNode node) {
+        FunctionNode fn = node.getConstructor();
+
+        if (fn == null) {
+            fn = new FunctionNode();
+            fn.setBody(new Block());
+        }
+
+        fn.setFunctionName(node.getClassName());
+        fn.setFunctionType(FunctionNode.FUNCTION_EXPRESSION);
+        Node transformedFn = transform(fn);
+        node.addChildToBack(transformedFn);
+        node.setParentFn(transformedFn);
+
+        for (ClassMethod cm : node.getClassMethods()) {
+            cm.addChildToBack(transform(cm.getName()));
+            cm.addChildToBack(transform(cm.getFunction()));
+            node.addChildToBack(cm);
+        }
+
+        return node;
     }
 
     private Node transformFunctionCall(FunctionCall node) {

@@ -711,6 +711,151 @@ public class Parser {
         return null;
     }
 
+    private ClassNode classExpr() throws IOException {
+        ClassNode cls = new ClassNode(ts.tokenBeg);
+
+        if (matchToken(Token.NAME)) {
+            cls.setClassName(createNameNode());
+        }
+
+        if (matchToken(Token.EXTENDS)) {
+            AstNode extendsName = memberExpr(true);
+            cls.setExtendsNode(extendsName);
+        }
+
+        mustMatchToken(Token.LC, "msg.class.missing.lc");
+
+        Set<String> getterNames = new HashSet<>();
+        Set<String> setterNames = new HashSet<>();
+        List<ClassMethod> classMethods = new ArrayList<>();
+
+        while (true) {
+            // Eat all useless semicolons and line breaks
+            while (matchToken(Token.SEMI) || matchToken(Token.EOL));
+
+            String propertyName = null;
+            int entryKind = PROP_ENTRY;
+            int tt = peekToken();
+            Comment jsdocNode = getAndResetJsDoc();
+            if (tt == Token.COMMENT) {
+                consumeToken();
+                tt = peekUntilNonComment(tt);
+            }
+            if (tt == Token.RC) {
+                consumeToken();
+                break;
+            }
+
+            boolean isStatic = matchToken(Token.STATIC);
+
+            AstNode pname = objliteralProperty();
+            int pos = ts.tokenBeg;
+            if (pname == null && peekToken() != Token.MUL) {
+                reportError("msg.bad.prop");
+            } else {
+                propertyName = ts.getString();
+                int peeked = peekToken();
+
+                if (peeked == Token.LP) {
+                    entryKind = METHOD_ENTRY;
+                } else if (peeked == Token.MUL) {
+                    entryKind = GENERATOR_ENTRY;
+                    consumeToken();
+                } else if (pname.getType() == Token.NAME) {
+                    if ("get".equals(propertyName)) {
+                        entryKind = GET_ENTRY;
+                    } else if ("set".equals(propertyName)) {
+                        entryKind = SET_ENTRY;
+                    }
+                }
+                if (entryKind == GET_ENTRY || entryKind == SET_ENTRY || entryKind == GENERATOR_ENTRY) {
+                    pname = objliteralProperty();
+                    if (pname == null) {
+                        reportError("msg.bad.prop");
+                    }
+                    consumeToken();
+                }
+
+                if (pname == null) {
+                    // TODO: Error
+                    throw Kit.codeBug();
+                } else {
+                    propertyName = ts.getString();
+
+                    FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION, entryKind);
+                    // We've already parsed the function name, so fn should be anonymous.
+                    Name name = fn.getFunctionName();
+                    if (name != null && name.length() != 0) {
+                        reportError("msg.bad.prop");
+                    }
+                    pname.setJsDocNode(jsdocNode);
+                    ClassMethod cm = new ClassMethod(pname, fn);
+                    switch (entryKind) {
+                        case GET_ENTRY:
+                            fn.setFunctionIsGetterMethod();
+                            cm.setIsGetterMethod();
+                            break;
+                        case SET_ENTRY:
+                            fn.setFunctionIsSetterMethod();
+                            cm.setIsSetterMethod();
+                            break;
+                        case METHOD_ENTRY:
+                            fn.setFunctionIsNormalMethod();
+                    }
+
+                    if (isStatic) {
+                        cm.setIsStatic();
+                    }
+
+                    int end = getNodeEnd(fn);
+                    cm.setLength(end - pos);
+
+                    if ("constructor".equals(propertyName)) {
+                        if (entryKind != METHOD_ENTRY) {
+                            // TODO: Error
+                            throw Kit.codeBug();
+                        }
+                        cls.setConstructor(fn);
+                    } else {
+                        classMethods.add(cm);
+                    }
+                }
+            }
+
+            if (this.inUseStrictDirective && propertyName != null) {
+                switch (entryKind) {
+                    case PROP_ENTRY:
+                    case METHOD_ENTRY:
+                        if (getterNames.contains(propertyName)
+                                || setterNames.contains(propertyName)) {
+                            addError("msg.dup.obj.lit.prop.strict", propertyName);
+                        }
+                        getterNames.add(propertyName);
+                        setterNames.add(propertyName);
+                        break;
+                    case GET_ENTRY:
+                        if (getterNames.contains(propertyName)) {
+                            addError("msg.dup.obj.lit.prop.strict", propertyName);
+                        }
+                        getterNames.add(propertyName);
+                        break;
+                    case SET_ENTRY:
+                        if (setterNames.contains(propertyName)) {
+                            addError("msg.dup.obj.lit.prop.strict", propertyName);
+                        }
+                        setterNames.add(propertyName);
+                        break;
+                }
+            }
+
+            // Eat any dangling jsdoc in the property.
+            getAndResetJsDoc();
+        }
+
+        cls.setClassMethods(classMethods);
+        return cls;
+    }
+
     // This function does not match the closing RC: the caller matches
     // the RC so it can provide a suitable error message if not matched.
     // This means it's up to the caller to set the length of the node to
@@ -719,8 +864,7 @@ public class Parser {
     // to be relative to the parent node.  All children of this block
     // node are given relative start positions and correct lengths.
 
-    private void parseFunctionParams(FunctionNode fnNode, boolean isObjectSetterFunction)
-            throws IOException {
+    private void parseFunctionParams(FunctionNode fnNode, boolean isObjectSetterFunction) throws IOException {
         if (matchToken(Token.RP)) {
             fnNode.setRp(ts.tokenBeg - fnNode.getPosition());
             return;
@@ -3079,6 +3223,11 @@ public class Parser {
                 pn = function(FunctionNode.FUNCTION_EXPRESSION);
                 break;
 
+            case Token.CLASS:
+                consumeToken();
+                pn = classExpr();
+                break;
+
             case Token.LB:
                 consumeToken();
                 pn = arrayLiteral();
@@ -3553,8 +3702,7 @@ public class Parser {
         }
     }
 
-    private ObjectLiteral objectLiteral()
-            throws IOException {
+    private ObjectLiteral objectLiteral() throws IOException {
         int pos = ts.tokenBeg, lineno = ts.lineno;
         int afterComma = -1;
         List<ObjectProperty> elems = new ArrayList<>();
@@ -3671,14 +3819,14 @@ public class Parser {
             // Eat any dangling jsdoc in the property.
             getAndResetJsDoc();
 
-            if (matchToken(Token.COMMA, true)) {
+            if (matchToken(Token.COMMA)) {
                 afterComma = ts.tokenEnd;
             } else {
                 break commaLoop;
             }
         }
 
-        mustMatchToken(Token.RC, "msg.no.brace.prop", true);
+        mustMatchToken(Token.RC, "msg.no.brace.prop");
         ObjectLiteral pn = new ObjectLiteral(pos, ts.tokenEnd - pos);
         if (objJsdocNode != null) {
             pn.setJsDocNode(objJsdocNode);
@@ -3781,8 +3929,7 @@ public class Parser {
         return pn;
     }
 
-    private ObjectProperty methodDefinition(int pos, AstNode propName, int entryKind)
-            throws IOException {
+    private ObjectProperty methodDefinition(int pos, AstNode propName, int entryKind) throws IOException {
         FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION, entryKind);
         // We've already parsed the function name, so fn should be anonymous.
         Name name = fn.getFunctionName();

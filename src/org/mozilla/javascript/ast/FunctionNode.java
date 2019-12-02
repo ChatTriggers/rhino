@@ -63,11 +63,8 @@ public class FunctionNode extends ScriptNode {
 
     public enum Form {FUNCTION, GETTER, SETTER, METHOD}
 
-    private static final List<AstNode> NO_PARAMS =
-            Collections.unmodifiableList(new ArrayList<>());
-
-    private static final Map<Integer, Node> NO_DEFAULT_PARAMS =
-            Collections.unmodifiableMap(new HashMap<>());
+    private static final List<AstNode> NO_PARAMS = Collections.unmodifiableList(new ArrayList<>());
+    private static final Map<Integer, Node> NO_DEFAULT_PARAMS = Collections.unmodifiableMap(new HashMap<>());
 
     private Name functionName;
     private List<AstNode> params;

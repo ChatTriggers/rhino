@@ -1805,8 +1805,7 @@ public class ScriptRuntime {
         return setObjectElem(sobj, elem, value, cx);
     }
 
-    public static Object setObjectElem(Scriptable obj, Object elem,
-                                       Object value, Context cx) {
+    public static Object setObjectElem(Scriptable obj, Object elem, Object value, Context cx) {
         if (obj instanceof XMLObject) {
             ((XMLObject) obj).put(cx, elem, value);
         } else if (isSymbol(elem)) {
@@ -1830,17 +1829,14 @@ public class ScriptRuntime {
      * @deprecated Use {@link #setObjectProp(Object, String, Object, Context, Scriptable)} instead
      */
     @Deprecated
-    public static Object setObjectProp(Object obj, String property,
-                                       Object value, Context cx) {
+    public static Object setObjectProp(Object obj, String property, Object value, Context cx) {
         return setObjectProp(obj, property, value, cx, getTopCallScope(cx));
     }
 
     /**
      * Version of setObjectElem when elem is a valid JS identifier name.
      */
-    public static Object setObjectProp(Object obj, String property,
-                                       Object value, Context cx,
-                                       Scriptable scope) {
+    public static Object setObjectProp(Object obj, String property, Object value, Context cx, Scriptable scope) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefWriteError(obj, property, value);
@@ -1848,8 +1844,7 @@ public class ScriptRuntime {
         return setObjectProp(sobj, property, value, cx);
     }
 
-    public static Object setObjectProp(Scriptable obj, String property,
-                                       Object value, Context cx) {
+    public static Object setObjectProp(Scriptable obj, String property, Object value, Context cx) {
         ScriptableObject.putProperty(obj, property, value);
         return value;
     }
@@ -1861,8 +1856,7 @@ public class ScriptRuntime {
      * @deprecated Use {@link #setObjectIndex(Object, double, Object, Context, Scriptable)} instead
      */
     @Deprecated
-    public static Object setObjectIndex(Object obj, double dblIndex,
-                                        Object value, Context cx) {
+    public static Object setObjectIndex(Object obj, double dblIndex, Object value, Context cx) {
         return setObjectIndex(obj, dblIndex, value, cx, getTopCallScope(cx));
     }
 
@@ -1870,9 +1864,7 @@ public class ScriptRuntime {
      * A cheaper and less general version of the above for well-known argument
      * types.
      */
-    public static Object setObjectIndex(Object obj, double dblIndex,
-                                        Object value, Context cx,
-                                        Scriptable scope) {
+    public static Object setObjectIndex(Object obj, double dblIndex, Object value, Context cx, Scriptable scope) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefWriteError(obj, String.valueOf(dblIndex), value);
@@ -1886,14 +1878,12 @@ public class ScriptRuntime {
         return setObjectProp(sobj, s, value, cx);
     }
 
-    public static Object setObjectIndex(Scriptable obj, int index, Object value,
-                                        Context cx) {
+    public static Object setObjectIndex(Scriptable obj, int index, Object value, Context cx) {
         ScriptableObject.putProperty(obj, index, value);
         return value;
     }
 
-    public static boolean deleteObjectElem(Scriptable target, Object elem,
-                                           Context cx) {
+    public static boolean deleteObjectElem(Scriptable target, Object elem, Context cx) {
         if (isSymbol(elem)) {
             SymbolScriptable so = ScriptableObject.ensureSymbolScriptable(target);
             Symbol s = (Symbol) elem;
