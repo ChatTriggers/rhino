@@ -16,8 +16,7 @@ import java.util.Iterator;
  * * If it has a function property called "return" then it will be called
  * when the caller is done iterating.
  */
-public class IteratorLikeIterable
-        implements Iterable<Object>, Closeable {
+public class IteratorLikeIterable implements Iterable<Object>, Closeable {
     private final Context cx;
     private final Scriptable scope;
     private final Callable next;
@@ -31,7 +30,7 @@ public class IteratorLikeIterable
         next = ScriptRuntime.getPropFunctionAndThis(target, "next", cx, scope);
         iterator = ScriptRuntime.lastStoredScriptable(cx);
         Scriptable st = ScriptableObject.ensureScriptable(target);
-        if (st.has("return", st)) {
+        if (st.has("return", st) && !ScriptRuntime.isNullOrUndefined(ScriptableObject.getProperty(st, "return"))) {
             returnFunc = ScriptRuntime.getPropFunctionAndThis(target, "return", cx, scope);
             ScriptRuntime.lastStoredScriptable(cx);
         } else {

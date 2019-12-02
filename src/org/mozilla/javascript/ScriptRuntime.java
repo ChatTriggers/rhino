@@ -2286,11 +2286,14 @@ public class ScriptRuntime {
             }
             Callable f = (Callable) v;
             Object[] args = new Object[]{keyOnly ? Boolean.TRUE : Boolean.FALSE};
-            v = f.call(cx, scope, obj, args);
-            if (!(v instanceof ES6Iterator)) {
+            Object result = f.call(cx, scope, obj, args);
+            if (result instanceof ES6Iterator) {
+                return (ES6Iterator) result;
+            } else if (result instanceof NativeObject) {
+                return ES6LikeIterator.from(cx, scope, result);
+            } else {
                 throw typeError0("msg.iterator.primitive");
             }
-            return (ES6Iterator) v;
         }
 
         return null;
@@ -4528,12 +4531,12 @@ public class ScriptRuntime {
         return left;
     }
 
-    public static boolean dontContinueChaining(Object prop) {
+    public static boolean isNullOrUndefined(Object prop) {
         return prop == null || prop == Undefined.instance;
     }
 
     public static Object optionalGetObjectProp(Object obj, String property, Context cx, Scriptable scope) {
-        if (dontContinueChaining(obj)) return Undefined.instance;
+        if (isNullOrUndefined(obj)) return Undefined.instance;
 
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
@@ -4543,19 +4546,19 @@ public class ScriptRuntime {
     }
 
     public static Object optionalGetObjectProp(Scriptable obj, String property, Context cx) {
-        if (dontContinueChaining(obj)) return Undefined.instance;
+        if (isNullOrUndefined(obj)) return Undefined.instance;
 
         return getObjectProp(obj, property, cx);
     }
 
     public static Object optionalGetObjectIndex(Object obj, double dblIndex, Context cx) {
-        if (dontContinueChaining(obj)) return Undefined.instance;
+        if (isNullOrUndefined(obj)) return Undefined.instance;
 
         return getObjectIndex(obj, dblIndex, cx, getTopCallScope(cx));
     }
 
     public static Object optionalGetObjectElem(Object obj, Object elem, Context cx, Scriptable scope) {
-        if (dontContinueChaining(obj)) return Undefined.instance;
+        if (isNullOrUndefined(obj)) return Undefined.instance;
 
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {

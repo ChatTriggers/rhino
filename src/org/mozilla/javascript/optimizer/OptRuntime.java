@@ -77,7 +77,7 @@ public final class OptRuntime extends ScriptRuntime {
     }
 
     public static Object optionalAccessCallProp0(Object value, String property, Context cx, Scriptable scope) {
-        if (ScriptRuntime.dontContinueChaining(value)) return Undefined.instance;
+        if (ScriptRuntime.isNullOrUndefined(value)) return Undefined.instance;
 
         Callable f = getPropFunctionAndThis(value, property, cx, scope);
         Scriptable thisObj = lastStoredScriptable(cx);
@@ -89,7 +89,7 @@ public final class OptRuntime extends ScriptRuntime {
         if (thisObj == null) {
             throw undefCallError(thisObj, property);
         }
-        if (dontContinueChaining(ScriptableObject.getProperty(thisObj, property))) {
+        if (isNullOrUndefined(ScriptableObject.getProperty(thisObj, property))) {
             return Undefined.instance;
         }
 

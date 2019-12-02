@@ -783,8 +783,7 @@ public class NativeArray extends IdScriptableObject implements List {
     }
 
     private static Object js_from(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        final Scriptable items =
-                ScriptRuntime.toObject(scope, (args.length >= 1) ? args[0] : Undefined.instance);
+        final Scriptable items = ScriptRuntime.toObject(scope, (args.length >= 1) ? args[0] : Undefined.instance);
         Object mapArg = (args.length >= 2) ? args[1] : Undefined.instance;
         Scriptable thisArg = Undefined.SCRIPTABLE_UNDEFINED;
         final boolean mapping = !Undefined.isUndefined(mapArg);
