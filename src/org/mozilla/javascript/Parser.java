@@ -319,8 +319,7 @@ public class Parser {
     //
     // Note that this function always returned the un-flagged token!
     // The flags, if any, are saved in currentFlaggedToken.
-    private int peekToken()
-            throws IOException {
+    private int peekToken() throws IOException {
         // By far the most common case:  last token hasn't been consumed,
         // so return already-peeked token.
         if (currentFlaggedToken != Token.EOF) {
@@ -372,10 +371,9 @@ public class Parser {
         return tt;
     }
 
-    private boolean matchToken(int toMatch, boolean ignoreComment)
-            throws IOException {
+    private boolean matchToken(int toMatch) throws IOException {
         int tt = peekToken();
-        while (tt == Token.COMMENT && ignoreComment) {
+        while (tt == Token.COMMENT) {
             consumeToken();
             tt = peekToken();
         }
@@ -401,15 +399,13 @@ public class Parser {
         return tt;
     }
 
-    private boolean mustMatchToken(int toMatch, String messageId, boolean ignoreComment)
-            throws IOException {
-        return mustMatchToken(toMatch, messageId, ts.tokenBeg,
-                ts.tokenEnd - ts.tokenBeg, ignoreComment);
+    private boolean mustMatchToken(int toMatch, String messageId) throws IOException {
+        return mustMatchToken(toMatch, messageId, ts.tokenBeg, ts.tokenEnd - ts.tokenBeg);
     }
 
-    private boolean mustMatchToken(int toMatch, String msgId, int pos, int len, boolean ignoreComment)
+    private boolean mustMatchToken(int toMatch, String msgId, int pos, int len)
             throws IOException {
-        if (matchToken(toMatch, ignoreComment)) {
+        if (matchToken(toMatch)) {
             return true;
         }
         reportError(msgId, pos, len);
@@ -625,7 +621,7 @@ public class Parser {
         // Tracks whether this function is a special rhino-specific "infix" function
         // e.g.: function square(x) x*x
         boolean isExpressionClosure = false;
-        if (!matchToken(Token.LC, true)) {
+        if (!matchToken(Token.LC)) {
             if (compilerEnv.getLanguageVersion() < Context.VERSION_1_8 && type != FunctionNode.ARROW_FUNCTION) {
                 reportError("msg.no.brace.body");
             } else {
@@ -699,7 +695,7 @@ public class Parser {
 
         int end = ts.tokenEnd;
         getAndResetJsDoc();
-        if (!isExpressionClosure && mustMatchToken(Token.RC, "msg.no.brace.after.body", true))
+        if (!isExpressionClosure && mustMatchToken(Token.RC, "msg.no.brace.after.body"))
             end = ts.tokenEnd;
         pn.setLength(end - pos);
         return pn;
@@ -725,7 +721,7 @@ public class Parser {
 
     private void parseFunctionParams(FunctionNode fnNode, boolean isObjectSetterFunction)
             throws IOException {
-        if (matchToken(Token.RP, true)) {
+        if (matchToken(Token.RP)) {
             fnNode.setRp(ts.tokenBeg - fnNode.getPosition());
             return;
         }
@@ -767,7 +763,7 @@ public class Parser {
             fnNode.putProp(Node.DESTRUCTURING_PARAMS, destructuringNode);
         }
 
-        if (mustMatchToken(Token.RP, "msg.no.paren.after.parms", true)) {
+        if (mustMatchToken(Token.RP, "msg.no.paren.after.parms")) {
             fnNode.setRp(ts.tokenBeg - fnNode.getPosition());
         }
     }
@@ -784,11 +780,11 @@ public class Parser {
         AstNode memberExprNode = null;
         boolean generator = objEntryKind == GENERATOR_ENTRY;
 
-        if (matchToken(Token.MUL, true)) {
+        if (matchToken(Token.MUL)) {
             generator = true;
         }
 
-        if (matchToken(Token.NAME, true)) {
+        if (matchToken(Token.NAME)) {
             name = createNameNode(true, Token.NAME);
             if (inUseStrictDirective) {
                 String id = name.getIdentifier();
@@ -796,15 +792,15 @@ public class Parser {
                     reportError("msg.bad.id.strict", id);
                 }
             }
-            if (!matchToken(Token.LP, true)) {
+            if (!matchToken(Token.LP)) {
                 if (compilerEnv.isAllowMemberExprAsFunctionName()) {
                     AstNode memberExprHead = name;
                     name = null;
                     memberExprNode = memberExprTail(false, memberExprHead);
                 }
-                mustMatchToken(Token.LP, "msg.no.paren.parms", true);
+                mustMatchToken(Token.LP, "msg.no.paren.parms");
             }
-        } else if (matchToken(Token.LP, true)) {
+        } else if (matchToken(Token.LP)) {
             // Anonymous function:  leave name as null
         } else {
             if (compilerEnv.isAllowMemberExprAsFunctionName()) {
@@ -813,7 +809,7 @@ public class Parser {
                 // processed as anonymous function
                 memberExprNode = memberExpr(false);
             }
-            mustMatchToken(Token.LP, "msg.no.paren.parms", true);
+            mustMatchToken(Token.LP, "msg.no.paren.parms");
         }
         int lpPos = currentToken == Token.LP ? ts.tokenBeg : -1;
 
@@ -994,12 +990,12 @@ public class Parser {
             throws IOException {
         ConditionData data = new ConditionData();
 
-        if (mustMatchToken(Token.LP, "msg.no.paren.cond", true))
+        if (mustMatchToken(Token.LP, "msg.no.paren.cond"))
             data.lp = ts.tokenBeg;
 
         data.condition = expr();
 
-        if (mustMatchToken(Token.RP, "msg.no.paren.after.cond", true))
+        if (mustMatchToken(Token.RP, "msg.no.paren.after.cond"))
             data.rp = ts.tokenBeg;
 
         // Report strict warning on code like "if (a = 7) ...". Suppress the
@@ -1208,7 +1204,7 @@ public class Parser {
         IfStatement pn = new IfStatement(pos);
         ConditionData data = condition();
         AstNode ifTrue = getNextStatementAfterInlineComments(pn), ifFalse = null;
-        if (matchToken(Token.ELSE, true)) {
+        if (matchToken(Token.ELSE)) {
             int tt = peekToken();
             if (tt == Token.COMMENT) {
                 pn.setElseKeyWordInlineComment(scannedComments.get(scannedComments.size() - 1));
@@ -1235,7 +1231,7 @@ public class Parser {
         int pos = ts.tokenBeg;
 
         SwitchStatement pn = new SwitchStatement(pos);
-        if (mustMatchToken(Token.LP, "msg.no.paren.switch", true))
+        if (mustMatchToken(Token.LP, "msg.no.paren.switch"))
             pn.setLp(ts.tokenBeg - pos);
         pn.setLineno(ts.lineno);
 
@@ -1244,10 +1240,10 @@ public class Parser {
         enterSwitch(pn);
 
         try {
-            if (mustMatchToken(Token.RP, "msg.no.paren.after.switch", true))
+            if (mustMatchToken(Token.RP, "msg.no.paren.after.switch"))
                 pn.setRp(ts.tokenBeg - pos);
 
-            mustMatchToken(Token.LC, "msg.no.brace.switch", true);
+            mustMatchToken(Token.LC, "msg.no.brace.switch");
 
             boolean hasDefault = false;
             int tt;
@@ -1264,7 +1260,7 @@ public class Parser {
 
                     case Token.CASE:
                         caseExpression = expr();
-                        mustMatchToken(Token.COLON, "msg.no.colon.case", true);
+                        mustMatchToken(Token.COLON, "msg.no.colon.case");
                         break;
 
                     case Token.DEFAULT:
@@ -1272,7 +1268,7 @@ public class Parser {
                             reportError("msg.double.switch.default");
                         }
                         hasDefault = true;
-                        mustMatchToken(Token.COLON, "msg.no.colon.case", true);
+                        mustMatchToken(Token.COLON, "msg.no.colon.case");
                         break;
                     case Token.COMMENT:
                         AstNode n = scannedComments.get(scannedComments.size() - 1);
@@ -1344,7 +1340,7 @@ public class Parser {
         enterLoop(pn);
         try {
             AstNode body = getNextStatementAfterInlineComments(pn);
-            mustMatchToken(Token.WHILE, "msg.no.while.do", true);
+            mustMatchToken(Token.WHILE, "msg.no.while.do");
             pn.setWhilePosition(ts.tokenBeg - pos);
             ConditionData data = condition();
             pn.setCondition(data.condition);
@@ -1357,7 +1353,7 @@ public class Parser {
         // Always auto-insert semicolon to follow SpiderMonkey:
         // It is required by ECMAScript but is ignored by the rest of
         // world, see bug 238945
-        if (matchToken(Token.SEMI, true)) {
+        if (matchToken(Token.SEMI)) {
             end = ts.tokenEnd;
         }
         pn.setLength(end - pos);
@@ -1402,7 +1398,7 @@ public class Parser {
         pushScope(tempScope);  // decide below what AST class to use
         try {
             // See if this is a for each () instead of just a for ()
-            if (matchToken(Token.NAME, true)) {
+            if (matchToken(Token.NAME)) {
                 if ("each".equals(ts.getString())) {
                     isForEach = true;
                     eachPos = ts.tokenBeg - forPos;
@@ -1411,22 +1407,22 @@ public class Parser {
                 }
             }
 
-            if (mustMatchToken(Token.LP, "msg.no.paren.for", true))
+            if (mustMatchToken(Token.LP, "msg.no.paren.for"))
                 lp = ts.tokenBeg - forPos;
             int tt = peekToken();
 
             init = forLoopInit(tt);
-            if (matchToken(Token.IN, true)) {
+            if (matchToken(Token.IN)) {
                 isForIn = true;
                 inPos = ts.tokenBeg - forPos;
                 cond = expr();  // object over which we're iterating
             } else if (compilerEnv.getLanguageVersion() >= Context.VERSION_ES6 &&
-                    matchToken(Token.NAME, true) && "of".equals(ts.getString())) {
+                    matchToken(Token.NAME) && "of".equals(ts.getString())) {
                 isForOf = true;
                 inPos = ts.tokenBeg - forPos;
                 cond = expr();  // object over which we're iterating
             } else {  // ordinary for-loop
-                mustMatchToken(Token.SEMI, "msg.no.semi.for", true);
+                mustMatchToken(Token.SEMI, "msg.no.semi.for");
                 if (peekToken() == Token.SEMI) {
                     // no loop condition
                     cond = new EmptyExpression(ts.tokenBeg, 1);
@@ -1435,7 +1431,7 @@ public class Parser {
                     cond = expr();
                 }
 
-                mustMatchToken(Token.SEMI, "msg.no.semi.for.cond", true);
+                mustMatchToken(Token.SEMI, "msg.no.semi.for.cond");
                 int tmpPos = ts.tokenEnd;
                 if (peekToken() == Token.RP) {
                     incr = new EmptyExpression(tmpPos, 1);
@@ -1445,7 +1441,7 @@ public class Parser {
                 }
             }
 
-            if (mustMatchToken(Token.RP, "msg.no.paren.for.ctrl", true))
+            if (mustMatchToken(Token.RP, "msg.no.paren.for.ctrl"))
                 rp = ts.tokenBeg - forPos;
 
             if (isForIn || isForOf) {
@@ -1556,16 +1552,16 @@ public class Parser {
         boolean sawDefaultCatch = false;
         int peek = peekToken();
         if (peek == Token.CATCH) {
-            while (matchToken(Token.CATCH, true)) {
+            while (matchToken(Token.CATCH)) {
                 int catchLineNum = ts.lineno;
                 if (sawDefaultCatch) {
                     reportError("msg.catch.unreachable");
                 }
                 int catchPos = ts.tokenBeg, lp = -1, rp = -1, guardPos = -1;
-                if (mustMatchToken(Token.LP, "msg.no.paren.catch", true))
+                if (mustMatchToken(Token.LP, "msg.no.paren.catch"))
                     lp = ts.tokenBeg;
 
-                mustMatchToken(Token.NAME, "msg.bad.catchcond", true);
+                mustMatchToken(Token.NAME, "msg.bad.catchcond");
 
                 Name varName = createNameNode();
                 Comment jsdocNodeForName = getAndResetJsDoc();
@@ -1581,16 +1577,16 @@ public class Parser {
                 }
 
                 AstNode catchCond = null;
-                if (matchToken(Token.IF, true)) {
+                if (matchToken(Token.IF)) {
                     guardPos = ts.tokenBeg;
                     catchCond = expr();
                 } else {
                     sawDefaultCatch = true;
                 }
 
-                if (mustMatchToken(Token.RP, "msg.bad.catchcond", true))
+                if (mustMatchToken(Token.RP, "msg.bad.catchcond"))
                     rp = ts.tokenBeg;
-                mustMatchToken(Token.LC, "msg.no.brace.catchblock", true);
+                mustMatchToken(Token.LC, "msg.no.brace.catchblock");
 
                 Block catchBlock = (Block) statements();
                 tryEnd = getNodeEnd(catchBlock);
@@ -1604,7 +1600,7 @@ public class Parser {
                 catchNode.setParens(lp, rp);
                 catchNode.setLineno(catchLineNum);
 
-                if (mustMatchToken(Token.RC, "msg.no.brace.after.body", true))
+                if (mustMatchToken(Token.RC, "msg.no.brace.after.body"))
                     tryEnd = ts.tokenEnd;
                 catchNode.setLength(tryEnd - catchPos);
                 if (clauses == null)
@@ -1612,11 +1608,11 @@ public class Parser {
                 clauses.add(catchNode);
             }
         } else if (peek != Token.FINALLY) {
-            mustMatchToken(Token.FINALLY, "msg.try.no.catchfinally", true);
+            mustMatchToken(Token.FINALLY, "msg.try.no.catchfinally");
         }
 
         AstNode finallyBlock = null;
-        if (matchToken(Token.FINALLY, true)) {
+        if (matchToken(Token.FINALLY)) {
             finallyPos = ts.tokenBeg;
             finallyBlock = statement();
             tryEnd = getNodeEnd(finallyBlock);
@@ -1747,12 +1743,12 @@ public class Parser {
         Comment withComment = getAndResetJsDoc();
 
         int lineno = ts.lineno, pos = ts.tokenBeg, lp = -1, rp = -1;
-        if (mustMatchToken(Token.LP, "msg.no.paren.with", true))
+        if (mustMatchToken(Token.LP, "msg.no.paren.with"))
             lp = ts.tokenBeg;
 
         AstNode obj = expr();
 
-        if (mustMatchToken(Token.RP, "msg.no.paren.after.with", true))
+        if (mustMatchToken(Token.RP, "msg.no.paren.after.with"))
             rp = ts.tokenBeg;
 
         WithStatement pn = new WithStatement(pos);
@@ -1847,7 +1843,7 @@ public class Parser {
         pushScope(block);
         try {
             statements(block);
-            mustMatchToken(Token.RC, "msg.no.brace.block", true);
+            mustMatchToken(Token.RC, "msg.no.brace.block");
             block.setLength(ts.tokenEnd - pos);
             return block;
         } finally {
@@ -1863,13 +1859,13 @@ public class Parser {
         setRequiresActivation();
         int lineno = ts.lineno, pos = ts.tokenBeg;
 
-        if (!(matchToken(Token.NAME, true) && "xml".equals(ts.getString()))) {
+        if (!(matchToken(Token.NAME) && "xml".equals(ts.getString()))) {
             reportError("msg.bad.namespace");
         }
-        if (!(matchToken(Token.NAME, true) && "namespace".equals(ts.getString()))) {
+        if (!(matchToken(Token.NAME) && "namespace".equals(ts.getString()))) {
             reportError("msg.bad.namespace");
         }
-        if (!matchToken(Token.ASSIGN, true)) {
+        if (!matchToken(Token.ASSIGN)) {
             reportError("msg.bad.namespace");
         }
 
@@ -2015,7 +2011,7 @@ public class Parser {
                     reportError("msg.bad.assign.left", kidPos, end - kidPos);
                 markDestructuring(destructuring);
             } else {
-                if (matchToken(Token.SPREAD, true)) {
+                if (matchToken(Token.SPREAD)) {
                     if (isObjectSetterFunction) {
                         reportError("msg.setter.rest");
                     }
@@ -2023,7 +2019,7 @@ public class Parser {
                 }
 
                 // Simple variable name
-                mustMatchToken(Token.NAME, "msg.bad.var", true);
+                mustMatchToken(Token.NAME, "msg.bad.var");
                 name = createNameNode();
                 name.setLineno(ts.getLineno());
 
@@ -2046,7 +2042,7 @@ public class Parser {
             Comment jsdocNode = getAndResetJsDoc();
 
             AstNode init = null;
-            if (matchToken(Token.ASSIGN, true)) {
+            if (matchToken(Token.ASSIGN)) {
                 if (rest) {
                     reportError("msg.rest.no.defaults");
                 }
@@ -2070,7 +2066,7 @@ public class Parser {
             vi.setLineno(lineno);
             pn.addVariable(vi);
 
-            if (!matchToken(Token.COMMA, true)) {
+            if (!matchToken(Token.COMMA)) {
                 break;
             } else if (rest) {
                 reportError("msg.rest.not.last");
@@ -2090,13 +2086,13 @@ public class Parser {
             throws IOException {
         LetNode pn = new LetNode(pos);
         pn.setLineno(ts.lineno);
-        if (mustMatchToken(Token.LP, "msg.no.paren.after.let", true))
+        if (mustMatchToken(Token.LP, "msg.no.paren.after.let"))
             pn.setLp(ts.tokenBeg - pos);
         pushScope(pn);
         try {
             VariableDeclaration vars = variables(Token.LET, ts.tokenBeg, isStatement);
             pn.setVariables(vars);
-            if (mustMatchToken(Token.RP, "msg.no.paren.let", true)) {
+            if (mustMatchToken(Token.RP, "msg.no.paren.let")) {
                 pn.setRp(ts.tokenBeg - pos);
             }
             if (isStatement && peekToken() == Token.LC) {
@@ -2104,7 +2100,7 @@ public class Parser {
                 consumeToken();
                 int beg = ts.tokenBeg;  // position stmt at LC
                 AstNode stmt = statements();
-                mustMatchToken(Token.RC, "msg.no.curly.let", true);
+                mustMatchToken(Token.RC, "msg.no.curly.let");
                 stmt.setLength(ts.tokenEnd - beg);
                 pn.setLength(ts.tokenEnd - pos);
                 pn.setBody(stmt);
@@ -2197,7 +2193,7 @@ public class Parser {
     private AstNode expr() throws IOException {
         AstNode pn = assignExpr();
         int pos = pn.getPosition();
-        while (matchToken(Token.COMMA, true)) {
+        while (matchToken(Token.COMMA)) {
             int opPos = ts.tokenBeg;
             if (compilerEnv.isStrictMode() && !pn.hasSideEffects())
                 addStrictWarning("msg.no.side.effects", "",
@@ -2280,7 +2276,7 @@ public class Parser {
 
     private AstNode condExpr() throws IOException {
         AstNode pn = pipelineExpr(null);
-        if (matchToken(Token.HOOK, true)) {
+        if (matchToken(Token.HOOK)) {
             int line = ts.lineno;
             int qmarkPos = ts.tokenBeg, colonPos = -1;
             /*
@@ -2296,7 +2292,7 @@ public class Parser {
             } finally {
                 inForInit = wasInForInit;
             }
-            if (mustMatchToken(Token.COLON, "msg.no.colon.cond", true))
+            if (mustMatchToken(Token.COLON, "msg.no.colon.cond"))
                 colonPos = ts.tokenBeg;
             AstNode ifFalse = assignExpr();
             int beg = pn.getPosition(), len = getNodeEnd(ifFalse) - beg;
@@ -2315,7 +2311,7 @@ public class Parser {
     private AstNode pipelineExpr(AstNode previousPipeline) throws IOException {
         AstNode pn = previousPipeline == null ? shortCircuitExpr(null) : previousPipeline;
 
-        if (matchToken(Token.PIPELINE, true)) {
+        if (matchToken(Token.PIPELINE)) {
             int opPos = ts.tokenBeg;
             FunctionCall fc = new FunctionCall(opPos);
             AstNode target = orExpr();
@@ -2339,7 +2335,7 @@ public class Parser {
     private AstNode shortCircuitExpr(AstNode previousShortCircuit) throws IOException {
         AstNode pn = previousShortCircuit == null ? orExpr() : previousShortCircuit;
 
-        if (matchToken(Token.NULLISH_COALESCING, true)) {
+        if (matchToken(Token.NULLISH_COALESCING)) {
             int opPos = ts.tokenBeg;
             pn = new InfixExpression(Token.NULLISH_COALESCING, pn, orExpr(), opPos);
             pn = shortCircuitExpr(pn);
@@ -2350,7 +2346,7 @@ public class Parser {
 
     private AstNode orExpr() throws IOException {
         AstNode pn = andExpr();
-        if (matchToken(Token.OR, true)) {
+        if (matchToken(Token.OR)) {
             int opPos = ts.tokenBeg;
             pn = new InfixExpression(Token.OR, pn, orExpr(), opPos);
         }
@@ -2360,7 +2356,7 @@ public class Parser {
     private AstNode andExpr()
             throws IOException {
         AstNode pn = bitOrExpr();
-        if (matchToken(Token.AND, true)) {
+        if (matchToken(Token.AND)) {
             int opPos = ts.tokenBeg;
             pn = new InfixExpression(Token.AND, pn, andExpr(), opPos);
         }
@@ -2370,7 +2366,7 @@ public class Parser {
     private AstNode bitOrExpr()
             throws IOException {
         AstNode pn = bitXorExpr();
-        while (matchToken(Token.BITOR, true)) {
+        while (matchToken(Token.BITOR)) {
             int opPos = ts.tokenBeg;
             pn = new InfixExpression(Token.BITOR, pn, bitXorExpr(), opPos);
         }
@@ -2380,7 +2376,7 @@ public class Parser {
     private AstNode bitXorExpr()
             throws IOException {
         AstNode pn = bitAndExpr();
-        while (matchToken(Token.BITXOR, true)) {
+        while (matchToken(Token.BITXOR)) {
             int opPos = ts.tokenBeg;
             pn = new InfixExpression(Token.BITXOR, pn, bitAndExpr(), opPos);
         }
@@ -2390,7 +2386,7 @@ public class Parser {
     private AstNode bitAndExpr()
             throws IOException {
         AstNode pn = eqExpr();
-        while (matchToken(Token.BITAND, true)) {
+        while (matchToken(Token.BITAND)) {
             int opPos = ts.tokenBeg;
             pn = new InfixExpression(Token.BITAND, pn, eqExpr(), opPos);
         }
@@ -2603,12 +2599,12 @@ public class Parser {
             switch (tt) {
                 case Token.XML:
                     pn.addFragment(new XmlString(ts.tokenBeg, ts.getString()));
-                    mustMatchToken(Token.LC, "msg.syntax", true);
+                    mustMatchToken(Token.LC, "msg.syntax");
                     int beg = ts.tokenBeg;
                     AstNode expr = (peekToken() == Token.RC)
                             ? new EmptyExpression(beg, ts.tokenEnd - beg)
                             : expr();
-                    mustMatchToken(Token.RC, "msg.syntax", true);
+                    mustMatchToken(Token.RC, "msg.syntax");
                     XmlExpression xexpr = new XmlExpression(beg, expr);
                     xexpr.setIsXmlAttribute(ts.isXMLAttribute());
                     xexpr.setLength(ts.tokenEnd - beg);
@@ -2628,7 +2624,7 @@ public class Parser {
 
     private List<AstNode> argumentList()
             throws IOException {
-        if (matchToken(Token.RP, true))
+        if (matchToken(Token.RP))
             return null;
 
         List<AstNode> result = new ArrayList<>();
@@ -2654,12 +2650,12 @@ public class Parser {
                 } else {
                     result.add(en);
                 }
-            } while (matchToken(Token.COMMA, true));
+            } while (matchToken(Token.COMMA));
         } finally {
             inForInit = wasInForInit;
         }
 
-        mustMatchToken(Token.RP, "msg.no.paren.arg", true);
+        mustMatchToken(Token.RP, "msg.no.paren.arg");
         return result;
     }
 
@@ -2678,8 +2674,8 @@ public class Parser {
         } else {
             consumeToken();
 
-            if (matchToken(Token.DOT, true)) {
-                mustMatchToken(Token.NAME, "Expected identifier", true);
+            if (matchToken(Token.DOT)) {
+                mustMatchToken(Token.NAME, "Expected identifier");
                 Name name = createNameNode();
 
                 if (!name.getString().equals("target")) {
@@ -2701,7 +2697,7 @@ public class Parser {
             nx.setTarget(target);
 
             int lp;
-            if (matchToken(Token.LP, true)) {
+            if (matchToken(Token.LP)) {
                 lp = ts.tokenBeg;
                 List<AstNode> args = argumentList();
                 if (args != null && args.size() > ARGC_LIMIT)
@@ -2717,7 +2713,7 @@ public class Parser {
             // expression, which will mean a kind of anonymous class built with
             // the JavaAdapter.  the object literal will be passed as an
             // additional argument to the constructor.
-            if (matchToken(Token.LC, true)) {
+            if (matchToken(Token.LC)) {
                 ObjectLiteral initializer = objectLiteral();
                 end = getNodeEnd(initializer);
                 nx.setInitializer(initializer);
@@ -2812,7 +2808,7 @@ public class Parser {
         int lineno = ts.lineno;
         AstNode expr = expr();
         int end = getNodeEnd(expr);
-        if (mustMatchToken(Token.RB, "msg.no.bracket.index", true)) {
+        if (mustMatchToken(Token.RB, "msg.no.bracket.index")) {
             rb = ts.tokenBeg;
             end = ts.tokenEnd;
         }
@@ -2994,7 +2990,7 @@ public class Parser {
         Name name = createNameNode(true, currentToken);
         Name ns = null;
 
-        if (matchToken(Token.COLONCOLON, true)) {
+        if (matchToken(Token.COLONCOLON)) {
             ns = name;
             colonPos = ts.tokenBeg;
 
@@ -3042,7 +3038,7 @@ public class Parser {
         int lb = ts.tokenBeg, rb = -1, pos = atPos != -1 ? atPos : lb;
         AstNode expr = expr();
         int end = getNodeEnd(expr);
-        if (mustMatchToken(Token.RB, "msg.no.bracket.index", true)) {
+        if (mustMatchToken(Token.RB, "msg.no.bracket.index")) {
             rb = ts.tokenBeg;
             end = ts.tokenEnd;
         }
@@ -3247,7 +3243,7 @@ public class Parser {
             if (peekToken() == Token.FOR) {
                 return generatorExpression(e, begin);
             }
-            mustMatchToken(Token.RP, "msg.no.paren", true);
+            mustMatchToken(Token.RP, "msg.no.paren");
             if (peekToken() == Token.ASSIGN) {
                 reportError("msg.bad.assign.left");
             }
@@ -3379,7 +3375,7 @@ public class Parser {
             ifPos = ts.tokenBeg - pos;
             data = condition();
         }
-        mustMatchToken(Token.RB, "msg.no.bracket.arg", true);
+        mustMatchToken(Token.RB, "msg.no.bracket.arg");
         ArrayComprehension pn = new ArrayComprehension(pos, ts.tokenEnd - pos);
         pn.setResult(result);
         pn.setLoops(loops);
@@ -3402,14 +3398,14 @@ public class Parser {
 
         pushScope(pn);
         try {
-            if (matchToken(Token.NAME, true)) {
+            if (matchToken(Token.NAME)) {
                 if (ts.getString().equals("each")) {
                     eachPos = ts.tokenBeg - pos;
                 } else {
                     reportError("msg.no.paren.for");
                 }
             }
-            if (mustMatchToken(Token.LP, "msg.no.paren.for", true)) {
+            if (mustMatchToken(Token.LP, "msg.no.paren.for")) {
                 lp = ts.tokenBeg - pos;
             }
 
@@ -3453,7 +3449,7 @@ public class Parser {
                     reportError("msg.in.after.for.name");
             }
             AstNode obj = expr();
-            if (mustMatchToken(Token.RP, "msg.no.paren.for.ctrl", true))
+            if (mustMatchToken(Token.RP, "msg.no.paren.for.ctrl"))
                 rp = ts.tokenBeg - pos;
 
             pn.setLength(ts.tokenEnd - pos);
@@ -3491,7 +3487,7 @@ public class Parser {
             data = condition();
         }
         if (!inFunctionParams) {
-            mustMatchToken(Token.RP, "msg.no.paren.let", true);
+            mustMatchToken(Token.RP, "msg.no.paren.let");
         }
         GeneratorExpression pn = new GeneratorExpression(pos, ts.tokenEnd - pos);
         pn.setResult(result);
@@ -3514,7 +3510,7 @@ public class Parser {
 
         pushScope(pn);
         try {
-            if (mustMatchToken(Token.LP, "msg.no.paren.for", true)) {
+            if (mustMatchToken(Token.LP, "msg.no.paren.for")) {
                 lp = ts.tokenBeg - pos;
             }
 
@@ -3540,10 +3536,10 @@ public class Parser {
                 defineSymbol(Token.LET, ts.getString(), true);
             }
 
-            if (mustMatchToken(Token.IN, "msg.in.after.for.name", true))
+            if (mustMatchToken(Token.IN, "msg.in.after.for.name"))
                 inPos = ts.tokenBeg - pos;
             AstNode obj = expr();
-            if (mustMatchToken(Token.RP, "msg.no.paren.for.ctrl", true))
+            if (mustMatchToken(Token.RP, "msg.no.paren.for.ctrl"))
                 rp = ts.tokenBeg - pos;
 
             pn.setLength(ts.tokenEnd - pos);
@@ -3716,7 +3712,7 @@ public class Parser {
                 consumeToken();
                 pname = assignExpr();
                 pname.putProp(Node.COMPUTED_PROP, true);
-                if (!matchToken(Token.RB, true)) {
+                if (!matchToken(Token.RB)) {
                     reportError("msg.bad.object.init");
                 }
                 consumeToken();
@@ -3769,7 +3765,7 @@ public class Parser {
             return pn;
         }
 
-        mustMatchToken(Token.COLON, "msg.no.colon.prop", true);
+        mustMatchToken(Token.COLON, "msg.no.colon.prop");
         ObjectProperty pn = new ObjectProperty();
         pn.setOperatorPosition(ts.tokenBeg);
 
