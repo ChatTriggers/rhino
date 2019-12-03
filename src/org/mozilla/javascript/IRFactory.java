@@ -640,6 +640,10 @@ public final class IRFactory extends Parser {
     }
 
     private Node transformClass(ClassNode node) {
+        if (node.getExtendsName() != null) {
+            node.setExtended(transform(node.getExtendsName()));
+        }
+
         FunctionNode fn = node.getConstructor();
 
         if (fn == null) {

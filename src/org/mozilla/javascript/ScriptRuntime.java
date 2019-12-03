@@ -804,6 +804,19 @@ public class ScriptRuntime {
         return clazzObj;
     }
 
+    public static Object setClassExtends(Object clazzObj, Object extended, Context cx, Scriptable scope) {
+        ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
+        ScriptableObject obj = ScriptableObject.ensureScriptableObject(extended);
+
+        Object clazzProto = ScriptableObject.getProperty(clazz, "prototype");
+        if (clazzProto instanceof Scriptable) {
+            ((Scriptable) clazzProto).setPrototype((Scriptable) ScriptableObject.getProperty(obj, "prototype"));
+        }
+        clazz.setPrototype(obj);
+
+        return clazzObj;
+    }
+
     public static Object[] combineSpreadArgs(Object[] args, Context cx, Scriptable scope) {
         int totalArgs = 0;
 

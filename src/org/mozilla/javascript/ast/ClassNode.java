@@ -12,6 +12,7 @@ public class ClassNode extends ScriptNode {
     private FunctionNode constructor = null;
     private List<ClassMethod> classMethods = new ArrayList<>();
     private Node parentFn = null;
+    private Node extended = null;
 
     {
         type = Token.CLASS;
@@ -70,5 +71,13 @@ public class ClassNode extends ScriptNode {
 
     public void setParentFn(Node parentFn) {
         this.parentFn = parentFn;
+    }
+
+    public Node getExtended() {
+        return extended;
+    }
+
+    public void setExtended(Node extended) {
+        this.extended = extended;
     }
 }
