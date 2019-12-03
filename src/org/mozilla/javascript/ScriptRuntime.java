@@ -1350,8 +1350,7 @@ public class ScriptRuntime {
         return function.call(cx, scope, thisObj, args);
     }
 
-    public static Scriptable newObject(Context cx, Scriptable scope,
-                                       String constructorName, Object[] args) {
+    public static Scriptable newObject(Context cx, Scriptable scope, String constructorName, Object[] args) {
         scope = ScriptableObject.getTopLevelScope(scope);
         Function ctor = getExistingCtor(cx, scope, constructorName);
         if (args == null) {
@@ -3616,15 +3615,11 @@ public class ScriptRuntime {
      * @deprecated Use {@link #doTopCall(Callable, Context, Scriptable, Scriptable, Object[], boolean)} instead
      */
     @Deprecated
-    public static Object doTopCall(Callable callable,
-                                   Context cx, Scriptable scope,
-                                   Scriptable thisObj, Object[] args) {
+    public static Object doTopCall(Callable callable, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         return doTopCall(callable, cx, scope, thisObj, args, cx.isTopLevelStrict);
     }
 
-    public static Object doTopCall(Callable callable,
-                                   Context cx, Scriptable scope,
-                                   Scriptable thisObj, Object[] args, boolean isTopLevelStrict) {
+    public static Object doTopCall(Callable callable, Context cx, Scriptable scope, Scriptable thisObj, Object[] args, boolean isTopLevelStrict) {
         if (scope == null)
             throw new IllegalArgumentException();
         if (cx.topCallScope != null) throw new IllegalStateException();

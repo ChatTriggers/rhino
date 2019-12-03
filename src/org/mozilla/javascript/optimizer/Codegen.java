@@ -592,14 +592,36 @@ public class Codegen implements Evaluator {
                     cfw.markTableSwitchDefault(switchStart);
                     switchStackTop = cfw.getStackTop();
                 } else {
-                    cfw.markTableSwitchCase(switchStart, i - 1,
-                            switchStackTop);
+                    cfw.markTableSwitchCase(switchStart, i - 1, switchStackTop);
                 }
             }
             if (n.getType() == Token.FUNCTION) {
                 OptFunctionNode ofn = OptFunctionNode.get(n);
+                FunctionNode fnode = ofn.fnode;
+                if (!fnode.isCallable()) {
+                    int callableLabel = cfw.acquireLabel();
+                    cfw.addALoad(3);
+                    cfw.addPush("new.target");
+                    cfw.addInvoke(
+                            ByteCode.INVOKESTATIC,
+                            "org/mozilla/javascript/ScriptableObject",
+                            "hasProperty",
+                            "(Lorg/mozilla/javascript/Scriptable;Ljava/lang/String;)Z"
+                    );
+                    cfw.add(ByteCode.IFNE, callableLabel);
+
+                    cfw.addPush("msg.class.not.callable");
+                    cfw.addInvoke(
+                            ByteCode.INVOKESTATIC,
+                            "org.mozilla.javascript.ScriptRuntime",
+                            "typeError0",
+                            "(Ljava/lang/String;)Lorg/mozilla/javascript/EcmaError;"
+                    );
+                    cfw.add(ByteCode.ATHROW);
+                    cfw.markLabel(callableLabel);
+                }
                 if (ofn.isTargetOfDirectCall()) {
-                    int pcount = ofn.fnode.getParamCount();
+                    int pcount = fnode.getParamCount();
                     if (pcount != 0) {
                         // loop invariant:
                         // stack top == arguments array from addALoad4()
@@ -1000,8 +1022,8 @@ public class Codegen implements Evaluator {
                         break;
 
                     case Do_construct:
-                        if (n instanceof FunctionNode && ((FunctionNode) n).isGenerator()) {
-                            // Throw a type error, as generators are not constructable
+                        if (n instanceof FunctionNode && !((FunctionNode) n).isConstructable()) {
+                            // Throw a type error, since this function was called with "new"
                             cfw.addPush("msg.not.ctor");
                             cfw.addPush(((FunctionNode) n).getName());
                             cfw.addInvoke(

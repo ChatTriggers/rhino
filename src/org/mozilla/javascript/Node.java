@@ -26,17 +26,17 @@ public class Node implements Iterable<Node> {
             REGEXP_PROP = 4,
             CASEARRAY_PROP = 5,
 
-    //  the following properties are defined and manipulated by the
-    //  optimizer -
-    //  TARGETBLOCK_PROP - the block referenced by a branch node
-    //  VARIABLE_PROP - the variable referenced by a BIND or NAME node
-    //  ISNUMBER_PROP - this node generates code on Number children and
-    //                  delivers a Number result (as opposed to Objects)
-    //  DIRECTCALL_PROP - this call node should emit code to test the function
-    //                    object against the known class and call direct if it
-    //                    matches.
+            //  the following properties are defined and manipulated by the
+            //  optimizer -
+            //  TARGETBLOCK_PROP - the block referenced by a branch node
+            //  VARIABLE_PROP - the variable referenced by a BIND or NAME node
+            //  ISNUMBER_PROP - this node generates code on Number children and
+            //                  delivers a Number result (as opposed to Objects)
+            //  DIRECTCALL_PROP - this call node should emit code to test the function
+            //                    object against the known class and call direct if it
+            //                    matches.
 
-    TARGETBLOCK_PROP = 6,
+            TARGETBLOCK_PROP = 6,
             VARIABLE_PROP = 7,
             ISNUMBER_PROP = 8,
             DIRECTCALL_PROP = 9,
@@ -61,6 +61,7 @@ public class Node implements Iterable<Node> {
             COMPUTED_PROP = 28,
             SPREAD_PROP = 29,
             CHAINING_PROP = 30,
+
             LAST_PROP = 30;
 
     // values of ISNUMBER_PROP to specify
