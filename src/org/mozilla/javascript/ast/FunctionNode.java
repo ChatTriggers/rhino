@@ -61,6 +61,14 @@ public class FunctionNode extends ScriptNode {
     public static final int FUNCTION_EXPRESSION_STATEMENT = 3;
     public static final int ARROW_FUNCTION = 4;
 
+    public boolean isCallable() {
+        return isCallable;
+    }
+
+    public void setCallable(boolean callable) {
+        isCallable = callable;
+    }
+
     public enum Form {FUNCTION, GETTER, SETTER, METHOD}
 
     private static final List<AstNode> NO_PARAMS = Collections.unmodifiableList(new ArrayList<>());
@@ -74,6 +82,8 @@ public class FunctionNode extends ScriptNode {
 
     private AstNode body;
     private boolean isExpressionClosure;
+    private boolean isConstructable = true;
+    private boolean isCallable = true;
     private Form functionForm = Form.FUNCTION;
     private int lp = -1;
     private int rp = -1;
@@ -292,6 +302,14 @@ public class FunctionNode extends ScriptNode {
         this.isExpressionClosure = isExpressionClosure;
     }
 
+    public boolean isConstructable() {
+        return isConstructable;
+    }
+
+    public void setConstructable(boolean constructable) {
+        isConstructable = constructable;
+    }
+
     /**
      * Return true if this function requires an Ecma-262 Activation object.
      * The Activation object is implemented by
@@ -315,6 +333,7 @@ public class FunctionNode extends ScriptNode {
     }
 
     public void setIsGenerator() {
+        isConstructable = false;
         isGenerator = true;
     }
 
