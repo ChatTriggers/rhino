@@ -598,7 +598,11 @@ public class Codegen implements Evaluator {
             if (n.getType() == Token.FUNCTION) {
                 OptFunctionNode ofn = OptFunctionNode.get(n);
                 FunctionNode fnode = ofn.fnode;
+
                 if (!fnode.isCallable()) {
+                    // This is a class - check for the existence of
+                    // "new.target" to see if this function was invoked
+                    // with "new", and throw an error if not
                     int callableLabel = cfw.acquireLabel();
                     cfw.addALoad(3);
                     cfw.addPush("new.target");
@@ -620,6 +624,15 @@ public class Codegen implements Evaluator {
                     cfw.add(ByteCode.ATHROW);
                     cfw.markLabel(callableLabel);
                 }
+
+                if (fnode.isStatic()) {
+                    // Set thisObj to undefined
+                    cfw.add(ByteCode.SWAP);
+                    cfw.add(ByteCode.POP);
+                    Codegen.pushUndefined(cfw);
+                    cfw.add(ByteCode.SWAP);
+                }
+
                 if (ofn.isTargetOfDirectCall()) {
                     int pcount = fnode.getParamCount();
                     if (pcount != 0) {
@@ -648,6 +661,7 @@ public class Codegen implements Evaluator {
                     }
                 }
             }
+
             cfw.addInvoke(ByteCode.INVOKESTATIC,
                     mainClassName,
                     getBodyMethodName(n),

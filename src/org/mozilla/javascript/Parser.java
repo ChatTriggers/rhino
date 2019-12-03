@@ -789,6 +789,9 @@ public class Parser {
                         reportError("msg.bad.prop");
                     }
                     pname.setJsDocNode(jsdocNode);
+                    if (isStatic) {
+                        fn.setStatic(true);
+                    }
                     ClassMethod cm = new ClassMethod(pname, fn);
                     switch (entryKind) {
                         case GET_ENTRY:
