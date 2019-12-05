@@ -2843,7 +2843,7 @@ public class ScriptRuntime {
         if (isApply) {
             // Follow Ecma 15.3.4.3
             callArgs = L <= 1 ? ScriptRuntime.emptyArgs :
-                    getApplyArguments(cx, args[1]);
+                    createArrFromArrayLike(cx, args[1]);
         } else {
             // Follow Ecma 15.3.4.4
             if (L <= 1) {
@@ -2860,7 +2860,7 @@ public class ScriptRuntime {
     /**
      * @return true if the passed in Scriptable looks like an array
      */
-    private static boolean isArrayLike(Scriptable obj) {
+    public static boolean isArrayLike(Scriptable obj) {
         return obj != null && (
                 obj instanceof NativeArray ||
                         obj instanceof Arguments ||
@@ -2868,7 +2868,7 @@ public class ScriptRuntime {
         );
     }
 
-    static Object[] getApplyArguments(Context cx, Object arg1) {
+    public static Object[] createArrFromArrayLike(Context cx, Object arg1) {
         if (arg1 == null || arg1 == Undefined.instance) {
             return ScriptRuntime.emptyArgs;
         } else if (arg1 instanceof Scriptable && isArrayLike((Scriptable) arg1)) {
