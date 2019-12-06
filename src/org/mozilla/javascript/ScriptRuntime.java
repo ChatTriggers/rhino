@@ -835,8 +835,15 @@ public class ScriptRuntime {
 
     public static Object setClassExtends(Object clazzObj, Object extendedObj, Context cx, Scriptable scope) {
         ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
-        ScriptableObject extended = ScriptableObject.ensureScriptableObject(extendedObj);
 
+        if (extendedObj == null) {
+            ScriptableObject newObject = new NativeObject();
+            newObject.defineProperty("constructor", clazz, ScriptableObject.DONTENUM);
+            ScriptableObject.putProperty(clazz, "prototype", newObject);
+            return clazz;
+        }
+
+        ScriptableObject extended = ScriptableObject.ensureScriptableObject(extendedObj);
         Scriptable extendedProto = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(extended, "prototype"));
 
         ScriptableObject newObject = new NativeObject();
