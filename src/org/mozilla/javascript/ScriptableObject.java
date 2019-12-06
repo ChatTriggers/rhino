@@ -3071,15 +3071,14 @@ public abstract class ScriptableObject implements Scriptable,
         return slotMap.isEmpty();
     }
 
-
-    public Object get(Object key) {
+    public Object get(Object key, Scriptable start) {
         Object value = null;
         if (key instanceof String) {
-            value = get((String) key, this);
+            value = get((String) key, start);
         } else if (key instanceof Symbol) {
-            value = get((Symbol) key, this);
+            value = get((Symbol) key, start);
         } else if (key instanceof Number) {
-            value = get(((Number) key).intValue(), this);
+            value = get(((Number) key).intValue(), start);
         }
         if (value == Scriptable.NOT_FOUND || value == Undefined.instance) {
             return null;
@@ -3088,6 +3087,10 @@ public abstract class ScriptableObject implements Scriptable,
         } else {
             return value;
         }
+    }
+
+    public Object get(Object key) {
+        return get(key, this);
     }
 
     private static final Comparator<Object> KEY_COMPARATOR = new KeyComparator();

@@ -2056,8 +2056,7 @@ public class Parser {
      * {@link LabeledStatement} "bundle" and return that.  Otherwise we parse
      * an expression and return it wrapped in an {@link ExpressionStatement}.
      */
-    private AstNode nameOrLabel()
-            throws IOException {
+    private AstNode nameOrLabel() throws IOException {
         if (currentToken != Token.NAME) throw codeBug();
         int pos = ts.tokenBeg;
 
@@ -3257,6 +3256,11 @@ public class Parser {
                 pn = attributeAccess();
                 break;
 
+            case Token.SUPER:
+                consumeToken();
+                pn = name(ttFlagged, tt);
+                pn.putProp(Node.SUPER_PROP, true);
+                break;
             case Token.NAME:
                 consumeToken();
                 pn = name(ttFlagged, tt);

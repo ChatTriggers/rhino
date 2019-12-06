@@ -818,6 +818,37 @@ public class ScriptRuntime {
         return clazzObj;
     }
 
+    public static Object callSuper(Object[] args, NativeFunction clazz, Scriptable scope, Context cx) {
+        if (args == null) {
+            args = new Object[0];
+        }
+
+        Scriptable extended = clazz.getPrototype();
+        if (!(extended instanceof BaseFunction)) {
+            // TODO: Error
+            throw Kit.codeBug();
+        }
+
+        return ((BaseFunction) extended).construct(cx, scope, args);
+    }
+
+    public static Object accessSuper(Object prop, Scriptable thisObj) {
+        Scriptable ctor = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(thisObj.getPrototype(), "constructor"));
+        Scriptable superProto = ScriptableObject.ensureScriptable(ctor.getPrototype().get("prototype", ctor));
+        return ScriptableObject.getProperty(superProto, prop);
+    }
+
+    public static Object callSuperProp(Object prop, Object[] args, Scriptable scope, Scriptable thisObj, Context cx) {
+        Scriptable method = ScriptableObject.ensureScriptable(accessSuper(prop, thisObj));
+
+        if (!(method instanceof Callable)) {
+            // TODO: Error
+            throw Kit.codeBug();
+        }
+
+        return ((Callable) method).call(cx, scope, thisObj, args);
+    }
+
     public static Scriptable initCtorReturn(NativeFunction clazz, Scriptable thisObj, Object[] args, Context cx, Scriptable scope) {
         Scriptable proto = clazz.getPrototype();
 

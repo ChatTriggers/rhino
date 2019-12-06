@@ -2839,6 +2839,16 @@ class BodyCodegen {
             case Token.GETELEM: {
                 Object spread = node.getProp(Node.SPREAD_PROP);
 
+                if (child.getProp(Node.SUPER_PROP) != null) {
+                    generateExpression(child.getNext(), node);
+                    cfw.addALoad(thisObjLocal);
+                    addScriptRuntimeInvoke(
+                            "accessSuper",
+                            "(Ljava/lang/Object;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;"
+                    );
+                    return;
+                }
+
                 if (spread != null) {
                     int startIndex = (int) ((Object[]) spread)[0];
                     Node right = (Node) ((Object[]) spread)[1];
@@ -3775,6 +3785,22 @@ class BodyCodegen {
         if (firstArgChild == null) {
             if (childType == Token.NAME) {
                 // name() call
+                if (child.getProp(Node.SUPER_PROP) != null) {
+                    cfw.add(ByteCode.ACONST_NULL);
+                    cfw.addALoad(funObjLocal);
+                    cfw.addALoad(variableObjectLocal);
+                    cfw.addALoad(contextLocal);
+                    addScriptRuntimeInvoke(
+                            "callSuper",
+                            "([Ljava/lang/Object;Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                    );
+
+                    cfw.add(ByteCode.DUP);
+                    cfw.addAStore(thisObjLocal);
+
+                    return;
+                }
+
                 String name = child.getString();
                 cfw.addPush(name);
                 methodName = "callName0";
@@ -3785,8 +3811,22 @@ class BodyCodegen {
             } else if (childType == Token.GETPROP) {
                 // x.name() call
                 Node propTarget = child.getFirstChild();
-                generateExpression(propTarget, node);
                 Node id = propTarget.getNext();
+
+                if (propTarget.getProp(Node.SUPER_PROP) != null) {
+                    generateExpression(id, node);
+                    cfw.add(ByteCode.ACONST_NULL);
+                    cfw.addALoad(variableObjectLocal);
+                    cfw.addALoad(thisObjLocal);
+                    cfw.addALoad(contextLocal);
+                    addScriptRuntimeInvoke(
+                            "callSuperProp",
+                            "(Ljava/lang/Object;[Ljava/lang/Object;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                    );
+                    return;
+                }
+
+                generateExpression(propTarget, node);
                 String property = id.getString();
                 cfw.addPush(property);
 
@@ -3822,6 +3862,22 @@ class BodyCodegen {
             // there are no checks for it
             String name = child.getString();
             generateCallArgArray(node, firstArgChild, false);
+
+            if (child.getProp(Node.SUPER_PROP) != null) {
+                cfw.addALoad(funObjLocal);
+                cfw.addALoad(variableObjectLocal);
+                cfw.addALoad(contextLocal);
+                addScriptRuntimeInvoke(
+                        "callSuper",
+                        "([Ljava/lang/Object;Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                );
+
+                cfw.add(ByteCode.DUP);
+                cfw.addAStore(thisObjLocal);
+
+                return;
+            }
+
             cfw.addPush(name);
             methodName = "callName";
             signature = "([Ljava/lang/Object;"
@@ -3838,6 +3894,20 @@ class BodyCodegen {
                 }
                 ++argCount;
             }
+
+            if (child.getFirstChild() != null && child.getFirstChild().getProp(Node.SUPER_PROP) != null) {
+                generateExpression(child.getLastChild(), node);
+                generateCallArgArray(node, firstArgChild, false);
+                cfw.addALoad(variableObjectLocal);
+                cfw.addALoad(thisObjLocal);
+                cfw.addALoad(contextLocal);
+                addScriptRuntimeInvoke(
+                        "callSuperProp",
+                        "(Ljava/lang/Object;[Ljava/lang/Object;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                );
+                return;
+            }
+
             generateFunctionAndThisObj(child, node);
             // stack: ... functionObj thisObj
             if (argCount == 1) {
@@ -5577,6 +5647,16 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     }
 
     private void visitGetProp(Node node, Node child) {
+        if (child.getProp(Node.SUPER_PROP) != null) {
+            generateExpression(child.getNext(), node);
+            cfw.addALoad(thisObjLocal);
+            addScriptRuntimeInvoke(
+                    "accessSuper",
+                    "(Ljava/lang/Object;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;"
+            );
+            return;
+        }
+
         generateExpression(child, node); // object
         Node nameChild = child.getNext();
         generateExpression(nameChild, node);  // the name
