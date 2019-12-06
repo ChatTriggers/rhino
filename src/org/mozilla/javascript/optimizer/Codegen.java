@@ -3792,7 +3792,11 @@ class BodyCodegen {
                     cfw.addALoad(contextLocal);
                     addScriptRuntimeInvoke(
                             "callSuper",
-                            "([Ljava/lang/Object;Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                            OBJECT,
+                            OBJECT_ARRAY,
+                            NATIVE_FUNCTION,
+                            SCRIPTABLE,
+                            CONTEXT
                     );
 
                     cfw.add(ByteCode.DUP);
@@ -3821,7 +3825,12 @@ class BodyCodegen {
                     cfw.addALoad(contextLocal);
                     addScriptRuntimeInvoke(
                             "callSuperProp",
-                            "(Ljava/lang/Object;[Ljava/lang/Object;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                            OBJECT,
+                            OBJECT,
+                            OBJECT_ARRAY,
+                            SCRIPTABLE,
+                            SCRIPTABLE,
+                            CONTEXT
                     );
                     return;
                 }
@@ -3869,7 +3878,11 @@ class BodyCodegen {
                 cfw.addALoad(contextLocal);
                 addScriptRuntimeInvoke(
                         "callSuper",
-                        "([Ljava/lang/Object;Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                        OBJECT,
+                        OBJECT_ARRAY,
+                        NATIVE_FUNCTION,
+                        SCRIPTABLE,
+                        CONTEXT
                 );
 
                 cfw.add(ByteCode.DUP);
@@ -3903,7 +3916,12 @@ class BodyCodegen {
                 cfw.addALoad(contextLocal);
                 addScriptRuntimeInvoke(
                         "callSuperProp",
-                        "(Ljava/lang/Object;[Ljava/lang/Object;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                        OBJECT,
+                        OBJECT,
+                        OBJECT_ARRAY,
+                        SCRIPTABLE,
+                        SCRIPTABLE,
+                        CONTEXT
                 );
                 return;
             }
@@ -5912,8 +5930,22 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         }
     }
 
-    private void addScriptRuntimeInvoke(String methodName,
-                                        String methodSignature) {
+    private static final String SCRIPTABLE = "Lorg/mozilla/javascript/Scriptable;";
+    private static final String SCRIPTABLE_OBJECT = "Lorg/mozilla/javascript/ScriptableObject;";
+    private static final String NATIVE_FUNCTION = "Lorg/mozilla/javascript/NativeFunction;";
+    private static final String CONTEXT = "Lorg/mozilla/javascript/Context;";
+    private static final String OBJECT = "Ljava/lang/Object;";
+    private static final String OBJECT_ARRAY = "[Ljava/lang/Object;";
+    private static final String INTEGER = "I";
+    private static final String BOOLEAN = "Z";
+    private static final String VOID = "V";
+    private static final String STRING = "Ljava/lang/String;";
+
+    private void addScriptRuntimeInvoke(String methodName, String returnValue, String... args) {
+        addScriptRuntimeInvoke(methodName, "(" + String.join("", args) + ")" + returnValue);
+    }
+
+    private void addScriptRuntimeInvoke(String methodName, String methodSignature) {
         cfw.addInvoke(ByteCode.INVOKESTATIC,
                 "org.mozilla.javascript.ScriptRuntime",
                 methodName,
