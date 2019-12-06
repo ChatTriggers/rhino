@@ -109,7 +109,7 @@ public class Parser {
      * @return {@code true} if all the bits in the mask are set in "after"
      * but not in "before"
      */
-    private static final boolean nowAllSet(int before, int after, int mask) {
+    private static boolean nowAllSet(int before, int after, int mask) {
         return ((before & mask) != mask) && ((after & mask) == mask);
     }
 
@@ -277,11 +277,10 @@ public class Parser {
                 comment);
         if (ts.commentType == Token.CommentType.JSDOC &&
                 compilerEnv.isRecordingLocalJsDocComments()) {
-            Comment jsDocCommentNode = new Comment(ts.tokenBeg,
+            currentJsDocComment = new Comment(ts.tokenBeg,
                     ts.getTokenLength(),
                     ts.commentType,
                     comment);
-            currentJsDocComment = jsDocCommentNode;
             currentJsDocComment.setLineno(lineno);
         }
         commentNode.setLineno(lineno);
@@ -354,8 +353,7 @@ public class Parser {
         return currentToken;  // return unflagged token
     }
 
-    private int peekFlaggedToken()
-            throws IOException {
+    private int peekFlaggedToken() throws IOException {
         peekToken();
         return currentFlaggedToken;
     }
@@ -364,8 +362,7 @@ public class Parser {
         currentFlaggedToken = Token.EOF;
     }
 
-    private int nextToken()
-            throws IOException {
+    private int nextToken() throws IOException {
         int tt = peekToken();
         consumeToken();
         return tt;
@@ -389,8 +386,7 @@ public class Parser {
     // token types valid if they are preceded by a newline.  One example is the
     // postfix ++ or -- operator, which has to be on the same line as its
     // operand.
-    private int peekTokenOrEOL()
-            throws IOException {
+    private int peekTokenOrEOL() throws IOException {
         int tt = peekToken();
         // Check for last peeked token flags
         if ((currentFlaggedToken & TI_AFTER_EOL) != 0) {
@@ -403,8 +399,7 @@ public class Parser {
         return mustMatchToken(toMatch, messageId, ts.tokenBeg, ts.tokenEnd - ts.tokenBeg);
     }
 
-    private boolean mustMatchToken(int toMatch, String msgId, int pos, int len)
-            throws IOException {
+    private boolean mustMatchToken(int toMatch, String msgId, int pos, int len) throws IOException {
         if (matchToken(toMatch)) {
             return true;
         }
@@ -514,8 +509,7 @@ public class Parser {
      * @deprecated use parse(String, String, int) instead
      */
     @Deprecated
-    public AstRoot parse(Reader sourceReader, String sourceURI, int lineno)
-            throws IOException {
+    public AstRoot parse(Reader sourceReader, String sourceURI, int lineno) throws IOException {
         if (parseFinished) throw new IllegalStateException("parser reused");
         if (compilerEnv.isIdeMode()) {
             return parse(Kit.readReader(sourceReader), sourceURI, lineno);
@@ -616,8 +610,7 @@ public class Parser {
         return root;
     }
 
-    private AstNode parseFunctionBody(int type, FunctionNode fnNode)
-            throws IOException {
+    private AstNode parseFunctionBody(int type, FunctionNode fnNode) throws IOException {
         // Tracks whether this function is a special rhino-specific "infix" function
         // e.g.: function square(x) x*x
         boolean isExpressionClosure = false;
@@ -1133,8 +1126,7 @@ public class Parser {
     }
 
     // parse and return a parenthesized expression
-    private ConditionData condition()
-            throws IOException {
+    private ConditionData condition() throws IOException {
         ConditionData data = new ConditionData();
 
         if (mustMatchToken(Token.LP, "msg.no.paren.cond"))
@@ -1155,8 +1147,7 @@ public class Parser {
         return data;
     }
 
-    private AstNode statement()
-            throws IOException {
+    private AstNode statement() throws IOException {
         int pos = ts.tokenBeg;
         try {
             AstNode pn = statementHelper();
@@ -1199,8 +1190,7 @@ public class Parser {
         return new EmptyStatement(pos, ts.tokenBeg - pos);
     }
 
-    private AstNode statementHelper()
-            throws IOException {
+    private AstNode statementHelper() throws IOException {
         // If the statement is set, then it's been told its label by now.
         if (currentLabel != null && currentLabel.getStatement() != null)
             currentLabel = null;
@@ -1343,8 +1333,7 @@ public class Parser {
         }
     }
 
-    private IfStatement ifStatement()
-            throws IOException {
+    private IfStatement ifStatement() throws IOException {
         if (currentToken != Token.IF) codeBug();
         consumeToken();
         int pos = ts.tokenBeg, lineno = ts.lineno, elsePos = -1;
@@ -1371,8 +1360,7 @@ public class Parser {
         return pn;
     }
 
-    private SwitchStatement switchStatement()
-            throws IOException {
+    private SwitchStatement switchStatement() throws IOException {
         if (currentToken != Token.SWITCH) codeBug();
         consumeToken();
         int pos = ts.tokenBeg;
@@ -1456,8 +1444,7 @@ public class Parser {
         return pn;
     }
 
-    private WhileLoop whileLoop()
-            throws IOException {
+    private WhileLoop whileLoop() throws IOException {
         if (currentToken != Token.WHILE) codeBug();
         consumeToken();
         int pos = ts.tokenBeg;
@@ -1477,8 +1464,7 @@ public class Parser {
         return pn;
     }
 
-    private DoLoop doLoop()
-            throws IOException {
+    private DoLoop doLoop() throws IOException {
         if (currentToken != Token.DO) codeBug();
         consumeToken();
         int pos = ts.tokenBeg, end;
@@ -1529,8 +1515,7 @@ public class Parser {
         return body;
     }
 
-    private Loop forLoop()
-            throws IOException {
+    private Loop forLoop() throws IOException {
         if (currentToken != Token.FOR) codeBug();
         consumeToken();
         int forPos = ts.tokenBeg, lineno = ts.lineno;
@@ -1669,8 +1654,7 @@ public class Parser {
         }
     }
 
-    private TryStatement tryStatement()
-            throws IOException {
+    private TryStatement tryStatement() throws IOException {
         if (currentToken != Token.TRY) codeBug();
         consumeToken();
 
@@ -1781,8 +1765,7 @@ public class Parser {
         return pn;
     }
 
-    private ThrowStatement throwStatement()
-            throws IOException {
+    private ThrowStatement throwStatement() throws IOException {
         if (currentToken != Token.THROW) codeBug();
         consumeToken();
         int pos = ts.tokenBeg, lineno = ts.lineno;
@@ -1797,8 +1780,7 @@ public class Parser {
         return pn;
     }
 
-    private LabeledStatement matchJumpLabelName()
-            throws IOException {
+    private LabeledStatement matchJumpLabelName() throws IOException {
         LabeledStatement label = null;
 
         if (peekTokenOrEOL() == Token.NAME) {
@@ -1814,8 +1796,7 @@ public class Parser {
         return label;
     }
 
-    private BreakStatement breakStatement()
-            throws IOException {
+    private BreakStatement breakStatement() throws IOException {
         if (currentToken != Token.BREAK) codeBug();
         consumeToken();
         int lineno = ts.lineno, pos = ts.tokenBeg, end = ts.tokenEnd;
@@ -1847,8 +1828,7 @@ public class Parser {
         return pn;
     }
 
-    private ContinueStatement continueStatement()
-            throws IOException {
+    private ContinueStatement continueStatement() throws IOException {
         if (currentToken != Token.CONTINUE) codeBug();
         consumeToken();
         int lineno = ts.lineno, pos = ts.tokenBeg, end = ts.tokenEnd;
@@ -1882,8 +1862,7 @@ public class Parser {
         return pn;
     }
 
-    private WithStatement withStatement()
-            throws IOException {
+    private WithStatement withStatement() throws IOException {
         if (currentToken != Token.WITH) codeBug();
         consumeToken();
 
@@ -1909,8 +1888,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode letStatement()
-            throws IOException {
+    private AstNode letStatement() throws IOException {
         if (currentToken != Token.LET) codeBug();
         consumeToken();
         int lineno = ts.lineno, pos = ts.tokenBeg;
@@ -1924,8 +1902,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode returnOrYield(int tt, boolean exprContext)
-            throws IOException {
+    private AstNode returnOrYield(int tt, boolean exprContext) throws IOException {
         if (!insideFunction()) {
             reportError(tt == Token.RETURN ? "msg.bad.return" : "msg.bad.yield");
         }
@@ -1980,8 +1957,7 @@ public class Parser {
         return ret;
     }
 
-    private AstNode block()
-            throws IOException {
+    private AstNode block() throws IOException {
         if (currentToken != Token.LC) codeBug();
         consumeToken();
         int pos = ts.tokenBeg;
@@ -1998,8 +1974,7 @@ public class Parser {
         }
     }
 
-    private AstNode defaultXmlNamespace()
-            throws IOException {
+    private AstNode defaultXmlNamespace() throws IOException {
         if (currentToken != Token.DEFAULT) codeBug();
         consumeToken();
         mustHaveXML();
@@ -2022,12 +1997,10 @@ public class Parser {
         dxmln.setOperand(e);
         dxmln.setLineno(lineno);
 
-        ExpressionStatement es = new ExpressionStatement(dxmln, true);
-        return es;
+        return new ExpressionStatement(dxmln, true);
     }
 
-    private void recordLabel(Label label, LabeledStatement bundle)
-            throws IOException {
+    private void recordLabel(Label label, LabeledStatement bundle) throws IOException {
         // current token should be colon that primaryExpr left untouched
         if (peekToken() != Token.COLON) codeBug();
         consumeToken();
@@ -2228,8 +2201,7 @@ public class Parser {
     }
 
     // have to pass in 'let' kwd position to compute kid offsets properly
-    private AstNode let(boolean isStatement, int pos)
-            throws IOException {
+    private AstNode let(boolean isStatement, int pos) throws IOException {
         LetNode pn = new LetNode(pos);
         pn.setLineno(ts.lineno);
         if (mustMatchToken(Token.LP, "msg.no.paren.after.let"))
@@ -2499,8 +2471,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode andExpr()
-            throws IOException {
+    private AstNode andExpr() throws IOException {
         AstNode pn = bitOrExpr();
         if (matchToken(Token.AND)) {
             int opPos = ts.tokenBeg;
@@ -2509,8 +2480,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode bitOrExpr()
-            throws IOException {
+    private AstNode bitOrExpr() throws IOException {
         AstNode pn = bitXorExpr();
         while (matchToken(Token.BITOR)) {
             int opPos = ts.tokenBeg;
@@ -2519,8 +2489,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode bitXorExpr()
-            throws IOException {
+    private AstNode bitXorExpr() throws IOException {
         AstNode pn = bitAndExpr();
         while (matchToken(Token.BITXOR)) {
             int opPos = ts.tokenBeg;
@@ -2529,8 +2498,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode bitAndExpr()
-            throws IOException {
+    private AstNode bitAndExpr() throws IOException {
         AstNode pn = eqExpr();
         while (matchToken(Token.BITAND)) {
             int opPos = ts.tokenBeg;
@@ -2539,8 +2507,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode eqExpr()
-            throws IOException {
+    private AstNode eqExpr() throws IOException {
         AstNode pn = relExpr();
         for (; ; ) {
             int tt = peekToken(), opPos = ts.tokenBeg;
@@ -2566,8 +2533,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode relExpr()
-            throws IOException {
+    private AstNode relExpr() throws IOException {
         AstNode pn = shiftExpr();
         for (; ; ) {
             int tt = peekToken(), opPos = ts.tokenBeg;
@@ -2590,8 +2556,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode shiftExpr()
-            throws IOException {
+    private AstNode shiftExpr() throws IOException {
         AstNode pn = addExpr();
         for (; ; ) {
             int tt = peekToken(), opPos = ts.tokenBeg;
@@ -2608,8 +2573,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode addExpr()
-            throws IOException {
+    private AstNode addExpr() throws IOException {
         AstNode pn = mulExpr();
         for (; ; ) {
             int tt = peekToken(), opPos = ts.tokenBeg;
@@ -2658,8 +2622,7 @@ public class Parser {
         return pn;
     }
 
-    private AstNode unaryExpr()
-            throws IOException {
+    private AstNode unaryExpr() throws IOException {
         AstNode node;
         int tt = peekToken();
         if (tt == Token.COMMENT) {
@@ -2729,8 +2692,7 @@ public class Parser {
         }
     }
 
-    private AstNode xmlInitializer()
-            throws IOException {
+    private AstNode xmlInitializer() throws IOException {
         if (currentToken != Token.LT) codeBug();
         int pos = ts.tokenBeg, tt = ts.getFirstXMLToken();
         if (tt != Token.XML && tt != Token.XMLEND) {
@@ -2768,8 +2730,7 @@ public class Parser {
         }
     }
 
-    private List<AstNode> argumentList()
-            throws IOException {
+    private List<AstNode> argumentList() throws IOException {
         if (matchToken(Token.RP))
             return null;
 
@@ -2868,8 +2829,7 @@ public class Parser {
             pn = nx;
         }
         pn.setLineno(lineno);
-        AstNode tail = memberExprTail(allowCallSyntax, pn);
-        return tail;
+        return memberExprTail(allowCallSyntax, pn);
     }
 
     /**
@@ -3447,8 +3407,7 @@ public class Parser {
     /**
      * May return an {@link ArrayLiteral} or {@link ArrayComprehension}.
      */
-    private AstNode arrayLiteral()
-            throws IOException {
+    private AstNode arrayLiteral() throws IOException {
         if (currentToken != Token.LB) codeBug();
         int pos = ts.tokenBeg, end = ts.tokenEnd;
         List<AstNode> elements = new ArrayList<>();
@@ -3517,8 +3476,7 @@ public class Parser {
      * @param pos    start of LB token that begins the array comprehension
      * @return the array comprehension or an error node
      */
-    private AstNode arrayComprehension(AstNode result, int pos)
-            throws IOException {
+    private AstNode arrayComprehension(AstNode result, int pos) throws IOException {
         List<ArrayComprehensionLoop> loops =
                 new ArrayList<ArrayComprehensionLoop>();
         while (peekToken() == Token.FOR) {
@@ -3544,8 +3502,7 @@ public class Parser {
         return pn;
     }
 
-    private ArrayComprehensionLoop arrayComprehensionLoop()
-            throws IOException {
+    private ArrayComprehensionLoop arrayComprehensionLoop() throws IOException {
         if (nextToken() != Token.FOR) codeBug();
         int pos = ts.tokenBeg;
         int eachPos = -1, lp = -1, rp = -1, inPos = -1;
@@ -3622,14 +3579,11 @@ public class Parser {
         }
     }
 
-    private AstNode generatorExpression(AstNode result, int pos)
-            throws IOException {
+    private AstNode generatorExpression(AstNode result, int pos) throws IOException {
         return generatorExpression(result, pos, false);
     }
 
-    private AstNode generatorExpression(AstNode result, int pos, boolean inFunctionParams)
-            throws IOException {
-
+    private AstNode generatorExpression(AstNode result, int pos, boolean inFunctionParams) throws IOException {
         List<GeneratorExpressionLoop> loops =
                 new ArrayList<GeneratorExpressionLoop>();
         while (peekToken() == Token.FOR) {
@@ -3657,8 +3611,7 @@ public class Parser {
         return pn;
     }
 
-    private GeneratorExpressionLoop generatorExpressionLoop()
-            throws IOException {
+    private GeneratorExpressionLoop generatorExpressionLoop() throws IOException {
         if (nextToken() != Token.FOR) codeBug();
         int pos = ts.tokenBeg;
         int lp = -1, rp = -1, inPos = -1;
