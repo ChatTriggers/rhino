@@ -2861,7 +2861,7 @@ public final class Interpreter extends Icode implements Evaluator {
         final CallFrame calleeFrame;
         if (BaseFunction.isApply(ifun)) {
             Object[] callArgs = indexReg < 2 ? ScriptRuntime.emptyArgs :
-                    ScriptRuntime.getApplyArguments(cx, stack[stackTop + 3]);
+                    ScriptRuntime.createArrFromArrayLike(cx, stack[stackTop + 3]);
             calleeFrame = initFrame(cx, calleeScope, applyThis, callArgs, null, 0,
                     callArgs.length, iApplyCallable, frame);
         } else {

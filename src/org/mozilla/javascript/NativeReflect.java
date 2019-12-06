@@ -138,19 +138,19 @@ public class NativeReflect extends IdScriptableObject {
     private Object js_construct(Object[] args, Context cx, Scriptable scope) {
         if (args.length < 1 || !(args[0] instanceof Function)) {
             throw ScriptRuntime.typeError1("msg.not.obj", args.length < 1 ? Undefined.instance : args[0]);
-        } else if (args.length < 2 || !(args[1] instanceof NativeArray)) {
+        } else if (args.length < 2 || !(args[1] instanceof Scriptable) || !(ScriptRuntime.isArrayLike((Scriptable) args[1]))) {
             throw ScriptRuntime.typeError("Expected argumentsList to be an array");
         }
 
         Function target = (Function) args[0];
-        NativeArray argumentsList = (NativeArray) args[1];
+        Object[] argumentsList = ScriptRuntime.createArrFromArrayLike(cx, args[1]);
         Function newTarget = null;
 
         if (args.length > 2) {
             newTarget = (Function) args[2];
         }
 
-        Scriptable val = target.construct(cx, scope, argumentsList.toArray());
+        Scriptable val = target.construct(cx, scope, argumentsList);
 
         if (newTarget != null) {
             Scriptable obj = newTarget.construct(cx, scope, new Object[]{});
