@@ -2454,13 +2454,15 @@ public class Context {
 
             bytecode = compiler.compile(compilerEnv, tree, tree.getEncodedSource(), returnFunction);
         } catch (ClassFileFormatException e) {
-            // we hit some class file limit, fall back to interpreter or report
+            throw Kit.codeBug();
 
-            // we have to recreate the tree because the compile call might have changed the tree already
-            tree = parse(sourceString, sourceName, lineno, compilerEnv, compilationErrorReporter, returnFunction);
-
-            compiler = createInterpreter();
-            bytecode = compiler.compile(compilerEnv, tree, tree.getEncodedSource(), returnFunction);
+            // // we hit some class file limit, fall back to interpreter or report
+            //
+            // // we have to recreate the tree because the compile call might have changed the tree already
+            // tree = parse(sourceString, sourceName, lineno, compilerEnv, compilationErrorReporter, returnFunction);
+            //
+            // compiler = createInterpreter();
+            // bytecode = compiler.compile(compilerEnv, tree, tree.getEncodedSource(), returnFunction);
         }
 
         if (debugger != null) {

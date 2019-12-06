@@ -1587,6 +1587,20 @@ class BodyCodegen {
         argsLocal = firstFreeLocal++;
         localsMax = firstFreeLocal;
 
+        if (currentCtorClass) {
+            cfw.addALoad(funObjLocal);
+            cfw.addALoad(thisObjLocal);
+            cfw.addALoad(argsLocal);
+            cfw.addALoad(contextLocal);
+            cfw.addALoad(variableObjectLocal);
+            addScriptRuntimeInvoke(
+                    "initCtorReturn",
+                    "(Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;)Lorg/mozilla/javascript/Scriptable;"
+            );
+
+            cfw.addAStore(thisObjLocal);
+        }
+
         // Generate Generator specific prelude
         if (isGenerator) {
 
@@ -2155,15 +2169,7 @@ class BodyCodegen {
                         if (!currentCtorClass) {
                             Codegen.pushUndefined(cfw);
                         } else {
-                            cfw.addALoad(funObjLocal);
                             cfw.addALoad(thisObjLocal);
-                            cfw.addALoad(argsLocal);
-                            cfw.addALoad(contextLocal);
-                            cfw.addALoad(variableObjectLocal);
-                            addScriptRuntimeInvoke(
-                                    "initCtorReturn",
-                                    "(Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;"
-                            );
                         }
                     } else {
                         if (popvLocal < 0) throw Codegen.badTree();

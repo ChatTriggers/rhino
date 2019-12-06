@@ -818,7 +818,7 @@ public class ScriptRuntime {
         return clazzObj;
     }
 
-    public static Object initCtorReturn(NativeFunction clazz, Scriptable thisObj, Object[] args, Context cx, Scriptable scope) {
+    public static Scriptable initCtorReturn(NativeFunction clazz, Scriptable thisObj, Object[] args, Context cx, Scriptable scope) {
         Scriptable proto = clazz.getPrototype();
 
         if (!(proto instanceof Function)) {
