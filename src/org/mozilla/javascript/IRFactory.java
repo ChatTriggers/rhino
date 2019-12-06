@@ -648,7 +648,17 @@ public final class IRFactory extends Parser {
 
         if (fn == null) {
             fn = new FunctionNode();
-            fn.setBody(new Block());
+            Block body = new Block();
+            if (node.getExtended() != null) {
+                FunctionCall superCall = new FunctionCall();
+                Name superName = new Name();
+                superName.setString("super");
+                superName.putProp(Node.SUPER_PROP, true);
+                superCall.setTarget(superName);
+                ExpressionStatement expr = new ExpressionStatement(superCall);
+                body.addStatement(expr);
+            }
+            fn.setBody(body);
         }
 
         fn.setFunctionName(node.getClassName());

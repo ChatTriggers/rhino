@@ -1578,17 +1578,6 @@ class BodyCodegen {
         argsLocal = firstFreeLocal++;
         localsMax = firstFreeLocal;
 
-        if (currentCtorClass) {
-            cfw.addALoad(funObjLocal);
-            cfw.addALoad(thisObjLocal);
-            cfw.addALoad(argsLocal);
-            cfw.addALoad(contextLocal);
-            cfw.addALoad(variableObjectLocal);
-            addScriptRuntimeInvoke("initCtorReturn", SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE, OBJECT_ARRAY, CONTEXT, SCRIPTABLE);
-
-            cfw.addAStore(thisObjLocal);
-        }
-
         // Generate Generator specific prelude
         if (isGenerator) {
 
@@ -3550,14 +3539,19 @@ class BodyCodegen {
             if (childType == Token.NAME) {
                 // name() call
                 if (child.getProp(Node.SUPER_PROP) != null) {
+                    boolean isReturned = node.getNext() != null && node.getNext().getType() == Token.RETURN;
                     cfw.add(ByteCode.ACONST_NULL);
+                    cfw.addPush(isReturned);
                     cfw.addALoad(funObjLocal);
+                    cfw.addALoad(thisObjLocal);
                     cfw.addALoad(variableObjectLocal);
                     cfw.addALoad(contextLocal);
-                    addScriptRuntimeInvoke("callSuper", OBJECT, OBJECT_ARRAY, NATIVE_FUNCTION, SCRIPTABLE, CONTEXT);
+                    addScriptRuntimeInvoke("callSuper", OBJECT, OBJECT_ARRAY, BOOLEAN, NATIVE_FUNCTION, SCRIPTABLE, SCRIPTABLE, CONTEXT);
 
-                    cfw.add(ByteCode.DUP);
-                    cfw.addAStore(thisObjLocal);
+                    if (!isReturned) {
+                        cfw.add(ByteCode.DUP);
+                        cfw.addAStore(thisObjLocal);
+                    }
 
                     return;
                 }
@@ -3611,13 +3605,18 @@ class BodyCodegen {
             generateCallArgArray(node, firstArgChild, false);
 
             if (child.getProp(Node.SUPER_PROP) != null) {
+                boolean isReturned = node.getNext() != null && node.getNext().getType() == Token.RETURN;
+                cfw.addPush(isReturned);
                 cfw.addALoad(funObjLocal);
+                cfw.addALoad(thisObjLocal);
                 cfw.addALoad(variableObjectLocal);
                 cfw.addALoad(contextLocal);
-                addScriptRuntimeInvoke("callSuper", OBJECT, OBJECT_ARRAY, NATIVE_FUNCTION, SCRIPTABLE, CONTEXT);
+                addScriptRuntimeInvoke("callSuper", OBJECT, OBJECT_ARRAY, BOOLEAN, NATIVE_FUNCTION, SCRIPTABLE, SCRIPTABLE, CONTEXT);
 
-                cfw.add(ByteCode.DUP);
-                cfw.addAStore(thisObjLocal);
+                if (!isReturned) {
+                    cfw.add(ByteCode.DUP);
+                    cfw.addAStore(thisObjLocal);
+                }
 
                 return;
             }

@@ -818,18 +818,36 @@ public class ScriptRuntime {
         return clazzObj;
     }
 
-    public static Object callSuper(Object[] args, NativeFunction clazz, Scriptable scope, Context cx) {
+    public static Object callSuper(Object[] args, boolean isReturned, NativeFunction clazz, Scriptable thisObj, Scriptable scope, Context cx) {
         if (args == null) {
             args = new Object[0];
         }
 
-        Scriptable extended = clazz.getPrototype();
-        if (!(extended instanceof BaseFunction)) {
+        if (isReturned) {
+            Scriptable extended = clazz.getPrototype();
+            if (!(extended instanceof BaseFunction)) {
+                // TODO: Error
+                throw Kit.codeBug();
+            }
+
+            return ((BaseFunction) extended).construct(cx, scope, args);
+        }
+
+        Scriptable proto = clazz.getPrototype();
+
+        if (!(proto instanceof Function)) {
             // TODO: Error
             throw Kit.codeBug();
         }
 
-        return ((BaseFunction) extended).construct(cx, scope, args);
+        Object newTarget = thisObj.get("new.target", thisObj);
+        BoundFunction ctor = new BoundFunction(cx, scope, (Callable) proto, null, args);
+        ctor.setForcedNewTarget(newTarget);
+        Scriptable instance = ctor.construct(cx, scope, new Object[]{});
+        instance.setPrototype(ScriptableObject.ensureScriptable(ScriptableObject.getProperty(clazz, "prototype")));
+        instance.put("new.target", instance, newTarget);
+
+        return instance;
     }
 
     public static Object accessSuper(Object prop, Scriptable thisObj) {
@@ -847,24 +865,6 @@ public class ScriptRuntime {
         }
 
         return ((Callable) method).call(cx, scope, thisObj, args);
-    }
-
-    public static Scriptable initCtorReturn(NativeFunction clazz, Scriptable thisObj, Object[] args, Context cx, Scriptable scope) {
-        Scriptable proto = clazz.getPrototype();
-
-        if (!(proto instanceof Function)) {
-            // TODO: Error
-            throw Kit.codeBug();
-        }
-
-        Object newTarget = thisObj.get("new.target", thisObj);
-        BoundFunction ctor = new BoundFunction(cx, scope, (Callable) proto, null, args);
-        ctor.setForcedNewTarget(newTarget);
-        Scriptable instance = ctor.construct(cx, scope, new Object[]{});
-        instance.setPrototype(ScriptableObject.ensureScriptable(ScriptableObject.getProperty(clazz, "prototype")));
-        instance.put("new.target", instance, newTarget);
-
-        return instance;
     }
 
     public static Scriptable endClassCtor(Scriptable obj) {
