@@ -4165,7 +4165,7 @@ exports.tests = [
       exec: function () {/*
         var closed = false;
         var iter = global.__createIterableObject([1, 2, 3], {
-          'return': function(){ closed = true; return {}; }
+          'throw': function(){ closed = true; return {}; }
         });
         try {
           for (var it of iter) throw 0;
