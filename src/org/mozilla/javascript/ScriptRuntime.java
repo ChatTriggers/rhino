@@ -804,7 +804,7 @@ public class ScriptRuntime {
         return clazzObj;
     }
 
-    public static Object initCtorReturn(NativeFunction clazz, Scriptable thisObj, Object[] args, Context cx) {
+    public static Object initCtorReturn(NativeFunction clazz, Scriptable thisObj, Object[] args, Context cx, Scriptable scope) {
         Scriptable proto = clazz.getPrototype();
 
         if (!(proto instanceof Function)) {
@@ -812,18 +812,23 @@ public class ScriptRuntime {
             throw Kit.codeBug();
         }
 
-        Object appliedProto = ScriptableObject.callMethod(proto, "apply", new Object[]{ thisObj, cx.newArray(thisObj, args) });
+        BoundFunction ctor = new BoundFunction(cx, scope, (Callable) proto, null, args);
+        Scriptable instance = ctor.construct(cx, scope, new Object[]{});
+        instance.setPrototype(ScriptableObject.ensureScriptable(ScriptableObject.getProperty(clazz, "prototype")));
 
-        if (appliedProto instanceof ScriptableObject) {
-            return appliedProto;
-        }
-
-        if (Undefined.isUndefined(thisObj)) {
-            // TODO: Error
-            throw Kit.codeBug();
-        }
-
-        return thisObj;
+        return instance;
+//        Object appliedProto = ScriptableObject.callMethod(proto, "apply", new Object[]{ thisObj, cx.newArray(thisObj, args) });
+//
+//        if (appliedProto instanceof ScriptableObject) {
+//            return appliedProto;
+//        }
+//
+//        if (Undefined.isUndefined(thisObj)) {
+//            // TODO: Error
+//            throw Kit.codeBug();
+//        }
+//
+//        return thisObj;
     }
 
     public static Object setClassExtends(Object clazzObj, Object extendedObj, Context cx, Scriptable scope) {

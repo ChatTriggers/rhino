@@ -2159,9 +2159,10 @@ class BodyCodegen {
                             cfw.addALoad(thisObjLocal);
                             cfw.addALoad(argsLocal);
                             cfw.addALoad(contextLocal);
+                            cfw.addALoad(variableObjectLocal);
                             addScriptRuntimeInvoke(
                                     "initCtorReturn",
-                                    "(Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                                    "(Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;"
                             );
                         }
                     } else {
