@@ -4136,7 +4136,7 @@ exports.tests = [
       name: 'iterator closing, break',
       exec: function () {/*
         var closed = false;
-        var iter = __createIterableObject([1, 2, 3], {
+        var iter = global.__createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         for (var it of iter) break;
@@ -4164,7 +4164,7 @@ exports.tests = [
       name: 'iterator closing, throw',
       exec: function () {/*
         var closed = false;
-        var iter = __createIterableObject([1, 2, 3], {
+        var iter = global.__createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         try {
