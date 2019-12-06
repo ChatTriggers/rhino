@@ -2696,10 +2696,9 @@ public class NativeRegExp extends IdScriptableObject implements Function {
 
             case Id_toString:
             case Id_toSource: {
-//                String source = (String) ScriptableObject.getProperty(thisObj, "source");
-//                String flags = (String) ScriptableObject.getProperty(thisObj, "flags");
-//                return toString(source, flags);
-                return realThis(thisObj, f).toString();
+                String source = ScriptableObject.getProperty(thisObj, "source").toString();
+                String flags = ScriptableObject.getProperty(thisObj, "flags").toString();
+                return toString(source, flags);
             }
 
             case Id_exec:

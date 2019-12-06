@@ -43,7 +43,7 @@
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">67% complete</sub><sub class="unflagged">49% complete</sub>
+                </div><sub class="flagged">69% complete</sub><sub class="unflagged">51% complete</sub>
               </th>
             </tr>
           </table>
@@ -894,7 +894,7 @@ return result === &quot;123&quot;;</div>}
             <div class="info">?
               <div class="fn">function(){
                 <div class="code">var closed = false;
-var iter = __createIterableObject([1, 2, 3], {
+var iter = global.__createIterableObject([1, 2, 3], {
   'return': function(){ closed = true; return {}; }
 });
 for (var it of iter) break;
@@ -907,7 +907,7 @@ return closed;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="Error flagged " title="&quot;__createIterableObject&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="Error flagged " title="&quot;__createIterableObject&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="Error flagged " title="&quot;__createIterableObject&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="Error flagged " title="&quot;__createIterableObject&quot; is not defined.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -915,8 +915,8 @@ return closed;</div>}
             <div class="info">?
               <div class="fn">function(){
                 <div class="code">var closed = false;
-var iter = __createIterableObject([1, 2, 3], {
-  'return': function(){ closed = true; return {}; }
+var iter = global.__createIterableObject([1, 2, 3], {
+  'throw': function(){ closed = true; return {}; }
 });
 try {
   for (var it of iter) throw 0;
@@ -930,7 +930,7 @@ return closed;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="Error flagged " title="&quot;__createIterableObject&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="Error flagged " title="&quot;__createIterableObject&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="Error flagged " title="&quot;__createIterableObject&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="Error flagged " title="&quot;__createIterableObject&quot; is not defined.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="7">
@@ -3640,7 +3640,7 @@ return new C instanceof C &amp;&amp; received === 'foo'</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -3667,7 +3667,7 @@ return arrow() === &quot;quux&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -4219,7 +4219,7 @@ return passed;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -4241,7 +4241,7 @@ return new C(&quot;baz&quot;)[0] === &quot;foobarbaz&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -4264,7 +4264,7 @@ return new C().quux(&quot;bar&quot;) === &quot;foobarbaz&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -4286,7 +4286,7 @@ return new C().qux(&quot;baz&quot;) === &quot;foobarbaz&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -4310,7 +4310,7 @@ return obj.qux(&quot;baz&quot;) === &quot;foobarbaz&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -4334,7 +4334,7 @@ return passed;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -4360,7 +4360,7 @@ return obj.qux() === &quot;barley&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="Invalid JavaScript value of type org.mozilla.javascript.UniqueTag">Error</div><div class="Error flagged " title="Invalid JavaScript value of type org.mozilla.javascript.UniqueTag">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -11899,7 +11899,7 @@ return c(6) === 9 &amp;&amp; c instanceof C;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="7">
@@ -12201,7 +12201,7 @@ return correctProtoBound(Function.prototype)
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -12230,7 +12230,7 @@ return correctProtoBound(Function.prototype)
           <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -12259,7 +12259,7 @@ return correctProtoBound(Function.prototype)
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -12288,7 +12288,7 @@ return correctProtoBound(Function.prototype)
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -12315,7 +12315,7 @@ return correctProtoBound(function(){})
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="7">
@@ -12706,7 +12706,7 @@ return get + '' === &quot;source,flags&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Proxy&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Proxy&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div><div class="Error flagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div><div class="Error flagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div><div class="Error flagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -14307,7 +14307,7 @@ try {
           <td class="result"><div class="Error unflagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div><div class="Error flagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div><div class="Error flagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div><div class="Error flagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div><div class="Error flagged " title="Method &quot;toString&quot; called on incompatible object.">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
