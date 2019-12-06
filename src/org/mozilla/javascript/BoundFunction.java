@@ -34,6 +34,10 @@ public class BoundFunction extends BaseFunction {
 
         ScriptRuntime.setFunctionProtoAndParent(this, scope);
 
+        if (targetFunction instanceof Scriptable) {
+            this.setPrototype(((Scriptable) targetFunction).getPrototype());
+        }
+
         Function thrower = ScriptRuntime.typeErrorThrower(cx);
         NativeObject throwing = new NativeObject();
         throwing.put("get", throwing, thrower);
