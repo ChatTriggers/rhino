@@ -1627,6 +1627,13 @@ public class NativeArray extends IdScriptableObject implements List {
     }
 
     private static BaseFunction getSpecies(Scriptable obj) {
+        if (obj instanceof NativeFunction) {
+            // If obj is an instance of a class, we need
+            // to access the constructor property of the
+            // base class, not the instance
+            obj = obj.getPrototype();
+        }
+
         if (ScriptableObject.hasProperty(obj, "constructor")) {
             Scriptable constructor = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(obj, "constructor"));
 

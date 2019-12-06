@@ -3299,6 +3299,18 @@ class BodyCodegen {
 
         child = child.getNext();
 
+        if (cls.getExtended() != null) {
+            generateExpression(cls.getExtended(), cls);
+            cfw.addALoad(contextLocal);
+            cfw.addALoad(variableObjectLocal);
+
+            // Object setClassExtends(Object clazzObj, Object extended, Context cx, Scriptable scope)
+            addScriptRuntimeInvoke(
+                    "setClassExtends",
+                    "(Ljava/lang/Object;Ljava/lang/Object;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;"
+            );
+        }
+
         while (child != null) {
             ClassMethod cm = (ClassMethod) child;
             Node method = cm.getFirstChild();
@@ -3326,18 +3338,6 @@ class BodyCodegen {
             );
 
             child = child.getNext();
-        }
-
-        if (cls.getExtended() != null) {
-            generateExpression(cls.getExtended(), cls);
-            cfw.addALoad(contextLocal);
-            cfw.addALoad(variableObjectLocal);
-
-            // Object setClassExtends(Object clazzObj, Object extended, Context cx, Scriptable scope)
-            addScriptRuntimeInvoke(
-                    "setClassExtends",
-                    "(Ljava/lang/Object;Ljava/lang/Object;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;"
-            );
         }
 
         // TODO: Only when a statement

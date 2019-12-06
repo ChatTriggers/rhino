@@ -790,13 +790,27 @@ public class ScriptRuntime {
                 clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.DONTENUM);
             }
         } else if (name instanceof Integer) {
-            int index = (Integer) name;
-            clazz.put(index, clazz, method);
-            clazz.setAttributes(index, clazz.getAttributes(index) | ScriptableObject.DONTENUM);
+            int nameInt = ((Integer) name);
+            if (getterSetter == 0) {
+                clazz.put(nameInt, clazz, method);
+                clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.DONTENUM);
+            } else {
+                Callable getterOrSetter = (Callable) method;
+                boolean isSetter = getterSetter == 1;
+                clazz.setGetterOrSetter(nameInt, 0, getterOrSetter, isSetter);
+                clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.DONTENUM);
+            }
         } else if (isSymbol(name)) {
-            Symbol symbolName = (Symbol) name;
-            ScriptableObject.putProperty(clazz, symbolName, method);
-            clazz.setAttributes(symbolName, clazz.getAttributes(symbolName) | ScriptableObject.DONTENUM);
+            Symbol nameSymbol = ((Symbol) name);
+            if (getterSetter == 0) {
+                clazz.put(nameSymbol, clazz, method);
+                clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.DONTENUM);
+            } else {
+                Callable getterOrSetter = (Callable) method;
+                boolean isSetter = getterSetter == 1;
+                clazz.setGetterOrSetter(nameSymbol, 0, getterOrSetter, isSetter);
+                clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.DONTENUM);
+            }
         } else {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }
@@ -817,18 +831,6 @@ public class ScriptRuntime {
         instance.setPrototype(ScriptableObject.ensureScriptable(ScriptableObject.getProperty(clazz, "prototype")));
 
         return instance;
-//        Object appliedProto = ScriptableObject.callMethod(proto, "apply", new Object[]{ thisObj, cx.newArray(thisObj, args) });
-//
-//        if (appliedProto instanceof ScriptableObject) {
-//            return appliedProto;
-//        }
-//
-//        if (Undefined.isUndefined(thisObj)) {
-//            // TODO: Error
-//            throw Kit.codeBug();
-//        }
-//
-//        return thisObj;
     }
 
     public static Object setClassExtends(Object clazzObj, Object extendedObj, Context cx, Scriptable scope) {
@@ -844,6 +846,8 @@ public class ScriptRuntime {
         ScriptableObject.putProperty(clazz, "prototype", newObject);
 
         clazz.setPrototype(extended);
+
+        ScriptableObject.putProperty(clazz, SymbolKey.SPECIES, clazz);
 
         return clazz;
     }

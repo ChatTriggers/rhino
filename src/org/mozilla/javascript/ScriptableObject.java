@@ -769,16 +769,86 @@ public abstract class ScriptableObject implements Scriptable,
         findAttributeSlot(key, SlotAccess.MODIFY).setAttributes(attributes);
     }
 
-    /**
-     * XXX: write docs.
-     */
-    public void setGetterOrSetter(String name, int index,
-                                  Callable getterOrSetter, boolean isSetter) {
+    public void setGetterOrSetter(int name, int index, Callable getterOrSetter, boolean isSetter) {
         setGetterOrSetter(name, index, getterOrSetter, isSetter, false);
     }
 
-    private void setGetterOrSetter(String name, int index, Callable getterOrSetter,
-                                   boolean isSetter, boolean force) {
+    private void setGetterOrSetter(int name, int index, Callable getterOrSetter, boolean isSetter, boolean force) {
+        if (index != 0)
+            throw new IllegalArgumentException(String.valueOf(name));
+
+        if (!force) {
+            checkNotSealed(name, index);
+        }
+
+        final GetterSlot gslot;
+        if (isExtensible()) {
+            gslot = (GetterSlot) slotMap.get(name, index, SlotAccess.MODIFY_GETTER_SETTER);
+        } else {
+            Slot slot = slotMap.query(name, index);
+            if (!(slot instanceof GetterSlot))
+                return;
+            gslot = (GetterSlot) slot;
+        }
+
+        if (!force) {
+            int attributes = gslot.getAttributes();
+            if ((attributes & READONLY) != 0) {
+                throw Context.reportRuntimeError1("msg.modify.readonly", name);
+            }
+        }
+        if (isSetter) {
+            gslot.setter = getterOrSetter;
+        } else {
+            gslot.getter = getterOrSetter;
+        }
+        gslot.value = Undefined.instance;
+    }
+
+    public void setGetterOrSetter(Symbol name, int index, Callable getterOrSetter, boolean isSetter) {
+        setGetterOrSetter(name, index, getterOrSetter, isSetter, false);
+    }
+
+    private void setGetterOrSetter(Symbol name, int index, Callable getterOrSetter, boolean isSetter, boolean force) {
+        if (name != null && index != 0)
+            throw new IllegalArgumentException(name.toString());
+
+        if (!force) {
+            checkNotSealed(name, index);
+        }
+
+        final GetterSlot gslot;
+        if (isExtensible()) {
+            gslot = (GetterSlot) slotMap.get(name, index, SlotAccess.MODIFY_GETTER_SETTER);
+        } else {
+            Slot slot = slotMap.query(name, index);
+            if (!(slot instanceof GetterSlot))
+                return;
+            gslot = (GetterSlot) slot;
+        }
+
+        if (!force) {
+            int attributes = gslot.getAttributes();
+            if ((attributes & READONLY) != 0) {
+                throw Context.reportRuntimeError1("msg.modify.readonly", name);
+            }
+        }
+        if (isSetter) {
+            gslot.setter = getterOrSetter;
+        } else {
+            gslot.getter = getterOrSetter;
+        }
+        gslot.value = Undefined.instance;
+    }
+
+    /**
+     * XXX: write docs.
+     */
+    public void setGetterOrSetter(String name, int index, Callable getterOrSetter, boolean isSetter) {
+        setGetterOrSetter(name, index, getterOrSetter, isSetter, false);
+    }
+
+    private void setGetterOrSetter(String name, int index, Callable getterOrSetter, boolean isSetter, boolean force) {
         if (name != null && index != 0)
             throw new IllegalArgumentException(name);
 
