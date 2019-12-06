@@ -61,22 +61,6 @@ public class FunctionNode extends ScriptNode {
     public static final int FUNCTION_EXPRESSION_STATEMENT = 3;
     public static final int ARROW_FUNCTION = 4;
 
-    public boolean isCallable() {
-        return isCallable;
-    }
-
-    public void setCallable(boolean callable) {
-        isCallable = callable;
-    }
-
-    public boolean isStatic() {
-        return isStatic;
-    }
-
-    public void setStatic(boolean aStatic) {
-        isStatic = aStatic;
-    }
-
     public enum Form {FUNCTION, GETTER, SETTER, METHOD}
 
     private static final List<AstNode> NO_PARAMS = Collections.unmodifiableList(new ArrayList<>());
@@ -91,7 +75,7 @@ public class FunctionNode extends ScriptNode {
     private AstNode body;
     private boolean isExpressionClosure;
     private boolean isConstructable = true;
-    private boolean isCallable = true;
+    private boolean isClassConstructor = false;
     private boolean isStatic = false;
     private Form functionForm = Form.FUNCTION;
     private int lp = -1;
@@ -317,6 +301,22 @@ public class FunctionNode extends ScriptNode {
 
     public void setConstructable(boolean constructable) {
         isConstructable = constructable;
+    }
+
+    public boolean isClassConstructor() {
+        return isClassConstructor;
+    }
+
+    public void setClassConstructor(boolean classConstructor) {
+        isClassConstructor = classConstructor;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
+    }
+
+    public void setStatic(boolean aStatic) {
+        isStatic = aStatic;
     }
 
     /**

@@ -804,17 +804,43 @@ public class ScriptRuntime {
         return clazzObj;
     }
 
-    public static Object setClassExtends(Object clazzObj, Object extended, Context cx, Scriptable scope) {
-        ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
-        ScriptableObject obj = ScriptableObject.ensureScriptableObject(extended);
+    public static Object initCtorReturn(NativeFunction clazz, Scriptable thisObj, Object[] args, Context cx) {
+        Scriptable proto = clazz.getPrototype();
 
-        Object clazzProto = ScriptableObject.getProperty(clazz, "prototype");
-        if (clazzProto instanceof Scriptable) {
-            ((Scriptable) clazzProto).setPrototype((Scriptable) ScriptableObject.getProperty(obj, "prototype"));
+        if (!(proto instanceof Function)) {
+            // TODO: Error
+            throw Kit.codeBug();
         }
-        clazz.setPrototype(obj);
 
-        return clazzObj;
+        Object appliedProto = ScriptableObject.callMethod(proto, "apply", new Object[]{ thisObj, cx.newArray(thisObj, args) });
+
+        if (appliedProto instanceof ScriptableObject) {
+            return appliedProto;
+        }
+
+        if (Undefined.isUndefined(thisObj)) {
+            // TODO: Error
+            throw Kit.codeBug();
+        }
+
+        return thisObj;
+    }
+
+    public static Object setClassExtends(Object clazzObj, Object extendedObj, Context cx, Scriptable scope) {
+        ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
+        ScriptableObject extended = ScriptableObject.ensureScriptableObject(extendedObj);
+
+        Scriptable extendedProto = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(extended, "prototype"));
+
+        ScriptableObject newObject = new NativeObject();
+        newObject.setParentScope(scope);
+        newObject.setPrototype(extendedProto);
+        newObject.defineProperty("constructor", clazz, ScriptableObject.DONTENUM);
+        ScriptableObject.putProperty(clazz, "prototype", newObject);
+
+        clazz.setPrototype(extended);
+
+        return clazz;
     }
 
     public static Object[] combineSpreadArgs(Object[] args, Context cx, Scriptable scope) {

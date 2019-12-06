@@ -369,6 +369,10 @@ public class Codegen implements Evaluator {
             bodygen.scriptOrFn = n;
             bodygen.scriptOrFnIndex = i;
 
+            if (n instanceof FunctionNode && ((FunctionNode) n).isClassConstructor()) {
+                bodygen.currentCtorClass = true;
+            }
+
             bodygen.generateBodyCode();
 
             if (n.getType() == Token.FUNCTION) {
@@ -599,7 +603,7 @@ public class Codegen implements Evaluator {
                 OptFunctionNode ofn = OptFunctionNode.get(n);
                 FunctionNode fnode = ofn.fnode;
 
-                if (!fnode.isCallable()) {
+                if (fnode.isClassConstructor()) {
                     // This is a class - check for the existence of
                     // "new.target" to see if this function was invoked
                     // with "new", and throw an error if not
@@ -2148,7 +2152,18 @@ class BodyCodegen {
                     if (child != null) {
                         generateExpression(child, node);
                     } else if (type == Token.RETURN) {
-                        Codegen.pushUndefined(cfw);
+                        if (!currentCtorClass) {
+                            Codegen.pushUndefined(cfw);
+                        } else {
+                            cfw.addALoad(funObjLocal);
+                            cfw.addALoad(thisObjLocal);
+                            cfw.addALoad(argsLocal);
+                            cfw.addALoad(contextLocal);
+                            addScriptRuntimeInvoke(
+                                    "initCtorReturn",
+                                    "(Lorg/mozilla/javascript/NativeFunction;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;"
+                            );
+                        }
                     } else {
                         if (popvLocal < 0) throw Codegen.badTree();
                         cfw.addALoad(popvLocal);
@@ -5923,6 +5938,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     static final int GENERATOR_START = 0;
     static final int GENERATOR_YIELD_START = 1;
 
+    boolean currentCtorClass = false;
     ClassFileWriter cfw;
     Codegen codegen;
     CompilerEnvirons compilerEnv;

@@ -327,8 +327,7 @@ public class BaseFunction extends IdScriptableObject implements Function {
 
             case Id_apply:
             case Id_call:
-                return ScriptRuntime.applyOrCall(id == Id_apply,
-                        cx, scope, thisObj, args);
+                return ScriptRuntime.applyOrCall(id == Id_apply, cx, scope, thisObj, args);
 
             case Id_bind:
                 if (!(thisObj instanceof Callable)) {
