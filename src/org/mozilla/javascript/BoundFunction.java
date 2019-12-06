@@ -61,6 +61,23 @@ public class BoundFunction extends BaseFunction {
     }
 
     @Override
+    public Object getForcedNewTarget() {
+        if (targetFunction instanceof BaseFunction) {
+            return ((BaseFunction) targetFunction).getForcedNewTarget();
+        }
+        throw ScriptRuntime.typeError0("msg.not.ctor");
+    }
+
+    @Override
+    public void setForcedNewTarget(Object forcedNewTarget) {
+        if (targetFunction instanceof BaseFunction) {
+            ((BaseFunction) targetFunction).setForcedNewTarget(forcedNewTarget);
+            return;
+        }
+        throw ScriptRuntime.typeError0("msg.not.ctor");
+    }
+
+    @Override
     public boolean hasInstance(Scriptable instance) {
         if (targetFunction instanceof Function) {
             return ((Function) targetFunction).hasInstance(instance);

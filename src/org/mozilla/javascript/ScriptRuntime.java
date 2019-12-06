@@ -765,7 +765,7 @@ public class ScriptRuntime {
         Scriptable obj = ScriptableObject.ensureScriptable(thisObj);
 
         if (obj.has("new.target", obj)) {
-            return constructor;
+            return obj.get("new.target", obj);
         }
 
         return Undefined.instance;
@@ -826,11 +826,19 @@ public class ScriptRuntime {
             throw Kit.codeBug();
         }
 
+        Object newTarget = thisObj.get("new.target", thisObj);
         BoundFunction ctor = new BoundFunction(cx, scope, (Callable) proto, null, args);
+        ctor.setForcedNewTarget(newTarget);
         Scriptable instance = ctor.construct(cx, scope, new Object[]{});
         instance.setPrototype(ScriptableObject.ensureScriptable(ScriptableObject.getProperty(clazz, "prototype")));
+        instance.put("new.target", instance, newTarget);
 
         return instance;
+    }
+
+    public static Scriptable endClassCtor(Scriptable obj) {
+        obj.delete("new.target");
+        return obj;
     }
 
     public static Object setClassExtends(Object clazzObj, Object extendedObj, Context cx, Scriptable scope) {

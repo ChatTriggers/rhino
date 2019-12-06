@@ -1928,8 +1928,14 @@ class BodyCodegen {
         }
 
         if (hasVarsInRegs && !isGenerator) {
+            if (currentCtorClass) {
+                addScriptRuntimeInvoke(
+                        "endClassCtor",
+                        "(Lorg/mozilla/javascript/Scriptable;)Lorg/mozilla/javascript/Scriptable;"
+                );
+            }
+
             cfw.add(ByteCode.ARETURN);
-            return;
         } else if (isGenerator) {
             // Generate final yield point, which returns the function's
             // return value of the form:

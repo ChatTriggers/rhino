@@ -395,7 +395,12 @@ public class BaseFunction extends IdScriptableObject implements Function {
     public Scriptable construct(Context cx, Scriptable scope, Object[] args) {
         Scriptable result = createObject(cx, scope);
         if (result != null) {
-            result.put("new.target", result, result);
+            if (getForcedNewTarget() != null) {
+                result.put("new.target", result, getForcedNewTarget());
+                setForcedNewTarget(null);
+            } else {
+                result.put("new.target", result, this);
+            }
             Object val = call(cx, scope, result, args);
             result.delete("new.target");
             if (val instanceof Scriptable) {
@@ -539,6 +544,14 @@ public class BaseFunction extends IdScriptableObject implements Function {
                 : activation.get("arguments", activation);
     }
 
+    public Object getForcedNewTarget() {
+        return forcedNewTarget;
+    }
+
+    public void setForcedNewTarget(Object forcedNewTarget) {
+        this.forcedNewTarget = forcedNewTarget;
+    }
+
     private static Object jsConstructor(Context cx, Scriptable scope,
                                         Object[] args) {
         int arglen = args.length;
@@ -653,6 +666,8 @@ public class BaseFunction extends IdScriptableObject implements Function {
 
     private Object prototypeProperty;
     private Object argumentsObj = NOT_FOUND;
+
+    private Object forcedNewTarget;
 
     // For function object instances, attributes are
     //  {configurable:false, enumerable:false};
