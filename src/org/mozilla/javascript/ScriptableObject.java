@@ -3102,25 +3102,27 @@ public abstract class ScriptableObject implements Scriptable,
      * change their order, but simply move all the numeric properties to the front, since this
      * method is defined to be stable.
      */
-    public static final class KeyComparator
-            implements Comparator<Object> {
+    public static final class KeyComparator implements Comparator<Object> {
         @Override
         public int compare(Object o1, Object o2) {
-            if (o1 instanceof Integer) {
-                if (o2 instanceof Integer) {
+            if (ScriptRuntime.isSymbol(o1)) {
+                if (ScriptRuntime.isSymbol(o2)) {
+                    return 0;
+                }
+                return 1;
+            }
+            if (ScriptRuntime.isSymbol(o2)) {
+                return -1;
+            }
+            if (o1 instanceof Integer && (Integer) o1 >= 0) {
+                if (o2 instanceof Integer && (Integer) o2 >= 0) {
                     int i1 = (Integer) o1;
                     int i2 = (Integer) o2;
-                    if (i1 < i2) {
-                        return -1;
-                    }
-                    if (i1 > i2) {
-                        return 1;
-                    }
-                    return 0;
+                    return Integer.compare(i1, i2);
                 }
                 return -1;
             }
-            if (o2 instanceof Integer) {
+            if (o2 instanceof Integer && (Integer) o2 >= 0) {
                 return 1;
             }
             return 0;
