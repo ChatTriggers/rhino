@@ -683,7 +683,9 @@ public final class IRFactory extends Parser {
         Node call = createCallOrNew(Token.CALL, transform(node.getTarget()));
 
         if (node.getProp(Node.CHAINING_PROP) != null) {
-            call.putProp(Node.CHAINING_PROP, true);
+            call.putProp(Node.CHAINING_PROP, node.getProp(Node.CHAINING_PROP));
+        } else if (node.getProp(Node.SPREAD_PROP) != null) {
+            call.putProp(Node.SPREAD_PROP, node.getProp(Node.SPREAD_PROP));
         }
 
         call.setLineno(node.getLineno());

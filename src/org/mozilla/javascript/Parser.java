@@ -2776,6 +2776,13 @@ public class Parser {
         int tt = peekToken(), lineno = ts.lineno;
         AstNode pn;
 
+        boolean spread = false;
+        if (tt == Token.SPREAD) {
+            spread = true;
+            consumeToken();
+            tt = peekToken();
+        }
+
         if (tt != Token.NEW) {
             pn = primaryExpr();
         } else {
@@ -2829,7 +2836,15 @@ public class Parser {
             pn = nx;
         }
         pn.setLineno(lineno);
-        return memberExprTail(allowCallSyntax, pn);
+        AstNode tail = memberExprTail(allowCallSyntax, pn);
+
+        if (spread) {
+            if (tail == null) throw Kit.codeBug();
+
+            tail.putProp(Node.SPREAD_PROP, true);
+        }
+
+        return tail;
     }
 
     /**
@@ -3170,13 +3185,6 @@ public class Parser {
         int ttFlagged = peekFlaggedToken();
         int tt = ttFlagged & CLEAR_TI_MASK;
 
-        boolean spread = false;
-        if (tt == Token.SPREAD) {
-            spread = true;
-            consumeToken();
-            tt = nextToken();
-        }
-
         AstNode pn = null;
 
         switch (tt) {
@@ -3301,12 +3309,6 @@ public class Parser {
                 consumeToken();
                 reportError("msg.syntax");
                 break;
-        }
-
-        if (spread) {
-            if (pn == null) throw Kit.codeBug();
-
-            pn.putProp(Node.SPREAD_PROP, true);
         }
 
         return pn;
