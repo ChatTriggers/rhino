@@ -94,6 +94,15 @@ public class BoundFunction extends BaseFunction {
         return length;
     }
 
+    @Override
+    public String getFunctionName() {
+        if (targetFunction instanceof BaseFunction) {
+            return "bound " + ((BaseFunction) targetFunction).getFunctionName();
+        }
+
+        return "";
+    }
+
     private Object[] concat(Object[] first, Object[] second) {
         Object[] args = new Object[first.length + second.length];
         System.arraycopy(first, 0, args, 0, first.length);
