@@ -639,6 +639,8 @@ public final class IRFactory extends Parser {
         }
     }
 
+    public static Object GENERATED_SUPER = new Object();
+
     private Node transformClass(ClassNode node) {
         if (node.getExtendsName() != null) {
             node.setExtended(transform(node.getExtendsName()));
@@ -653,7 +655,7 @@ public final class IRFactory extends Parser {
                 FunctionCall superCall = new FunctionCall();
                 Name superName = new Name();
                 superName.setString("super");
-                superName.putProp(Node.SUPER_PROP, true);
+                superName.putProp(Node.SUPER_PROP, GENERATED_SUPER);
                 superCall.setTarget(superName);
                 ExpressionStatement expr = new ExpressionStatement(superCall);
                 body.addStatement(expr);

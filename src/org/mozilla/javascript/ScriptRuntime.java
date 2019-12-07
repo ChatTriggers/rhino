@@ -771,11 +771,17 @@ public class ScriptRuntime {
         return Undefined.instance;
     }
 
+    public static final Object SUPER_KEY = new Object();
+
     public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter) {
         ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
 
         if (instance) {
             clazz = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(clazz, "prototype"));
+        }
+
+        if (method instanceof ScriptableObject) {
+            ((ScriptableObject) method).associateValue(SUPER_KEY, clazz.getPrototype());
         }
 
         if (name instanceof String) {
@@ -850,14 +856,14 @@ public class ScriptRuntime {
         return instance;
     }
 
-    public static Object accessSuper(Object prop, Scriptable thisObj) {
-        Scriptable ctor = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(thisObj.getPrototype(), "constructor"));
-        Scriptable superProto = ScriptableObject.ensureScriptable(ctor.getPrototype().get("prototype", ctor));
+    public static Object accessSuper(Object prop, Scriptable thisObj, NativeFunction method) {
+        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(method.getAssociatedValue(SUPER_KEY));
+
         return ScriptableObject.getProperty(superProto, prop);
     }
 
-    public static Object callSuperProp(Object prop, Object[] args, Scriptable scope, Scriptable thisObj, Context cx) {
-        Scriptable method = ScriptableObject.ensureScriptable(accessSuper(prop, thisObj));
+    public static Object callSuperProp(Object prop, Object[] args, Scriptable scope, Scriptable thisObj, NativeFunction nativeFunction, Context cx) {
+        Scriptable method = ScriptableObject.ensureScriptable(accessSuper(prop, thisObj, nativeFunction));
 
         if (!(method instanceof Callable)) {
             // TODO: Error

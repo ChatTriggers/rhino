@@ -2727,7 +2727,8 @@ class BodyCodegen {
                 if (child.getProp(Node.SUPER_PROP) != null) {
                     generateExpression(child.getNext(), node);
                     cfw.addALoad(thisObjLocal);
-                    addScriptRuntimeInvoke("accessSuper", OBJECT, OBJECT, SCRIPTABLE);
+                    cfw.addALoad(funObjLocal);
+                    addScriptRuntimeInvoke("accessSuper", OBJECT, OBJECT, SCRIPTABLE, NATIVE_FUNCTION);
                     return;
                 }
 
@@ -3540,7 +3541,11 @@ class BodyCodegen {
                 // name() call
                 if (child.getProp(Node.SUPER_PROP) != null) {
                     boolean isReturned = node.getNext() != null && node.getNext().getType() == Token.RETURN;
-                    cfw.add(ByteCode.ACONST_NULL);
+                    if (child.getProp(Node.SUPER_PROP) == IRFactory.GENERATED_SUPER) {
+                        cfw.addALoad(argsLocal);
+                    } else {
+                        cfw.add(ByteCode.ACONST_NULL);
+                    }
                     cfw.addPush(isReturned);
                     cfw.addALoad(funObjLocal);
                     cfw.addALoad(thisObjLocal);
@@ -3570,8 +3575,9 @@ class BodyCodegen {
                     cfw.add(ByteCode.ACONST_NULL);
                     cfw.addALoad(variableObjectLocal);
                     cfw.addALoad(thisObjLocal);
+                    cfw.addALoad(funObjLocal);
                     cfw.addALoad(contextLocal);
-                    addScriptRuntimeInvoke("callSuperProp", OBJECT, OBJECT, OBJECT_ARRAY, SCRIPTABLE, SCRIPTABLE, CONTEXT);
+                    addScriptRuntimeInvoke("callSuperProp", OBJECT, OBJECT, OBJECT_ARRAY, SCRIPTABLE, SCRIPTABLE, NATIVE_FUNCTION, CONTEXT);
                     return;
                 }
 
@@ -3639,8 +3645,9 @@ class BodyCodegen {
                 generateCallArgArray(node, firstArgChild, false);
                 cfw.addALoad(variableObjectLocal);
                 cfw.addALoad(thisObjLocal);
+                cfw.addALoad(funObjLocal);
                 cfw.addALoad(contextLocal);
-                addScriptRuntimeInvoke("callSuperProp", OBJECT, OBJECT, OBJECT_ARRAY, SCRIPTABLE, SCRIPTABLE, CONTEXT);
+                addScriptRuntimeInvoke("callSuperProp", OBJECT, OBJECT, OBJECT_ARRAY, SCRIPTABLE, SCRIPTABLE, NATIVE_FUNCTION, CONTEXT);
                 return;
             }
 
@@ -5262,7 +5269,8 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         if (child.getProp(Node.SUPER_PROP) != null) {
             generateExpression(child.getNext(), node);
             cfw.addALoad(thisObjLocal);
-            addScriptRuntimeInvoke("accessSuper", OBJECT, OBJECT, SCRIPTABLE);
+            cfw.addALoad(funObjLocal);
+            addScriptRuntimeInvoke("accessSuper", OBJECT, OBJECT, SCRIPTABLE, NATIVE_FUNCTION);
             return;
         }
 
