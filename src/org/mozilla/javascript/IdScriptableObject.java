@@ -821,6 +821,20 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
     protected void fillConstructorProperties(IdFunctionObject ctor) {
     }
 
+    protected void addCtorSpecies(IdFunctionObject ctor) {
+        NativeObject desc = new NativeObject();
+        ScriptableObject.defineProperty(desc, "configurable", true, 0);
+        ScriptableObject.defineProperty(desc, "enumerable", false, 0);
+        ScriptableObject.defineProperty(desc, "get", new BaseFunction() {
+            @Override
+            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                return ctor;
+            }
+        }, 0);
+
+        ctor.defineOwnProperty(Context.getContext(), SymbolKey.SPECIES, desc, true);
+    }
+
     protected void addIdFunctionProperty(Scriptable obj, Object tag, int id, String name, int arity) {
         Scriptable scope = ScriptableObject.getTopLevelScope(obj);
         IdFunctionObject f = newIdFunction(tag, id, name, arity, scope);

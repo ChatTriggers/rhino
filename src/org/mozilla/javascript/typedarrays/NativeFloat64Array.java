@@ -42,6 +42,11 @@ public class NativeFloat64Array
     }
 
     @Override
+    protected void fillConstructorProperties(IdFunctionObject ctor) {
+        addCtorSpecies(ctor);
+    }
+
+    @Override
     protected NativeFloat64Array construct(NativeArrayBuffer ab, int off, int len) {
         return new NativeFloat64Array(ab, off, len);
     }

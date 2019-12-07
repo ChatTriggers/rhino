@@ -13,8 +13,7 @@ import org.mozilla.javascript.*;
  * It also implements List&lt;Float&gt; for direct manipulation in Java.
  */
 
-public class NativeFloat32Array
-        extends NativeTypedArrayView<Float> {
+public class NativeFloat32Array extends NativeTypedArrayView<Float> {
     private static final long serialVersionUID = -8963461831950499340L;
 
     private static final String CLASS_NAME = "Float32Array";
@@ -39,6 +38,11 @@ public class NativeFloat32Array
     public static void init(Context cx, Scriptable scope, boolean sealed) {
         NativeFloat32Array a = new NativeFloat32Array();
         a.exportAsJSClass(MAX_PROTOTYPE_ID, scope, sealed);
+    }
+
+    @Override
+    protected void fillConstructorProperties(IdFunctionObject ctor) {
+        addCtorSpecies(ctor);
     }
 
     @Override

@@ -45,6 +45,11 @@ public class NativeUint16Array
     }
 
     @Override
+    protected void fillConstructorProperties(IdFunctionObject ctor) {
+        addCtorSpecies(ctor);
+    }
+
+    @Override
     protected NativeUint16Array construct(NativeArrayBuffer ab, int off, int len) {
         return new NativeUint16Array(ab, off, len);
     }

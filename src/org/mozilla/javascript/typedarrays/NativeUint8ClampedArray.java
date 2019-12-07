@@ -45,6 +45,11 @@ public class NativeUint8ClampedArray
     }
 
     @Override
+    protected void fillConstructorProperties(IdFunctionObject ctor) {
+        addCtorSpecies(ctor);
+    }
+
+    @Override
     protected NativeUint8ClampedArray construct(NativeArrayBuffer ab, int off, int len) {
         return new NativeUint8ClampedArray(ab, off, len);
     }

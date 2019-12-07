@@ -197,6 +197,7 @@ public class NativeArrayBuffer extends IdScriptableObject {
     @Override
     protected void fillConstructorProperties(IdFunctionObject ctor) {
         addIdFunctionProperty(ctor, CLASS_NAME, ConstructorId_isView, "isView", 1);
+        addCtorSpecies(ctor);
     }
 
     // Properties here

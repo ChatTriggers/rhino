@@ -1965,9 +1965,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param desc       the new property descriptor, as described in 8.6.1
      * @param checkValid whether to perform validity checks
      */
-    protected void defineOwnProperty(Context cx, Object id, ScriptableObject desc,
-                                     boolean checkValid) {
-
+    protected void defineOwnProperty(Context cx, Object id, ScriptableObject desc, boolean checkValid) {
         Slot slot = getSlot(cx, id, SlotAccess.QUERY);
         boolean isNew = slot == null;
 

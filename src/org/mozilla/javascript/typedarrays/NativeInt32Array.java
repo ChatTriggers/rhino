@@ -36,6 +36,11 @@ public class NativeInt32Array
         return CLASS_NAME;
     }
 
+    @Override
+    protected void fillConstructorProperties(IdFunctionObject ctor) {
+        addCtorSpecies(ctor);
+    }
+
     public static void init(Context cx, Scriptable scope, boolean sealed) {
         NativeInt32Array a = new NativeInt32Array();
         a.exportAsJSClass(MAX_PROTOTYPE_ID, scope, sealed);

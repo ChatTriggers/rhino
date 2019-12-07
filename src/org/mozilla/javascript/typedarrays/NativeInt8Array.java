@@ -43,6 +43,11 @@ public class NativeInt8Array extends NativeTypedArrayView<Byte> {
     }
 
     @Override
+    protected void fillConstructorProperties(IdFunctionObject ctor) {
+        addCtorSpecies(ctor);
+    }
+
+    @Override
     protected NativeInt8Array construct(NativeArrayBuffer ab, int off, int len) {
         return new NativeInt8Array(ab, off, len);
     }

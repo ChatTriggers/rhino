@@ -44,6 +44,11 @@ public class NativeUint8Array
     }
 
     @Override
+    protected void fillConstructorProperties(IdFunctionObject ctor) {
+        addCtorSpecies(ctor);
+    }
+
+    @Override
     protected NativeUint8Array construct(NativeArrayBuffer ab, int off, int len) {
         return new NativeUint8Array(ab, off, len);
     }

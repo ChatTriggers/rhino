@@ -40,6 +40,11 @@ public class NativeMap extends IdScriptableObject {
     }
 
     @Override
+    protected void fillConstructorProperties(IdFunctionObject ctor) {
+        addCtorSpecies(ctor);
+    }
+
+    @Override
     public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope,
                              Scriptable thisObj, Object[] args) {
         if (!f.hasTag(MAP_TAG)) {
