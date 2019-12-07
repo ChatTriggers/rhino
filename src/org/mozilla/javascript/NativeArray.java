@@ -471,7 +471,11 @@ public class NativeArray extends IdScriptableObject implements List {
                 case Id_values:
                 case SymbolId_iterator:
                     thisObj = ScriptRuntime.toObject(cx, scope, thisObj);
-                    return new NativeArrayIterator(scope, thisObj, NativeArrayIterator.ARRAY_ITERATOR_TYPE.VALUES);
+                    NativeArrayIterator.ARRAY_ITERATOR_TYPE type = NativeArrayIterator.ARRAY_ITERATOR_TYPE.VALUES;
+                    if (args.length > 0 && args[0] instanceof Boolean && (boolean) args[0]) {
+                        type = NativeArrayIterator.ARRAY_ITERATOR_TYPE.KEYS;
+                    }
+                    return new NativeArrayIterator(scope, thisObj, type);
             }
             throw new IllegalArgumentException("Array.prototype has no method: " + f.getFunctionName());
         }

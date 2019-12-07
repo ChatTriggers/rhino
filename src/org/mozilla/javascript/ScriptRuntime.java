@@ -923,7 +923,7 @@ public class ScriptRuntime {
             if (arg instanceof Object[]) {
                 totalArgs += ((Object[]) arg).length;
             } else if (arg instanceof Scriptable) {
-                ES6Iterator it = toIterator(cx, scope, (Scriptable) arg, true);
+                ES6Iterator it = toIterator(cx, scope, (Scriptable) arg, false);
                 if (it == null) {
                     throw typeError0("msg.invalid.iterator");
                 }
@@ -2524,8 +2524,14 @@ public class ScriptRuntime {
             Callable f = (Callable) v;
             Context cx = Context.getContext();
             try {
-                x.currentId = f.call(cx, x.iterator.getParentScope(),
-                        x.iterator, emptyArgs);
+                Object result = f.call(cx, x.iterator.getParentScope(), x.iterator, emptyArgs);
+                if (result instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) result, "done")) {
+                    x.currentId = ScriptableObject.getProperty((Scriptable) result, "value");
+                    Object done = ScriptableObject.getProperty((Scriptable) result, "done");
+                    return !(done instanceof Boolean && (boolean) done);
+                }
+
+                x.currentId = result;
                 return Boolean.TRUE;
             } catch (JavaScriptException e) {
                 if (e.getValue() instanceof NativeIterator.StopIteration) {
