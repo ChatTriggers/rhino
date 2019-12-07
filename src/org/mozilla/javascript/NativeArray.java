@@ -950,7 +950,7 @@ public class NativeArray extends IdScriptableObject implements List {
                 String msg = ScriptRuntime.getMessage0("msg.arraylength.bad");
                 throw ScriptRuntime.constructError("RangeError", msg);
             }
-            return (int) NativeNumber.MAX_SAFE_INTEGER;
+            return (long) NativeNumber.MAX_SAFE_INTEGER;
         }
         if (doubleLen < 0) {
             return 0;
