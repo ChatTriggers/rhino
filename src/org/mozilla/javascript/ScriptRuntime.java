@@ -899,7 +899,17 @@ public class ScriptRuntime {
 
         clazz.setPrototype(extended);
 
-        ScriptableObject.putProperty(clazz, SymbolKey.SPECIES, clazz);
+        NativeObject desc = new NativeObject();
+        ScriptableObject.defineProperty(desc, "configurable", true, 0);
+        ScriptableObject.defineProperty(desc, "enumerable", false, 0);
+        ScriptableObject.defineProperty(desc, "get", new BaseFunction() {
+            @Override
+            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                return clazz;
+            }
+        }, 0);
+
+        clazz.defineOwnProperty(Context.getContext(), SymbolKey.SPECIES, desc, true);
 
         return clazz;
     }
