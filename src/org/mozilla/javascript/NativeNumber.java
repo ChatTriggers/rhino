@@ -81,8 +81,8 @@ final class NativeNumber extends IdScriptableObject {
 
         Object parseFloat = ScriptableObject.getProperty(global, "parseFloat");
         Object parseInt = ScriptableObject.getProperty(global, "parseInt");
-        ScriptableObject.putProperty(ctor, "parseFloat", parseFloat);
-        ScriptableObject.putProperty(ctor, "parseInt", parseInt);
+        ctor.defineProperty("parseFloat", parseFloat, DONTENUM);
+        ctor.defineProperty("parseInt", parseInt, DONTENUM);
 
         super.fillConstructorProperties(ctor);
     }
