@@ -1416,8 +1416,7 @@ public class NativeArray extends IdScriptableObject implements List {
         return setLengthProperty(thisObj, length);
     }
 
-    private static Object js_splice(Context cx, Scriptable scope,
-                                    Scriptable thisObj, Object[] args) {
+    private static Object js_splice(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         NativeArray na = null;
         boolean denseMode = false;
         if (thisObj instanceof NativeArray) {
@@ -1487,7 +1486,10 @@ public class NativeArray extends IdScriptableObject implements List {
                     if (species == null) {
                         result = cx.newArray(scope, copy);
                     } else {
-                        result = species.construct(cx, scope, copy);
+                        result = species.construct(cx, scope, new Object[]{});
+                        for (int i = 0; i < copy.length; i++) {
+                            ScriptableObject.putProperty(ScriptableObject.ensureScriptable(result), i, copy[i]);
+                        }
                     }
                 } else {
 
@@ -1642,15 +1644,25 @@ public class NativeArray extends IdScriptableObject implements List {
             if (obj instanceof ScriptableObject) {
                 ScriptableObject ctorDesc = ((ScriptableObject) obj).getOwnPropertyDescriptor(Context.getContext(), "constructor");
 
-                if (ctorDesc != null && ScriptableObject.hasProperty(ctorDesc, "getter") && !Undefined.isUndefined(ScriptableObject.getProperty(ctorDesc, "getter"))) {
+                if (ctorDesc != null && ScriptableObject.hasProperty(ctorDesc, "get") && !Undefined.isUndefined(ScriptableObject.getProperty(ctorDesc, "get"))) {
                     return null;
                 }
             }
 
-            Scriptable ctor = ScriptableObject.ensureScriptable(obj);
+            Object ctorObj = ScriptableObject.getProperty(obj, "constructor");
+
+            if (Undefined.isUndefined(ctorObj)) {
+                return null;
+            }
+
+            Scriptable ctor = ScriptableObject.ensureScriptable(ctorObj);
 
             if (ScriptableObject.hasProperty(ctor, SymbolKey.SPECIES)) {
                 Object species = ScriptableObject.getProperty(ctor, SymbolKey.SPECIES);
+
+                if (Undefined.isUndefined(species) || species == null) {
+                    return null;
+                }
 
                 if (!(species instanceof BaseFunction)) {
                     // TODO: Error
@@ -1700,7 +1712,7 @@ public class NativeArray extends IdScriptableObject implements List {
             scope = getTopLevelScope(scope);
             result = cx.newArray(scope, 0);
         } else {
-            result = species.construct(cx, scope, args);
+            result = species.construct(cx, scope, new Object[]{});
         }
 
         long len = getLengthProperty(thisObj, false, false);
@@ -2066,7 +2078,7 @@ public class NativeArray extends IdScriptableObject implements List {
                 scope = getTopLevelScope(scope);
                 array = cx.newArray(scope, resultLength);
             } else {
-                array = species.construct(cx, scope, args);
+                array = species.construct(cx, scope, new Object[]{});
             }
         }
         long j = 0;
@@ -2074,7 +2086,10 @@ public class NativeArray extends IdScriptableObject implements List {
             Object[] innerArgs = new Object[3];
             Object elem = getRawElem(o, i);
             if (elem == Scriptable.NOT_FOUND) {
-                if (id == Id_find || id == Id_findIndex) {
+                if (id == Id_map) {
+                    defineElem(array, i, Undefined.instance);
+                    continue;
+                } else if (id == Id_find || id == Id_findIndex) {
                     elem = Undefined.instance;
                 } else {
                     continue;
