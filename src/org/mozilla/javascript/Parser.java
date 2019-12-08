@@ -3472,14 +3472,16 @@ public class Parser {
             } else if (tt == Token.SPREAD) {
                 consumeToken();
                 AstNode expr = assignExpr();
-                if (expr instanceof Assignment) {
+                if (inDestructuringAssignment && expr instanceof Assignment) {
                     reportError("msg.rest.no.defaults");
                 }
                 expr.putProp(Node.SPREAD_PROP, true);
                 elements.add(expr);
                 after_lb_or_comma = false;
                 afterComma = -1;
-                if (peekToken() == Token.COMMA) {
+
+                if (inDestructuringAssignment && peekToken() == Token.COMMA) {
+                    // If we're destructuring (not spreading!), a rest element needs to be last.
                     reportError("msg.rest.not.last");
                 }
             } else if (tt == Token.EOF) {
