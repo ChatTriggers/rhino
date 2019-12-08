@@ -145,6 +145,10 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
                 arity = 1;
                 s = "sort";
                 break;
+            case Id_includes:
+                arity = 1;
+                s = "includes";
+                break;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -320,6 +324,11 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
                         scope,
                         thisObj,
                         args.length > 0 ? args[0] : null
+                );
+            case Id_includes:
+                return realThis(thisObj, f).js_includes(
+                        args.length >= 1 ? args[0] : Undefined.instance,
+                        args.length >= 2 ? (int) ScriptRuntime.toNumber(args[1]) : 0
                 );
             case Id_keys:
                 return new NativeArrayIterator(scope, thisObj, ARRAY_ITERATOR_TYPE.KEYS);
@@ -858,6 +867,26 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
         return this;
     }
 
+    private boolean js_includes(Object searchElement, int fromIndex) {
+        if (length <= 0) {
+            return false;
+        }
+
+        int k = fromIndex >= 0 ? fromIndex : length + fromIndex;
+
+        if (k < 0) {
+            k = 0;
+        }
+
+        for (; k < length; k++) {
+            if (ScriptRuntime.shallowEq(getArrayElement(k), searchElement)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void validateFunctionalArgs(Object cb, Object thisObj, String errorStr) {
         if (cb == null) {
             throw ScriptRuntime.typeError2("msg.typed.array.missing.argument", "0", errorStr);
@@ -881,137 +910,51 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-11-25 20:03:32 CST
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            L:
-            switch (s.length()) {
-                case 3:
-                    c = s.charAt(0);
-                    if (c == 'g') {
-                        if (s.charAt(2) == 't' && s.charAt(1) == 'e') {
-                            id = Id_get;
-                            break L0;
-                        }
-                    } else if (c == 'm') {
-                        if (s.charAt(2) == 'p' && s.charAt(1) == 'a') {
-                            id = Id_map;
-                            break L0;
-                        }
-                    } else if (c == 's') {
-                        if (s.charAt(2) == 't' && s.charAt(1) == 'e') {
-                            id = Id_set;
-                            break L0;
-                        }
-                    }
-                    break L;
-                case 4:
-                    switch (s.charAt(2)) {
-                        case 'i':
-                            X = "join";
-                            id = Id_join;
-                            break L;
-                        case 'l':
-                            X = "fill";
-                            id = Id_fill;
-                            break L;
-                        case 'm':
-                            X = "some";
-                            id = Id_some;
-                            break L;
-                        case 'n':
-                            X = "find";
-                            id = Id_find;
-                            break L;
-                        case 'r':
-                            X = "sort";
-                            id = Id_sort;
-                            break L;
-                        case 'y':
-                            X = "keys";
-                            id = Id_keys;
-                            break L;
-                    }
-                    break L;
-                case 5:
-                    c = s.charAt(0);
-                    if (c == 'e') {
-                        X = "every";
-                        id = Id_every;
-                    } else if (c == 's') {
-                        X = "slice";
-                        id = Id_slice;
-                    }
-                    break L;
-                case 6:
-                    c = s.charAt(0);
-                    if (c == 'f') {
-                        X = "filter";
-                        id = Id_filter;
-                    } else if (c == 'r') {
-                        X = "reduce";
-                        id = Id_reduce;
-                    } else if (c == 'v') {
-                        X = "values";
-                        id = Id_values;
-                    }
-                    break L;
-                case 7:
-                    switch (s.charAt(0)) {
-                        case 'e':
-                            X = "entries";
-                            id = Id_entries;
-                            break L;
-                        case 'f':
-                            X = "forEach";
-                            id = Id_forEach;
-                            break L;
-                        case 'i':
-                            X = "indexOf";
-                            id = Id_indexOf;
-                            break L;
-                        case 'r':
-                            X = "reverse";
-                            id = Id_reverse;
-                            break L;
-                    }
-                    break L;
-                case 8:
-                    c = s.charAt(0);
-                    if (c == 's') {
-                        X = "subarray";
-                        id = Id_subarray;
-                    } else if (c == 't') {
-                        X = "toString";
-                        id = Id_toString;
-                    }
-                    break L;
-                case 9:
-                    X = "findIndex";
-                    id = Id_findIndex;
-                    break L;
-                case 10:
-                    X = "copyWithin";
-                    id = Id_copyWithin;
-                    break L;
-                case 11:
-                    c = s.charAt(0);
-                    if (c == 'c') {
-                        X = "constructor";
-                        id = Id_constructor;
-                    } else if (c == 'l') {
-                        X = "lastIndexOf";
-                        id = Id_lastIndexOf;
-                    } else if (c == 'r') {
-                        X = "reduceRight";
-                        id = Id_reduceRight;
-                    }
-                    break L;
+// #generated# Last update: 2019-12-08 13:39:52 EST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 3: c=s.charAt(0);
+                if (c=='g') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_get; break L0;} }
+                else if (c=='m') { if (s.charAt(2)=='p' && s.charAt(1)=='a') {id=Id_map; break L0;} }
+                else if (c=='s') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_set; break L0;} }
+                break L;
+            case 4: switch (s.charAt(2)) {
+                case 'i': X="join";id=Id_join; break L;
+                case 'l': X="fill";id=Id_fill; break L;
+                case 'm': X="some";id=Id_some; break L;
+                case 'n': X="find";id=Id_find; break L;
+                case 'r': X="sort";id=Id_sort; break L;
+                case 'y': X="keys";id=Id_keys; break L;
+                } break L;
+            case 5: c=s.charAt(0);
+                if (c=='e') { X="every";id=Id_every; }
+                else if (c=='s') { X="slice";id=Id_slice; }
+                break L;
+            case 6: c=s.charAt(0);
+                if (c=='f') { X="filter";id=Id_filter; }
+                else if (c=='r') { X="reduce";id=Id_reduce; }
+                else if (c=='v') { X="values";id=Id_values; }
+                break L;
+            case 7: switch (s.charAt(0)) {
+                case 'e': X="entries";id=Id_entries; break L;
+                case 'f': X="forEach";id=Id_forEach; break L;
+                case 'i': X="indexOf";id=Id_indexOf; break L;
+                case 'r': X="reverse";id=Id_reverse; break L;
+                } break L;
+            case 8: c=s.charAt(0);
+                if (c=='i') { X="includes";id=Id_includes; }
+                else if (c=='s') { X="subarray";id=Id_subarray; }
+                else if (c=='t') { X="toString";id=Id_toString; }
+                break L;
+            case 9: X="findIndex";id=Id_findIndex; break L;
+            case 10: X="copyWithin";id=Id_copyWithin; break L;
+            case 11: c=s.charAt(0);
+                if (c=='c') { X="constructor";id=Id_constructor; }
+                else if (c=='l') { X="lastIndexOf";id=Id_lastIndexOf; }
+                else if (c=='r') { X="reduceRight";id=Id_reduceRight; }
+                break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -1045,7 +988,8 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
             Id_values = 23,
             Id_entries = 24,
             Id_sort = 25,
-            SymbolId_iterator = 26;
+            Id_includes = 26,
+            SymbolId_iterator = 27;
 
     protected static final int
             MAX_PROTOTYPE_ID = SymbolId_iterator;
@@ -1095,20 +1039,12 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
     @Override
     protected int findInstanceIdInfo(String s) {
         int id;
-// #generated# Last update: 2019-11-25 20:03:32 CST
-        L0:
-        {
-            id = 0;
-            String X = null;
+// #generated# Last update: 2019-12-08 13:39:52 EST
+        L0: { id = 0; String X = null;
             int s_length = s.length();
-            if (s_length == 6) {
-                X = "length";
-                id = Id_length;
-            } else if (s_length == 17) {
-                X = "BYTES_PER_ELEMENT";
-                id = Id_BYTES_PER_ELEMENT;
-            }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (s_length==6) { X="length";id=Id_length; }
+            else if (s_length==17) { X="BYTES_PER_ELEMENT";id=Id_BYTES_PER_ELEMENT; }
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
