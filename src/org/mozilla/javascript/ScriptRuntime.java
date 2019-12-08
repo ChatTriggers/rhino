@@ -4253,9 +4253,24 @@ public class ScriptRuntime {
                 }
             } else if (id instanceof Integer) {
                 int index = (Integer) id;
-                object.put(index, object, value);
+                if (getterSetter == 0) {
+                    object.put(index, object, value);
+                } else {
+                    ScriptableObject so = (ScriptableObject) object;
+                    Callable getterOrSetter = (Callable) value;
+                    boolean isSetter = getterSetter == 1;
+                    so.setGetterOrSetter((String) null, index, getterOrSetter, isSetter);
+                }
             } else if (isSymbol(id)) {
-                ScriptableObject.putProperty(object, (Symbol) id, value);
+                Symbol symbol = (Symbol) id;
+                if (getterSetter == 0) {
+                    ScriptableObject.putProperty(object, (Symbol) id, value);
+                } else {
+                    ScriptableObject so = (ScriptableObject) object;
+                    Callable getterOrSetter = (Callable) value;
+                    boolean isSetter = getterSetter == 1;
+                    so.setGetterOrSetter(symbol, 0, getterOrSetter, isSetter);
+                }
             } else {
                 throw throwError(cx, scope, "msg.object.invalid.key.type");
             }
