@@ -2526,7 +2526,7 @@ public class ScriptRuntime {
             try {
                 Object result = f.call(cx, x.iterator.getParentScope(), x.iterator, emptyArgs);
                 if (result instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) result, "done")) {
-                    x.currentId = ScriptableObject.getProperty((Scriptable) result, "value");
+                    x.currentId = ScriptRuntime.toString(ScriptableObject.getProperty((Scriptable) result, "value"));
                     Object done = ScriptableObject.getProperty((Scriptable) result, "done");
                     return !(done instanceof Boolean && (boolean) done);
                 }

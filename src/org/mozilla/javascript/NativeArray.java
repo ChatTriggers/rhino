@@ -1650,7 +1650,7 @@ public class NativeArray extends IdScriptableObject implements List {
             scope = getTopLevelScope(scope);
             result = cx.newArray(scope, 0);
         } else {
-            result = species.construct(cx, scope, args);
+            result = species.construct(cx, scope, new Object[]{});
         }
 
         long length = doConcat(cx, scope, result, thisObj, 0);
