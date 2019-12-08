@@ -2138,6 +2138,8 @@ public class Parser {
                     rest = true;
                 }
 
+                tt = peekToken();
+
                 if (inUseStrictDirective) {
                     // Simple variable name
                     mustMatchToken(Token.NAME, "msg.bad.var");
