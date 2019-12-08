@@ -70,7 +70,7 @@ public class FunctionNode extends ScriptNode {
     private List<AstNode> params;
     private Map<Integer, Node> defaultParams;
 
-    private VariableDeclaration parameters;
+    private boolean hasComplexParameters = false;
 
     private AstNode body;
     private boolean isExpressionClosure;
@@ -134,10 +134,6 @@ public class FunctionNode extends ScriptNode {
         return functionName != null ? functionName.getIdentifier() : "";
     }
 
-    public void setParams(VariableDeclaration vd) {
-        this.parameters = vd;
-    }
-
     /**
      * Returns the function parameter list
      *
@@ -146,6 +142,14 @@ public class FunctionNode extends ScriptNode {
      */
     public List<AstNode> getParams() {
         return params != null ? params : NO_PARAMS;
+    }
+
+    public boolean hasComplexParameters() {
+        return hasComplexParameters;
+    }
+
+    public void setHasComplexParameters() {
+        this.hasComplexParameters = true;
     }
 
     /**

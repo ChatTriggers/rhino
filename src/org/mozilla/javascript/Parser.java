@@ -668,6 +668,10 @@ public class Parser {
                                 if (directive == null) {
                                     inDirectivePrologue = false;
                                 } else if (directive.equals("use strict")) {
+                                    if (fnNode.hasComplexParameters()) {
+                                        reportError("msg.complex.params.in.strict");
+                                    }
+
                                     inUseStrictDirective = true;
                                     fnNode.setInStrictMode(true);
                                     if (!savedStrictMode) {
@@ -869,7 +873,6 @@ public class Parser {
         // Would prefer not to call createDestructuringAssignment until codegen,
         // but the symbol definitions have to happen now, before body is parsed.
         final VariableDeclaration vd = variables(Token.LP, ts.tokenEnd, false, true, isObjectSetterFunction);
-        fnNode.setParams(vd);
 
         List<VariableInitializer> variables = vd.getVariables();
         Node destructuringNode = new Node(Token.COMMA);
@@ -881,13 +884,20 @@ public class Parser {
             final AstNode initializer = variable.getInitializer();
 
             fnNode.addParam(target);
-            if (initializer != null)
+            if (initializer != null) {
                 fnNode.addDefaultParam(i1, initializer);
+                fnNode.setHasComplexParameters();
+            }
 
             if (variable.isDestructuring()) {
                 String tempName = currentScriptOrFn.getNextTempName();
                 defineSymbol(Token.LP, tempName, false);
                 destructVars.put(tempName, variable);
+                fnNode.setHasComplexParameters();
+            }
+
+            if (target.getProp(Node.SPREAD_PROP) != null) {
+                fnNode.setHasComplexParameters();
             }
         }
 
