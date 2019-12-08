@@ -698,6 +698,14 @@ public class Token {
                 return "throw";
             case Token.TRY:
                 return "try";
+            case Token.CLASS:
+                return "class";
+            case Token.STATIC:
+                return "static";
+            case Token.SUPER:
+                return "super";
+            case Token.EXTENDS:
+                return "extends";
             default:
                 return null;
         }

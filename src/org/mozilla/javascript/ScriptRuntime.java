@@ -2147,6 +2147,9 @@ public class ScriptRuntime {
             throw undefDeleteError(obj, id);
         }
         boolean result = deleteObjectElem(sobj, id, cx);
+        if (!result && (cx.isStrictMode() || cx.hasFeature(Context.FEATURE_STRICT_MODE))) {
+            throw typeError1("msg.delete.failed.strict", toString(id));
+        }
         return wrapBoolean(result);
     }
 

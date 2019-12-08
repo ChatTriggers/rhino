@@ -6,6 +6,7 @@
 
 package org.mozilla.javascript;
 
+import jdk.nashorn.internal.runtime.ParserException;
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
 
@@ -2137,9 +2138,28 @@ public class Parser {
                     rest = true;
                 }
 
-                // Simple variable name
-                mustMatchToken(Token.NAME, "msg.bad.var");
-                name = createNameNode();
+                if (inUseStrictDirective) {
+                    // Simple variable name
+                    mustMatchToken(Token.NAME, "msg.bad.var");
+                    name = createNameNode();
+                } else {
+                    if (compilerEnv.isReservedKeywordAsIdentifier()) {
+                        boolean isKeyword = TokenStream.isKeyword(ts.getString(), compilerEnv.getLanguageVersion(), false);
+                        boolean isSafeKeyword = Token.keywordToName(tt) == null;
+
+                        if (isKeyword && isSafeKeyword) {
+                            name = createNameNode();
+                            consumeToken();
+                        }
+                    }
+
+                    if (name == null) {
+                        // Simple variable name
+                        mustMatchToken(Token.NAME, "msg.bad.var");
+                        name = createNameNode();
+                    }
+                }
+
                 name.setLineno(ts.getLineno());
 
                 if (rest) {
@@ -3292,7 +3312,11 @@ public class Parser {
 
             case Token.RESERVED:
                 consumeToken();
-                reportError("msg.reserved.id", ts.getString());
+                if (compilerEnv.isReservedKeywordAsIdentifier() && TokenStream.isKeyword(ts.getString(), compilerEnv.getLanguageVersion(), inUseStrictDirective)) {
+                    pn = name(ttFlagged, tt);
+                } else {
+                    reportError("msg.reserved.id", ts.getString());
+                }
                 break;
 
             case Token.ERROR:
@@ -3448,10 +3472,16 @@ public class Parser {
             } else if (tt == Token.SPREAD) {
                 consumeToken();
                 AstNode expr = assignExpr();
+                if (expr instanceof Assignment) {
+                    reportError("msg.rest.no.defaults");
+                }
                 expr.putProp(Node.SPREAD_PROP, true);
                 elements.add(expr);
                 after_lb_or_comma = false;
                 afterComma = -1;
+                if (peekToken() == Token.COMMA) {
+                    reportError("msg.rest.not.last");
+                }
             } else if (tt == Token.EOF) {
                 reportError("msg.no.bracket.arg");
                 break;
