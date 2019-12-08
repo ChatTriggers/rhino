@@ -344,7 +344,8 @@ final class NativeDate extends IdScriptableObject {
                 }
 
                 Object v = getProperty(thisObj, method);
-                if (!(v instanceof Function)) throw Kit.codeBug();
+                if (!(v instanceof Function))
+                    throw ScriptRuntime.typeError2("msg.conversion.not.allowed", "thisObj", "string");
 
                 Function fn = (Function) v;
                 return fn.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);

@@ -953,10 +953,7 @@ public class NativeArray extends IdScriptableObject implements List {
         if (asUint32) {
             return ScriptRuntime.toUint32(len);
         } else {
-            if (len instanceof Double) {
-                return ((Double) len).longValue();
-            }
-            throw Kit.codeBug(len.getClass().getSimpleName());
+            return (long) ScriptRuntime.toNumber(len);
         }
     }
 
@@ -2033,7 +2030,7 @@ public class NativeArray extends IdScriptableObject implements List {
 
         long length = getLengthProperty(o, id == Id_map);
 
-        if (length > Integer.MAX_VALUE) {
+        if (id != Id_every && id != Id_some && length > Integer.MAX_VALUE) {
             throw ScriptRuntime.rangeError("msg.arraylength.invalid");
         }
 
