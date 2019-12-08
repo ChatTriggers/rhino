@@ -1620,10 +1620,21 @@ public class NativeArray extends IdScriptableObject implements List {
         }
 
         if (ScriptableObject.hasProperty(obj, "constructor")) {
-            Scriptable constructor = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(obj, "constructor"));
+            // If the constructor is a getter, we want to return null
+            // and make sure to NOT access the constructor, as a
+            // get constructor does not influence Symbol.species
+            if (obj instanceof ScriptableObject) {
+                ScriptableObject ctorDesc = ((ScriptableObject) obj).getOwnPropertyDescriptor(Context.getContext(), "constructor");
 
-            if (ScriptableObject.hasProperty(constructor, SymbolKey.SPECIES)) {
-                Object species = ScriptableObject.getProperty(constructor, SymbolKey.SPECIES);
+                if (ctorDesc != null && ScriptableObject.hasProperty(ctorDesc, "getter") && !Undefined.isUndefined(ScriptableObject.getProperty(ctorDesc, "getter"))) {
+                    return null;
+                }
+            }
+
+            Scriptable ctor = ScriptableObject.ensureScriptable(obj);
+
+            if (ScriptableObject.hasProperty(ctor, SymbolKey.SPECIES)) {
+                Object species = ScriptableObject.getProperty(ctor, SymbolKey.SPECIES);
 
                 if (!(species instanceof BaseFunction)) {
                     // TODO: Error
