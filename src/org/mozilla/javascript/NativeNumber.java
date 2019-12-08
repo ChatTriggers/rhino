@@ -407,7 +407,7 @@ final class NativeNumber extends IdScriptableObject {
             Id_toFixed = 6,
             Id_toExponential = 7,
             Id_toPrecision = 8,
-            MAX_PROTOTYPE_ID = 10;
+            MAX_PROTOTYPE_ID = 8;
 
 // #/string_id_map#
 
