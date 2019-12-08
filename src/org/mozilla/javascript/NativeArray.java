@@ -923,13 +923,7 @@ public class NativeArray extends IdScriptableObject implements List {
         length = longVal;
     }
 
-    /* Support for generic Array-ish objects.  Most of the Array
-     * functions try to be generic; anything that has a length
-     * property is assumed to be an array.
-     * getLengthProperty returns 0 if obj does not have the length property
-     * or its value is not convertible to a number.
-     */
-    static long getLengthProperty(Scriptable obj, boolean throwIfTooLarge) {
+    static long getLengthProperty(Scriptable obj, boolean throwIfTooLarge, boolean asUint32) {
         // These will both give numeric lengths within Uint32 range.
         if (obj instanceof NativeString) {
             return ((NativeString) obj).getLength();
@@ -955,11 +949,28 @@ public class NativeArray extends IdScriptableObject implements List {
         if (doubleLen < 0) {
             return 0;
         }
-        return ScriptRuntime.toUint32(len);
+
+        if (asUint32) {
+            return ScriptRuntime.toUint32(len);
+        } else {
+            if (len instanceof Double) {
+                return ((Double) len).longValue();
+            }
+            throw Kit.codeBug(len.getClass().getSimpleName());
+        }
     }
 
-    private static Object setLengthProperty(Scriptable target,
-                                            long length) {
+    /* Support for generic Array-ish objects.  Most of the Array
+     * functions try to be generic; anything that has a length
+     * property is assumed to be an array.
+     * getLengthProperty returns 0 if obj does not have the length property
+     * or its value is not convertible to a number.
+     */
+    static long getLengthProperty(Scriptable obj, boolean throwIfTooLarge) {
+        return getLengthProperty(obj, throwIfTooLarge, true);
+    }
+
+    private static Object setLengthProperty(Scriptable target, long length) {
         Object len = ScriptRuntime.wrapNumber(length);
         ScriptableObject.putProperty(target, "length", len);
         return len;
@@ -1382,8 +1393,12 @@ public class NativeArray extends IdScriptableObject implements List {
                 return ScriptRuntime.wrapNumber(na.length);
             }
         }
-        long length = getLengthProperty(thisObj, false);
+        long length = getLengthProperty(thisObj, false, false);
         int argc = args.length;
+
+        if (length + argc > NativeNumber.MAX_SAFE_INTEGER) {
+            throw ScriptRuntime.rangeError("msg.arraylength.invalid");
+        }
 
         if (args.length > 0) {
             /*  Slide up the array to make room for args at the bottom */
@@ -1418,7 +1433,11 @@ public class NativeArray extends IdScriptableObject implements List {
         int argc = args.length;
         if (argc == 0)
             return cx.newArray(scope, 0);
-        long length = getLengthProperty(thisObj, false);
+        long length = getLengthProperty(thisObj, false, false);
+
+        if (length > Integer.MAX_VALUE) {
+            throw ScriptRuntime.rangeError("msg.arraylength.invalid");
+        }
 
         /* Convert the first argument into a starting index. */
         long begin = toSliceIndex(ScriptRuntime.toInteger(args[0]), length);
@@ -1687,7 +1706,7 @@ public class NativeArray extends IdScriptableObject implements List {
             result = species.construct(cx, scope, args);
         }
 
-        long len = getLengthProperty(thisObj, false);
+        long len = getLengthProperty(thisObj, false, false);
 
         long begin, end;
         if (args.length == 0) {
@@ -1700,6 +1719,10 @@ public class NativeArray extends IdScriptableObject implements List {
             } else {
                 end = toSliceIndex(ScriptRuntime.toInteger(args[1]), len);
             }
+        }
+
+        if (len >= Integer.MAX_VALUE) {
+            throw ScriptRuntime.rangeError("msg.arraylength.invalid");
         }
 
         for (long slot = begin; slot < end; slot++) {
@@ -2009,6 +2032,11 @@ public class NativeArray extends IdScriptableObject implements List {
         if (Id_find == id || Id_findIndex == id) o = requireObjectCoercible(cx, o, idFunctionObject);
 
         long length = getLengthProperty(o, id == Id_map);
+
+        if (length > Integer.MAX_VALUE) {
+            throw ScriptRuntime.rangeError("msg.arraylength.invalid");
+        }
+
         Object callbackArg = args.length > 0 ? args[0] : Undefined.instance;
         if (!(callbackArg instanceof Function)) {
             throw ScriptRuntime.notFunctionError(callbackArg);

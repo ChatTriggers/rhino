@@ -4767,8 +4767,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                 || (type == Token.MUL);
     }
 
-    private void visitArithmetic(Node node, int opCode, Node child,
-                                 Node parent) {
+    private void visitArithmetic(Node node, int opCode, Node child, Node parent) {
         int childNumberFlag = node.getIntProp(Node.ISNUMBER_PROP, -1);
         if (childNumberFlag != -1) {
             generateExpression(child, node);
@@ -4789,8 +4788,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         }
     }
 
-    private void visitExponentiation(Node node, Node child,
-                                     Node parent) {
+    private void visitExponentiation(Node node, Node child, Node parent) {
         int childNumberFlag = node.getIntProp(Node.ISNUMBER_PROP, -1);
 
         if (childNumberFlag != -1) {
@@ -4816,9 +4814,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                     "pow",
                     "(DD)D"
             );
-            if (!childOfArithmetic) {
-                addDoubleWrap();
-            }
+            addDoubleWrap();
         }
     }
 
