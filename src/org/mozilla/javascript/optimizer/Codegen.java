@@ -209,9 +209,7 @@ public class Codegen implements Evaluator {
             Class<?> cl = loader.defineClass(className, classBytes);
             loader.linkClass(cl);
             return cl;
-        } catch (SecurityException x) {
-            e = x;
-        } catch (IllegalArgumentException x) {
+        } catch (SecurityException | IllegalArgumentException x) {
             e = x;
         }
         throw new RuntimeException("Malformed optimizer package " + e);
