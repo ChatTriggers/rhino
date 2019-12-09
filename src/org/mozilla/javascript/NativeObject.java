@@ -291,12 +291,17 @@ public class NativeObject extends IdScriptableObject implements Map {
                             String.valueOf(args[0]));
                 }
                 ScriptableObject so = (ScriptableObject) thisObj;
-                String name = ScriptRuntime.toStringIdOrIndex(cx, args[0]);
-                int index = (name != null ? 0
-                        : ScriptRuntime.lastIndexResult(cx));
-                Callable getterOrSetter = (Callable) args[1];
-                boolean isSetter = (id == Id___defineSetter__);
-                so.setGetterOrSetter(name, index, getterOrSetter, isSetter);
+                if (ScriptRuntime.isSymbol(args[0])) {
+                    Callable getterOrSetter = (Callable) args[1];
+                    boolean isSetter = (id == Id___defineSetter__);
+                    so.setGetterOrSetter((Symbol) args[0], 0, getterOrSetter, isSetter);
+                } else {
+                    String name = ScriptRuntime.toStringIdOrIndex(cx, args[0]);
+                    int index = name != null ? 0 : ScriptRuntime.lastIndexResult(cx);
+                    Callable getterOrSetter = (Callable) args[1];
+                    boolean isSetter = (id == Id___defineSetter__);
+                    so.setGetterOrSetter(name, index, getterOrSetter, isSetter);
+                }
                 if (so instanceof NativeArray)
                     ((NativeArray) so).setDenseOnly(false);
             }
@@ -309,27 +314,44 @@ public class NativeObject extends IdScriptableObject implements Map {
                     return Undefined.instance;
 
                 ScriptableObject so = (ScriptableObject) thisObj;
-                String name = ScriptRuntime.toStringIdOrIndex(cx, args[0]);
-                int index = (name != null ? 0
-                        : ScriptRuntime.lastIndexResult(cx));
                 boolean isSetter = (id == Id___lookupSetter__);
-                Object gs;
-                for (; ; ) {
-                    gs = so.getGetterOrSetter(name, index, isSetter);
-                    if (gs != null)
-                        break;
-                    // If there is no getter or setter for the object itself,
-                    // how about the prototype?
-                    Scriptable v = so.getPrototype();
-                    if (v == null)
-                        break;
-                    if (v instanceof ScriptableObject)
-                        so = (ScriptableObject) v;
-                    else
-                        break;
+
+                if (ScriptRuntime.isSymbol(args[0])) {
+                    Symbol symbol = ((Symbol) args[0]);
+
+                    for (; ; ) {
+                        Object gs = so.getGetterOrSetter(symbol, 0, isSetter);
+                        if (gs != null)
+                            return gs;
+                        // If there is no getter or setter for the object itself,
+                        // how about the prototype?
+                        Scriptable v = so.getPrototype();
+                        if (v == null)
+                            break;
+                        if (v instanceof ScriptableObject)
+                            so = (ScriptableObject) v;
+                        else
+                            break;
+                    }
+                } else {
+                    String name = ScriptRuntime.toStringIdOrIndex(cx, args[0]);
+                    int index = (name != null ? 0 : ScriptRuntime.lastIndexResult(cx));
+
+                    for (; ; ) {
+                        Object gs = so.getGetterOrSetter(name, index, isSetter);
+                        if (gs != null)
+                            return gs;
+                        // If there is no getter or setter for the object itself,
+                        // how about the prototype?
+                        Scriptable v = so.getPrototype();
+                        if (v == null)
+                            break;
+                        if (v instanceof ScriptableObject)
+                            so = (ScriptableObject) v;
+                        else
+                            break;
+                    }
                 }
-                if (gs != null)
-                    return gs;
             }
             return Undefined.instance;
 
