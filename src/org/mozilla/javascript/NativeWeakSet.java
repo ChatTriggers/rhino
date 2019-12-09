@@ -114,7 +114,7 @@ public class NativeWeakSet extends IdScriptableObject {
     protected void initPrototypeId(int id) {
         if (id == SymbolId_toStringTag) {
             initPrototypeValue(SymbolId_toStringTag, SymbolKey.TO_STRING_TAG,
-                    getClassName(), DONTENUM | READONLY);
+                    getClassName(), NOT_ENUMERABLE | NOT_WRITABLE);
             return;
         }
 

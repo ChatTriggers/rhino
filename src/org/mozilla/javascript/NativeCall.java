@@ -44,7 +44,7 @@ public final class NativeCall extends IdScriptableObject {
                 String name = function.getParamOrVarName(i);
                 Object val = i < args.length ? args[i]
                         : Undefined.instance;
-                defineProperty(name, val, PERMANENT);
+                defineProperty(name, val, NOT_CONFIGURABLE);
             }
         }
 
@@ -52,7 +52,7 @@ public final class NativeCall extends IdScriptableObject {
         // the parameter with the same name
         if (!super.has("arguments", this) && !isArrow) {
             arguments = new Arguments(this);
-            defineProperty("arguments", arguments, PERMANENT);
+            defineProperty("arguments", arguments, NOT_CONFIGURABLE);
         }
 
         if (paramAndVarCount != 0) {
@@ -63,7 +63,7 @@ public final class NativeCall extends IdScriptableObject {
                         defineProperty(name, Undefined.instance, CONST);
                     } else if (!(function instanceof InterpretedFunction)
                                 || ((InterpretedFunction) function).hasFunctionNamed(name)) {
-                        defineProperty(name, Undefined.instance, PERMANENT);
+                        defineProperty(name, Undefined.instance, NOT_CONFIGURABLE);
                     }
                 }
             }

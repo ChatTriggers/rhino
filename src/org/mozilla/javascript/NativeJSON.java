@@ -33,7 +33,7 @@ public final class NativeJSON extends IdScriptableObject {
             obj.sealObject();
         }
         ScriptableObject.defineProperty(scope, "JSON", obj,
-                ScriptableObject.DONTENUM);
+                ScriptableObject.NOT_ENUMERABLE);
     }
 
     private NativeJSON() {

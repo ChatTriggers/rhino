@@ -33,7 +33,7 @@ public class DefineFunctionPropertiesTest extends TestCase {
             String[] names = { "f", "g" };
             global.defineFunctionProperties(names,
                     DefineFunctionPropertiesTest.class,
-                    ScriptableObject.DONTENUM);
+                    ScriptableObject.NOT_ENUMERABLE);
         } finally {
             Context.exit();
         }

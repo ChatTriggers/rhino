@@ -2473,7 +2473,7 @@ public final class Interpreter extends Icode implements Evaluator {
                                      Object[] vars, double[] varDbls,
                                      int[] varAttributes, int indexReg) {
         if (!frame.useActivation) {
-            if ((varAttributes[indexReg] & ScriptableObject.READONLY) == 0) {
+            if ((varAttributes[indexReg] & ScriptableObject.NOT_WRITABLE) == 0) {
                 throw Context.reportRuntimeError1("msg.var.redecl",
                         frame.idata.argNames[indexReg]);
             }
@@ -2502,7 +2502,7 @@ public final class Interpreter extends Icode implements Evaluator {
                                 Object[] vars, double[] varDbls,
                                 int[] varAttributes, int indexReg) {
         if (!frame.useActivation) {
-            if ((varAttributes[indexReg] & ScriptableObject.READONLY) == 0) {
+            if ((varAttributes[indexReg] & ScriptableObject.NOT_WRITABLE) == 0) {
                 vars[indexReg] = stack[stackTop];
                 varDbls[indexReg] = sDbl[stackTop];
             } else {
@@ -2551,7 +2551,7 @@ public final class Interpreter extends Icode implements Evaluator {
             double d2 = ((incrDecrMask & Node.DECR_FLAG) == 0)
                     ? d + 1.0 : d - 1.0;
             boolean post = ((incrDecrMask & Node.POST_FLAG) != 0);
-            if ((varAttributes[indexReg] & ScriptableObject.READONLY) == 0) {
+            if ((varAttributes[indexReg] & ScriptableObject.NOT_WRITABLE) == 0) {
                 if (varValue != DOUBLE_MARK) {
                     vars[indexReg] = DOUBLE_MARK;
                 }

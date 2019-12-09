@@ -111,7 +111,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
         NativeRegExpCtor ctor = new NativeRegExpCtor();
         // Bug #324006: ECMA-262 15.10.6.1 says "The initial value of
         // RegExp.prototype.constructor is the builtin RegExp constructor."
-        proto.defineProperty("constructor", ctor, ScriptableObject.DONTENUM);
+        proto.defineProperty("constructor", ctor, ScriptableObject.NOT_ENUMERABLE);
 
         ScriptRuntime.setFunctionProtoAndParent(ctor, scope);
 
@@ -122,7 +122,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             ctor.sealObject();
         }
 
-        defineProperty(scope, "RegExp", ctor, ScriptableObject.DONTENUM);
+        defineProperty(scope, "RegExp", ctor, ScriptableObject.NOT_ENUMERABLE);
     }
 
     NativeRegExp(Scriptable scope, RECompiled regexpCompiled) {
@@ -2571,7 +2571,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             case Id_multiline:
             case Id_sticky:
             case Id_flags:
-                attr = PERMANENT | READONLY | DONTENUM;
+                attr = NOT_CONFIGURABLE | NOT_WRITABLE | NOT_ENUMERABLE;
                 break;
             default:
                 throw new IllegalStateException();
@@ -2783,7 +2783,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
 
     private RECompiled re;
     Object lastIndex = 0d;     /* index after last match, for //g iterator */
-    private int lastIndexAttr = DONTENUM | PERMANENT;
+    private int lastIndexAttr = NOT_ENUMERABLE | NOT_CONFIGURABLE;
 
 }       // class NativeRegExp
 

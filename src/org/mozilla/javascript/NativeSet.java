@@ -201,7 +201,7 @@ public class NativeSet extends IdScriptableObject {
                 return;
             case SymbolId_toStringTag:
                 initPrototypeValue(SymbolId_toStringTag, SymbolKey.TO_STRING_TAG,
-                        getClassName(), DONTENUM | READONLY);
+                        getClassName(), NOT_ENUMERABLE | NOT_WRITABLE);
                 return;
             // fallthrough
         }

@@ -788,34 +788,34 @@ public class ScriptRuntime {
             String nameString = ((String) name);
             if (getterSetter == 0) {
                 clazz.put(nameString, clazz, method);
-                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.DONTENUM);
+                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.NOT_ENUMERABLE);
             } else {
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
                 clazz.setGetterOrSetter(nameString, 0, getterOrSetter, isSetter);
-                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.DONTENUM);
+                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.NOT_ENUMERABLE);
             }
         } else if (name instanceof Integer) {
             int nameInt = ((Integer) name);
             if (getterSetter == 0) {
                 clazz.put(nameInt, clazz, method);
-                clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.DONTENUM);
+                clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.NOT_ENUMERABLE);
             } else {
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
                 clazz.setGetterOrSetter(nameInt, 0, getterOrSetter, isSetter);
-                clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.DONTENUM);
+                clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.NOT_ENUMERABLE);
             }
         } else if (isSymbol(name)) {
             Symbol nameSymbol = ((Symbol) name);
             if (getterSetter == 0) {
                 clazz.put(nameSymbol, clazz, method);
-                clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.DONTENUM);
+                clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.NOT_ENUMERABLE);
             } else {
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
                 clazz.setGetterOrSetter(nameSymbol, 0, getterOrSetter, isSetter);
-                clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.DONTENUM);
+                clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.NOT_ENUMERABLE);
             }
         } else {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
@@ -883,7 +883,7 @@ public class ScriptRuntime {
 
         if (extendedObj == null) {
             ScriptableObject newObject = new NativeObject();
-            newObject.defineProperty("constructor", clazz, ScriptableObject.DONTENUM);
+            newObject.defineProperty("constructor", clazz, ScriptableObject.NOT_ENUMERABLE);
             ScriptableObject.putProperty(clazz, "prototype", newObject);
             return clazz;
         }
@@ -894,7 +894,7 @@ public class ScriptRuntime {
         ScriptableObject newObject = new NativeObject();
         newObject.setParentScope(scope);
         newObject.setPrototype(extendedProto);
-        newObject.defineProperty("constructor", clazz, ScriptableObject.DONTENUM);
+        newObject.defineProperty("constructor", clazz, ScriptableObject.NOT_ENUMERABLE);
         ScriptableObject.putProperty(clazz, "prototype", newObject);
 
         clazz.setPrototype(extended);
@@ -1583,8 +1583,8 @@ public class ScriptRuntime {
         if (!scope.has(DEFAULT_NS_TAG, scope)) {
             // XXX: this is racy of cause
             ScriptableObject.defineProperty(scope, DEFAULT_NS_TAG, ns,
-                    ScriptableObject.PERMANENT
-                            | ScriptableObject.DONTENUM);
+                    ScriptableObject.NOT_CONFIGURABLE
+                            | ScriptableObject.NOT_ENUMERABLE);
         } else {
             scope.put(DEFAULT_NS_TAG, scope, ns);
         }
@@ -3826,7 +3826,7 @@ public class ScriptRuntime {
                         if (!(funObj instanceof InterpretedFunction)
                             || ((InterpretedFunction) funObj).hasFunctionNamed(name)) {
                             // Global var definitions are supposed to be DONTDELETE
-                            ScriptableObject.defineProperty(varScope, name, Undefined.instance, ScriptableObject.PERMANENT);
+                            ScriptableObject.defineProperty(varScope, name, Undefined.instance, ScriptableObject.NOT_CONFIGURABLE);
                         }
                     } else {
                         varScope.put(name, varScope, Undefined.instance);
@@ -3970,13 +3970,13 @@ public class ScriptRuntime {
                         null);
                 ScriptableObject.defineProperty(
                         errorObject, "javaException", wrap,
-                        ScriptableObject.PERMANENT | ScriptableObject.READONLY | ScriptableObject.DONTENUM);
+                        ScriptableObject.NOT_CONFIGURABLE | ScriptableObject.NOT_WRITABLE | ScriptableObject.NOT_ENUMERABLE);
             }
             if (isVisible(cx, re)) {
                 Object wrap = cx.getWrapFactory().wrap(cx, scope, re, null);
                 ScriptableObject.defineProperty(
                         errorObject, "rhinoException", wrap,
-                        ScriptableObject.PERMANENT | ScriptableObject.READONLY | ScriptableObject.DONTENUM);
+                        ScriptableObject.NOT_CONFIGURABLE | ScriptableObject.NOT_WRITABLE | ScriptableObject.NOT_ENUMERABLE);
             }
             obj = errorObject;
         }
@@ -3984,7 +3984,7 @@ public class ScriptRuntime {
         NativeObject catchScopeObject = new NativeObject();
         // See ECMA 12.4
         catchScopeObject.defineProperty(
-                exceptionName, obj, ScriptableObject.PERMANENT);
+                exceptionName, obj, ScriptableObject.NOT_CONFIGURABLE);
 
         if (isVisible(cx, t)) {
             // Add special Rhino object __exception__ defined in the catch
@@ -3992,7 +3992,7 @@ public class ScriptRuntime {
             // with the JavaScript exception (to get stack trace info, etc.)
             catchScopeObject.defineProperty(
                     "__exception__", Context.javaToJS(t, scope),
-                    ScriptableObject.PERMANENT | ScriptableObject.DONTENUM);
+                    ScriptableObject.NOT_CONFIGURABLE | ScriptableObject.NOT_ENUMERABLE);
         }
 
         if (cacheObj) {
@@ -4063,13 +4063,13 @@ public class ScriptRuntime {
                     null);
             ScriptableObject.defineProperty(
                     errorObject, "javaException", wrap,
-                    ScriptableObject.PERMANENT | ScriptableObject.READONLY | ScriptableObject.DONTENUM);
+                    ScriptableObject.NOT_CONFIGURABLE | ScriptableObject.NOT_WRITABLE | ScriptableObject.NOT_ENUMERABLE);
         }
         if (isVisible(cx, re)) {
             Object wrap = cx.getWrapFactory().wrap(cx, scope, re, null);
             ScriptableObject.defineProperty(
                     errorObject, "rhinoException", wrap,
-                    ScriptableObject.PERMANENT | ScriptableObject.READONLY | ScriptableObject.DONTENUM);
+                    ScriptableObject.NOT_CONFIGURABLE | ScriptableObject.NOT_WRITABLE | ScriptableObject.NOT_ENUMERABLE);
         }
         return errorObject;
     }
@@ -4150,7 +4150,7 @@ public class ScriptRuntime {
                     // ECMA specifies that functions defined in global and
                     // function scope outside eval should have DONTDELETE set.
                     ScriptableObject.defineProperty
-                            (scope, name, function, ScriptableObject.PERMANENT);
+                            (scope, name, function, ScriptableObject.NOT_CONFIGURABLE);
                 } else {
                     scope.put(name, scope, function);
                 }

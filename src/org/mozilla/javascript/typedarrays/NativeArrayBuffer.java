@@ -226,7 +226,7 @@ public class NativeArrayBuffer extends IdScriptableObject {
     @Override
     protected int findInstanceIdInfo(String s) {
         if ("byteLength".equals(s)) {
-            return instanceIdInfo(READONLY | PERMANENT, Id_byteLength);
+            return instanceIdInfo(NOT_WRITABLE | NOT_CONFIGURABLE, Id_byteLength);
         }
         return super.findInstanceIdInfo(s);
     }

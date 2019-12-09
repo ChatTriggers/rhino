@@ -20,7 +20,7 @@ public class ObjectGetOwnPropertyDescriptorTest {
     NativeObject descriptor;
     NativeObject object = new NativeObject();
     object.defineProperty("a", "1", ScriptableObject.EMPTY);
-    object.defineProperty("b", "2", ScriptableObject.DONTENUM | ScriptableObject.READONLY | ScriptableObject.PERMANENT);
+    object.defineProperty("b", "2", ScriptableObject.NOT_ENUMERABLE | ScriptableObject.NOT_WRITABLE | ScriptableObject.NOT_CONFIGURABLE);
 
     descriptor = (NativeObject) eval("Object.getOwnPropertyDescriptor(obj, 'a')", "obj", object);
     assertEquals("1",  descriptor.get("value"));

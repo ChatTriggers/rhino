@@ -23,7 +23,7 @@ public class BaseFunction extends IdScriptableObject implements Function {
     static void init(Scriptable scope, boolean sealed) {
         BaseFunction obj = new BaseFunction();
         // Function.prototype attributes: see ECMA 15.3.3.1
-        obj.prototypePropertyAttributes = DONTENUM | READONLY | PERMANENT;
+        obj.prototypePropertyAttributes = NOT_ENUMERABLE | NOT_WRITABLE | NOT_CONFIGURABLE;
         obj.exportAsJSClass(MAX_PROTOTYPE_ID, scope, sealed);
     }
 
@@ -134,11 +134,11 @@ public class BaseFunction extends IdScriptableObject implements Function {
         int attr;
         switch (id) {
             case Id_length:
-                attr = DONTENUM | READONLY;
+                attr = NOT_ENUMERABLE | NOT_WRITABLE;
                 break;
             case Id_arity:
             case Id_name:
-                attr = DONTENUM | READONLY | PERMANENT;
+                attr = NOT_ENUMERABLE | NOT_WRITABLE | NOT_CONFIGURABLE;
                 break;
             case Id_prototype:
                 // some functions such as built-ins don't have a prototype property
@@ -194,7 +194,7 @@ public class BaseFunction extends IdScriptableObject implements Function {
     protected void setInstanceIdValue(int id, Object value) {
         switch (id) {
             case Id_prototype:
-                if ((prototypePropertyAttributes & READONLY) == 0) {
+                if ((prototypePropertyAttributes & NOT_WRITABLE) == 0) {
                     prototypeProperty = (value != null)
                             ? value : UniqueTag.NULL_VALUE;
                 }
@@ -206,7 +206,7 @@ public class BaseFunction extends IdScriptableObject implements Function {
                 }
                 if (defaultHas("arguments")) {
                     defaultPut("arguments", value);
-                } else if ((argumentsAttributes & READONLY) == 0) {
+                } else if ((argumentsAttributes & NOT_WRITABLE) == 0) {
                     argumentsObj = value;
                 }
                 return;
@@ -367,11 +367,11 @@ public class BaseFunction extends IdScriptableObject implements Function {
      * prototype property of this Function object
      */
     public void setImmunePrototypeProperty(Object value) {
-        if ((prototypePropertyAttributes & READONLY) != 0) {
+        if ((prototypePropertyAttributes & NOT_WRITABLE) != 0) {
             throw new IllegalStateException();
         }
         prototypeProperty = (value != null) ? value : UniqueTag.NULL_VALUE;
-        prototypePropertyAttributes = DONTENUM | PERMANENT | READONLY;
+        prototypePropertyAttributes = NOT_ENUMERABLE | NOT_CONFIGURABLE | NOT_WRITABLE;
     }
 
     protected Scriptable getClassPrototype() {
@@ -510,7 +510,7 @@ public class BaseFunction extends IdScriptableObject implements Function {
             return prototypeProperty;
         }
         NativeObject obj = new NativeObject();
-        final int attr = ScriptableObject.DONTENUM;
+        final int attr = ScriptableObject.NOT_ENUMERABLE;
         obj.defineProperty("constructor", this, attr);
         // put the prototype property into the object now, then in the
         // wacky case of a user defining a function Object(), we don't
@@ -672,7 +672,7 @@ public class BaseFunction extends IdScriptableObject implements Function {
     // For function object instances, attributes are
     //  {configurable:false, enumerable:false};
     // see ECMA 15.3.5.2
-    private int prototypePropertyAttributes = PERMANENT | DONTENUM;
-    private int argumentsAttributes = PERMANENT | DONTENUM;
+    private int prototypePropertyAttributes = NOT_CONFIGURABLE | NOT_ENUMERABLE;
+    private int argumentsAttributes = NOT_CONFIGURABLE | NOT_ENUMERABLE;
 }
 

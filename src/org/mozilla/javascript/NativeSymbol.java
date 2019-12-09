@@ -106,7 +106,7 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
                                              ScriptableObject ctor,
                                              String name, SymbolKey key) {
         Scriptable sym = cx.newObject(scope, CLASS_NAME, new Object[]{name, key});
-        ctor.defineProperty(name, sym, DONTENUM | READONLY | PERMANENT);
+        ctor.defineProperty(name, sym, NOT_ENUMERABLE | NOT_WRITABLE | NOT_CONFIGURABLE);
     }
 
     // #string_id_map#
@@ -173,7 +173,7 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
                 initPrototypeMethod(CLASS_NAME, id, "valueOf", 0);
                 break;
             case SymbolId_toStringTag:
-                initPrototypeValue(id, SymbolKey.TO_STRING_TAG, CLASS_NAME, DONTENUM | READONLY);
+                initPrototypeValue(id, SymbolKey.TO_STRING_TAG, CLASS_NAME, NOT_ENUMERABLE | NOT_WRITABLE);
                 break;
             case SymbolId_toPrimitive:
                 initPrototypeMethod(CLASS_NAME, id, SymbolKey.TO_PRIMITIVE, "Symbol.toPrimitive", 1);

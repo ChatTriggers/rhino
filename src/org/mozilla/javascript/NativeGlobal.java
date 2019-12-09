@@ -83,14 +83,14 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
 
         ScriptableObject.defineProperty(
                 scope, "NaN", ScriptRuntime.NaNobj,
-                READONLY | DONTENUM | PERMANENT);
+                NOT_WRITABLE | NOT_ENUMERABLE | NOT_CONFIGURABLE);
         ScriptableObject.defineProperty(
                 scope, "Infinity",
                 ScriptRuntime.wrapNumber(Double.POSITIVE_INFINITY),
-                READONLY | DONTENUM | PERMANENT);
+                NOT_WRITABLE | NOT_ENUMERABLE | NOT_CONFIGURABLE);
         ScriptableObject.defineProperty(
                 scope, "undefined", Undefined.instance,
-                READONLY | DONTENUM | PERMANENT);
+                NOT_WRITABLE | NOT_ENUMERABLE | NOT_CONFIGURABLE);
 
         /*
             Each error constructor gets its own Error object as a prototype,
@@ -113,7 +113,7 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
                     name, 1, scope);
             ctor.markAsConstructor(errorProto);
             errorProto.put("constructor", errorProto, ctor);
-            errorProto.setAttributes("constructor", ScriptableObject.DONTENUM);
+            errorProto.setAttributes("constructor", ScriptableObject.NOT_ENUMERABLE);
             if (sealed) {
                 errorProto.sealObject();
                 ctor.sealObject();

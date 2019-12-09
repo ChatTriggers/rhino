@@ -42,7 +42,7 @@ final class Arguments extends IdScriptableObject {
             callerObj = NOT_FOUND;
         }
 
-        defineProperty(SymbolKey.ITERATOR, iteratorMethod, ScriptableObject.DONTENUM);
+        defineProperty(SymbolKey.ITERATOR, iteratorMethod, ScriptableObject.NOT_ENUMERABLE);
     }
 
     @Override
@@ -412,8 +412,8 @@ final class Arguments extends IdScriptableObject {
         setGetterOrSetter("caller", 0, new ThrowTypeError("caller"), false);
         setGetterOrSetter("callee", 0, new ThrowTypeError("callee"), true);
         setGetterOrSetter("callee", 0, new ThrowTypeError("callee"), false);
-        setAttributes("caller", DONTENUM | PERMANENT);
-        setAttributes("callee", DONTENUM | PERMANENT);
+        setAttributes("caller", NOT_ENUMERABLE | NOT_CONFIGURABLE);
+        setAttributes("callee", NOT_ENUMERABLE | NOT_CONFIGURABLE);
         callerObj = null;
         calleeObj = null;
     }
@@ -455,9 +455,9 @@ final class Arguments extends IdScriptableObject {
     private Object calleeObj;
     private Object lengthObj;
 
-    private int callerAttr = DONTENUM;
-    private int calleeAttr = DONTENUM;
-    private int lengthAttr = DONTENUM;
+    private int callerAttr = NOT_ENUMERABLE;
+    private int calleeAttr = NOT_ENUMERABLE;
+    private int lengthAttr = NOT_ENUMERABLE;
 
     private NativeCall activation;
 

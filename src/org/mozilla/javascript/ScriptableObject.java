@@ -58,7 +58,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @see org.mozilla.javascript.ScriptableObject#getAttributes(String)
      * @see org.mozilla.javascript.ScriptableObject#setAttributes(String, int)
      */
-    public static final int READONLY = 0x01;
+    public static final int NOT_WRITABLE = 0x01;
 
     /**
      * Property attribute indicating property is not enumerated.
@@ -69,7 +69,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @see org.mozilla.javascript.ScriptableObject#getAttributes(String)
      * @see org.mozilla.javascript.ScriptableObject#setAttributes(String, int)
      */
-    public static final int DONTENUM = 0x02;
+    public static final int NOT_ENUMERABLE = 0x02;
 
     /**
      * Property attribute indicating property cannot be deleted.
@@ -78,7 +78,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @see org.mozilla.javascript.ScriptableObject#getAttributes(String)
      * @see org.mozilla.javascript.ScriptableObject#setAttributes(String, int)
      */
-    public static final int PERMANENT = 0x04;
+    public static final int NOT_CONFIGURABLE = 0x04;
 
     /**
      * Property attribute indicating that this is a const property that has not
@@ -97,7 +97,7 @@ public abstract class ScriptableObject implements Scriptable,
      */
     public static final int INITIALIZED_CONST = 0x10;
 
-    public static final int CONST = PERMANENT | READONLY | UNINITIALIZED_CONST;
+    public static final int CONST = NOT_CONFIGURABLE | NOT_WRITABLE | UNINITIALIZED_CONST;
     /**
      * The prototype of this object.
      */
@@ -164,7 +164,7 @@ public abstract class ScriptableObject implements Scriptable,
         }
 
         boolean setValue(Object value, Scriptable owner, Scriptable start) {
-            if ((attributes & READONLY) != 0) {
+            if ((attributes & NOT_WRITABLE) != 0) {
                 Context cx = Context.getContext();
                 if ((attributes & INITIALIZED_CONST) != 0) {
                     throw ScriptRuntime.typeError1("msg.const.inval.assign", name);
@@ -206,9 +206,9 @@ public abstract class ScriptableObject implements Scriptable,
         ScriptableObject desc = new NativeObject();
         ScriptRuntime.setBuiltinProtoAndParent(desc, scope, TopLevel.Builtins.Object);
         desc.defineProperty("value", value, EMPTY);
-        desc.defineProperty("writable", (attributes & READONLY) == 0, EMPTY);
-        desc.defineProperty("enumerable", (attributes & DONTENUM) == 0, EMPTY);
-        desc.defineProperty("configurable", (attributes & PERMANENT) == 0, EMPTY);
+        desc.defineProperty("writable", (attributes & NOT_WRITABLE) == 0, EMPTY);
+        desc.defineProperty("enumerable", (attributes & NOT_ENUMERABLE) == 0, EMPTY);
+        desc.defineProperty("configurable", (attributes & NOT_CONFIGURABLE) == 0, EMPTY);
         return desc;
     }
 
@@ -231,10 +231,10 @@ public abstract class ScriptableObject implements Scriptable,
             int attr = getAttributes();
             ScriptableObject desc = new NativeObject();
             ScriptRuntime.setBuiltinProtoAndParent(desc, scope, TopLevel.Builtins.Object);
-            desc.defineProperty("enumerable", (attr & DONTENUM) == 0, EMPTY);
-            desc.defineProperty("configurable", (attr & PERMANENT) == 0, EMPTY);
+            desc.defineProperty("enumerable", (attr & NOT_ENUMERABLE) == 0, EMPTY);
+            desc.defineProperty("configurable", (attr & NOT_CONFIGURABLE) == 0, EMPTY);
             if (getter == null && setter == null) {
-                desc.defineProperty("writable", (attr & READONLY) == 0, EMPTY);
+                desc.defineProperty("writable", (attr & NOT_WRITABLE) == 0, EMPTY);
             }
 
             String fName = name == null ? "f" : name.toString();
@@ -346,7 +346,7 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     static void checkValidAttributes(int attributes) {
-        final int mask = READONLY | DONTENUM | PERMANENT | UNINITIALIZED_CONST | INITIALIZED_CONST;
+        final int mask = NOT_WRITABLE | NOT_ENUMERABLE | NOT_CONFIGURABLE | UNINITIALIZED_CONST | INITIALIZED_CONST;
         if ((attributes & ~mask) != 0) {
             throw new IllegalArgumentException(String.valueOf(attributes));
         }
@@ -601,7 +601,7 @@ public abstract class ScriptableObject implements Scriptable,
      */
     @Override
     public void putConst(String name, Scriptable start, Object value) {
-        if (putConstImpl(name, 0, start, value, READONLY))
+        if (putConstImpl(name, 0, start, value, NOT_WRITABLE))
             return;
 
         if (start == this) throw Kit.codeBug();
@@ -634,8 +634,8 @@ public abstract class ScriptableObject implements Scriptable,
         if (slot == null) {
             return false;
         }
-        return (slot.getAttributes() & (PERMANENT | READONLY)) ==
-                (PERMANENT | READONLY);
+        return (slot.getAttributes() & (NOT_CONFIGURABLE | NOT_WRITABLE)) ==
+                (NOT_CONFIGURABLE | NOT_WRITABLE);
 
     }
 
@@ -687,9 +687,9 @@ public abstract class ScriptableObject implements Scriptable,
      * @return the bitset of attributes
      * @throws EvaluatorException if the named property is not found
      * @see org.mozilla.javascript.ScriptableObject#has(String, Scriptable)
-     * @see org.mozilla.javascript.ScriptableObject#READONLY
-     * @see org.mozilla.javascript.ScriptableObject#DONTENUM
-     * @see org.mozilla.javascript.ScriptableObject#PERMANENT
+     * @see org.mozilla.javascript.ScriptableObject#NOT_WRITABLE
+     * @see org.mozilla.javascript.ScriptableObject#NOT_ENUMERABLE
+     * @see org.mozilla.javascript.ScriptableObject#NOT_CONFIGURABLE
      * @see org.mozilla.javascript.ScriptableObject#EMPTY
      */
     public int getAttributes(String name) {
@@ -704,9 +704,9 @@ public abstract class ScriptableObject implements Scriptable,
      * @throws EvaluatorException if the named property is not found
      *                            is not found
      * @see org.mozilla.javascript.ScriptableObject#has(String, Scriptable)
-     * @see org.mozilla.javascript.ScriptableObject#READONLY
-     * @see org.mozilla.javascript.ScriptableObject#DONTENUM
-     * @see org.mozilla.javascript.ScriptableObject#PERMANENT
+     * @see org.mozilla.javascript.ScriptableObject#NOT_WRITABLE
+     * @see org.mozilla.javascript.ScriptableObject#NOT_ENUMERABLE
+     * @see org.mozilla.javascript.ScriptableObject#NOT_CONFIGURABLE
      * @see org.mozilla.javascript.ScriptableObject#EMPTY
      */
     public int getAttributes(int index) {
@@ -734,9 +734,9 @@ public abstract class ScriptableObject implements Scriptable,
      * @param attributes the bitset of attributes
      * @throws EvaluatorException if the named property is not found
      * @see org.mozilla.javascript.Scriptable#has(String, Scriptable)
-     * @see org.mozilla.javascript.ScriptableObject#READONLY
-     * @see org.mozilla.javascript.ScriptableObject#DONTENUM
-     * @see org.mozilla.javascript.ScriptableObject#PERMANENT
+     * @see org.mozilla.javascript.ScriptableObject#NOT_WRITABLE
+     * @see org.mozilla.javascript.ScriptableObject#NOT_ENUMERABLE
+     * @see org.mozilla.javascript.ScriptableObject#NOT_CONFIGURABLE
      * @see org.mozilla.javascript.ScriptableObject#EMPTY
      */
     public void setAttributes(String name, int attributes) {
@@ -751,9 +751,9 @@ public abstract class ScriptableObject implements Scriptable,
      * @param attributes the bitset of attributes
      * @throws EvaluatorException if the named property is not found
      * @see org.mozilla.javascript.Scriptable#has(String, Scriptable)
-     * @see org.mozilla.javascript.ScriptableObject#READONLY
-     * @see org.mozilla.javascript.ScriptableObject#DONTENUM
-     * @see org.mozilla.javascript.ScriptableObject#PERMANENT
+     * @see org.mozilla.javascript.ScriptableObject#NOT_WRITABLE
+     * @see org.mozilla.javascript.ScriptableObject#NOT_ENUMERABLE
+     * @see org.mozilla.javascript.ScriptableObject#NOT_CONFIGURABLE
      * @see org.mozilla.javascript.ScriptableObject#EMPTY
      */
     public void setAttributes(int index, int attributes) {
@@ -793,7 +793,7 @@ public abstract class ScriptableObject implements Scriptable,
 
         if (!force) {
             int attributes = gslot.getAttributes();
-            if ((attributes & READONLY) != 0) {
+            if ((attributes & NOT_WRITABLE) != 0) {
                 throw Context.reportRuntimeError1("msg.modify.readonly", name);
             }
         }
@@ -829,7 +829,7 @@ public abstract class ScriptableObject implements Scriptable,
 
         if (!force) {
             int attributes = gslot.getAttributes();
-            if ((attributes & READONLY) != 0) {
+            if ((attributes & NOT_WRITABLE) != 0) {
                 throw Context.reportRuntimeError1("msg.modify.readonly", name);
             }
         }
@@ -868,7 +868,7 @@ public abstract class ScriptableObject implements Scriptable,
 
         if (!force) {
             int attributes = gslot.getAttributes();
-            if ((attributes & READONLY) != 0) {
+            if ((attributes & NOT_WRITABLE) != 0) {
                 throw Context.reportRuntimeError1("msg.modify.readonly", name);
             }
         }
@@ -982,7 +982,7 @@ public abstract class ScriptableObject implements Scriptable,
         } else {
             // Define "length" to return whatever length the List gives us.
             defineProperty("length", null,
-                    GET_ARRAY_LENGTH, null, READONLY | DONTENUM);
+                    GET_ARRAY_LENGTH, null, NOT_WRITABLE | NOT_ENUMERABLE);
         }
     }
 
@@ -1294,7 +1294,7 @@ public abstract class ScriptableObject implements Scriptable,
      *                                   during execution of methods of the named class
      * @see org.mozilla.javascript.Function
      * @see org.mozilla.javascript.FunctionObject
-     * @see org.mozilla.javascript.ScriptableObject#READONLY
+     * @see org.mozilla.javascript.ScriptableObject#NOT_WRITABLE
      * @see org.mozilla.javascript.ScriptableObject
      * #defineProperty(String, Class, int)
      */
@@ -1372,7 +1372,7 @@ public abstract class ScriptableObject implements Scriptable,
         if (ctor == null)
             return null;
         String name = ctor.getClassPrototype().getClassName();
-        defineProperty(scope, name, ctor, ScriptableObject.DONTENUM);
+        defineProperty(scope, name, ctor, ScriptableObject.NOT_ENUMERABLE);
         return name;
     }
 
@@ -1564,10 +1564,10 @@ public abstract class ScriptableObject implements Scriptable,
                             proto.getClass().toString(), name);
                 }
                 Method setter = findSetterMethod(methods, name, setterPrefix);
-                int attr = ScriptableObject.PERMANENT |
-                        ScriptableObject.DONTENUM |
+                int attr = ScriptableObject.NOT_CONFIGURABLE |
+                        ScriptableObject.NOT_ENUMERABLE |
                         (setter != null ? 0
-                                : ScriptableObject.READONLY);
+                                : ScriptableObject.NOT_WRITABLE);
                 ((ScriptableObject) proto).defineProperty(name, null,
                         method, setter,
                         attr);
@@ -1584,7 +1584,7 @@ public abstract class ScriptableObject implements Scriptable,
                 throw Context.reportRuntimeError1
                         ("msg.varargs.fun", ctorMember.getName());
             }
-            defineProperty(isStatic ? ctor : proto, name, f, DONTENUM);
+            defineProperty(isStatic ? ctor : proto, name, f, NOT_ENUMERABLE);
             if (sealed) {
                 f.sealObject();
             }
@@ -1788,7 +1788,7 @@ public abstract class ScriptableObject implements Scriptable,
         Method getter = FunctionObject.findSingleMethod(methods, getterName);
         Method setter = FunctionObject.findSingleMethod(methods, setterName);
         if (setter == null)
-            attributes |= ScriptableObject.READONLY;
+            attributes |= ScriptableObject.NOT_WRITABLE;
         defineProperty(propertyName, null, getter,
                 setter, attributes);
     }
@@ -1936,6 +1936,7 @@ public abstract class ScriptableObject implements Scriptable,
             Object descObj = ScriptRuntime.getObjectElem(props, ids[i], cx);
             ScriptableObject desc = ensureScriptableObject(descObj);
             checkPropertyDefinition(desc);
+            checkObjectPropertyRestrictions(ids[i], desc);
             descs[i] = desc;
         }
         for (int i = 0, len = ids.length; i < len; ++i) {
@@ -1952,6 +1953,7 @@ public abstract class ScriptableObject implements Scriptable,
      */
     public void defineOwnProperty(Context cx, Object id, ScriptableObject desc) {
         checkPropertyDefinition(desc);
+        checkObjectPropertyRestrictions(id, desc);
         defineOwnProperty(cx, id, desc, true);
     }
 
@@ -1980,7 +1982,7 @@ public abstract class ScriptableObject implements Scriptable,
 
         if (slot == null) { // new slot
             slot = getSlot(cx, id, isAccessor ? SlotAccess.MODIFY_GETTER_SETTER : SlotAccess.MODIFY);
-            attributes = applyDescriptorToAttributeBitset(DONTENUM | READONLY | PERMANENT, desc);
+            attributes = applyDescriptorToAttributeBitset(NOT_ENUMERABLE | NOT_WRITABLE | NOT_CONFIGURABLE, desc);
         } else {
             attributes = applyDescriptorToAttributeBitset(slot.getAttributes(), desc);
         }
@@ -2032,6 +2034,9 @@ public abstract class ScriptableObject implements Scriptable,
         if (isDataDescriptor(desc) && isAccessorDescriptor(desc)) {
             throw ScriptRuntime.typeError0("msg.both.data.and.accessor.desc");
         }
+    }
+
+    protected void checkObjectPropertyRestrictions(Object id, ScriptableObject desc) {
     }
 
     protected void checkPropertyChange(Object id, ScriptableObject current,
@@ -2117,24 +2122,23 @@ public abstract class ScriptableObject implements Scriptable,
         return ScriptRuntime.shallowEq(currentValue, newValue);
     }
 
-    protected int applyDescriptorToAttributeBitset(int attributes,
-                                                   ScriptableObject desc) {
+    protected int applyDescriptorToAttributeBitset(int attributes, ScriptableObject desc) {
         Object enumerable = getProperty(desc, "enumerable");
         if (enumerable != NOT_FOUND) {
             attributes = ScriptRuntime.toBoolean(enumerable)
-                    ? attributes & ~DONTENUM : attributes | DONTENUM;
+                    ? attributes & ~NOT_ENUMERABLE : attributes | NOT_ENUMERABLE;
         }
 
         Object writable = getProperty(desc, "writable");
         if (writable != NOT_FOUND) {
             attributes = ScriptRuntime.toBoolean(writable)
-                    ? attributes & ~READONLY : attributes | READONLY;
+                    ? attributes & ~NOT_WRITABLE : attributes | NOT_WRITABLE;
         }
 
         Object configurable = getProperty(desc, "configurable");
         if (configurable != NOT_FOUND) {
             attributes = ScriptRuntime.toBoolean(configurable)
-                    ? attributes & ~PERMANENT : attributes | PERMANENT;
+                    ? attributes & ~NOT_CONFIGURABLE : attributes | NOT_CONFIGURABLE;
         }
 
         return attributes;
@@ -2973,7 +2977,7 @@ public abstract class ScriptableObject implements Scriptable,
         final long stamp = slotMap.readLock();
         try {
             for (Slot slot : slotMap) {
-                if ((getNonEnumerable || (slot.getAttributes() & DONTENUM) == 0) &&
+                if ((getNonEnumerable || (slot.getAttributes() & NOT_ENUMERABLE) == 0) &&
                         (getSymbols || !(slot.name instanceof Symbol))) {
                     if (c == externalLen) {
                         // Special handling to combine external array with additional properties

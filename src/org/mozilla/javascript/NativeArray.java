@@ -98,9 +98,9 @@ public class NativeArray extends IdScriptableObject implements List {
             case "length":
                 return instanceIdInfo(lengthAttr, Id_length);
             case "lastItem":
-                return instanceIdInfo(DONTENUM | PERMANENT, Id_lastItem);
+                return instanceIdInfo(NOT_ENUMERABLE | NOT_CONFIGURABLE, Id_lastItem);
             case "lastIndex":
-                return instanceIdInfo(DONTENUM | PERMANENT | READONLY, Id_lastIndex);
+                return instanceIdInfo(NOT_ENUMERABLE | NOT_CONFIGURABLE | NOT_WRITABLE, Id_lastIndex);
         }
         return super.findInstanceIdInfo(s);
     }
@@ -585,7 +585,7 @@ public class NativeArray extends IdScriptableObject implements List {
             }
         }
         super.put(index, start, value);
-        if (start == this && (lengthAttr & READONLY) == 0) {
+        if (start == this && (lengthAttr & NOT_WRITABLE) == 0) {
             // only set the array length if given an array index (ECMA 15.4.0)
             if (this.length <= index) {
                 // avoid overflowing index!
@@ -695,9 +695,7 @@ public class NativeArray extends IdScriptableObject implements List {
     }
 
     @Override
-    protected void defineOwnProperty(Context cx, Object id,
-                                     ScriptableObject desc,
-                                     boolean checkValid) {
+    protected void defineOwnProperty(Context cx, Object id, ScriptableObject desc, boolean checkValid) {
         if (dense != null) {
             Object[] values = dense;
             dense = null;
@@ -713,6 +711,19 @@ public class NativeArray extends IdScriptableObject implements List {
             length = index + 1;
         }
         super.defineOwnProperty(cx, id, desc, checkValid);
+    }
+
+    @Override
+    protected void checkObjectPropertyRestrictions(Object id, ScriptableObject desc) {
+        if ("length".equals(id)) {
+            Object value = desc.get("value", desc);
+
+            if (Undefined.isUndefined(value)) {
+                throw ScriptRuntime.rangeError("Invalid array length");
+            } else if (value == null) {
+                ScriptableObject.putProperty(desc, "value", 0);
+            }
+        }
     }
 
     /**
@@ -868,7 +879,7 @@ public class NativeArray extends IdScriptableObject implements List {
          * 2. If Result(1) is false, return.
          * ?
          */
-        if ((lengthAttr & READONLY) != 0) {
+        if ((lengthAttr & NOT_WRITABLE) != 0) {
             return;
         }
 
@@ -2739,7 +2750,7 @@ public class NativeArray extends IdScriptableObject implements List {
     /**
      * Attributes of the array's length property
      */
-    private int lengthAttr = DONTENUM | PERMANENT;
+    private int lengthAttr = NOT_ENUMERABLE | NOT_CONFIGURABLE;
 
     /**
      * Fast storage for dense arrays. Sparse arrays will use the superclass's

@@ -30,7 +30,7 @@ final class NativeMath extends IdScriptableObject {
             obj.sealObject();
         }
         ScriptableObject.defineProperty(scope, "Math", obj,
-                ScriptableObject.DONTENUM);
+                ScriptableObject.NOT_ENUMERABLE);
     }
 
     private NativeMath() {
@@ -272,7 +272,7 @@ final class NativeMath extends IdScriptableObject {
                     throw new IllegalStateException(String.valueOf(id));
             }
             initPrototypeValue(id, name, ScriptRuntime.wrapNumber(x),
-                    DONTENUM | READONLY | PERMANENT);
+                    NOT_ENUMERABLE | NOT_WRITABLE | NOT_CONFIGURABLE);
         }
     }
 

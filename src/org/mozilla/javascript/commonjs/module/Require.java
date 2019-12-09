@@ -345,8 +345,8 @@ public class Require extends BaseFunction {
     private static void defineReadOnlyProperty(ScriptableObject obj,
                                                String name, Object value) {
         ScriptableObject.putProperty(obj, name, value);
-        obj.setAttributes(name, ScriptableObject.READONLY |
-                ScriptableObject.PERMANENT);
+        obj.setAttributes(name, ScriptableObject.NOT_WRITABLE |
+                ScriptableObject.NOT_CONFIGURABLE);
     }
 
     private ModuleScript getModule(Context cx, String id, URI uri, URI base) {

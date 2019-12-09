@@ -14,8 +14,8 @@ public class IdFunctionObjectES6 extends IdFunctionObject {
 
     @Override
     protected int findInstanceIdInfo(String s) {
-        if (s.equals("length")) return instanceIdInfo(READONLY | DONTENUM, Id_length);
-        else if (s.equals("name")) return instanceIdInfo(READONLY | DONTENUM, Id_name);
+        if (s.equals("length")) return instanceIdInfo(NOT_WRITABLE | NOT_ENUMERABLE, Id_length);
+        else if (s.equals("name")) return instanceIdInfo(NOT_WRITABLE | NOT_ENUMERABLE, Id_name);
         return super.findInstanceIdInfo(s);
     }
 

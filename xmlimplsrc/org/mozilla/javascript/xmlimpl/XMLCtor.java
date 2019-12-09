@@ -115,7 +115,7 @@ class XMLCtor extends IdFunctionObject
           case Id_ignoreWhitespace:
           case Id_prettyIndent:
           case Id_prettyPrinting:
-            attr = PERMANENT | DONTENUM;
+            attr = NOT_CONFIGURABLE | NOT_ENUMERABLE;
             break;
           default: throw new IllegalStateException();
         }

@@ -53,10 +53,10 @@ public abstract class ES6Iterator extends IdScriptableObject {
                 initPrototypeMethod(getTag(), id, NEXT_METHOD, 0);
                 return;
             case SymbolId_iterator:
-                initPrototypeMethod(getTag(), id, SymbolKey.ITERATOR, "[Symbol.iterator]", DONTENUM | READONLY);
+                initPrototypeMethod(getTag(), id, SymbolKey.ITERATOR, "[Symbol.iterator]", NOT_ENUMERABLE | NOT_WRITABLE);
                 return;
             case SymbolId_toStringTag:
-                initPrototypeValue(SymbolId_toStringTag, SymbolKey.TO_STRING_TAG, getClassName(), DONTENUM | READONLY);
+                initPrototypeValue(SymbolId_toStringTag, SymbolKey.TO_STRING_TAG, getClassName(), NOT_ENUMERABLE | NOT_WRITABLE);
                 return;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));

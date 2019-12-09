@@ -281,7 +281,7 @@ public class EmbeddedSlotMap
             }
             if (slot != null) {
                 // non-configurable
-                if ((slot.getAttributes() & ScriptableObject.PERMANENT) != 0) {
+                if ((slot.getAttributes() & ScriptableObject.NOT_CONFIGURABLE) != 0) {
                     Context cx = Context.getContext();
                     if (cx.isStrictMode()) {
                         throw ScriptRuntime.typeError1("msg.delete.property.with.configurable.false", key);

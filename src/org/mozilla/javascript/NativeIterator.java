@@ -30,7 +30,7 @@ public final class NativeIterator extends IdScriptableObject {
         if (sealed) {
             obj.sealObject();
         }
-        ScriptableObject.defineProperty(scope, STOP_ITERATION, obj, ScriptableObject.DONTENUM);
+        ScriptableObject.defineProperty(scope, STOP_ITERATION, obj, ScriptableObject.NOT_ENUMERABLE);
         // Use "associateValue" so that generators can continue to
         // throw StopIteration even if the property of the global
         // scope is replaced or deleted.

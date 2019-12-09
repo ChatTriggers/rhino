@@ -150,7 +150,7 @@ public abstract class NativeArrayBufferView extends IdScriptableObject {
         if (id == 0) {
             return super.findInstanceIdInfo(s);
         }
-        return instanceIdInfo(READONLY | PERMANENT, id);
+        return instanceIdInfo(NOT_WRITABLE | NOT_CONFIGURABLE, id);
     }
 
     private static final int

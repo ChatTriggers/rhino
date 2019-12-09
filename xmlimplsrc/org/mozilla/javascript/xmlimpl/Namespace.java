@@ -127,7 +127,7 @@ class Namespace extends IdScriptableObject
         switch (id) {
           case Id_prefix:
           case Id_uri:
-            attr = PERMANENT | READONLY;
+            attr = NOT_CONFIGURABLE | NOT_WRITABLE;
             break;
           default: throw new IllegalStateException();
         }

@@ -202,7 +202,7 @@ public class Main
         System.arraycopy(args, 0, array, 0, args.length);
         Scriptable argsObj = cx.newArray(global, array);
         global.defineProperty("arguments", argsObj,
-                              ScriptableObject.DONTENUM);
+                              ScriptableObject.NOT_ENUMERABLE);
 
         for (String file: fileList) {
             try {

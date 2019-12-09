@@ -45,9 +45,9 @@ final class NativeNumber extends IdScriptableObject {
 
     @Override
     protected void fillConstructorProperties(IdFunctionObject ctor) {
-        final int attr = ScriptableObject.DONTENUM |
-                ScriptableObject.PERMANENT |
-                ScriptableObject.READONLY;
+        final int attr = ScriptableObject.NOT_ENUMERABLE |
+                ScriptableObject.NOT_CONFIGURABLE |
+                ScriptableObject.NOT_WRITABLE;
 
         ctor.defineProperty("NaN", ScriptRuntime.NaNobj, attr);
         ctor.defineProperty("POSITIVE_INFINITY",
@@ -81,8 +81,8 @@ final class NativeNumber extends IdScriptableObject {
 
         Object parseFloat = ScriptableObject.getProperty(global, "parseFloat");
         Object parseInt = ScriptableObject.getProperty(global, "parseInt");
-        ctor.defineProperty("parseFloat", parseFloat, DONTENUM);
-        ctor.defineProperty("parseInt", parseInt, DONTENUM);
+        ctor.defineProperty("parseFloat", parseFloat, NOT_ENUMERABLE);
+        ctor.defineProperty("parseInt", parseInt, NOT_ENUMERABLE);
 
         super.fillConstructorProperties(ctor);
     }

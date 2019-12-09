@@ -58,7 +58,7 @@ final class NativeString extends IdScriptableObject {
     @Override
     protected int findInstanceIdInfo(String s) {
         if ("length".equals(s)) {
-            return instanceIdInfo(DONTENUM | READONLY | PERMANENT, Id_length);
+            return instanceIdInfo(NOT_ENUMERABLE | NOT_WRITABLE | NOT_CONFIGURABLE, Id_length);
         }
         return super.findInstanceIdInfo(s);
     }
@@ -711,9 +711,9 @@ final class NativeString extends IdScriptableObject {
     @Override
     public int getAttributes(int index) {
         if (0 <= index && index < string.length()) {
-            int attribs = READONLY | PERMANENT;
+            int attribs = NOT_WRITABLE | NOT_CONFIGURABLE;
             if (Context.getContext().getLanguageVersion() < Context.VERSION_ES6) {
-                attribs |= DONTENUM;
+                attribs |= NOT_ENUMERABLE;
             }
             return attribs;
         }

@@ -258,7 +258,7 @@ class NativeRegExpCtor extends BaseFunction {
                 attr = underscoreAttr;
                 break;
             default:
-                attr = PERMANENT | READONLY;
+                attr = NOT_CONFIGURABLE | NOT_WRITABLE;
                 break;
         }
 
@@ -427,8 +427,8 @@ class NativeRegExpCtor extends BaseFunction {
         super.setInstanceIdAttributes(id, attr);
     }
 
-    private int multilineAttr = PERMANENT;
-    private int starAttr = PERMANENT;
-    private int inputAttr = PERMANENT;
-    private int underscoreAttr = PERMANENT;
+    private int multilineAttr = NOT_CONFIGURABLE;
+    private int starAttr = NOT_CONFIGURABLE;
+    private int inputAttr = NOT_CONFIGURABLE;
+    private int underscoreAttr = NOT_CONFIGURABLE;
 }

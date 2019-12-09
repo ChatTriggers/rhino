@@ -221,7 +221,7 @@ public class NativeObject extends IdScriptableObject implements Map {
                     if (result && thisObj instanceof ScriptableObject) {
                         ScriptableObject so = (ScriptableObject) thisObj;
                         int attrs = so.getAttributes((Symbol) arg);
-                        result = ((attrs & ScriptableObject.DONTENUM) == 0);
+                        result = ((attrs & ScriptableObject.NOT_ENUMERABLE) == 0);
                     }
                 } else {
                     String s = ScriptRuntime.toStringIdOrIndex(cx, arg);
@@ -235,14 +235,14 @@ public class NativeObject extends IdScriptableObject implements Map {
                             if (result && thisObj instanceof ScriptableObject) {
                                 ScriptableObject so = (ScriptableObject) thisObj;
                                 int attrs = so.getAttributes(index);
-                                result = ((attrs & ScriptableObject.DONTENUM) == 0);
+                                result = ((attrs & ScriptableObject.NOT_ENUMERABLE) == 0);
                             }
                         } else {
                             result = thisObj.has(s, thisObj);
                             if (result && thisObj instanceof ScriptableObject) {
                                 ScriptableObject so = (ScriptableObject) thisObj;
                                 int attrs = so.getAttributes(s);
-                                result = ((attrs & ScriptableObject.DONTENUM) == 0);
+                                result = ((attrs & ScriptableObject.NOT_ENUMERABLE) == 0);
                             }
                         }
                     } catch (EvaluatorException ee) {

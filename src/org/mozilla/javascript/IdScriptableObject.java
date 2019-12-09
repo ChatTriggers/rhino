@@ -181,7 +181,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
             if (value == NOT_FOUND) throw new IllegalArgumentException();
             ensureId(id);
             int attr = attributeArray[id - 1];
-            if ((attr & READONLY) == 0) {
+            if ((attr & NOT_WRITABLE) == 0) {
                 if (start == obj) {
                     if (value == null) {
                         value = UniqueTag.NULL_VALUE;
@@ -208,7 +208,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
             ensureId(id);
             int attr = attributeArray[id - 1];
             // non-configurable
-            if ((attr & PERMANENT) != 0) {
+            if ((attr & NOT_CONFIGURABLE) != 0) {
                 Context cx = Context.getContext();
                 if (cx.isStrictMode()) {
                     int nameSlot = (id - 1) * SLOT_SPAN + NAME_SLOT;
@@ -242,7 +242,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
             int count = 0;
             for (int id = 1; id <= maxId; ++id) {
                 Object value = ensureId(id);
-                if (getAll || (attributeArray[id - 1] & DONTENUM) == 0) {
+                if (getAll || (attributeArray[id - 1] & NOT_ENUMERABLE) == 0) {
                     if (value != NOT_FOUND) {
                         int nameSlot = (id - 1) * SLOT_SPAN + NAME_SLOT;
                         Object name = valueArray[nameSlot];
@@ -335,7 +335,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
         int info = findInstanceIdInfo(name);
         if (info != 0) {
             int attr = (info >>> 16);
-            if ((attr & PERMANENT) != 0) {
+            if ((attr & NOT_CONFIGURABLE) != 0) {
                 return true;
             }
             int id = (info & 0xFFFF);
@@ -356,7 +356,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
         int info = findInstanceIdInfo(key);
         if (info != 0) {
             int attr = (info >>> 16);
-            if ((attr & PERMANENT) != 0) {
+            if ((attr & NOT_CONFIGURABLE) != 0) {
                 return true;
             }
             int id = (info & 0xFFFF);
@@ -426,7 +426,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
                         name);
             }
             int attr = (info >>> 16);
-            if ((attr & READONLY) == 0) {
+            if ((attr & NOT_WRITABLE) == 0) {
                 if (start == this) {
                     int id = (info & 0xFFFF);
                     setInstanceIdValue(id, value);
@@ -458,7 +458,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
                 throw Context.reportRuntimeError0("msg.modify.sealed");
             }
             int attr = (info >>> 16);
-            if ((attr & READONLY) == 0) {
+            if ((attr & NOT_WRITABLE) == 0) {
                 if (start == this) {
                     int id = (info & 0xFFFF);
                     setInstanceIdValue(id, value);
@@ -489,7 +489,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
             if (!isSealed()) {
                 int attr = (info >>> 16);
                 // non-configurable
-                if ((attr & PERMANENT) != 0) {
+                if ((attr & NOT_CONFIGURABLE) != 0) {
                     Context cx = Context.getContext();
                     if (cx.isStrictMode()) {
                         throw ScriptRuntime.typeError1("msg.delete.property.with.configurable.false", name);
@@ -521,7 +521,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
             if (!isSealed()) {
                 int attr = (info >>> 16);
                 // non-configurable
-                if ((attr & PERMANENT) != 0) {
+                if ((attr & NOT_CONFIGURABLE) != 0) {
                     Context cx = Context.getContext();
                     if (cx.isStrictMode()) {
                         throw ScriptRuntime.typeError0("msg.delete.property.with.configurable.false");
@@ -617,12 +617,12 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
                 int info = findInstanceIdInfo(name);
                 if (info != 0) {
                     int attr = (info >>> 16);
-                    if ((attr & PERMANENT) == 0) {
+                    if ((attr & NOT_CONFIGURABLE) == 0) {
                         if (NOT_FOUND == getInstanceIdValue(id)) {
                             continue;
                         }
                     }
-                    if (getNonEnumerable || (attr & DONTENUM) == 0) {
+                    if (getNonEnumerable || (attr & NOT_ENUMERABLE) == 0) {
                         if (count == 0) {
                             // Need extra room for no more then [1..id] names
                             ids = new Object[id];
@@ -775,14 +775,14 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
     public final IdFunctionObject initPrototypeMethod(Object tag, int id, String propertyName, String functionName, int arity) {
         Scriptable scope = ScriptableObject.getTopLevelScope(this);
         IdFunctionObject function = newIdFunction(tag, id, functionName != null ? functionName : propertyName, arity, scope);
-        prototypeValues.initValue(id, propertyName, function, DONTENUM);
+        prototypeValues.initValue(id, propertyName, function, NOT_ENUMERABLE);
         return function;
     }
 
     public final IdFunctionObject initPrototypeMethod(Object tag, int id, Symbol key, String functionName, int arity) {
         Scriptable scope = ScriptableObject.getTopLevelScope(this);
         IdFunctionObject function = newIdFunction(tag, id, functionName, arity, scope);
-        prototypeValues.initValue(id, key, function, DONTENUM);
+        prototypeValues.initValue(id, key, function, NOT_ENUMERABLE);
         return function;
     }
 
@@ -795,7 +795,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
         if (isSealed()) {
             f.sealObject();
         }
-        prototypeValues.initValue(id, "constructor", f, DONTENUM);
+        prototypeValues.initValue(id, "constructor", f, NOT_ENUMERABLE);
     }
 
     public final void initPrototypeValue(int id, String name, Object value, int attributes) {
@@ -892,11 +892,12 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
                     delete(id); // it will be replaced with a slot
                 } else {
                     checkPropertyDefinition(desc);
+                    checkObjectPropertyRestrictions(key, desc);
                     ScriptableObject current = getOwnPropertyDescriptor(cx, key);
                     checkPropertyChange(name, current, desc);
                     int attr = (info >>> 16);
                     Object value = getProperty(desc, "value");
-                    if (value != NOT_FOUND && (attr & PERMANENT) == 0) {
+                    if (value != NOT_FOUND && (attr & NOT_WRITABLE) == 0) {
                         Object currentValue = getInstanceIdValue(id);
                         if (!sameValue(value, currentValue)) {
                             setInstanceIdValue(id, value);
@@ -913,11 +914,12 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
                         prototypeValues.delete(id); // it will be replaced with a slot
                     } else {
                         checkPropertyDefinition(desc);
+                        checkObjectPropertyRestrictions(key, desc);
                         ScriptableObject current = getOwnPropertyDescriptor(cx, key);
                         checkPropertyChange(name, current, desc);
                         int attr = prototypeValues.getAttributes(id);
                         Object value = getProperty(desc, "value");
-                        if (value != NOT_FOUND && (attr & READONLY) == 0) {
+                        if (value != NOT_FOUND && (attr & NOT_WRITABLE) == 0) {
                             Object currentValue = prototypeValues.get(id);
                             if (!sameValue(value, currentValue)) {
                                 prototypeValues.set(id, this, value);

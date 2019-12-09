@@ -48,8 +48,8 @@ final class NativeError extends IdScriptableObject {
         ScriptableObject.putProperty(obj, "message", "");
         ScriptableObject.putProperty(obj, "fileName", "");
         ScriptableObject.putProperty(obj, "lineNumber", Integer.valueOf(0));
-        obj.setAttributes("name", ScriptableObject.DONTENUM);
-        obj.setAttributes("message", ScriptableObject.DONTENUM);
+        obj.setAttributes("name", ScriptableObject.NOT_ENUMERABLE);
+        obj.setAttributes("message", ScriptableObject.NOT_ENUMERABLE);
         obj.exportAsJSClass(MAX_PROTOTYPE_ID, scope, sealed);
         NativeCallSite.init(obj, sealed);
     }
@@ -168,7 +168,7 @@ final class NativeError extends IdScriptableObject {
             stackProvider = re;
             defineProperty("stack", this,
                     ERROR_DELEGATE_GET_STACK, ERROR_DELEGATE_SET_STACK,
-                    DONTENUM);
+                    NOT_ENUMERABLE);
         }
     }
 

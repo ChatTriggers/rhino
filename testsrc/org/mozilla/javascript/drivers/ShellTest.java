@@ -264,8 +264,8 @@ public class ShellTest {
         global.setErr(p);
         global.defineFunctionProperties(
                 new String[] { "options" }, ShellTest.class,
-                ScriptableObject.DONTENUM | ScriptableObject.PERMANENT |
-                  ScriptableObject.READONLY);
+                ScriptableObject.NOT_ENUMERABLE | ScriptableObject.NOT_CONFIGURABLE |
+                  ScriptableObject.NOT_WRITABLE);
         // test suite expects keywords to be disallowed as identifiers
         shellContextFactory.setAllowReservedKeywords(false);
         final TestState testState = new TestState();

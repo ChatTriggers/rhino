@@ -54,7 +54,7 @@ public class Bug685403Test {
 
         String[] functions = new String[] { "continuation" };
         scope.defineFunctionProperties(functions, Bug685403Test.class,
-                ScriptableObject.DONTENUM);
+                ScriptableObject.NOT_ENUMERABLE);
 
         Object state = null;
         Script script = cx.compileString(source, "", 1, null);

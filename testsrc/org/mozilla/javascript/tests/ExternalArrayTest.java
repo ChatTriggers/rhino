@@ -87,7 +87,7 @@ public class ExternalArrayTest
         for (int i = 0; i < 10; i++) {
             a.put(i, a, i);
         }
-        a.defineProperty("length", 10, ScriptableObject.DONTENUM);
+        a.defineProperty("length", 10, ScriptableObject.NOT_ENUMERABLE);
         root.put("regularArray", root, true);
         runScript("testsrc/jstests/extensions/external-array-test.js", 1);
     }

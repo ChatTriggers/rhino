@@ -46,7 +46,7 @@ public final class LazilyLoadedCtor implements Serializable {
         this.state = STATE_BEFORE_INIT;
 
         scope.addLazilyInitializedValue(propertyName, 0, this,
-                ScriptableObject.DONTENUM);
+                ScriptableObject.NOT_ENUMERABLE);
     }
 
     void init() {

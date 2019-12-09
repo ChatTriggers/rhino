@@ -10,7 +10,7 @@ public class NativeReflect extends IdScriptableObject {
         obj.setParentScope(scope);
         if (sealed)
             obj.sealObject();
-        ScriptableObject.defineProperty(scope, "Reflect", obj, ScriptableObject.DONTENUM);
+        ScriptableObject.defineProperty(scope, "Reflect", obj, ScriptableObject.NOT_ENUMERABLE);
     }
 
     @Override

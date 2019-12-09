@@ -1115,7 +1115,7 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
         if (id == 0) {
             return super.findInstanceIdInfo(s);
         }
-        return instanceIdInfo(READONLY | PERMANENT, id);
+        return instanceIdInfo(NOT_WRITABLE | NOT_CONFIGURABLE, id);
     }
 
     /*

@@ -158,7 +158,7 @@ final class QName extends IdScriptableObject
         switch (id) {
           case Id_localName:
           case Id_uri:
-            attr = PERMANENT | READONLY;
+            attr = NOT_CONFIGURABLE | NOT_WRITABLE;
             break;
           default: throw new IllegalStateException();
         }

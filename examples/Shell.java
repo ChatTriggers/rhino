@@ -57,7 +57,7 @@ public class Shell extends ScriptableObject
             // that these functions are not part of ECMA.
             String[] names = { "print", "quit", "version", "load", "help" };
             shell.defineFunctionProperties(names, Shell.class,
-                                           ScriptableObject.DONTENUM);
+                                           ScriptableObject.NOT_ENUMERABLE);
 
             args = processOptions(cx, args);
 
@@ -73,7 +73,7 @@ public class Shell extends ScriptableObject
             }
             Scriptable argsObj = cx.newArray(shell, array);
             shell.defineProperty("arguments", argsObj,
-                                 ScriptableObject.DONTENUM);
+                                 ScriptableObject.NOT_ENUMERABLE);
 
             shell.processSource(cx, args.length == 0 ? null : args[0]);
         } finally {
