@@ -1176,6 +1176,39 @@ public class ScriptRuntime {
         }
     }
 
+    public static String toStringPretty(Object val) {
+        for (; ; ) {
+            if (val == null) {
+                return "null";
+            }
+            if (val == Undefined.instance || val == Undefined.SCRIPTABLE_UNDEFINED) {
+                return "undefined";
+            }
+            if (val instanceof String) {
+                return '"' + (String) val + '"';
+            }
+            if (val instanceof CharSequence) {
+                return val.toString();
+            }
+            if (val instanceof Number) {
+                // XXX should we just teach NativeNumber.stringValue()
+                // about Numbers?
+                return numberToString(((Number) val).doubleValue(), 10);
+            }
+            if (val instanceof Symbol) {
+                throw typeError0("msg.not.a.string");
+            }
+            if (val instanceof Scriptable) {
+                val = ((Scriptable) val).getDefaultValue(StringClass);
+                if ((val instanceof Scriptable) && !isSymbol(val)) {
+                    throw errorWithClassName("msg.primitive.expected", val);
+                }
+                continue;
+            }
+            return val.toString();
+        }
+    }
+
     static String defaultObjectToString(Scriptable obj) {
         if (obj == null)
             return "[object Null]";
