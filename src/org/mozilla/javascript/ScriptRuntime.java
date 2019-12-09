@@ -787,33 +787,44 @@ public class ScriptRuntime {
         if (name instanceof String) {
             String nameString = ((String) name);
             if (getterSetter == 0) {
+                setFunctionNameIfApplicable(method, nameString);
+
+                if (nameString.equals("name") && clazz instanceof BaseFunction) {
+                    ((BaseFunction) clazz).setForcedName(method);
+                }
+
                 clazz.put(nameString, clazz, method);
                 clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.NOT_ENUMERABLE);
             } else {
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
+                setFunctionNameIfApplicable(method, (isSetter ? "set " : "get ") + nameString);
                 clazz.setGetterOrSetter(nameString, 0, getterOrSetter, isSetter);
                 clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.NOT_ENUMERABLE);
             }
         } else if (name instanceof Integer) {
             int nameInt = ((Integer) name);
             if (getterSetter == 0) {
+                setFunctionNameIfApplicable(method, String.valueOf(nameInt));
                 clazz.put(nameInt, clazz, method);
                 clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.NOT_ENUMERABLE);
             } else {
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
+                setFunctionNameIfApplicable(method, (isSetter ? "set " : "get ") + nameInt);
                 clazz.setGetterOrSetter(nameInt, 0, getterOrSetter, isSetter);
                 clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.NOT_ENUMERABLE);
             }
         } else if (isSymbol(name)) {
             Symbol nameSymbol = ((Symbol) name);
             if (getterSetter == 0) {
+                setFunctionNameIfApplicable(method, nameSymbol.toSymbolString());
                 clazz.put(nameSymbol, clazz, method);
                 clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.NOT_ENUMERABLE);
             } else {
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
+                setFunctionNameIfApplicable(method, (isSetter ? "set " : "get ") + nameSymbol.toSymbolString());
                 clazz.setGetterOrSetter(nameSymbol, 0, getterOrSetter, isSetter);
                 clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.NOT_ENUMERABLE);
             }
@@ -2322,8 +2333,9 @@ public class ScriptRuntime {
         return firstXMLObject;
     }
 
-    public static Object setName(Scriptable bound, Object value,
-                                 Context cx, Scriptable scope, String id) {
+    public static Object setName(Scriptable bound, Object value, Context cx, Scriptable scope, String id) {
+        setFunctionNameIfApplicable(value, id);
+
         if (bound != null) {
             // TODO: we used to special-case XMLObject here, but putProperty
             // seems to work for E4X and it's better to optimize  the common case
@@ -4243,32 +4255,41 @@ public class ScriptRuntime {
                         Ref ref = specialRef(object, (String) id, cx, scope);
                         ref.set(cx, scope, value);
                     } else {
+                        setFunctionNameIfApplicable(value, id);
+
                         object.put((String) id, object, value);
                     }
                 } else {
                     ScriptableObject so = (ScriptableObject) object;
                     Callable getterOrSetter = (Callable) value;
                     boolean isSetter = getterSetter == 1;
+
+                    setFunctionNameIfApplicable(value, (isSetter ? "set " : "get ") + id);
+
                     so.setGetterOrSetter((String) id, 0, getterOrSetter, isSetter);
                 }
             } else if (id instanceof Integer) {
                 int index = (Integer) id;
                 if (getterSetter == 0) {
+                    setFunctionNameIfApplicable(value, String.valueOf(index));
                     object.put(index, object, value);
                 } else {
                     ScriptableObject so = (ScriptableObject) object;
                     Callable getterOrSetter = (Callable) value;
                     boolean isSetter = getterSetter == 1;
+                    setFunctionNameIfApplicable(value, (isSetter ? "set " : "get ") + index);
                     so.setGetterOrSetter((String) null, index, getterOrSetter, isSetter);
                 }
             } else if (isSymbol(id)) {
                 Symbol symbol = (Symbol) id;
                 if (getterSetter == 0) {
-                    ScriptableObject.putProperty(object, (Symbol) id, value);
+                    setFunctionNameIfApplicable(value, symbol.toSymbolString());
+                    ScriptableObject.putProperty(object, symbol, value);
                 } else {
                     ScriptableObject so = (ScriptableObject) object;
                     Callable getterOrSetter = (Callable) value;
                     boolean isSetter = getterSetter == 1;
+                    setFunctionNameIfApplicable(value, (isSetter ? "set " : "get ") + symbol.toSymbolString());
                     so.setGetterOrSetter(symbol, 0, getterOrSetter, isSetter);
                 }
             } else {
@@ -4276,6 +4297,14 @@ public class ScriptRuntime {
             }
         }
         return object;
+    }
+
+    private static void setFunctionNameIfApplicable(Object fn, Object name) {
+        if (fn instanceof BaseFunction) {
+            if (((BaseFunction) fn).getFunctionName().equals("") && ((BaseFunction) fn).getForcedName() == null) {
+                ((BaseFunction) fn).setForcedName(name);
+            }
+        }
     }
 
     public static boolean isArrayObject(Object obj) {

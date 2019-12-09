@@ -278,6 +278,10 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
         return Undefined.instance;
     }
 
+    public String toSymbolString() {
+        return key.toSymbolString();
+    }
+
     @Override
     public String toString() {
         return key.toString();

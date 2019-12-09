@@ -134,10 +134,10 @@ public class BaseFunction extends IdScriptableObject implements Function {
         int attr;
         switch (id) {
             case Id_length:
+            case Id_name:
                 attr = NOT_ENUMERABLE | NOT_WRITABLE;
                 break;
             case Id_arity:
-            case Id_name:
                 attr = NOT_ENUMERABLE | NOT_WRITABLE | NOT_CONFIGURABLE;
                 break;
             case Id_prototype:
@@ -180,8 +180,13 @@ public class BaseFunction extends IdScriptableObject implements Function {
                 return ScriptRuntime.wrapInt(getLength());
             case Id_arity:
                 return ScriptRuntime.wrapInt(getArity());
-            case Id_name:
+            case Id_name: {
+                if (forcedName != null) {
+                    return forcedName;
+                }
+
                 return getFunctionName();
+            }
             case Id_prototype:
                 return getPrototypeProperty();
             case Id_arguments:
@@ -544,6 +549,14 @@ public class BaseFunction extends IdScriptableObject implements Function {
                 : activation.get("arguments", activation);
     }
 
+    public Object getForcedName() {
+        return forcedName;
+    }
+
+    public void setForcedName(Object forcedName) {
+        this.forcedName = forcedName;
+    }
+
     public Object getForcedNewTarget() {
         return forcedNewTarget;
     }
@@ -668,6 +681,7 @@ public class BaseFunction extends IdScriptableObject implements Function {
     private Object argumentsObj = NOT_FOUND;
 
     private Object forcedNewTarget;
+    private Object forcedName;
 
     // For function object instances, attributes are
     //  {configurable:false, enumerable:false};
