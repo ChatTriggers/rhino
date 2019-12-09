@@ -7,6 +7,7 @@
 package org.mozilla.javascript;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 /**
  * This class reflects Java arrays into the JavaScript environment.
@@ -119,8 +120,28 @@ public class NativeJavaArray
 
     @Override
     public Object getDefaultValue(Class<?> hint) {
-        if (hint == null || hint == ScriptRuntime.StringClass)
-            return array.toString();
+        if (hint == null || hint == ScriptRuntime.StringClass) {
+            Class<?> eClass = array.getClass();
+
+            if (eClass == byte[].class)
+                return Arrays.toString((byte[]) array);
+            else if (eClass == short[].class)
+                return Arrays.toString((short[]) array);
+            else if (eClass == int[].class)
+                return Arrays.toString((int[]) array);
+            else if (eClass == long[].class)
+                return Arrays.toString((long[]) array);
+            else if (eClass == char[].class)
+                return Arrays.toString((char[]) array);
+            else if (eClass == float[].class)
+                return Arrays.toString((float[]) array);
+            else if (eClass == double[].class)
+                return Arrays.toString((double[]) array);
+            else if (eClass == boolean[].class)
+                return Arrays.toString((boolean[]) array);
+
+            return Arrays.deepToString((Object[]) array);
+        }
         if (hint == ScriptRuntime.BooleanClass)
             return Boolean.TRUE;
         if (hint == ScriptRuntime.NumberClass)
