@@ -2420,6 +2420,10 @@ public class Context {
         return cx;
     }
 
+    public static Scriptable getScope() {
+        return getContext().topCallScope;
+    }
+
     private Object compileImpl(Scriptable scope,
                                String sourceString, String sourceName, int lineno,
                                Object securityDomain, boolean returnFunction,

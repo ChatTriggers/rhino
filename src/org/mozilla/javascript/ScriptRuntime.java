@@ -1177,6 +1177,8 @@ public class ScriptRuntime {
     }
 
     public static String toStringPretty(Object val) {
+        boolean quoteString = true;
+
         for (; ; ) {
             if (val == null) {
                 return "null";
@@ -1185,7 +1187,10 @@ public class ScriptRuntime {
                 return "undefined";
             }
             if (val instanceof String) {
-                return '"' + (String) val + '"';
+                if (quoteString) {
+                    return '"' + (String) val + '"';
+                }
+                return (String) val;
             }
             if (val instanceof CharSequence) {
                 return val.toString();
@@ -1200,6 +1205,7 @@ public class ScriptRuntime {
             }
             if (val instanceof Scriptable) {
                 val = ((Scriptable) val).getDefaultValue(StringClass);
+                quoteString = false;
                 if ((val instanceof Scriptable) && !isSymbol(val)) {
                     throw errorWithClassName("msg.primitive.expected", val);
                 }

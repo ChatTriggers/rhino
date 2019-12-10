@@ -279,7 +279,8 @@ public final class NativeJSON extends IdScriptableObject {
 
         ScriptableObject wrapper = new NativeObject();
         wrapper.setParentScope(scope);
-        wrapper.setPrototype(ScriptableObject.getObjectPrototype(scope));
+        if (scope != null)
+            wrapper.setPrototype(ScriptableObject.getObjectPrototype(scope));
         wrapper.defineProperty("", value, 0);
         return str("", wrapper, state);
     }
