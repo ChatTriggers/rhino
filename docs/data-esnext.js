@@ -1216,6 +1216,7 @@ exports.tests = [
         }).then(function(val) {
           score += (val === 'foo');
           if (score === 2) asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -1241,6 +1242,7 @@ exports.tests = [
         }).catch(function(err) {
           score += (err === 'bar');
           if (score === 2) asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -1266,6 +1268,7 @@ exports.tests = [
         }).then(function(val) {
           score += (val === 'foo');
           if (score === 2) asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -1291,6 +1294,7 @@ exports.tests = [
         }).catch(function(err) {
           score += (err === 'bar');
           if (score === 2) asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -2995,6 +2999,7 @@ exports.tests = [
       Promise.resolve(3)
     ]).then(it => {
       if (it === 1) asyncTestPassed();
+      else asyncTestFailed();
     });
   */},
   res: {
@@ -3460,6 +3465,7 @@ exports.tests = [
 
         toArray(iterator).then(it => {
           if (it.join() === '1,2,3') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3487,6 +3493,7 @@ exports.tests = [
 
         toArray(iterator).then(it => {
           if (it.join() === '1,2,3') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3514,6 +3521,7 @@ exports.tests = [
 
         toArray(iterator).then(it => {
           if (it.join() === '1,2,3') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3537,6 +3545,7 @@ exports.tests = [
 
         toArray((async function*() { yield * [1, 2, 3] })().asIndexedPairs()).then(it => {
           if (it.join() === '0,1,1,2,2,3') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3560,6 +3569,7 @@ exports.tests = [
 
         toArray(async function*() { yield * [1, 2, 3] }().drop(1)).then(it => {
           if (it.join() === '2,3') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3577,6 +3587,7 @@ exports.tests = [
       exec: function () {/*
         (async function*() { yield * [1, 2, 3] })().every(it => typeof it === 'number').then(it => {
           if (it === true) asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3600,6 +3611,7 @@ exports.tests = [
 
         toArray(async function*() { yield * [1, 2, 3] }().filter(it => it % 2)).then(it => {
           if (it.join() === '1,3') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3617,6 +3629,7 @@ exports.tests = [
       exec: function () {/*
         (async function*() { yield * [1, 2, 3] })().find(it => it % 2).then(it => {
           if (it === 1) asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3640,6 +3653,7 @@ exports.tests = [
 
         toArray(async function*() { yield * [1, 2, 3] }().flatMap(it => [it, 0])).then(it => {
           if (it.join() === '1,0,2,0,3,0') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3658,6 +3672,7 @@ exports.tests = [
         let result = '';
         (async function*() { yield * [1, 2, 3] })().forEach(it => result += it).then(() => {
           if (result === '123') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3681,6 +3696,7 @@ exports.tests = [
 
         toArray(async function*() { yield * [1, 2, 3] }().map(it => it * it)).then(it => {
           if (it.join() === '1,4,9') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3698,6 +3714,7 @@ exports.tests = [
       exec: function () {/*
         (async function*() { yield * [1, 2, 3] })().reduce((a, b) => a + b).then(it => {
           if (it === 6) asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3715,6 +3732,7 @@ exports.tests = [
       exec: function () {/*
         (async function*() { yield * [1, 2, 3] })().some(it => typeof it === 'number').then(it => {
           if (it === true) asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3738,6 +3756,7 @@ exports.tests = [
 
         toArray(async function*() { yield * [1, 2, 3] }().take(2)).then(it => {
           if (it.join() === '1,2') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
@@ -3755,6 +3774,7 @@ exports.tests = [
       exec: function () {/*
         (async function*() { yield * [1, 2, 3] })().toArray().then(it => {
           if (Array.isArray(it) && it.join() === '1,2,3') asyncTestPassed();
+          else asyncTestFailed();
         });
       */},
       res: {
