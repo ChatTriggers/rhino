@@ -15,4 +15,5 @@ package org.mozilla.javascript;
  */
 
 public interface Symbol {
+    String toSymbolString();
 }

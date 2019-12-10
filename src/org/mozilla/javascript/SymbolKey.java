@@ -54,6 +54,13 @@ public class SymbolKey
         return false;
     }
 
+    public String toSymbolString() {
+        if (name == null || name.equals("")) {
+            return "";
+        }
+        return "[" + name + "]";
+    }
+
     @Override
     public String toString() {
         if (name == null) {
