@@ -46,13 +46,10 @@ public class NativeProxyCtor extends BaseFunction {
 
             NativeProxy proxy = new NativeProxy((ScriptableObject) args[0], (ScriptableObject) args[1]);
 
-            Function revoke = new BaseFunction() {
-                @Override
-                public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-                    proxy.revoke();
-                    return null;
-                }
-            };
+            Function revoke = BaseFunction.wrap((_cx, _scope, _thisObj, _args) -> {
+                proxy.revoke();
+                return null;
+            });
 
             NativeProxyRevocableObject obj = new NativeProxyRevocableObject(proxy, revoke);
 

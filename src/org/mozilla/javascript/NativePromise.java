@@ -153,22 +153,16 @@ public class NativePromise extends IdScriptableObject {
                     final Object[] result = {null};
 
                     resolver.call(Context.getContext(), scope, this, new Object[]{
-                            new BaseFunction() {
-                                @Override
-                                public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-                                    status[0] = PromiseState.FULFILLED;
-                                    result[0] = args.length > 0 ? args[0] : null;
-                                    return null;
-                                }
-                            },
-                            new BaseFunction() {
-                                @Override
-                                public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-                                    status[0] = PromiseState.REJECTED;
-                                    result[0] = args.length > 0 ? args[0] : null;
-                                    return null;
-                                }
-                            }
+                            BaseFunction.wrap((_cx, _scope, _thisObj, _args) -> {
+                                status[0] = PromiseState.FULFILLED;
+                                result[0] = _args.length > 0 ? _args[0] : null;
+                                return null;
+                            }),
+                            BaseFunction.wrap((_cx, _scope, _thisObj, _args) -> {
+                                status[0] = PromiseState.REJECTED;
+                                result[0] = _args.length > 0 ? _args[0] : null;
+                                return null;
+                            })
                     });
 
                     //noinspection LoopConditionNotUpdatedInsideLoop,StatementWithEmptyBody
@@ -303,13 +297,10 @@ public class NativePromise extends IdScriptableObject {
 
     private Object js_reject(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         return constructPromise(cx, scope, thisObj, new Object[]{
-                new BaseFunction() {
-                    @Override
-                    public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] innerArgs) {
-                        ((Callable) innerArgs[1]).call(cx, scope, thisObj, args);
-                        return Undefined.instance;
-                    }
-                }
+                BaseFunction.wrap((_cx, _scope, _thisObj, _args) -> {
+                    ((Callable) _args[1]).call(_cx, _scope, _thisObj, args);
+                    return Undefined.instance;
+                })
         });
     }
 
@@ -323,22 +314,19 @@ public class NativePromise extends IdScriptableObject {
 
             if (then instanceof Callable) {
                 return constructPromise(cx, scope, thisObj, new Object[]{
-                        new BaseFunction() {
-                            @Override
-                            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-                                BaseFunction fulfill = (BaseFunction) args[0];
-                                BaseFunction reject = (BaseFunction) args[1];
+                        BaseFunction.wrap((_cx, _scope, _thisObj, _args) -> {
+                            BaseFunction fulfill = (BaseFunction) _args[0];
+                            BaseFunction reject = (BaseFunction) _args[1];
 
-                                try {
-                                    Object result = ((Callable) then).call(cx, scope, thisObj, new Object[]{ fulfill, reject });
-                                    NativeObject obj = new NativeObject();
-                                    ScriptableObject.putProperty(obj, "result", result);
-                                    return obj;
-                                } catch (Exception e) {
-                                    throw ScriptRuntime.throwCustomError(cx, scope, "Error", "TODO");
-                                }
+                            try {
+                                Object result = ((Callable) then).call(_cx, _scope, _thisObj, new Object[]{ fulfill, reject });
+                                NativeObject obj = new NativeObject();
+                                ScriptableObject.putProperty(obj, "result", result);
+                                return obj;
+                            } catch (Exception e) {
+                                throw ScriptRuntime.throwCustomError(_cx, _scope, "Error", "TODO");
                             }
-                        }
+                        })
                 });
             }
         }
