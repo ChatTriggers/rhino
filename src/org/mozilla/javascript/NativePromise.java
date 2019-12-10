@@ -126,6 +126,11 @@ public class NativePromise extends IdScriptableObject {
     }
 
     private Object js_construct(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (thisObj != null) {
+            // Not called with "new"
+            throw ScriptRuntime.typeError0("msg.promise.no.new");
+        }
+
         Object arg0 = args.length > 0 ? args[0] : null;
         Object arg1 = args.length > 1 ? args[1] : null;
         NativePromise promise = new NativePromise();
