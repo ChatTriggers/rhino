@@ -1216,6 +1216,9 @@ public class ScriptRuntime {
                 throw typeError0("msg.not.a.string");
             }
             if (val instanceof Scriptable) {
+                if (val instanceof NativeArray) {
+                    return NativeArray.toStringHelper(Context.getContext(), Context.getContext().topCallScope, (Scriptable) val, true, false);
+                }
                 val = ((Scriptable) val).getDefaultValue(StringClass);
                 quoteString = false;
                 if ((val instanceof Scriptable) && !isSymbol(val)) {

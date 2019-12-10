@@ -25,17 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextAction;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.GeneratedClassLoader;
-import org.mozilla.javascript.Kit;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.RhinoException;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.SecurityController;
+import org.mozilla.javascript.*;
 import org.mozilla.javascript.commonjs.module.ModuleScope;
 import org.mozilla.javascript.commonjs.module.Require;
 import org.mozilla.javascript.optimizer.Codegen;
@@ -528,7 +518,7 @@ public class Main
                                         source.trim().startsWith("function")))
                         {
                             try {
-                                console.println(Context.toString(result));
+                                console.println(ScriptRuntime.toStringPretty(result));
                             } catch (RhinoException rex) {
                                 ToolErrorReporter.reportException(
                                         cx.getErrorReporter(), rex);
