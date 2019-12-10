@@ -68,10 +68,6 @@ function run (name, script, cb) {
   if (/incomplete patterns and quantifiers/.test(name)) {
 	return cb(false);
   }
-  // Work around an exception bug in recent versions of Rhino
-  if (/__define[GS]etter__.+ToObject/.test(name)) {
-	return cb(false);
-  }
 
   // kangax's Promise tests reply on a asyncTestPassed function.
   var async = /asyncTestPassed/.test(script)
