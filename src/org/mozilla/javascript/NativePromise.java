@@ -171,6 +171,7 @@ public class NativePromise extends IdScriptableObject {
                             }
                     });
 
+                    //noinspection LoopConditionNotUpdatedInsideLoop,StatementWithEmptyBody
                     while (status[0] == PromiseState.PENDING) { }
 
                     if (status[0] == PromiseState.FULFILLED) {
@@ -179,7 +180,7 @@ public class NativePromise extends IdScriptableObject {
                         return obj;
                     }
 
-                    throw ScriptRuntime.throwCustomError(cx, scope, "Error", ScriptRuntime.toString(result[0]));
+                    throw new JavaScriptException(result[0], null, 0);
                 } finally {
                     Context.exit();
                 }
