@@ -1,9 +1,7 @@
 package org.mozilla.javascript;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
 
 public class NativePromise extends IdScriptableObject {
@@ -119,6 +117,14 @@ public class NativePromise extends IdScriptableObject {
         return null;
     }
 
+    private NativePromise ensureCorrectProto(Scriptable thisObj, String methodName) {
+        if (!(thisObj instanceof NativePromise) || ((NativePromise) thisObj).future == null || getSpecies(thisObj) == null) {
+            throw ScriptRuntime.typeError1("msg.incompat.call", methodName);
+        }
+
+        return ((NativePromise) thisObj);
+    }
+
     private Object js_construct(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         Object arg0 = args.length > 0 ? args[0] : null;
         Object arg1 = args.length > 1 ? args[1] : null;
@@ -165,8 +171,7 @@ public class NativePromise extends IdScriptableObject {
                             }
                     });
 
-                    while (status[0] == PromiseState.PENDING) {
-                    }
+                    while (status[0] == PromiseState.PENDING) { }
 
                     if (status[0] == PromiseState.FULFILLED) {
                         NativeObject obj = new NativeObject();
@@ -175,9 +180,6 @@ public class NativePromise extends IdScriptableObject {
                     }
 
                     throw ScriptRuntime.throwCustomError(cx, scope, "Error", ScriptRuntime.toString(result[0]));
-                } catch (Exception e) {
-                    System.out.println("test");
-                    throw e;
                 } finally {
                     Context.exit();
                 }
@@ -188,6 +190,7 @@ public class NativePromise extends IdScriptableObject {
     }
 
     private Object js_catch(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        ensureCorrectProto(thisObj, "catch");
         return js_then(cx, scope, thisObj, new Object[]{ null, args.length > 0 ? args[0] : null });
     }
 
@@ -196,7 +199,7 @@ public class NativePromise extends IdScriptableObject {
     }
 
     private Object js_then(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        NativePromise promise = (NativePromise) thisObj;
+        NativePromise promise = ensureCorrectProto(thisObj, "then");
         Callable onFulfillment = null;
         Callable onRejection = null;
 
