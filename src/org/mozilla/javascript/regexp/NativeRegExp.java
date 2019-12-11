@@ -35,6 +35,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
     public static final int JSREG_MULTILINE = 0x4;  // 'm' flag: multiline
     public static final int JSREG_STICKY = 0x8;  // 'y' flag: sticky
     public static final int JSREG_UNICODE = 0x10;  // 'm' flag: unicode
+    public static final int JSREG_DOTALL = 0x20;  // 'm' flag: unicode
 
     //type of match to perform
     public static final int TEST = 0;
@@ -271,12 +272,14 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             buf.append('m');
         if ((flags & JSREG_STICKY) != 0)
             buf.append('y');
+        if ((flags & JSREG_DOTALL) != 0)
+            buf.append('s');
         if ((flags & JSREG_UNICODE) != 0)
             buf.append('u');
         return buf.toString();
     }
 
-    static int parseREFlags(String descriptor) {
+    private static int parseREFlags(String descriptor) {
         int flags = 0;
         for (int i = 0; i < descriptor.length(); i++) {
             char c = descriptor.charAt(i);
@@ -289,6 +292,8 @@ public class NativeRegExp extends IdScriptableObject implements Function {
                 f = JSREG_MULTILINE;
             } else if (c == 'y') {
                 f = JSREG_STICKY;
+            } else if (c == 's') {
+                f = JSREG_DOTALL;
             } else {
                 reportError("msg.invalid.re.flag", String.valueOf(c));
             }
@@ -1749,7 +1754,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
                         ^ ((gData.cp < end) && isWord(input.charAt(gData.cp))));
                 break;
             case REOP_DOT:
-                if (gData.cp != end && !isLineTerm(input.charAt(gData.cp))) {
+                if (gData.cp != end && (gData.dotAll || !isLineTerm(input.charAt(gData.cp)))) {
                     result = true;
                     gData.cp++;
                 }
@@ -2287,9 +2292,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
 
     }
 
-    private static boolean
-    matchRegExp(REGlobalData gData, RECompiled re,
-                String input, int start, int end, boolean multiline) {
+    private static boolean matchRegExp(REGlobalData gData, RECompiled re, String input, int start, int end, boolean multiline) {
         if (re.parenCount != 0) {
             gData.parens = new long[re.parenCount];
         } else {
@@ -2300,6 +2303,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
         gData.stateStackTop = null;
 
         gData.multiline = multiline || (re.flags & JSREG_MULTILINE) != 0;
+        gData.dotAll = (re.flags & JSREG_DOTALL) != 0;
         gData.regexp = re;
 
         int anchorCh = gData.regexp.anchorCh;
@@ -2500,9 +2504,10 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             Id_ignoreCase = 4,
             Id_multiline = 5,
             Id_sticky = 6,
-            Id_flags = 7,
+            Id_dotAll = 7,
+            Id_flags = 8,
 
-    MAX_INSTANCE_ID = 7;
+    MAX_INSTANCE_ID = Id_flags;
 
     @Override
     protected int getMaxInstanceId() {
@@ -2512,47 +2517,23 @@ public class NativeRegExp extends IdScriptableObject implements Function {
     @Override
     protected int findInstanceIdInfo(String s) {
         int id;
-// #generated# Last update: 2019-11-21 20:32:35 EST
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            L:
-            switch (s.length()) {
-                case 5:
-                    X = "flags";
-                    id = Id_flags;
-                    break L;
-                case 6:
-                    c = s.charAt(1);
-                    if (c == 'l') {
-                        X = "global";
-                        id = Id_global;
-                    } else if (c == 'o') {
-                        X = "source";
-                        id = Id_source;
-                    } else if (c == 't') {
-                        X = "sticky";
-                        id = Id_sticky;
-                    }
-                    break L;
-                case 9:
-                    c = s.charAt(0);
-                    if (c == 'l') {
-                        X = "lastIndex";
-                        id = Id_lastIndex;
-                    } else if (c == 'm') {
-                        X = "multiline";
-                        id = Id_multiline;
-                    }
-                    break L;
-                case 10:
-                    X = "ignoreCase";
-                    id = Id_ignoreCase;
-                    break L;
+// #generated# Last update: 2019-12-11 15:09:11 EST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 5: X="flags";id=Id_flags; break L;
+            case 6: switch (s.charAt(2)) {
+                case 'i': X="sticky";id=Id_sticky; break L;
+                case 'o': X="global";id=Id_global; break L;
+                case 't': X="dotAll";id=Id_dotAll; break L;
+                case 'u': X="source";id=Id_source; break L;
+                } break L;
+            case 9: c=s.charAt(0);
+                if (c=='l') { X="lastIndex";id=Id_lastIndex; }
+                else if (c=='m') { X="multiline";id=Id_multiline; }
+                break L;
+            case 10: X="ignoreCase";id=Id_ignoreCase; break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -2570,6 +2551,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             case Id_ignoreCase:
             case Id_multiline:
             case Id_sticky:
+            case Id_dotAll:
             case Id_flags:
                 attr = NOT_CONFIGURABLE | NOT_WRITABLE | NOT_ENUMERABLE;
                 break;
@@ -2594,6 +2576,8 @@ public class NativeRegExp extends IdScriptableObject implements Function {
                 return "multiline";
             case Id_sticky:
                 return "sticky";
+            case Id_dotAll:
+                return "dotAll";
             case Id_flags:
                 return "flags";
         }
@@ -2617,6 +2601,8 @@ public class NativeRegExp extends IdScriptableObject implements Function {
                 return ScriptRuntime.wrapBoolean((re.flags & JSREG_MULTILINE) != 0);
             case Id_sticky:
                 return ScriptRuntime.wrapBoolean((re.flags & JSREG_STICKY) != 0);
+            case Id_dotAll:
+                return ScriptRuntime.wrapBoolean((re.flags & JSREG_DOTALL) != 0);
         }
         return super.getInstanceIdValue(id);
     }
@@ -2632,6 +2618,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             case Id_ignoreCase:
             case Id_multiline:
             case Id_sticky:
+            case Id_dotAll:
             case Id_flags:
                 return;
         }
@@ -2725,44 +2712,21 @@ public class NativeRegExp extends IdScriptableObject implements Function {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-11-21 20:32:35 EST
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            L:
-            switch (s.length()) {
-                case 4:
-                    c = s.charAt(0);
-                    if (c == 'e') {
-                        X = "exec";
-                        id = Id_exec;
-                    } else if (c == 't') {
-                        X = "test";
-                        id = Id_test;
-                    }
-                    break L;
-                case 6:
-                    X = "prefix";
-                    id = Id_prefix;
-                    break L;
-                case 7:
-                    X = "compile";
-                    id = Id_compile;
-                    break L;
-                case 8:
-                    c = s.charAt(3);
-                    if (c == 'o') {
-                        X = "toSource";
-                        id = Id_toSource;
-                    } else if (c == 't') {
-                        X = "toString";
-                        id = Id_toString;
-                    }
-                    break L;
+// #generated# Last update: 2019-12-11 15:09:11 EST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 4: c=s.charAt(0);
+                if (c=='e') { X="exec";id=Id_exec; }
+                else if (c=='t') { X="test";id=Id_test; }
+                break L;
+            case 6: X="prefix";id=Id_prefix; break L;
+            case 7: X="compile";id=Id_compile; break L;
+            case 8: c=s.charAt(3);
+                if (c=='o') { X="toSource";id=Id_toSource; }
+                else if (c=='t') { X="toString";id=Id_toString; }
+                break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -2915,6 +2879,7 @@ class REBackTrackData {
 
 class REGlobalData {
     boolean multiline;
+    boolean dotAll;
     RECompiled regexp;              /* the RE in execution */
     int skipped;                    /* chars skipped anchoring this r.e. */
 

@@ -1387,6 +1387,8 @@ class TokenStream {
                 addToString('m');
             else if (matchChar('y'))  // FireFox 3
                 addToString('y');
+            else if (matchChar('s'))  // ES2018
+                addToString('s');
             else
                 break;
         }
