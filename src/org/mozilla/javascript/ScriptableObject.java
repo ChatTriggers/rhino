@@ -1557,11 +1557,11 @@ public abstract class ScriptableObject implements Scriptable,
             names.add(propName);
             name = propName;
 
-            if (annotation instanceof JSGetter || prefix == getterPrefix) {
+            if (annotation instanceof JSGetter || prefix.equals(getterPrefix)) {
                 if (!(proto instanceof ScriptableObject)) {
-                    throw Context.reportRuntimeError2(
+                    throw Context.reportRuntimeError3(
                             "msg.extend.scriptable",
-                            proto.getClass().toString(), name);
+                            proto.getClass().toString(), "define", name);
                 }
                 Method setter = findSetterMethod(methods, name, setterPrefix);
                 int attr = ScriptableObject.NOT_CONFIGURABLE |

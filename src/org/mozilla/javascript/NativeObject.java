@@ -285,9 +285,10 @@ public class NativeObject extends IdScriptableObject implements Map {
                     throw ScriptRuntime.notFunctionError(badArg);
                 }
                 if (!(thisObj instanceof ScriptableObject)) {
-                    throw Context.reportRuntimeError2(
+                    throw Context.reportRuntimeError3(
                             "msg.extend.scriptable",
                             thisObj == null ? "null" : thisObj.getClass().getName(),
+                            "define",
                             String.valueOf(args[0]));
                 }
                 ScriptableObject so = (ScriptableObject) thisObj;
@@ -309,9 +310,17 @@ public class NativeObject extends IdScriptableObject implements Map {
 
             case Id___lookupGetter__:
             case Id___lookupSetter__: {
-                if (args.length < 1 ||
-                        !(thisObj instanceof ScriptableObject))
+                if (args.length < 1) {
                     return Undefined.instance;
+                }
+
+                if (!(thisObj instanceof ScriptableObject)) {
+                    throw Context.reportRuntimeError3(
+                            "msg.extend.scriptable",
+                            thisObj == null ? "null" : thisObj.getClass().getName(),
+                            "lookup",
+                            String.valueOf(args[0]));
+                }
 
                 ScriptableObject so = (ScriptableObject) thisObj;
                 boolean isSetter = (id == Id___lookupSetter__);
