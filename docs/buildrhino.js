@@ -42,7 +42,7 @@ function result (type, nodeVersion, esVersion, path) {
   return `<div class="${result} ${type} ${flagRequired ? 'required' : ''}" title="${$escape(title)}">${result === 'Yes' && flagRequired ? 'Flag' : result}</div>`
 }
 
-var html = pug.renderFile('rhinoindex.pug', {
+var html = pug.renderFile('./docs/rhinoindex.pug', {
   pretty: true,
   flaggable: true,
   headers: headers,
@@ -58,4 +58,4 @@ var html = pug.renderFile('rhinoindex.pug', {
   }
 })
 
-require('fs').writeFileSync('./index.html', html)
+require('fs').writeFileSync('./docs/index.html', html)

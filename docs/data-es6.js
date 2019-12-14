@@ -2247,7 +2247,7 @@ exports.tests = [
     {
       name: 'with generic iterables, in calls',
       exec: function () {/*
-        var iterable = global.__createIterableObject([1, 2, 3]);
+        var iterable = __createIterableObject([1, 2, 3]);
         return Math.max(...iterable) === 3;
       */},
       res: {
@@ -2280,7 +2280,7 @@ exports.tests = [
     {
       name: 'with generic iterables, in arrays',
       exec: function () {/*
-        var iterable = global.__createIterableObject(["b", "c", "d"]);
+        var iterable = __createIterableObject(["b", "c", "d"]);
         return ["a", ...iterable, "e"][3] === "d";
       */},
       res: {
@@ -2308,7 +2308,7 @@ exports.tests = [
     {
       name: 'with instances of iterables, in calls',
       exec: function () {/*
-        var iterable = global.__createIterableObject([1, 2, 3]);
+        var iterable = __createIterableObject([1, 2, 3]);
         return Math.max(...Object.create(iterable)) === 3;
       */},
       res: {
@@ -2337,7 +2337,7 @@ exports.tests = [
     {
       name: 'with instances of iterables, in arrays',
       exec: function () {/*
-        var iterable = global.__createIterableObject(["b", "c", "d"]);
+        var iterable = __createIterableObject(["b", "c", "d"]);
         return ["a", ...Object.create(iterable), "e"][3] === "d";
       */},
       res: {
@@ -4072,7 +4072,7 @@ exports.tests = [
       name: 'with generic iterables',
       exec: function () {/*
         var result = "";
-        var iterable = global.__createIterableObject([1, 2, 3]);
+        var iterable = __createIterableObject([1, 2, 3]);
         for (var item of iterable) {
           result += item;
         }
@@ -4104,7 +4104,7 @@ exports.tests = [
       name: 'with instances of generic iterables',
       exec: function () {/*
         var result = "";
-        var iterable = global.__createIterableObject([1, 2, 3]);
+        var iterable = __createIterableObject([1, 2, 3]);
         for (var item of Object.create(iterable)) {
           result += item;
         }
@@ -4136,7 +4136,7 @@ exports.tests = [
       name: 'iterator closing, break',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         for (var it of iter) break;
@@ -4164,7 +4164,7 @@ exports.tests = [
       name: 'iterator closing, throw',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'throw': function(){ closed = true; return {}; }
         });
         try {
@@ -4770,7 +4770,7 @@ exports.tests = [
       name: 'yield *, generic iterables',
       exec: function () {/*
         var iterator = (function * generator() {
-          yield * global.__createIterableObject([5, 6, 7]);
+          yield * __createIterableObject([5, 6, 7]);
         }());
         var item = iterator.next();
         var passed = item.value === 5 && item.done === false;
@@ -4924,7 +4924,7 @@ exports.tests = [
       name: 'yield *, iterator closing via throw()',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'throw': undefined,
           'return': function() {
             closed = true;
@@ -7300,7 +7300,7 @@ exports.tests = [
       name: 'iterator closing',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         try {
@@ -7904,7 +7904,7 @@ exports.tests = [
       name: 'iterator closing',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         var add = Set.prototype.add;
@@ -8539,7 +8539,7 @@ exports.tests = [
       name: 'iterator closing',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         try {
@@ -8890,7 +8890,7 @@ exports.tests = [
       name: 'iterator closing',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         try {
@@ -12536,7 +12536,7 @@ exports.tests = [
     {
       name: 'with generic iterables',
       exec: function(){/*
-        var [a, b, c] = global.__createIterableObject([1, 2]);
+        var [a, b, c] = __createIterableObject([1, 2]);
         return a === 1 && b === 2 && c === undefined;
       */},
       res: {
@@ -12564,7 +12564,7 @@ exports.tests = [
     {
       name: 'with instances of generic iterables',
       exec: function(){/*
-        var [a, b, c] = Object.create(global.__createIterableObject([1, 2]));
+        var [a, b, c] = Object.create(__createIterableObject([1, 2]));
         return a === 1 && b === 2 && c === undefined;
       */},
       res: {
@@ -12593,7 +12593,7 @@ exports.tests = [
       name: 'iterator closing',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         var [a, b] = iter;
@@ -13215,7 +13215,7 @@ exports.tests = [
       name: 'with generic iterables',
       exec: function(){/*
         var a,b,c;
-        [a, b, c] = global.__createIterableObject([1, 2]);
+        [a, b, c] = __createIterableObject([1, 2]);
         return a === 1 && b === 2 && c === undefined;
       */},
       res: {
@@ -13244,7 +13244,7 @@ exports.tests = [
       name: 'with instances of generic iterables',
       exec: function(){/*
         var a,b,c;
-        [a, b, c] = Object.create(global.__createIterableObject([1, 2]));
+        [a, b, c] = Object.create(__createIterableObject([1, 2]));
         return a === 1 && b === 2 && c === undefined;
       */},
       res: {
@@ -13273,7 +13273,7 @@ exports.tests = [
       name: 'iterator closing',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         var a,b;
@@ -13968,7 +13968,7 @@ exports.tests = [
       exec: function(){/*
         return function([a, b, c]) {
           return a === 1 && b === 2 && c === undefined;
-        }(global.__createIterableObject([1, 2]));
+        }(__createIterableObject([1, 2]));
       */},
       res: {
         tr: true,
@@ -13997,7 +13997,7 @@ exports.tests = [
       exec: function(){/*
         return function([a, b, c]) {
           return a === 1 && b === 2 && c === undefined;
-        }(Object.create(global.__createIterableObject([1, 2])));
+        }(Object.create(__createIterableObject([1, 2])));
       */},
       res: {
         tr: true,
@@ -14025,7 +14025,7 @@ exports.tests = [
       name: 'iterator closing',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         (function([a,b]) {}(iter));
@@ -14688,11 +14688,11 @@ exports.tests = [
     {
       name: 'Promise.all, generic iterables',
       exec: function () {/*
-        var fulfills = Promise.all(global.__createIterableObject([
+        var fulfills = Promise.all(__createIterableObject([
           new Promise(function(resolve)   { setTimeout(resolve,2000,"foo"); }),
           new Promise(function(resolve)   { setTimeout(resolve,1000,"bar"); }),
         ]));
-        var rejects = Promise.all(global.__createIterableObject([
+        var rejects = Promise.all(__createIterableObject([
           new Promise(function(_, reject) { setTimeout(reject, 2000,"baz"); }),
           new Promise(function(_, reject) { setTimeout(reject, 1000,"qux"); }),
         ]));
@@ -14765,11 +14765,11 @@ exports.tests = [
     {
       name: 'Promise.race, generic iterables',
       exec: function () {/*
-        var fulfills = Promise.race(global.__createIterableObject([
+        var fulfills = Promise.race(__createIterableObject([
           new Promise(function(resolve)   { setTimeout(resolve,1000,"foo"); }),
           new Promise(function(_, reject) { setTimeout(reject, 2000,"bar"); }),
         ]));
-        var rejects = Promise.race(global.__createIterableObject([
+        var rejects = Promise.race(__createIterableObject([
           new Promise(function(_, reject) { setTimeout(reject, 1000,"baz"); }),
           new Promise(function(resolve)   { setTimeout(resolve,2000,"qux"); }),
         ]));
@@ -18154,7 +18154,7 @@ exports.tests = [
     {
       name: 'Array.from, generic iterables',
       exec: function () {/*
-        var iterable = global.__createIterableObject([1, 2, 3]);
+        var iterable = __createIterableObject([1, 2, 3]);
         return Array.from(iterable) + '' === "1,2,3";
       */},
       res: {
@@ -18181,7 +18181,7 @@ exports.tests = [
     {
       name: 'Array.from, instances of generic iterables',
       exec: function () {/*
-        var iterable = global.__createIterableObject([1, 2, 3]);
+        var iterable = __createIterableObject([1, 2, 3]);
         return Array.from(Object.create(iterable)) + '' === "1,2,3";
       */},
       res: {
@@ -18262,7 +18262,7 @@ exports.tests = [
     {
       name: 'Array.from map function, generic iterables',
       exec: function () {/*
-        var iterable = global.__createIterableObject(["foo", "bar", "bal"]);
+        var iterable = __createIterableObject(["foo", "bar", "bal"]);
         return Array.from(iterable, function(e, i) {
           return e + this.baz + i;
         }, { baz: "d" }) + '' === "food0,bard1,bald2";
@@ -18290,7 +18290,7 @@ exports.tests = [
     {
       name: 'Array.from map function, instances of iterables',
       exec: function () {/*
-        var iterable = global.__createIterableObject(["foo", "bar", "bal"]);
+        var iterable = __createIterableObject(["foo", "bar", "bal"]);
         return Array.from(Object.create(iterable), function(e, i) {
           return e + this.baz + i;
         }, { baz: "d" }) + '' === "food0,bard1,bald2";
@@ -18318,7 +18318,7 @@ exports.tests = [
       name: 'Array.from, iterator closing',
       exec: function () {/*
         var closed = false;
-        var iter = global.__createIterableObject([1, 2, 3], {
+        var iter = __createIterableObject([1, 2, 3], {
           'return': function(){ closed = true; return {}; }
         });
         try {
