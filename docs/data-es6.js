@@ -12310,8 +12310,8 @@ exports.tests = [
         var p2 = Reflect.construct(Promise,[function(resolve, reject) { reject("quux"); }], F);
         var score = +(p1 instanceof F && p2 instanceof F);
 
-        function thenFn(result)  { score += (result === "foo"); }
-        function catchFn(result) { score += (result === "quux"); }
+        function thenFn(result)  { score += (result === "foo");  check(); }
+        function catchFn(result) { score += (result === "quux"); check(); }
         function shouldNotRun(result)  { score = -Infinity;   }
 
         p1.then = p2.then = Promise.prototype.then;
@@ -12322,10 +12322,9 @@ exports.tests = [
         p1.catch(shouldNotRun);
         p2.catch(catchFn);
 
-        setTimeout(function() {
+        function check() {
           if (score === 4) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         ejs: null,
@@ -14547,8 +14546,8 @@ exports.tests = [
         var p2 = new Promise(function(resolve, reject) { reject("quux"); });
         var score = 0;
 
-        function thenFn(result)  { score += (result === "foo"); }
-        function catchFn(result) { score += (result === "quux"); }
+        function thenFn(result)  { score += (result === "foo");  check(); }
+        function catchFn(result) { score += (result === "quux"); check(); }
         function shouldNotRun(result)  { score = -Infinity;   }
 
         p1.then(thenFn, shouldNotRun);
@@ -14559,12 +14558,12 @@ exports.tests = [
         p1.then(function() {
           // Promise.prototype.then() should return a new Promise
           score += p1.then() !== p1;
+          check();
         });
 
-        setTimeout(function() {
+        function check() {
           if (score === 4) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         tr: true,
@@ -14660,13 +14659,12 @@ exports.tests = [
           new Promise(function(_, reject) { setTimeout(reject, 1000,"qux"); }),
         ]);
         var score = 0;
-        fulfills.then(function(result) { score += (result + "" === "foo,bar"); });
-        rejects.catch(function(result) { score += (result === "qux"); });
+        fulfills.then(function(result) { score += (result + "" === "foo,bar"); check(); });
+        rejects.catch(function(result) { score += (result === "qux"); check(); });
 
-        setTimeout(function() {
+        function check() {
           if (score === 2) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         tr: true,
@@ -14699,13 +14697,12 @@ exports.tests = [
           new Promise(function(_, reject) { setTimeout(reject, 1000,"qux"); }),
         ]));
         var score = 0;
-        fulfills.then(function(result) { score += (result + "" === "foo,bar"); });
-        rejects.catch(function(result) { score += (result === "qux"); });
+        fulfills.then(function(result) { score += (result + "" === "foo,bar"); check(); });
+        rejects.catch(function(result) { score += (result === "qux"); check(); });
 
-        setTimeout(function() {
+        function check() {
           if (score === 2) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         babel6corejs2: babel.corejs,
@@ -14738,13 +14735,12 @@ exports.tests = [
           new Promise(function(resolve)   { setTimeout(resolve,2000,"qux"); }),
         ]);
         var score = 0;
-        fulfills.then(function(result) { score += (result === "foo"); });
-        rejects.catch(function(result) { score += (result === "baz"); });
+        fulfills.then(function(result) { score += (result === "foo"); check(); });
+        rejects.catch(function(result) { score += (result === "baz"); check(); });
 
-        setTimeout(function() {
+        function check() {
           if (score === 2) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         tr: true,
@@ -14778,13 +14774,12 @@ exports.tests = [
           new Promise(function(resolve)   { setTimeout(resolve,2000,"qux"); }),
         ]));
         var score = 0;
-        fulfills.then(function(result) { score += (result === "foo"); });
-        rejects.catch(function(result) { score += (result === "baz"); });
+        fulfills.then(function(result) { score += (result === "foo"); check(); });
+        rejects.catch(function(result) { score += (result === "baz"); check(); });
 
-        setTimeout(function() {
+        function check() {
           if (score === 2) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         babel6corejs2: babel.corejs,
@@ -20002,8 +19997,8 @@ exports.tests = [
         var p2 = new P(function(resolve, reject) { reject("quux"); });
         var score = +(p1 instanceof P);
 
-        function thenFn(result)  { score += (result === "foo");  }
-        function catchFn(result) { score += (result === "quux"); }
+        function thenFn(result)  { score += (result === "foo");  check(); }
+        function catchFn(result) { score += (result === "quux"); check(); }
         function shouldNotRun(result)  { score = -Infinity;   }
 
         p1.then(thenFn, shouldNotRun);
@@ -20014,12 +20009,12 @@ exports.tests = [
         p1.then(function() {
           // P.prototype.then() should return a new P
           score += p1.then() instanceof P && p1.then() !== p1;
+          check();
         });
 
-        setTimeout(function() {
+        function check() {
           if (score === 5) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         typescript1corejs2: false,
@@ -20076,13 +20071,12 @@ exports.tests = [
           new Promise(function(_, reject) { setTimeout(reject, 1000,"qux"); }),
         ]);
         var score = +(fulfills instanceof P);
-        fulfills.then(function(result) { score += (result + "" === "foo,bar"); });
-        rejects.catch(function(result) { score += (result === "qux"); });
+        fulfills.then(function(result) { score += (result + "" === "foo,bar"); check(); });
+        rejects.catch(function(result) { score += (result === "qux"); check(); });
 
-        setTimeout(function() {
+        function check() {
           if (score === 3) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         typescript1corejs2: false,
@@ -20113,13 +20107,12 @@ exports.tests = [
           new Promise(function(resolve)   { setTimeout(resolve,2000,"qux"); }),
         ]);
         var score = +(fulfills instanceof P);
-        fulfills.then(function(result) { score += (result === "foo"); });
-        rejects.catch(function(result) { score += (result === "baz"); });
+        fulfills.then(function(result) { score += (result === "foo"); check(); });
+        rejects.catch(function(result) { score += (result === "baz"); check(); });
 
-        setTimeout(function() {
+        function check() {
           if (score === 3) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
       res: {
         typescript1corejs2: false,

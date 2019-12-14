@@ -5,7 +5,7 @@ var global = {};
 
 // This function is needed to run the tests and was extracted from:
 // https://github.com/kangax/compat-table/blob/gh-pages/node.js
-global.__createIterableObject = function(arr, methods) {
+global.__createIterableObject = function (arr, methods) {
   methods = methods || {}
   if (typeof Symbol !== 'function' || !Symbol.iterator) {
     return {}
@@ -33,22 +33,9 @@ var output = {
   _engine: 'Rhino',
 }
 
-let activeAsyncTests = 0;
-var shouldWrite = false;
-
-var interval = setInterval(function() {
-  if (shouldWrite && activeAsyncTests == 0) {
-    write();
-    clearInterval(interval);
-  }
-}, 100);
-
 var versions = Object.keys(testers)
-function next(ver) {
-  if (!ver) {
-    shouldWrite = true;
-    return;
-  }
+function next (ver) {
+  if (!ver) return write()
 
   var completed = 0
   var results = output[ver] = {
@@ -60,16 +47,16 @@ function next(ver) {
     var script = testers[ver][name]
     results[name] = false // make SURE it makes it to the output
 
-    run(name, script, function(result) {
+    run(name, script, function (result) {
       // expected results: `e.message` or true/false
       results[name] = typeof result === 'string' ? result : !!result
       if (results[name] === true) results._successful++
 
       if (++completed === results._count) {
         results._percent = results._successful / results._count
-        // In the future this needs to become setTimeout
-        // so that we can support Promises
-        next(versions.pop());
+		// In the future this needs to become setTimeout
+		// so that we can support Promises
+		next(versions.pop());
       }
     })
   })
@@ -79,37 +66,36 @@ next(versions.pop());
 function run (name, script, cb) {
   // Work around a regexp bug in older Rhinos
   if (/incomplete patterns and quantifiers/.test(name)) {
-	  return cb(false);
+	return cb(false);
   }
 
   // kangax's Promise tests reply on a asyncTestPassed function.
   var async = /asyncTestPassed/.test(script)
   if (async) {
-    runAsync(script, cb);
+    runAsync(script, function (result) {
+      return cb(result)
+    })
   } else {
-    cb(runSync(script))
+    var result = runSync(script)
+    return cb(result)
   }
 }
 
-function runAsync(script, cb) {
-  activeAsyncTests += 1;
+function runAsync (script, cb) {
+
   try {
-    var fn = new Function('asyncTestPassed', 'asyncTestFailed', script)
+    var fn = new Function('asyncTestPassed', script)
 
     fn(function () {
-      activeAsyncTests -= 1;
-      cb(true);
-    }, function() {
-      activeAsyncTests -= 1;
-      cb(false);
-    });
+	  // TODO eventually do this async
+	  cb(true);
+    })
   } catch (e) {
     cb(e.message)
-    activeAsyncTests -= 1;
   }
 }
 
-function runSync(script) {
+function runSync (script) {
   try {
     // print('==================');
     // print(script);
@@ -120,6 +106,6 @@ function runSync(script) {
   }
 }
 
-function write() {
+function write () {
   print(JSON.stringify(output, null, 2));
 }

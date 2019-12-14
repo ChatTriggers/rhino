@@ -198,7 +198,6 @@ public class ScriptRuntime {
         NativeJSON.init(scope, sealed);
         NativeReflect.init(scope, sealed);
         NativeProxy.init(scope, sealed);
-        NativePromise.init(scope, sealed);
 
         NativeWith.init(scope, sealed);
         NativeCall.init(scope, sealed);
@@ -914,7 +913,13 @@ public class ScriptRuntime {
         NativeObject desc = new NativeObject();
         ScriptableObject.defineProperty(desc, "configurable", true, 0);
         ScriptableObject.defineProperty(desc, "enumerable", false, 0);
-        ScriptableObject.defineProperty(desc, "get", BaseFunction.wrap((cx1, scope1, thisObj, args) -> clazz), 0);
+        ScriptableObject.defineProperty(desc, "get", new BaseFunction() {
+            @Override
+            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                return clazz;
+            }
+        }, 0);
+
         clazz.defineOwnProperty(Context.getContext(), SymbolKey.SPECIES, desc, true);
 
         return clazz;

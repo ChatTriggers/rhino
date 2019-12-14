@@ -825,7 +825,13 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
         NativeObject desc = new NativeObject();
         ScriptableObject.defineProperty(desc, "configurable", true, 0);
         ScriptableObject.defineProperty(desc, "enumerable", false, 0);
-        ScriptableObject.defineProperty(desc, "get", BaseFunction.wrap((cx, scope, thisObj, args) -> ctor), 0);
+        ScriptableObject.defineProperty(desc, "get", new BaseFunction() {
+            @Override
+            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                return ctor;
+            }
+        }, 0);
+
         ctor.defineOwnProperty(Context.getContext(), SymbolKey.SPECIES, desc, true);
     }
 

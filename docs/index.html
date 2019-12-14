@@ -43,7 +43,7 @@
               </th>
               <th class="version v1">1.7.16
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">70% complete</sub><sub class="unflagged">51% complete</sub>
+                </div><sub class="flagged">71% complete</sub><sub class="unflagged">52% complete</sub>
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
@@ -620,7 +620,7 @@ return Math.max(...Object.create(iterable)) === 3;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -638,7 +638,7 @@ return [&quot;a&quot;, ...Object.create(iterable), &quot;e&quot;][3] === &quot;d
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -1100,7 +1100,7 @@ return `${a}` === &quot;foo&quot;;</div>}
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -9201,8 +9201,8 @@ var p1 = Reflect.construct(Promise,[function(resolve, reject) { resolve(&quot;fo
 var p2 = Reflect.construct(Promise,[function(resolve, reject) { reject(&quot;quux&quot;); }], F);
 var score = +(p1 instanceof F &amp;&amp; p2 instanceof F);
 
-function thenFn(result)  { score += (result === &quot;foo&quot;); }
-function catchFn(result) { score += (result === &quot;quux&quot;); }
+function thenFn(result)  { score += (result === &quot;foo&quot;);  check(); }
+function catchFn(result) { score += (result === &quot;quux&quot;); check(); }
 function shouldNotRun(result)  { score = -Infinity;   }
 
 p1.then = p2.then = Promise.prototype.then;
@@ -9213,10 +9213,9 @@ p2.then(shouldNotRun, catchFn);
 p1.catch(shouldNotRun);
 p2.catch(catchFn);
 
-setTimeout(function() {
+function check() {
   if (score === 4) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -9226,7 +9225,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Method &quot;then&quot; called on incompatible object.">Error</div><div class="Error flagged " title="Method &quot;then&quot; called on incompatible object.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -9244,8 +9243,8 @@ setTimeout(function() {
 var p2 = new Promise(function(resolve, reject) { reject(&quot;quux&quot;); });
 var score = 0;
 
-function thenFn(result)  { score += (result === &quot;foo&quot;); }
-function catchFn(result) { score += (result === &quot;quux&quot;); }
+function thenFn(result)  { score += (result === &quot;foo&quot;);  check(); }
+function catchFn(result) { score += (result === &quot;quux&quot;); check(); }
 function shouldNotRun(result)  { score = -Infinity;   }
 
 p1.then(thenFn, shouldNotRun);
@@ -9256,12 +9255,12 @@ p2.catch(catchFn);
 p1.then(function() {
   // Promise.prototype.then() should return a new Promise
   score += p1.then() !== p1;
+  check();
 });
 
-setTimeout(function() {
+function check() {
   if (score === 4) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -9271,7 +9270,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -9294,7 +9293,7 @@ try {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -9316,7 +9315,7 @@ try {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -9332,13 +9331,12 @@ var rejects = Promise.all([
   new Promise(function(_, reject) { setTimeout(reject, 1000,&quot;qux&quot;); }),
 ]);
 var score = 0;
-fulfills.then(function(result) { score += (result + &quot;&quot; === &quot;foo,bar&quot;); });
-rejects.catch(function(result) { score += (result === &quot;qux&quot;); });
+fulfills.then(function(result) { score += (result + &quot;&quot; === &quot;foo,bar&quot;); check(); });
+rejects.catch(function(result) { score += (result === &quot;qux&quot;); check(); });
 
-setTimeout(function() {
+function check() {
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -9348,9 +9346,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function all in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function all in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -9366,13 +9362,12 @@ var rejects = Promise.all(global.__createIterableObject([
   new Promise(function(_, reject) { setTimeout(reject, 1000,&quot;qux&quot;); }),
 ]));
 var score = 0;
-fulfills.then(function(result) { score += (result + &quot;&quot; === &quot;foo,bar&quot;); });
-rejects.catch(function(result) { score += (result === &quot;qux&quot;); });
+fulfills.then(function(result) { score += (result + &quot;&quot; === &quot;foo,bar&quot;); check(); });
+rejects.catch(function(result) { score += (result === &quot;qux&quot;); check(); });
 
-setTimeout(function() {
+function check() {
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -9382,9 +9377,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function all in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function all in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -9400,13 +9393,12 @@ var rejects = Promise.race([
   new Promise(function(resolve)   { setTimeout(resolve,2000,&quot;qux&quot;); }),
 ]);
 var score = 0;
-fulfills.then(function(result) { score += (result === &quot;foo&quot;); });
-rejects.catch(function(result) { score += (result === &quot;baz&quot;); });
+fulfills.then(function(result) { score += (result === &quot;foo&quot;); check(); });
+rejects.catch(function(result) { score += (result === &quot;baz&quot;); check(); });
 
-setTimeout(function() {
+function check() {
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -9416,9 +9408,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function race in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function race in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -9434,13 +9424,12 @@ var rejects = Promise.race(global.__createIterableObject([
   new Promise(function(resolve)   { setTimeout(resolve,2000,&quot;qux&quot;); }),
 ]));
 var score = 0;
-fulfills.then(function(result) { score += (result === &quot;foo&quot;); });
-rejects.catch(function(result) { score += (result === &quot;baz&quot;); });
+fulfills.then(function(result) { score += (result === &quot;foo&quot;); check(); });
+rejects.catch(function(result) { score += (result === &quot;baz&quot;); check(); });
 
-setTimeout(function() {
+function check() {
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -9450,9 +9439,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function race in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function race in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -9470,7 +9457,7 @@ return 'get' in prop &amp;&amp; Promise[Symbol.species] === Promise;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -10015,7 +10002,7 @@ return promise.then(function(){}) instanceof FakePromise2;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="Invalid JavaScript value of type java.util.concurrent.CompletableFuture">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -10215,7 +10202,7 @@ return passed === 3;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -10234,7 +10221,7 @@ return (a + &quot;&quot;) === &quot;[object foo]&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -10529,7 +10516,7 @@ return foo.bind({}).name === &quot;bound foo&quot; &amp;&amp;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -12493,8 +12480,8 @@ var p1 = new P(function(resolve, reject) { resolve(&quot;foo&quot;); });
 var p2 = new P(function(resolve, reject) { reject(&quot;quux&quot;); });
 var score = +(p1 instanceof P);
 
-function thenFn(result)  { score += (result === &quot;foo&quot;);  }
-function catchFn(result) { score += (result === &quot;quux&quot;); }
+function thenFn(result)  { score += (result === &quot;foo&quot;);  check(); }
+function catchFn(result) { score += (result === &quot;quux&quot;); check(); }
 function shouldNotRun(result)  { score = -Infinity;   }
 
 p1.then(thenFn, shouldNotRun);
@@ -12505,12 +12492,12 @@ p2.catch(catchFn);
 p1.then(function() {
   // P.prototype.then() should return a new P
   score += p1.then() instanceof P &amp;&amp; p1.then() !== p1;
+  check();
 });
 
-setTimeout(function() {
+function check() {
   if (score === 5) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -12520,7 +12507,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -12539,7 +12526,7 @@ return c instanceof C &amp;&amp; c instanceof Promise &amp;&amp; Object.getProto
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -12556,13 +12543,12 @@ var rejects = P.all([
   new Promise(function(_, reject) { setTimeout(reject, 1000,&quot;qux&quot;); }),
 ]);
 var score = +(fulfills instanceof P);
-fulfills.then(function(result) { score += (result + &quot;&quot; === &quot;foo,bar&quot;); });
-rejects.catch(function(result) { score += (result === &quot;qux&quot;); });
+fulfills.then(function(result) { score += (result + &quot;&quot; === &quot;foo,bar&quot;); check(); });
+rejects.catch(function(result) { score += (result === &quot;qux&quot;); check(); });
 
-setTimeout(function() {
+function check() {
   if (score === 3) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -12572,9 +12558,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function all in object 
-function P() {...}.">Error</div><div class="Error flagged " title="Cannot find function all in object 
-function P() {...}.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -12591,13 +12575,12 @@ var rejects = P.race([
   new Promise(function(resolve)   { setTimeout(resolve,2000,&quot;qux&quot;); }),
 ]);
 var score = +(fulfills instanceof P);
-fulfills.then(function(result) { score += (result === &quot;foo&quot;); });
-rejects.catch(function(result) { score += (result === &quot;baz&quot;); });
+fulfills.then(function(result) { score += (result === &quot;foo&quot;); check(); });
+rejects.catch(function(result) { score += (result === &quot;baz&quot;); check(); });
 
-setTimeout(function() {
+function check() {
   if (score === 3) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -12607,9 +12590,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function race in object 
-function P() {...}.">Error</div><div class="Error flagged " title="Cannot find function race in object 
-function P() {...}.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -13642,7 +13623,7 @@ return get + '' === &quot;then&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -16077,7 +16058,7 @@ return (get + '' === &quot;length,1,2&quot;);</div>}
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">32% complete</sub><sub class="unflagged">26% complete</sub>
+                </div><sub class="flagged">29% complete</sub><sub class="unflagged">23% complete</sub>
               </th>
             </tr>
           </table>
@@ -16328,8 +16309,6 @@ if (!(p instanceof Promise)) {
 p.then(function(result) {
   if (result === &quot;foo&quot;) {
     asyncTestPassed();
-  } else {
-    asyncTestFailed();
   }
 });</div>}
               </div>
@@ -16358,8 +16337,6 @@ if (!(p instanceof Promise)) {
 p.catch(function(result) {
   if (result === &quot;foo&quot;) {
     asyncTestPassed();
-  } else {
-    asyncTestFailed();
   }
 });</div>}
               </div>
@@ -16420,8 +16397,6 @@ return !a.hasOwnProperty(&quot;prototype&quot;);</div>}
   var a2 = await new Promise(function(resolve) { setTimeout(resolve,800,&quot;bar&quot;); });
   if (a1 + a2 === &quot;foobar&quot;) {
     asyncTestPassed();
-  } else {
-    asyncTestFailed();
   }
 }());</div>}
               </div>
@@ -16447,8 +16422,6 @@ return !a.hasOwnProperty(&quot;prototype&quot;);</div>}
   } catch(e) {
     if (e === &quot;foo&quot;) {
       asyncTestPassed();
-    } else {
-      asyncTestFailed();
     }
   }
 }());</div>}
@@ -16491,8 +16464,6 @@ try { Function(&quot;(async function a(){ await; }())&quot;)(); } catch(e) { ret
   var e = await &quot;foo&quot;;
   if (e === &quot;foo&quot;) {
     asyncTestPassed();
-  } else {
-    asyncTestFailed();
   }
 }());</div>}
               </div>
@@ -16539,8 +16510,6 @@ if (!(p instanceof Promise)) {
 p.then(function(result) {
   if (result === &quot;foo&quot;) {
     asyncTestPassed();
-  } else {
-    asyncTestFailed();
   }
 });</div>}
               </div>
@@ -16569,8 +16538,6 @@ if (!(p instanceof Promise)) {
 p.then(function(result) {
   if (result === &quot;foo&quot;) {
     asyncTestPassed();
-  } else {
-    asyncTestFailed();
   }
 });</div>}
               </div>
@@ -16589,24 +16556,17 @@ p.then(function(result) {
             <div class="hash" id="ES2017-features-async-functions-async-arrow-functions-in-methods--classes"></div><a href="#ES2017-features-async-functions-async-arrow-functions-in-methods--classes">async arrow functions in methods, classes</a>
             <div class="info">?
               <div class="fn">function(){
-                <div class="code">var timeout = setTimeout(function() {
-  asyncTestFailed();
-}, 300);
-
-function doSomething(callback) {
+                <div class="code">function doSomething(callback) {
   callback();
 }
-
 class C {
   a(){
     doSomething(async () =&gt; {
       await 1;
-      clearTimeout(timeout);
       asyncTestPassed();
     });
   }
 };
-
 var p = new C().a();</div>}
               </div>
             </div>
@@ -16632,8 +16592,6 @@ if (!(p instanceof Promise)) {
 p.then(function(result) {
   if (result === &quot;foo&quot;) {
     asyncTestPassed();
-  } else {
-    asyncTestFailed();
   }
 });</div>}
               </div>
@@ -16696,8 +16654,6 @@ if (!(p instanceof Promise)) {
 p.then(function(result) {
   if (result === &quot;foo&quot;) {
     asyncTestPassed();
-  } else {
-    asyncTestFailed();
   }
 });</div>}
               </div>
@@ -17141,7 +17097,7 @@ return true;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -17209,7 +17165,7 @@ return true;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -17674,25 +17630,28 @@ var p2 = Promise.reject(&quot;bar&quot;);
 var score = 0;
 function thenFn(result)  {
   score += (result === &quot;foo&quot;);
+  check();
 }
 function catchFn(result) {
   score += (result === &quot;bar&quot;);
+  check();
 }
 function finallyFn() {
   score += (arguments.length === 0);
+  check();
 }
 p1.then(thenFn);
 p1.finally(finallyFn);
 p1.finally(function() {
   // should return a new Promise
   score += p1.finally() !== p1;
+  check();
 });
 p2.catch(catchFn);
 p2.finally(finallyFn);
-setTimeout(function() {
+function check() {
   if (score === 5) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -17702,9 +17661,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function resolve in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function resolve in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -17714,20 +17671,22 @@ setTimeout(function() {
                 <div class="code">var score = 0;
 function thenFn(result)  {
   score += (result === &quot;foo&quot;);
+  check();
 }
 function catchFn(result) {
   score += (result === &quot;bar&quot;);
+  check();
 }
 function finallyFn() {
   score++;
+  check();
   return Promise.resolve(&quot;foobar&quot;);
 }
 Promise.resolve(&quot;foo&quot;).finally(finallyFn).then(thenFn);
 Promise.reject(&quot;bar&quot;).finally(finallyFn).catch(catchFn);
-setTimeout(function() {
+function check() {
   if (score === 4) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -17737,9 +17696,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function resolve in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function resolve in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -17754,6 +17711,7 @@ Promise
   })
   .catch(function(result) {
     score += (result === &quot;foo&quot;);
+    check();
     return Promise.reject(&quot;foobar&quot;);
   })
   .finally(function() {
@@ -17761,11 +17719,11 @@ Promise
   })
   .catch(function(result) {
     score += (result.message === &quot;bar&quot;);
+    check();
   });
-setTimeout(function() {
+function check() {
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
-}, 100);</div>}
+}</div>}
               </div>
             </div>
           </td>
@@ -17775,9 +17733,7 @@ setTimeout(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function reject in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function reject in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -17885,10 +17841,7 @@ return regex.test('foo\nbar');</div>}
 
 var iterator = generator();
 iterator.next().then(function(step){
-  if (iterator[Symbol.asyncIterator]() === iterator &amp;&amp; step.done === false &amp;&amp; step.value === 42)
-    asyncTestPassed();
-  else
-    asyncTestFailed();
+  if(iterator[Symbol.asyncIterator]() === iterator &amp;&amp; step.done === false &amp;&amp; step.value === 42)asyncTestPassed();
 });</div>}
               </div>
             </div>
@@ -17922,8 +17875,7 @@ asyncIterable[Symbol.asyncIterator] = function(){
 (async function(){
   var result = '';
   for await(var value of asyncIterable)result += value;
-  if (result === 'ab') asyncTestPassed();
-  else asyncTestFailed();
+  if(result === 'ab')asyncTestPassed();
 })();</div>}
               </div>
             </div>
@@ -18413,7 +18365,6 @@ return foo.baz?.() === 42 &amp;&amp; bar.baz?.() === undefined;</div>}
   Promise.resolve(3)
 ]).then(it =&gt; {
   if (it === 1) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -18424,9 +18375,7 @@ return foo.baz?.() === 42 &amp;&amp; bar.baz?.() === undefined;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function any in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function any in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -19317,7 +19266,6 @@ if (!('next' in iterator) || !(iterator instanceof AsyncIterator)) return false;
 
 toArray(iterator).then(it =&gt; {
   if (it.join() === '1,2,3') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19347,7 +19295,6 @@ if (!('next' in iterator) || !(iterator instanceof AsyncIterator)) return false;
 
 toArray(iterator).then(it =&gt; {
   if (it.join() === '1,2,3') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19377,7 +19324,6 @@ if (!('next' in iterator) || !(iterator instanceof AsyncIterator)) return false;
 
 toArray(iterator).then(it =&gt; {
   if (it.join() === '1,2,3') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19403,7 +19349,6 @@ toArray(iterator).then(it =&gt; {
 
 toArray((async function*() { yield * [1, 2, 3] })().asIndexedPairs()).then(it =&gt; {
   if (it.join() === '0,1,1,2,2,3') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19429,7 +19374,6 @@ toArray((async function*() { yield * [1, 2, 3] })().asIndexedPairs()).then(it =&
 
 toArray(async function*() { yield * [1, 2, 3] }().drop(1)).then(it =&gt; {
   if (it.join() === '2,3') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19449,7 +19393,6 @@ toArray(async function*() { yield * [1, 2, 3] }().drop(1)).then(it =&gt; {
               <div class="fn">function(){
                 <div class="code">(async function*() { yield * [1, 2, 3] })().every(it =&gt; typeof it === 'number').then(it =&gt; {
   if (it === true) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19475,7 +19418,6 @@ toArray(async function*() { yield * [1, 2, 3] }().drop(1)).then(it =&gt; {
 
 toArray(async function*() { yield * [1, 2, 3] }().filter(it =&gt; it % 2)).then(it =&gt; {
   if (it.join() === '1,3') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19495,7 +19437,6 @@ toArray(async function*() { yield * [1, 2, 3] }().filter(it =&gt; it % 2)).then(
               <div class="fn">function(){
                 <div class="code">(async function*() { yield * [1, 2, 3] })().find(it =&gt; it % 2).then(it =&gt; {
   if (it === 1) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19521,7 +19462,6 @@ toArray(async function*() { yield * [1, 2, 3] }().filter(it =&gt; it % 2)).then(
 
 toArray(async function*() { yield * [1, 2, 3] }().flatMap(it =&gt; [it, 0])).then(it =&gt; {
   if (it.join() === '1,0,2,0,3,0') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19542,7 +19482,6 @@ toArray(async function*() { yield * [1, 2, 3] }().flatMap(it =&gt; [it, 0])).the
                 <div class="code">let result = '';
 (async function*() { yield * [1, 2, 3] })().forEach(it =&gt; result += it).then(() =&gt; {
   if (result === '123') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19568,7 +19507,6 @@ toArray(async function*() { yield * [1, 2, 3] }().flatMap(it =&gt; [it, 0])).the
 
 toArray(async function*() { yield * [1, 2, 3] }().map(it =&gt; it * it)).then(it =&gt; {
   if (it.join() === '1,4,9') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19588,7 +19526,6 @@ toArray(async function*() { yield * [1, 2, 3] }().map(it =&gt; it * it)).then(it
               <div class="fn">function(){
                 <div class="code">(async function*() { yield * [1, 2, 3] })().reduce((a, b) =&gt; a + b).then(it =&gt; {
   if (it === 6) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19608,7 +19545,6 @@ toArray(async function*() { yield * [1, 2, 3] }().map(it =&gt; it * it)).then(it
               <div class="fn">function(){
                 <div class="code">(async function*() { yield * [1, 2, 3] })().some(it =&gt; typeof it === 'number').then(it =&gt; {
   if (it === true) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19634,7 +19570,6 @@ toArray(async function*() { yield * [1, 2, 3] }().map(it =&gt; it * it)).then(it
 
 toArray(async function*() { yield * [1, 2, 3] }().take(2)).then(it =&gt; {
   if (it.join() === '1,2') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -19654,7 +19589,6 @@ toArray(async function*() { yield * [1, 2, 3] }().take(2)).then(it =&gt; {
               <div class="fn">function(){
                 <div class="code">(async function*() { yield * [1, 2, 3] })().toArray().then(it =&gt; {
   if (Array.isArray(it) &amp;&amp; it.join() === '1,2,3') asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -20143,7 +20077,7 @@ return Symbol.observable in Observable.prototype &amp;&amp; o[Symbol.observable]
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -20160,9 +20094,7 @@ return Symbol.observable in Observable.prototype &amp;&amp; o[Symbol.observable]
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -20181,9 +20113,7 @@ return score === 1;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -20197,7 +20127,6 @@ Promise.try(function() {
 }).then(function(val) {
   score += (val === 'foo');
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -20208,9 +20137,7 @@ Promise.try(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -20224,7 +20151,6 @@ Promise.try(function() {
 }).catch(function(err) {
   score += (err === 'bar');
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -20235,9 +20161,7 @@ Promise.try(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -20251,7 +20175,6 @@ Promise.try(function() {
 }).then(function(val) {
   score += (val === 'foo');
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -20262,9 +20185,7 @@ Promise.try(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -20278,7 +20199,6 @@ Promise.try(function() {
 }).catch(function(err) {
   score += (err === 'bar');
   if (score === 2) asyncTestPassed();
-  else asyncTestFailed();
 });</div>}
               </div>
             </div>
@@ -20289,9 +20209,7 @@ Promise.try(function() {
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function try in object function Promise() { [native code for Promise.Promise, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Promise&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;Promise&quot; is not defined.">Error</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -21621,11 +21539,7 @@ return typeof obj::foo === &quot;function&quot; &amp;&amp; obj::foo().garply ===
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;{
-  &quot;garply&quot;: &quot;bar&quot;
-}&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;{
-  &quot;garply&quot;: &quot;bar&quot;
-}&quot;:foo&quot; from undefined">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">

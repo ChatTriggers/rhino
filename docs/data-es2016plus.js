@@ -467,8 +467,6 @@ exports.tests = [
           p.then(function(result) {
             if (result === "foo") {
               asyncTestPassed();
-            } else {
-              asyncTestFailed();
             }
           });
         */},
@@ -503,8 +501,6 @@ exports.tests = [
           p.catch(function(result) {
             if (result === "foo") {
               asyncTestPassed();
-            } else {
-              asyncTestFailed();
             }
           });
         */},
@@ -585,8 +581,6 @@ exports.tests = [
             var a2 = await new Promise(function(resolve) { setTimeout(resolve,800,"bar"); });
             if (a1 + a2 === "foobar") {
               asyncTestPassed();
-            } else {
-              asyncTestFailed();
             }
           }());
         */},
@@ -618,8 +612,6 @@ exports.tests = [
             } catch(e) {
               if (e === "foo") {
                 asyncTestPassed();
-              } else {
-                asyncTestFailed();
               }
             }
           }());
@@ -674,8 +666,6 @@ exports.tests = [
             var e = await "foo";
             if (e === "foo") {
               asyncTestPassed();
-            } else {
-              asyncTestFailed();
             }
           }());
         */},
@@ -734,8 +724,6 @@ exports.tests = [
           p.then(function(result) {
             if (result === "foo") {
               asyncTestPassed();
-            } else {
-              asyncTestFailed();
             }
           });
         */},
@@ -770,8 +758,6 @@ exports.tests = [
           p.then(function(result) {
             if (result === "foo") {
               asyncTestPassed();
-            } else {
-              asyncTestFailed();
             }
           });
         */},
@@ -796,24 +782,17 @@ exports.tests = [
       {
         name: 'async arrow functions in methods, classes',
         exec: function () {/*
-          var timeout = setTimeout(function() {
-            asyncTestFailed();
-          }, 300);
-
           function doSomething(callback) {
             callback();
           }
-
           class C {
             a(){
               doSomething(async () => {
                 await 1;
-                clearTimeout(timeout);
                 asyncTestPassed();
               });
             }
           };
-
           var p = new C().a();
         */},
         res: {
@@ -847,8 +826,6 @@ exports.tests = [
           p.then(function(result) {
             if (result === "foo") {
               asyncTestPassed();
-            } else {
-              asyncTestFailed();
             }
           });
         */},
@@ -930,8 +907,6 @@ exports.tests = [
           p.then(function(result) {
             if (result === "foo") {
               asyncTestPassed();
-            } else {
-              asyncTestFailed();
             }
           });
         */},
@@ -2477,25 +2452,28 @@ exports.tests = [
         var score = 0;
         function thenFn(result)  {
           score += (result === "foo");
+          check();
         }
         function catchFn(result) {
           score += (result === "bar");
+          check();
         }
         function finallyFn() {
           score += (arguments.length === 0);
+          check();
         }
         p1.then(thenFn);
         p1.finally(finallyFn);
         p1.finally(function() {
           // should return a new Promise
           score += p1.finally() !== p1;
+          check();
         });
         p2.catch(catchFn);
         p2.finally(finallyFn);
-        setTimeout(function() {
+        function check() {
           if (score === 5) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
         res: {
           babel6corejs2: babel.corejs,
@@ -2522,20 +2500,22 @@ exports.tests = [
         var score = 0;
         function thenFn(result)  {
           score += (result === "foo");
+          check();
         }
         function catchFn(result) {
           score += (result === "bar");
+          check();
         }
         function finallyFn() {
           score++;
+          check();
           return Promise.resolve("foobar");
         }
         Promise.resolve("foo").finally(finallyFn).then(thenFn);
         Promise.reject("bar").finally(finallyFn).catch(catchFn);
-        setTimeout(function() {
+        function check() {
           if (score === 4) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
         res: {
           babel6corejs2: babel.corejs,
@@ -2567,6 +2547,7 @@ exports.tests = [
           })
           .catch(function(result) {
             score += (result === "foo");
+            check();
             return Promise.reject("foobar");
           })
           .finally(function() {
@@ -2574,11 +2555,11 @@ exports.tests = [
           })
           .catch(function(result) {
             score += (result.message === "bar");
+            check();
           });
-        setTimeout(function() {
+        function check() {
           if (score === 2) asyncTestPassed();
-          else asyncTestFailed();
-        }, 100);
+        }
       */},
         res: {
           babel6corejs2: babel.corejs,
@@ -2756,10 +2737,7 @@ exports.tests = [
 
           var iterator = generator();
           iterator.next().then(function(step){
-            if (iterator[Symbol.asyncIterator]() === iterator && step.done === false && step.value === 42)
-              asyncTestPassed();
-            else
-              asyncTestFailed();
+            if(iterator[Symbol.asyncIterator]() === iterator && step.done === false && step.value === 42)asyncTestPassed();
           });
         */},
         res: {
@@ -2799,8 +2777,7 @@ exports.tests = [
           (async function(){
             var result = '';
             for await(var value of asyncIterable)result += value;
-            if (result === 'ab') asyncTestPassed();
-            else asyncTestFailed();
+            if(result === 'ab')asyncTestPassed();
           })();
         */},
         res: {
@@ -2863,7 +2840,6 @@ exports.tests = [
           (async function (){
             try {
               await Promise.reject();
-              asyncTestFailed();
             }
             catch {
               asyncTestPassed();
@@ -3707,7 +3683,6 @@ exports.tests = [
           it[1].status === 'rejected' && it[1].reason === 2 &&
           it[2].status === 'fulfilled' && it[2].value === 3
         ) asyncTestPassed();
-        else asyncTestFailed();
       });
     */},
     res: {
