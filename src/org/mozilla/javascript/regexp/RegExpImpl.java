@@ -546,8 +546,19 @@ public class RegExpImpl implements RegExpProxy {
      * argument.
      */
     @Override
-    public Object js_split(Context cx, Scriptable scope,
-                           String target, Object[] args) {
+    public Object js_split(Context cx, Scriptable scope, String target, Object[] args) {
+        if (args[0] instanceof NativeObject) {
+            NativeObject arg0 = (NativeObject) args[0];
+
+            if (ScriptableObject.hasProperty(arg0, SymbolKey.SPLIT)) {
+                Object split = ScriptableObject.getProperty(arg0, SymbolKey.SPLIT);
+
+                if (split instanceof Callable) {
+                    return ((Callable) split).call(cx, scope, null, new Object[]{ target });
+                }
+            }
+        }
+
         // create an empty Array to return;
         Scriptable result = cx.newArray(scope, 0);
 
