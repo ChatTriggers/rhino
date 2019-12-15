@@ -61,7 +61,8 @@ public class Node implements Iterable<Node> {
             COMPUTED_PROP = 28,
             SPREAD_PROP = 29,
             CHAINING_PROP = 30,
-            SUPER_PROP = 31;
+            SUPER_PROP = 31,
+            SPREAD_IDS_PROP = 32;
 
     // values of ISNUMBER_PROP to specify
     // which of the children are Number types
@@ -463,6 +464,8 @@ public class Node implements Iterable<Node> {
                     return "destructuring_shorthand";
                 case SUPER_PROP:
                     return "super_prop";
+                case SPREAD_IDS_PROP:
+                    return "spread_ids";
                 default:
                     Kit.codeBug();
             }

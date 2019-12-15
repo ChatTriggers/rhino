@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class rewrites the parse tree into an IR suitable for codegen.
@@ -985,7 +986,8 @@ public final class IRFactory extends Parser {
         // creation plus object property entries, so later compiler
         // stages don't need to know about object literals.
         decompiler.addToken(Token.LC);
-        List<ObjectProperty> elems = node.getElements();
+        List<ObjectProperty> elems = node.getElements().stream().filter((it) -> it.getLeft().getProp(Node.SPREAD_PROP) == null).collect(Collectors.toList());;
+        List<ObjectProperty> spread = node.getElements().stream().filter((it) -> it.getLeft().getProp(Node.SPREAD_PROP) != null).collect(Collectors.toList());
         Node object = new Node(Token.OBJECTLIT);
         Object[] properties;
         if (elems.isEmpty()) {
@@ -1025,6 +1027,16 @@ public final class IRFactory extends Parser {
                 }
             }
         }
+
+        if (spread.size() > 0) {
+            Object[] spreadProps = new Object[spread.size()];
+            int i = 0;
+            for (ObjectProperty prop : spread) {
+                spreadProps[i++] = getPropKey(prop.getLeft());
+            }
+            object.putProp(Node.SPREAD_IDS_PROP, spreadProps);
+        }
+
         decompiler.addToken(Token.RC);
         object.putProp(Node.OBJECT_IDS_PROP, properties);
         return object;
@@ -1039,9 +1051,14 @@ public final class IRFactory extends Parser {
             decompile((AstNode) id);
             decompiler.addToken(Token.RB);
         } else if (id instanceof Name) {
-            String s = ((Name) id).getIdentifier();
-            decompiler.addName(s);
-            key = ScriptRuntime.getIndexObject(s);
+            if (id.getProp(Node.SPREAD_PROP) != null) {
+                decompiler.addToken(Token.SPREAD);
+                key = id;
+            } else {
+                String s = ((Name) id).getIdentifier();
+                decompiler.addName(s);
+                key = ScriptRuntime.getIndexObject(s);
+            }
         } else if (id instanceof StringLiteral) {
             String s = ((StringLiteral) id).getValue();
             decompiler.addString(s);
