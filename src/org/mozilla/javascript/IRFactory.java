@@ -169,7 +169,11 @@ public final class IRFactory extends Parser {
             case Token.SWITCH:
                 return transformSwitch((SwitchStatement) node);
             case Token.THROW:
-                return transformThrow((ThrowStatement) node);
+                if (node instanceof ThrowStatement) {
+                    return transformThrow((ThrowStatement) node);
+                } else {
+                    return transformThrowExpr((UnaryExpression) node);
+                }
             case Token.TRY:
                 return transformTry((TryStatement) node);
             case Token.WHILE:
@@ -1265,6 +1269,12 @@ public final class IRFactory extends Parser {
         decompiler.addEOL(Token.RC);
         closeSwitch(block);
         return block;
+    }
+
+    private Node transformThrowExpr(UnaryExpression node) {
+        decompiler.addToken(Token.THROW);
+        Node value = transform(node.getOperand());
+        return new Node(Token.THROW, value, node.getLineno());
     }
 
     private Node transformThrow(ThrowStatement node) {

@@ -1681,8 +1681,20 @@ class BodyCodegen {
                                 //     Object a = ScriptRuntime.mixDefaultArgument(var4[0], var0);
                                 //     return a;
                                 // }
-                                generateExpression(defaultParams.get(i), fnCurrent.fnode);
-                                addScriptRuntimeInvoke("mixDefaultArgument", OBJECT, OBJECT, OBJECT);
+                                if (defaultParams.get(i).getType() == Token.THROW) {
+                                    int label = cfw.acquireLabel();
+                                    cfw.addALoad(argsLocal);
+                                    cfw.addPush(i);
+                                    cfw.add(ByteCode.AALOAD);
+                                    cfw.addInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/Undefined", "isUndefined", "(Ljava/lang/Object;)Z");
+                                    cfw.add(ByteCode.IFEQ, label);
+                                    generateExpression(defaultParams.get(i), fnCurrent.fnode);
+                                    cfw.markLabel(label);
+                                } else {
+                                    generateExpression(defaultParams.get(i), fnCurrent.fnode);
+                                    addScriptRuntimeInvoke("mixDefaultArgument", OBJECT, OBJECT, OBJECT);
+                                }
+
                             }
                         }
 
@@ -2303,6 +2315,14 @@ class BodyCodegen {
         Node child = node.getFirstChild();
         switch (type) {
             case Token.USE_STACK:
+                break;
+
+            case Token.THROW:
+                generateExpression(child, node);
+                if (compilerEnv.isGenerateObserverCount())
+                    addInstructionCount();
+                generateThrowJavaScriptException();
+                Codegen.pushUndefined(cfw);
                 break;
 
             case Token.FUNCTION:
