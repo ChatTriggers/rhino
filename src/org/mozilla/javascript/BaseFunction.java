@@ -27,15 +27,6 @@ public class BaseFunction extends IdScriptableObject implements Function {
         obj.exportAsJSClass(MAX_PROTOTYPE_ID, scope, sealed);
     }
 
-    public static BaseFunction wrap(BaseFunctionLambda lambda) {
-        return new BaseFunction() {
-            @Override
-            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-                return lambda.call(cx, scope, thisObj, args);
-            }
-        };
-    }
-
     public BaseFunction() {
     }
 
