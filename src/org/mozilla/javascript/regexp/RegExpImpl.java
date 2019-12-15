@@ -39,6 +39,18 @@ public class RegExpImpl implements RegExpProxy {
 
         switch (actionType) {
             case RA_MATCH: {
+                if (args[0] instanceof NativeObject) {
+                    NativeObject arg0 = (NativeObject) args[0];
+
+                    if (ScriptableObject.hasProperty(arg0, SymbolKey.MATCH)) {
+                        Object match = ScriptableObject.getProperty(arg0, SymbolKey.MATCH);
+
+                        if (match instanceof Callable) {
+                            return ((Callable) match).call(cx, scope, thisObj, new Object[]{ data.str });
+                        }
+                    }
+                }
+
                 int optarg = Integer.MAX_VALUE;
                 if (cx.getLanguageVersion() < Context.VERSION_1_6) {
                     optarg = 1;
@@ -50,6 +62,18 @@ public class RegExpImpl implements RegExpProxy {
             }
 
             case RA_SEARCH: {
+                if (args[0] instanceof NativeObject) {
+                    NativeObject arg0 = (NativeObject) args[0];
+
+                    if (ScriptableObject.hasProperty(arg0, SymbolKey.SEARCH)) {
+                        Object search = ScriptableObject.getProperty(arg0, SymbolKey.SEARCH);
+
+                        if (search instanceof Callable) {
+                            return ((Callable) search).call(cx, scope, thisObj, new Object[]{ data.str });
+                        }
+                    }
+                }
+
                 int optarg = Integer.MAX_VALUE;
                 if (cx.getLanguageVersion() < Context.VERSION_1_6) {
                     optarg = 1;
@@ -60,8 +84,6 @@ public class RegExpImpl implements RegExpProxy {
             }
 
             case RA_REPLACE: {
-                boolean useRE = args.length > 0 && args[0] instanceof NativeRegExp;
-
                 if (args[0] instanceof NativeObject) {
                     NativeObject arg0 = (NativeObject) args[0];
 
@@ -73,6 +95,8 @@ public class RegExpImpl implements RegExpProxy {
                         }
                     }
                 }
+
+                boolean useRE = args.length > 0 && args[0] instanceof NativeRegExp;
 
                 // ignore other parameters
                 if (cx.getLanguageVersion() < Context.VERSION_1_6) {
