@@ -6,7 +6,6 @@
 
 package org.mozilla.javascript;
 
-import jdk.nashorn.internal.runtime.ParserException;
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
 
@@ -3900,6 +3899,14 @@ public class Parser {
                 consumeToken();
                 break;
 
+            case Token.SPREAD:
+                consumeToken();
+                mustMatchToken(Token.NAME, "msg.obj.spread.bad.ident");
+                pname = createNameNode();
+                consumeToken();
+                pname.putProp(Node.SPREAD_PROP, true);
+                break;
+
             default:
                 if (compilerEnv.isReservedKeywordAsIdentifier()
                         && TokenStream.isKeyword(ts.getString(), compilerEnv.getLanguageVersion(), inUseStrictDirective)) {
@@ -3918,6 +3925,19 @@ public class Parser {
         // Support, e.g., |var {x, y} = o| as destructuring shorthand
         // for |var {x: x, y: y} = o|, as implemented in spidermonkey JS 1.8.
         int tt = peekToken();
+
+        if (ptt == Token.SPREAD) {
+            if (tt != Token.COMMA && tt != Token.RC) {
+                reportError("msg.obj.spread.extra");
+            }
+
+            AstNode nn = new Name(property.getPosition(), property.getString());
+            ObjectProperty pn = new ObjectProperty();
+
+            pn.setLeftAndRight(property, nn);
+            return pn;
+        }
+
         if ((tt == Token.COMMA || tt == Token.RC || tt == Token.ASSIGN) && ptt == Token.NAME
                 && compilerEnv.getLanguageVersion() >= Context.VERSION_1_8) {
             if (!inDestructuringAssignment) {

@@ -950,6 +950,24 @@ public class ScriptRuntime {
         return clazz;
     }
 
+    public static void addSpreadObject(Scriptable obj, Scriptable spread) {
+        Object[] ids = spread.getIds();
+        for (Object key : ids) {
+            if (key instanceof String) {
+                Object val = spread.get((String) key, obj);
+                if ((val != Scriptable.NOT_FOUND) && (val != Undefined.instance)) {
+                    obj.put((String) key, obj, val);
+                }
+            } else if (key instanceof Number) {
+                int ii = ScriptRuntime.toInt32(key);
+                Object val = spread.get(ii, obj);
+                if ((val != Scriptable.NOT_FOUND) && (val != Undefined.instance)) {
+                    obj.put(ii, obj, val);
+                }
+            }
+        }
+    }
+
     public static Object[] combineSpreadArgs(Object[] args, Context cx, Scriptable scope) {
         int totalArgs = 0;
 
@@ -1810,7 +1828,7 @@ public class ScriptRuntime {
     static Object getIndexObject(String s) {
         long indexTest = indexFromString(s);
         if (indexTest >= 0) {
-            return Integer.valueOf((int) indexTest);
+            return (int) indexTest;
         }
         return s;
     }

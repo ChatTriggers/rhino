@@ -3508,6 +3508,17 @@ class BodyCodegen {
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
         addScriptRuntimeInvoke("newObjectLiteral", SCRIPTABLE, OBJECT_ARRAY, OBJECT_ARRAY, "[" + INTEGER, CONTEXT, SCRIPTABLE);
+
+        Object spreadProp = node.getProp(Node.SPREAD_IDS_PROP);
+        if (spreadProp != null) {
+            Object[] spread = (Object[]) spreadProp;
+
+            for (Object obj : spread) {
+                cfw.add(ByteCode.DUP);
+                generateExpression((Node) obj, node);
+                addScriptRuntimeInvoke("addSpreadObject", VOID, SCRIPTABLE, SCRIPTABLE);
+            }
+        }
     }
 
     private void visitSpecialCall(Node node, int type, int specialType,
