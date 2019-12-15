@@ -49,7 +49,8 @@ public class Parser {
     private static final int GET_ENTRY = 2;
     private static final int SET_ENTRY = 4;
     private static final int METHOD_ENTRY = 8;
-    private static final int GENERATOR_ENTRY = 0x10;
+    private static final int GENERATOR_ENTRY = 16;
+    private static final int FIELD_ENTRY = 32;
     protected int nestingOfFunction;
     protected boolean inUseStrictDirective;
     CompilerEnvirons compilerEnv;
@@ -726,6 +727,7 @@ public class Parser {
         Set<String> getterNames = new HashSet<>();
         Set<String> setterNames = new HashSet<>();
         List<ClassMethod> classMethods = new ArrayList<>();
+        List<ClassProperty> classProperties = new ArrayList<>();
 
         while (true) {
             // Eat all useless semicolons and line breaks
@@ -759,6 +761,8 @@ public class Parser {
                 } else if (peeked == Token.MUL) {
                     entryKind = GENERATOR_ENTRY;
                     consumeToken();
+                } else if (peeked == Token.SEMI || peeked == Token.ASSIGN) {
+                    entryKind = FIELD_ENTRY;
                 } else if (pname.getType() == Token.NAME) {
                     if ("get".equals(propertyName)) {
                         entryKind = GET_ENTRY;
@@ -780,45 +784,68 @@ public class Parser {
                 } else {
                     propertyName = ts.getString();
 
-                    FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION, entryKind);
-                    // We've already parsed the function name, so fn should be anonymous.
-                    Name name = fn.getFunctionName();
-                    if (name != null && name.length() != 0) {
-                        reportError("msg.bad.prop");
-                    }
-                    pname.setJsDocNode(jsdocNode);
-                    if (isStatic) {
-                        fn.setStatic(true);
-                    }
-                    ClassMethod cm = new ClassMethod(pname, fn);
-                    switch (entryKind) {
-                        case GET_ENTRY:
-                            fn.setFunctionIsGetterMethod();
-                            cm.setIsGetterMethod();
-                            break;
-                        case SET_ENTRY:
-                            fn.setFunctionIsSetterMethod();
-                            cm.setIsSetterMethod();
-                            break;
-                        case METHOD_ENTRY:
-                            fn.setFunctionIsNormalMethod();
-                    }
+                    if (entryKind == FIELD_ENTRY) {
+                        AstNode defaultValue = null;
 
-                    if (isStatic) {
-                        cm.setIsStatic();
-                    }
-
-                    int end = getNodeEnd(fn);
-                    cm.setLength(end - pos);
-
-                    if ("constructor".equals(propertyName)) {
-                        if (entryKind != METHOD_ENTRY) {
-                            // TODO: Error
-                            reportError("msg.class.bad.method.definition");
+                        int token = peekTokenOrEOL();
+                        if (token == Token.ASSIGN) {
+                            consumeToken();
+                            defaultValue = expr();
+                        } else if (token != Token.SEMI && token != Token.EOL) {
+                            throw Kit.codeBug();
                         }
-                        cls.setConstructor(fn);
+
+                        if (defaultValue == null) {
+                            defaultValue = new Name(ts.tokenBeg, "undefined");
+                        }
+
+                        ClassProperty cp = new ClassProperty(pname, defaultValue);
+                        if (isStatic) {
+                            cp.setIsStatic();
+                        }
+                        cp.setLength(getNodeEnd(defaultValue) - pos);
+                        classProperties.add(cp);
                     } else {
-                        classMethods.add(cm);
+                        FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION, entryKind);
+                        // We've already parsed the function name, so fn should be anonymous.
+                        Name name = fn.getFunctionName();
+                        if (name != null && name.length() != 0) {
+                            reportError("msg.bad.prop");
+                        }
+                        pname.setJsDocNode(jsdocNode);
+                        if (isStatic) {
+                            fn.setStatic(true);
+                        }
+                        ClassMethod cm = new ClassMethod(pname, fn);
+                        switch (entryKind) {
+                            case GET_ENTRY:
+                                fn.setFunctionIsGetterMethod();
+                                cm.setIsGetterMethod();
+                                break;
+                            case SET_ENTRY:
+                                fn.setFunctionIsSetterMethod();
+                                cm.setIsSetterMethod();
+                                break;
+                            case METHOD_ENTRY:
+                                fn.setFunctionIsNormalMethod();
+                        }
+
+                        if (isStatic) {
+                            cm.setIsStatic();
+                        }
+
+                        int end = getNodeEnd(fn);
+                        cm.setLength(end - pos);
+
+                        if ("constructor".equals(propertyName)) {
+                            if (entryKind != METHOD_ENTRY) {
+                                // TODO: Error
+                                reportError("msg.class.bad.method.definition");
+                            }
+                            cls.setConstructor(fn);
+                        } else {
+                            classMethods.add(cm);
+                        }
                     }
                 }
             }
@@ -853,6 +880,7 @@ public class Parser {
             getAndResetJsDoc();
         }
 
+        cls.setClassProperties(classProperties);
         cls.setClassMethods(classMethods);
         return cls;
     }

@@ -11,6 +11,7 @@ public class ClassNode extends ScriptNode {
     private AstNode extendsName;
     private FunctionNode constructor = null;
     private List<ClassMethod> classMethods = new ArrayList<>();
+    private List<ClassProperty> classProperties = new ArrayList<>();
     private Node parentFn = null;
     private Node extended = null;
 
@@ -63,6 +64,14 @@ public class ClassNode extends ScriptNode {
 
     public void setClassMethods(List<ClassMethod> classMethods) {
         this.classMethods = classMethods;
+    }
+
+    public List<ClassProperty> getClassProperties() {
+        return classProperties;
+    }
+
+    public void setClassProperties(List<ClassProperty> classProperties) {
+        this.classProperties = classProperties;
     }
 
     public Node getParentFn() {

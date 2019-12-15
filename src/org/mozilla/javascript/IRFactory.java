@@ -676,6 +676,12 @@ public final class IRFactory extends Parser {
             node.addChildToBack(cm);
         }
 
+        for (ClassProperty cp : node.getClassProperties()) {
+            cp.setNameKey(getPropKey(cp.getName()));
+            cp.addChildToBack(transform(cp.getDefaultValue()));
+            node.addChildToBack(cp);
+        }
+
         return node;
     }
 

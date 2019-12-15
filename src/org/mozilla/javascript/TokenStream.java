@@ -155,7 +155,7 @@ class TokenStream {
 
         int id;
         String s = name;
-// #generated# Last update: 2019-12-02 12:41:34 CST
+// #generated# Last update: 2019-12-14 23:01:17 CST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 2: c=s.charAt(1);
@@ -329,7 +329,7 @@ class TokenStream {
 
         int id;
         String s = name;
-// #generated# Last update: 2019-12-02 12:41:34 CST
+// #generated# Last update: 2019-12-14 23:01:17 CST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 2: c=s.charAt(1);

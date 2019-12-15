@@ -785,7 +785,7 @@ public class ScriptRuntime {
         }
 
         if (name instanceof String) {
-            String nameString = ((String) name);
+            String nameString = (String) name;
             if (getterSetter == 0) {
                 setFunctionNameIfApplicable(method, nameString);
 
@@ -828,6 +828,31 @@ public class ScriptRuntime {
                 clazz.setGetterOrSetter(nameSymbol, 0, getterOrSetter, isSetter);
                 clazz.setAttributes(nameSymbol, clazz.getAttributes(nameSymbol) | ScriptableObject.NOT_ENUMERABLE);
             }
+        } else {
+            throw throwError(cx, clazz, "msg.object.invalid.key.type");
+        }
+
+        return clazzObj;
+    }
+
+    public static Object addClassProperty(Object clazzObj, Object name, Object defaultValue, Context cx, boolean instance) {
+        ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
+
+        if (instance) {
+            clazz = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(clazz, "prototype"));
+        }
+
+        if (name instanceof String) {
+            String s = toStringIdOrIndex(cx, name);
+            if (s == null) {
+                clazz.put(lastIndexResult(cx), clazz, defaultValue);
+            } else {
+                clazz.put(s, clazz, defaultValue);
+            }
+        } else if (isSymbol(name)) {
+            clazz.put((Symbol) name, clazz, defaultValue);
+        } else if (name instanceof Integer) {
+            clazz.put((Integer) name, clazz, defaultValue);
         } else {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }

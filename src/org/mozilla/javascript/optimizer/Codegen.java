@@ -3132,27 +3132,50 @@ class BodyCodegen {
         }
 
         while (child != null) {
-            ClassMethod cm = (ClassMethod) child;
-            Node method = cm.getFirstChild();
-            Object name = cm.getNameKey();
+            if (child instanceof ClassMethod) {
+                ClassMethod cm = (ClassMethod) child;
+                Node method = cm.getFirstChild();
+                Object name = cm.getNameKey();
 
-            if (name instanceof String) {
-                cfw.addPush((String) name);
-            } else if (name instanceof Node) {
-                Node node = (Node) name;
-                generateExpression(node, cls);
-            } else {
-                cfw.addPush((Integer) name);
-                addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
+                if (name instanceof String) {
+                    cfw.addPush((String) name);
+                } else if (name instanceof Node) {
+                    Node node = (Node) name;
+                    generateExpression(node, cls);
+                } else {
+                    cfw.addPush((Integer) name);
+                    addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
+                }
+
+                generateExpression(method, cls);
+                cfw.addALoad(contextLocal);
+                cfw.addPush(!cm.isStatic());
+                cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
+                addScriptRuntimeInvoke("addClassMethod", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, INTEGER);
+
+                child = child.getNext();
+            } else if (child instanceof ClassProperty) {
+                ClassProperty cp = (ClassProperty) child;
+                Node defaultValue = cp.getFirstChild();
+                Object name = cp.getNameKey();
+
+                if (name instanceof String) {
+                    cfw.addPush((String) name);
+                } else if (name instanceof Node) {
+                    Node node = (Node) name;
+                    generateExpression(node, cls);
+                } else {
+                    cfw.addPush((Integer) name);
+                    addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
+                }
+
+                generateExpression(defaultValue, cls);
+                cfw.addALoad(contextLocal);
+                cfw.addPush(!cp.isStatic());
+                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
+
+                child = child.getNext();
             }
-
-            generateExpression(method, cls);
-            cfw.addALoad(contextLocal);
-            cfw.addPush(!cm.isStatic());
-            cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
-            addScriptRuntimeInvoke("addClassMethod", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, INTEGER);
-
-            child = child.getNext();
         }
 
         // TODO: Only when a statement
