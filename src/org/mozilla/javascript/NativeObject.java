@@ -648,14 +648,6 @@ public class NativeObject extends IdScriptableObject implements Map {
         return ensureScriptable(arg);
     }
 
-    @Override
-    public Object getDefaultValue(Class<?> typeHint) {
-        if (typeHint == ScriptRuntime.StringClass) {
-            return NativeJSON.stringify(Context.getContext(), Context.getScope(), this, null, 2);
-        }
-        return super.getDefaultValue(typeHint);
-    }
-
     // methods implementing java.util.Map
 
     @Override

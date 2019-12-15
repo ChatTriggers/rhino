@@ -1217,6 +1217,8 @@ public class ScriptRuntime {
             if (val instanceof Scriptable) {
                 if (val instanceof NativeArray) {
                     return NativeArray.toStringHelper(Context.getContext(), Context.getContext().topCallScope, (Scriptable) val, true, false);
+                } else if (val instanceof NativeObject) {
+                    return NativeJSON.stringify(Context.getContext(), Context.getScope(), val, null, 2).toString();
                 }
                 val = ((Scriptable) val).getDefaultValue(StringClass);
                 quoteString = false;
