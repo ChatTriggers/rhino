@@ -62,6 +62,18 @@ public class RegExpImpl implements RegExpProxy {
             case RA_REPLACE: {
                 boolean useRE = args.length > 0 && args[0] instanceof NativeRegExp;
 
+                if (args[0] instanceof NativeObject) {
+                    NativeObject arg0 = (NativeObject) args[0];
+
+                    if (ScriptableObject.hasProperty(arg0, SymbolKey.REPLACE)) {
+                        Object replace = ScriptableObject.getProperty(arg0, SymbolKey.REPLACE);
+
+                        if (replace instanceof Callable) {
+                            return ((Callable) replace).call(cx, scope, thisObj, new Object[]{ data.str });
+                        }
+                    }
+                }
+
                 // ignore other parameters
                 if (cx.getLanguageVersion() < Context.VERSION_1_6) {
                     useRE |= args.length > 2;
