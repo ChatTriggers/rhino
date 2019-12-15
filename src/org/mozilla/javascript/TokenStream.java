@@ -1287,6 +1287,16 @@ class TokenStream {
                     }
 
                 case '-':
+                    if (matchChar('-')) {
+                        if (matchChar('>')) {
+                            tokenBeg = cursor - 3;
+                            skipLine();
+                            commentType = Token.CommentType.HTML;
+                            return Token.COMMENT;
+                        }
+                        ungetCharIgnoreLineEnd('-');
+                    }
+
                     if (matchChar('=')) {
                         c = Token.ASSIGN_SUB;
                     } else if (matchChar('-')) {
