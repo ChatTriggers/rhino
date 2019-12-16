@@ -3335,12 +3335,12 @@ class BodyCodegen {
                 }
 
                 generateExpression(method, cls);
+                generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP));
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cm.isStatic());
                 cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
                 cfw.addPush(cm.isPrivate());
                 addScriptRuntimeInvoke("addClassMethod", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, INTEGER, BOOLEAN);
-                generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP));
 
                 child = child.getNext();
             } else if (child instanceof ClassProperty) {
