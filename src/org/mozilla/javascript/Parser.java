@@ -2711,6 +2711,7 @@ public class Parser {
             case Token.BITNOT:
             case Token.TYPEOF:
             case Token.DELPROP:
+            case Token.THROW:
                 consumeToken();
                 node = new UnaryExpression(tt, ts.tokenBeg, unaryExpr());
                 node.setLineno(line);
