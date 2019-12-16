@@ -11,5 +11,5 @@ public interface Decorator {
     int PRIVATE = 1 << 4;
     int STATIC  = 1 << 5;
 
-    Object consume(Context cx, Scriptable scope, Scriptable thisObj, Object obj, int descriptor, Object[] descriptorArgs, Object[] metadata);
+    Object consume(Object target, int descriptor, Object[] descriptorArgs, Object[] metadata, Context cx, Scriptable scope, Scriptable thisObj);
 }

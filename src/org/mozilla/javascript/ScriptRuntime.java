@@ -903,10 +903,6 @@ public class ScriptRuntime {
         return clazzObj;
     }
 
-    public static Object applyDecorator(Object target, Decorator decorator, int attributes, Object[] descriptorArgs, Object[] metadata, Context cx, Scriptable scope, Scriptable thisObj) {
-        return decorator.consume(cx, scope, thisObj, target, attributes, descriptorArgs, metadata);
-    }
-
     public static void togglePrivateProtoTree(ScriptableObject obj) {
         while (obj != null) {
             obj.togglePrivateSlots();

@@ -297,6 +297,7 @@ exports.tests = [
 
           function transform(clazz) {
             clazz.x = 8;
+            return clazz;
           }
 
           function cb(proto, name) {

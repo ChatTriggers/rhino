@@ -3225,6 +3225,8 @@ class BodyCodegen {
 
             Name name = dn.getName();
             generateExpression(name, node);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/decorators/Decorator");
+            cfw.add(ByteCode.SWAP);
 
             // attributes
             int attributes = 0;
@@ -3275,17 +3277,11 @@ class BodyCodegen {
             cfw.addALoad(variableObjectLocal);
             cfw.addALoad(thisObjLocal);
 
-            addScriptRuntimeInvoke(
-                    "applyDecorator",
-                    OBJECT,
-                    OBJECT,
-                    "Lorg/mozilla/javascript/decorators/Decorator;",
-                    INTEGER,
-                    OBJECT_ARRAY,
-                    OBJECT_ARRAY,
-                    CONTEXT,
-                    SCRIPTABLE,
-                    SCRIPTABLE
+            cfw.addInvoke(
+                    ByteCode.INVOKEINTERFACE,
+                    "org/mozilla/javascript/decorators/Decorator",
+                    "consume",
+                    "(" + OBJECT + INTEGER + OBJECT_ARRAY + OBJECT_ARRAY + CONTEXT + SCRIPTABLE + SCRIPTABLE + ")" + OBJECT
             );
         }
     }
@@ -3302,6 +3298,8 @@ class BodyCodegen {
 
             Name name = dn.getName();
             generateExpression(name, node);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/decorators/Decorator");
+            cfw.add(ByteCode.SWAP);
 
             // attributes
             cfw.addPush(-1);
@@ -3330,17 +3328,11 @@ class BodyCodegen {
             cfw.addALoad(variableObjectLocal);
             cfw.addALoad(thisObjLocal);
 
-            addScriptRuntimeInvoke(
-                    "applyDecorator",
-                    OBJECT,
-                    OBJECT,
-                    "Lorg/mozilla/javascript/decorators/Decorator;",
-                    INTEGER,
-                    OBJECT_ARRAY,
-                    OBJECT_ARRAY,
-                    CONTEXT,
-                    SCRIPTABLE,
-                    SCRIPTABLE
+            cfw.addInvoke(
+                    ByteCode.INVOKEINTERFACE,
+                    "org/mozilla/javascript/decorators/Decorator",
+                    "consume",
+                    "(" + OBJECT + INTEGER + OBJECT_ARRAY + OBJECT_ARRAY + CONTEXT + SCRIPTABLE + SCRIPTABLE + ")" + OBJECT
             );
         }
     }
@@ -3349,8 +3341,6 @@ class BodyCodegen {
         Node child = cls.getFirstChild();
 
         generateExpression(child, cls);
-        generateApplyWrapDecoratorCall(cls, (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP));
-
         child = child.getNext();
 
         if (cls.getExtended() != null) {
@@ -3413,6 +3403,8 @@ class BodyCodegen {
                 child = child.getNext();
             }
         }
+
+        generateApplyWrapDecoratorCall(cls, (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP));
 
         // A decorator can map the class to any value. We need
         // to make sure it's still a nativefunction before we

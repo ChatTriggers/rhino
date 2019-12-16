@@ -17986,7 +17986,7 @@ return tag`\01\1\xg\xAg\u0\u0g\u00g\u000g\u{g\u{0\u{110000}${0}\0`;</div>}
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">20% complete</sub><sub class="unflagged">20% complete</sub>
+                </div><sub class="flagged">22% complete</sub><sub class="unflagged">21% complete</sub>
               </th>
             </tr>
           </table>
@@ -18623,7 +18623,7 @@ return A.s === 3 &amp;&amp; a.sIs1() &amp;&amp; a.xIs2();</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;A&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;A&quot; is not defined.">Error</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -18636,7 +18636,7 @@ function cb(proto, name) {
   passed = proto === A &amp;&amp; name === undefined;
 }
 
-@register(cb);
+@register(cb)
 class A {}
 
 return passed;</div>}
@@ -18649,7 +18649,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Error unflagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div><div class="Error flagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -18715,7 +18715,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -18782,6 +18782,7 @@ return passed;</div>}
 
 function transform(clazz) {
   clazz.x = 8;
+  return clazz;
 }
 
 function cb(proto, name) {
@@ -18804,7 +18805,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type undefined">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type undefined">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">

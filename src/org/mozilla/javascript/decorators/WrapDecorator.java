@@ -12,7 +12,7 @@ public class WrapDecorator implements Decorator {
     }
 
     @Override
-    public Object consume(Context cx, Scriptable scope, Scriptable thisObj, Object obj, int descriptor, Object[] descriptorArgs, Object[] metadata) {
-        return ((Callable) descriptorArgs[0]).call(cx, scope, thisObj, new Object[]{ obj });
+    public Object consume(Object target, int descriptor, Object[] descriptorArgs, Object[] metadata, Context cx, Scriptable scope, Scriptable thisObj) {
+        return ((Callable) descriptorArgs[0]).call(cx, scope, thisObj, new Object[]{ target });
     }
 }
