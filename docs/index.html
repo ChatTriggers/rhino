@@ -43,7 +43,7 @@
               </th>
               <th class="version v1">1.7.16
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">71% complete</sub><sub class="unflagged">52% complete</sub>
+                </div><sub class="flagged">70% complete</sub><sub class="unflagged">51% complete</sub>
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
@@ -620,7 +620,7 @@ return Math.max(...Object.create(iterable)) === 3;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -638,7 +638,7 @@ return [&quot;a&quot;, ...Object.create(iterable), &quot;e&quot;][3] === &quot;d
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -3851,7 +3851,7 @@ return arrow() === &quot;quux&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type object">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type object">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type object">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type object">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot use super in class without super class">Error</div><div class="Error flagged " title="Cannot use super in class without super class">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -10516,7 +10516,7 @@ return foo.bind({}).name === &quot;bound foo&quot; &amp;&amp;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -17986,7 +17986,7 @@ return tag`\01\1\xg\xAg\u0\u0g\u00g\u000g\u{g\u{0\u{110000}${0}\0`;</div>}
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">13% complete</sub><sub class="unflagged">13% complete</sub>
+                </div><sub class="flagged">20% complete</sub><sub class="unflagged">20% complete</sub>
               </th>
             </tr>
           </table>
@@ -18509,34 +18509,528 @@ return result === 'tromple';</div>}
         <tr>
           <td class="feature sub" colspan="8">
             <h3>
-              <div class="hash" id="ESNEXT-draft--stage-2--Class-and-Property-Decorators"></div><a href="#ESNEXT-draft--stage-2--Class-and-Property-Decorators">Class and Property Decorators</a>
+              <div class="hash" id="ESNEXT-draft--stage-2--Class-Decorators"></div><a href="#ESNEXT-draft--stage-2--Class-Decorators">Class Decorators</a>
             </h3>
           </td>
         </tr>
         <tr>
           <td class="feature subsub">
-            <div class="hash" id="ESNEXT-draft--stage-2--Class-and-Property-Decorators-class-decorators"></div><a href="#ESNEXT-draft--stage-2--Class-and-Property-Decorators-class-decorators">class decorators</a>
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Decorators--wrap-basic-functionality"></div><a href="#ESNEXT-draft--stage-2--Class-Decorators--wrap-basic-functionality">@wrap basic functionality</a>
             <div class="info">?
               <div class="fn">function(){
-                <div class="code">class A {
-  @nonconf
-  get B() {}
-}
-function nonconf(target, name, descriptor) {
-  descriptor.configurable = false;
-  return descriptor;
-}
-return Object.getOwnPropertyDescriptor(A.prototype, &quot;B&quot;).configurable === false;</div>}
+                <div class="code">@wrap(a =&gt; a)
+class A { }
+
+var a = new A();
+return true;</div>}
               </div>
             </div>
           </td>
-          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Decorators--wrap-modify-static-fields---properties"></div><a href="#ESNEXT-draft--stage-2--Class-Decorators--wrap-modify-static-fields---properties">@wrap modify static fields &amp; properties</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">function transform(clazz) {
+  clazz.staticField = 1;
+  clazz.staticMethod = function() { return 2; }
+  return clazz;
+}
+
+@wrap(transform)
+class A {}
+
+return A.staticField === 1 &amp;&amp; A.staticMethod() === 2;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Decorators--wrap-modify-instance-fields---properties"></div><a href="#ESNEXT-draft--stage-2--Class-Decorators--wrap-modify-instance-fields---properties">@wrap modify instance fields &amp; properties</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">function transform(clazz) {
+  clazz.prototype.instanceField = 3;
+  clazz.prototype.instanceMethod = function() { return 4; }
+  return clazz;
+}
+
+@wrap(transform)
+class A {}
+
+var a = new A();
+
+return a.instanceField === 3 &amp;&amp; a.instanceMethod() === 4;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Decorators--wrap-Class-access-inside-class-refers-to-unwrapped-class"></div><a href="#ESNEXT-draft--stage-2--Class-Decorators--wrap-Class-access-inside-class-refers-to-unwrapped-class">@wrap Class access inside class refers to unwrapped class</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">function transform(clazz) {
+  clazz.s = 3;
+  return clazz;
+}
+
+@wrap(transform)
+class A {
+  static s = 1;
+  x = A.s + 1;
+
+  sIs1() {
+    return A.s === 1;
+  }
+
+  xIs2() {
+    return this.x === 2;
+  }
+}
+
+var a = new A();
+return A.s === 3 &amp;&amp; a.sIs1() &amp;&amp; a.xIs2();</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;A&quot; is not defined.">Error</div><div class="Error flagged " title="&quot;A&quot; is not defined.">Error</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Decorators--register-basic-functionality"></div><a href="#ESNEXT-draft--stage-2--Class-Decorators--register-basic-functionality">@register basic functionality</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">var passed;
+
+function cb(proto, name) {
+  passed = proto === A &amp;&amp; name === undefined;
+}
+
+@register(cb);
+class A {}
+
+return passed;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div><div class="Error flagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div></td>
+        </tr>
+        <tr>
+          <td class="feature sub" colspan="8">
+            <h3>
+              <div class="hash" id="ESNEXT-draft--stage-2--Class-Property-Decorators"></div><a href="#ESNEXT-draft--stage-2--Class-Property-Decorators">Class Property Decorators</a>
+            </h3>
+          </td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Property-Decorators--wrap-is-a-syntax-error"></div><a href="#ESNEXT-draft--stage-2--Class-Property-Decorators--wrap-is-a-syntax-error">@wrap is a syntax error</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">var passed = 1;
+
+try {
+  eval(`class A {
+          @wrap(f =&gt; f)
+          x = 1;
+        }`);
+  return false;
+} catch (e) {
+  passed &amp;= e.message.includes('SyntaxError');
+}
+
+try {
+  eval(`class A {
+          @wrap(f =&gt; f)
+          static x = 1;
+      }`);
+  return false;
+} catch (e) {
+  passed &amp;= e.message.includes('SyntaxError');
+}
+
+try {
+  eval(`class A {
+          @wrap(f =&gt; f)
+          #x = 1;
+      }`);
+  return false;
+} catch (e) {
+  passed &amp;= e.message.includes('SyntaxError');
+}
+
+try {
+  eval(`class A {
+          @wrap(f =&gt; f)
+          static #x = 1;
+      }`);
+  return false;
+} catch (e) {
+  passed &amp;= e.message.includes('SyntaxError');
+}
+
+return passed;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Property-Decorators--register-static-properties"></div><a href="#ESNEXT-draft--stage-2--Class-Property-Decorators--register-static-properties">@register static properties</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">var passed = false;
+
+function cb(target, name) {
+  passed = target[name] === 4;
+}
+
+class A {
+  @register(cb)
+  static x = 4;
+}
+
+return passed;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Property-Decorators--register-instance-properties"></div><a href="#ESNEXT-draft--stage-2--Class-Property-Decorators--register-instance-properties">@register instance properties</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">var passed = false;
+
+function cb(target, name) {
+  passed = new target()[name] === 4;
+}
+
+class A {
+  @register(cb)
+  x = 4;
+}
+
+return passed;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Property-Decorators--wrap-handled-before--register"></div><a href="#ESNEXT-draft--stage-2--Class-Property-Decorators--wrap-handled-before--register">@wrap handled before @register</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">var passed = false;
+
+function transform(clazz) {
+  clazz.x = 8;
+}
+
+function cb(proto, name) {
+  passed = proto[name] === 8;
+}
+
+@wrap(transform)
+class A {
+  @register(cb)
+  static x = 4;
+}
+
+return passed;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type undefined">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type undefined">Error</div></td>
+        </tr>
+        <tr>
+          <td class="feature sub" colspan="8">
+            <h3>
+              <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators">Class Method Decorators</a>
+            </h3>
+          </td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-instance-methods-basic-functionality"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-instance-methods-basic-functionality">@wrap instance methods basic functionality</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">class A {
+  @wrap(f =&gt; f)
+  method() {}
+}
+
+var a = new A();
+return true;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-modifying-instance-method"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-modifying-instance-method">@wrap modifying instance method</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">function transform(method) {
+  return () =&gt; method() + 1;
+}
+
+class A {
+  @wrap(transform)
+  method() {
+    return 5;
+  }
+}
+
+var a = new A();
+return a.method() === 6;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-delete-instance-method"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-delete-instance-method">@wrap delete instance method</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">function transform() {
+  return undefined;
+}
+
+class A {
+  @wrap(transform)
+  method() {
+    return 5;
+  }
+}
+
+var a = new A();
+return a.method === undefined;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-static-methods-basic-functionality"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-static-methods-basic-functionality">@wrap static methods basic functionality</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">class A {
+  @wrap(f =&gt; f)
+  static method() {}
+}
+
+return true;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-modifying-static-method"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-modifying-static-method">@wrap modifying static method</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">function transform(method) {
+  return () =&gt; method() + 1;
+}
+
+class A {
+  @wrap(transform)
+  static method() {
+    return 5;
+  }
+}
+
+return A.method() === 6;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-delete-static-methods"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators--wrap-delete-static-methods">@wrap delete static methods</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">function transform() {
+  return undefined;
+}
+
+class A {
+  @wrap(transform)
+  static method() {
+    return 5;
+  }
+}
+
+return A.method === undefined;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators--register-instance-methods-basic-functionality"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators--register-instance-methods-basic-functionality">@register instance methods basic functionality</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">var passed = false;
+
+function cb(proto, name) {
+  passed = new proto()[name]() === 5;
+}
+
+class A {
+  @register(cb)
+  x() {
+    return 5;
+  }
+}
+
+return passed;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+        </tr>
+        <tr>
+          <td class="feature subsub">
+            <div class="hash" id="ESNEXT-draft--stage-2--Class-Method-Decorators--register-static-methods-basic-functionality"></div><a href="#ESNEXT-draft--stage-2--Class-Method-Decorators--register-static-methods-basic-functionality">@register static methods basic functionality</a>
+            <div class="info">?
+              <div class="fn">function(){
+                <div class="code">var passed = false;
+
+function cb(proto, name) {
+  passed = proto[name]() === 5;
+}
+
+class A {
+  @register(cb)
+  static x() {
+    return 5;
+  }
+}
+
+return passed;</div>}
+              </div>
+            </div>
+          </td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -18566,7 +19060,7 @@ try {
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -18593,7 +19087,7 @@ try {
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -18615,7 +19109,7 @@ try {
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -18637,7 +19131,7 @@ try {
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -21633,7 +22127,7 @@ return (@inverse function(it){
           <td class="result"><div class="Error unflagged " title="missing ) in parenthetical">Error</div><div class="Error flagged " title="missing ) in parenthetical">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) in parenthetical">Error</div><div class="Error flagged " title="missing ) in parenthetical">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) in parenthetical">Error</div><div class="Error flagged " title="missing ) in parenthetical">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ) in parenthetical">Error</div><div class="Error flagged " title="missing ) in parenthetical">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div><div class="Error flagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">

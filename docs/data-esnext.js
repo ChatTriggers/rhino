@@ -102,39 +102,365 @@ exports.tests = [
     graalvm: false,
   }
 },
-{
-  name: 'Class and Property Decorators',
-  category: STAGE2,
-  significance: 'medium',
-  spec: 'https://github.com/tc39/proposal-decorators',
-  subtests: [
-    {
-      name: 'class decorators',
-      spec: 'https://github.com/wycats/javascript-decorators',
-      exec: function(){/*
+  {
+    name: 'Class Decorators',
+    category: STAGE2,
+    significance: 'medium',
+    spec: 'https://github.com/tc39/proposal-decorators',
+    subtests: [
+      {
+        name: '@wrap basic functionality',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+        @wrap(a => a)
+        class A { }
+
+        var a = new A();
+        return true;
+        */},
+      },
+      {
+        name: '@wrap modify static fields & properties',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+        function transform(clazz) {
+          clazz.staticField = 1;
+          clazz.staticMethod = function() { return 2; }
+          return clazz;
+        }
+
+        @wrap(transform)
+        class A {}
+
+        return A.staticField === 1 && A.staticMethod() === 2;
+        */}
+      },
+      {
+        name: '@wrap modify instance fields & properties',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+        function transform(clazz) {
+          clazz.prototype.instanceField = 3;
+          clazz.prototype.instanceMethod = function() { return 4; }
+          return clazz;
+        }
+
+        @wrap(transform)
+        class A {}
+
+        var a = new A();
+
+        return a.instanceField === 3 && a.instanceMethod() === 4;
+        */}
+      },
+      {
+        name: '@wrap Class access inside class refers to unwrapped class',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+        function transform(clazz) {
+          clazz.s = 3;
+          return clazz;
+        }
+
+        @wrap(transform)
         class A {
-          @nonconf
-          get B() {}
+          static s = 1;
+          x = A.s + 1;
+
+          sIs1() {
+            return A.s === 1;
+          }
+
+          xIs2() {
+            return this.x === 2;
+          }
         }
-        function nonconf(target, name, descriptor) {
-          descriptor.configurable = false;
-          return descriptor;
-        }
-        return Object.getOwnPropertyDescriptor(A.prototype, "B").configurable === false;
-      */},
-      res: {
-        babel6corejs2: {val: false, note_id: "babel-decorators-legacy", note_html: "Babel 6 still has no official support decorators, but you can use <a href='https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy'>this plugin</a>."},
-        typescript1corejs2: true,
-        ie11: false,
-        firefox2: false,
-        opera10_50: false,
-        chrome77: false,
-        duktape2_0: false,
-        graalvm: false,
+
+        var a = new A();
+        return A.s === 3 && a.sIs1() && a.xIs2();
+        */}
+      },
+      {
+        name: '@register basic functionality',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function() {/*
+          var passed;
+
+          function cb(proto, name) {
+            passed = proto === A && name === undefined;
+          }
+
+          @register(cb);
+          class A {}
+
+          return passed;
+        */}
       }
-    },
-  ],
-},
+    ],
+  },
+  {
+    name: 'Class Property Decorators',
+    category: STAGE2,
+    significance: 'medium',
+    spec: 'https://github.com/tc39/proposal-decorators',
+    subtests: [
+      {
+        name: '@wrap is a syntax error',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+        var passed = 1;
+
+        try {
+          eval(`class A {
+                  @wrap(f => f)
+                  x = 1;
+                }`);
+          return false;
+        } catch (e) {
+          passed &= e.message.includes('SyntaxError');
+        }
+
+        try {
+          eval(`class A {
+                  @wrap(f => f)
+                  static x = 1;
+              }`);
+          return false;
+        } catch (e) {
+          passed &= e.message.includes('SyntaxError');
+        }
+
+        try {
+          eval(`class A {
+                  @wrap(f => f)
+                  #x = 1;
+              }`);
+          return false;
+        } catch (e) {
+          passed &= e.message.includes('SyntaxError');
+        }
+
+        try {
+          eval(`class A {
+                  @wrap(f => f)
+                  static #x = 1;
+              }`);
+          return false;
+        } catch (e) {
+          passed &= e.message.includes('SyntaxError');
+        }
+
+        return passed;
+        */}
+      },
+      {
+        name: '@register static properties',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function() {/*
+          var passed = false;
+
+          function cb(target, name) {
+            passed = target[name] === 4;
+          }
+
+          class A {
+            @register(cb)
+            static x = 4;
+          }
+
+          return passed;
+        */}
+      },
+      {
+        name: '@register instance properties',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function() {/*
+          var passed = false;
+
+          function cb(target, name) {
+            passed = new target()[name] === 4;
+          }
+
+          class A {
+            @register(cb)
+            x = 4;
+          }
+
+          return passed;
+        */}
+      },
+      {
+        name: '@wrap handled before @register',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function() {/*
+          var passed = false;
+
+          function transform(clazz) {
+            clazz.x = 8;
+          }
+
+          function cb(proto, name) {
+            passed = proto[name] === 8;
+          }
+
+          @wrap(transform)
+          class A {
+            @register(cb)
+            static x = 4;
+          }
+
+          return passed;
+        */}
+      }
+    ],
+  },
+  {
+    name: 'Class Method Decorators',
+    category: STAGE2,
+    significance: 'medium',
+    spec: 'https://github.com/tc39/proposal-decorators',
+    subtests: [
+      {
+        name: '@wrap instance methods basic functionality',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+          class A {
+            @wrap(f => f)
+            method() {}
+          }
+
+          var a = new A();
+          return true;
+        */}
+      },
+      {
+        name: '@wrap modifying instance method',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+          function transform(method) {
+            return () => method() + 1;
+          }
+
+          class A {
+            @wrap(transform)
+            method() {
+              return 5;
+            }
+          }
+
+          var a = new A();
+          return a.method() === 6;
+        */}
+      },
+      {
+        name: '@wrap delete instance method',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+          function transform() {
+            return undefined;
+          }
+
+          class A {
+            @wrap(transform)
+            method() {
+              return 5;
+            }
+          }
+
+          var a = new A();
+          return a.method === undefined;
+        */}
+      },
+      {
+        name: '@wrap static methods basic functionality',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+          class A {
+            @wrap(f => f)
+            static method() {}
+          }
+
+          return true;
+        */}
+      },
+      {
+        name: '@wrap modifying static method',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+          function transform(method) {
+            return () => method() + 1;
+          }
+
+          class A {
+            @wrap(transform)
+            static method() {
+              return 5;
+            }
+          }
+
+          return A.method() === 6;
+        */}
+      },
+      {
+        name: '@wrap delete static methods',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function () {/*
+          function transform() {
+            return undefined;
+          }
+
+          class A {
+            @wrap(transform)
+            static method() {
+              return 5;
+            }
+          }
+
+          return A.method === undefined;
+        */}
+      },
+      {
+        name: '@register instance methods basic functionality',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function() {/*
+          var passed = false;
+
+          function cb(proto, name) {
+            passed = new proto()[name]() === 5;
+          }
+
+          class A {
+            @register(cb)
+            x() {
+              return 5;
+            }
+          }
+
+          return passed;
+        */}
+      },
+      {
+        name: '@register static methods basic functionality',
+        spec: 'https://github.com/tc39/proposal-decorators',
+        exec: function() {/*
+          var passed = false;
+
+          function cb(proto, name) {
+            passed = proto[name]() === 5;
+          }
+
+          class A {
+            @register(cb)
+            static x() {
+              return 5;
+            }
+          }
+
+          return passed;
+        */}
+      }
+    ],
+  },
 {
   name: 'Realms',
   category: STAGE2,
