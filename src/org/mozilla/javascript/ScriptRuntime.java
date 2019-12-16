@@ -857,12 +857,8 @@ public class ScriptRuntime {
         return clazzObj;
     }
 
-    public static Object addClassProperty(Object clazzObj, Object name, Object defaultValue, Context cx, boolean instance, boolean isPrivate) {
+    public static Object addClassProperty(Object clazzObj, Object name, Object defaultValue, Context cx, boolean isPrivate) {
         ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
-
-        if (instance) {
-            clazz = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(clazz, "prototype"));
-        }
 
         if (isPrivate) {
             clazz.togglePrivateSlots();

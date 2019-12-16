@@ -682,7 +682,7 @@ public final class IRFactory extends Parser {
 
         fn.setFunctionName(node.getClassName());
         fn.setFunctionType(FunctionNode.FUNCTION_EXPRESSION);
-        fn.setClassConstructor(true);
+        fn.setParentClass(node);
 
         List<Node> decorators = new ArrayList<>();
 

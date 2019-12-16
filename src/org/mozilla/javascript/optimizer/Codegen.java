@@ -1565,6 +1565,50 @@ class BodyCodegen {
             }
         }
 
+        if (currentCtorClass) {
+            ClassNode cls = ((FunctionNode) scriptOrFn).getParentClass();
+            Node child = cls.getFirstChild().getNext();
+
+            cfw.addALoad(3); // this
+
+            while (child != null) {
+                if (child instanceof ClassProperty) {
+                    ClassProperty cp = (ClassProperty) child;
+                    Node defaultValue = cp.getFirstChild();
+                    Object name = cp.getNameKey();
+
+                    if (cp.isStatic()) {
+                        child = child.getNext();
+                        continue;
+                    }
+
+                    if (name instanceof String) {
+                        cfw.addPush((String) name);
+                    } else if (name instanceof Node) {
+                        Node nameNode = (Node) name;
+                        generateExpression(nameNode, cls);
+                    } else {
+                        cfw.addPush((Integer) name);
+                        addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
+                    }
+
+                    generateExpression(defaultValue, cls);
+                    // Wrap decorators are invalid for properties; this call
+                    // throws an error if a wrap decorator exists for the field
+
+                    // TODO:
+//                    generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP));
+                    cfw.addALoad(contextLocal);
+                    cfw.addPush(cp.isPrivate());
+                    addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
+                }
+
+                child = child.getNext();
+            }
+
+            cfw.add(ByteCode.POP);
+        }
+
         if (fnCurrent != null) {
             // Use the enclosing scope of the function as our variable object.
             cfw.addALoad(funObjLocal);
@@ -3350,6 +3394,11 @@ class BodyCodegen {
                 Node defaultValue = cp.getFirstChild();
                 Object name = cp.getNameKey();
 
+                if (!cp.isStatic()) {
+                    child = child.getNext();
+                    continue;
+                }
+
                 if (name instanceof String) {
                     cfw.addPush((String) name);
                 } else if (name instanceof Node) {
@@ -3365,9 +3414,8 @@ class BodyCodegen {
                 // throws an error if a wrap decorator exists for the field
                 generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP));
                 cfw.addALoad(contextLocal);
-                cfw.addPush(!cp.isStatic());
                 cfw.addPush(cp.isPrivate());
-                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, BOOLEAN);
+                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
 
                 child = child.getNext();
             }

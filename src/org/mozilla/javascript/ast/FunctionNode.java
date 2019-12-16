@@ -75,7 +75,7 @@ public class FunctionNode extends ScriptNode {
     private AstNode body;
     private boolean isExpressionClosure;
     private boolean isConstructable = true;
-    private boolean isClassConstructor = false;
+    private ClassNode parentClass = null;
     private boolean isStatic = false;
     private boolean isPrivate = false;
     private Form functionForm = Form.FUNCTION;
@@ -309,11 +309,15 @@ public class FunctionNode extends ScriptNode {
     }
 
     public boolean isClassConstructor() {
-        return isClassConstructor;
+        return parentClass != null;
     }
 
-    public void setClassConstructor(boolean classConstructor) {
-        isClassConstructor = classConstructor;
+    public ClassNode getParentClass() {
+        return parentClass;
+    }
+
+    public void setParentClass(ClassNode classConstructor) {
+        parentClass = classConstructor;
     }
 
     public boolean isStatic() {
