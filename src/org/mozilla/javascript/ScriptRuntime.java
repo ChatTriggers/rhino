@@ -927,6 +927,40 @@ public class ScriptRuntime {
         return instance;
     }
 
+    public static Object setSuperElem(Object prop, Object value, Scriptable thisObj, NativeFunction method) {
+        Object superObj = method.getAssociatedValue(SUPER_KEY);
+
+        if (superObj == null) {
+            throw typeError0("msg.class.no.super");
+        }
+
+        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
+
+        if (prop instanceof String) {
+            ScriptableObject.putProperty(superProto, (String) prop, value);
+        } else if (prop instanceof Integer) {
+            ScriptableObject.putProperty(superProto, (Integer) prop, value);
+        } else if (isSymbol(prop)) {
+            ScriptableObject.putProperty(superProto, (Symbol) prop, value);
+        }
+
+        return value;
+    }
+
+    public static Object setSuperProp(String prop, Object value, Scriptable thisObj, NativeFunction method) {
+        Object superObj = method.getAssociatedValue(SUPER_KEY);
+
+        if (superObj == null) {
+            throw typeError0("msg.class.no.super");
+        }
+
+        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
+
+        ScriptableObject.putProperty(superProto, prop, value);
+
+        return value;
+    }
+
     public static Object accessSuper(Object prop, Scriptable thisObj, NativeFunction method) {
         Object superObj = method.getAssociatedValue(SUPER_KEY);
 

@@ -5403,7 +5403,11 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         boolean isPrivate = node.getProp(Node.PRIVATE_ACCESS_PROP) != null;
 
         Node objectChild = child;
-        generateExpression(child, node);
+        boolean isSuper = objectChild.getProp(Node.SUPER_PROP) != null;
+
+        if (!isSuper) {
+            generateExpression(child, node);
+        }
 
         short objLocal = 0;
         if (isPrivate) {
@@ -5442,6 +5446,15 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                 addScriptRuntimeInvoke("getObjectProp", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
             }
         }
+
+        if (isSuper) {
+            generateExpression(child, node);
+            cfw.addALoad(thisObjLocal);
+            cfw.addALoad(funObjLocal);
+            addScriptRuntimeInvoke("setSuperProp", OBJECT, STRING, OBJECT, SCRIPTABLE, NATIVE_FUNCTION);
+            return;
+        }
+
         generateExpression(child, node);
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
@@ -5454,12 +5467,28 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     }
 
     private void visitSetElem(int type, Node node, Node child) {
-        generateExpression(child, node);
+        boolean isSuper = child.getProp(Node.SUPER_PROP) != null;
+
+        if (isSuper) {
+            child = child.getNext();
+            generateExpression(child, node); // super.<key> = value;
+
+            child = child.getNext();
+            generateExpression(child, node); // super.key = <value>;
+
+            cfw.addALoad(thisObjLocal);
+            cfw.addALoad(funObjLocal);
+
+            addScriptRuntimeInvoke("setSuperElem", OBJECT, OBJECT, OBJECT, SCRIPTABLE, NATIVE_FUNCTION);
+            return;
+        }
+
+        generateExpression(child, node); // <obj>.key = value;
         child = child.getNext();
         if (type == Token.SETELEM_OP) {
             cfw.add(ByteCode.DUP);
         }
-        generateExpression(child, node);
+        generateExpression(child, node); // obj.<key> = value;
         child = child.getNext();
         boolean indexIsNumber = (node.getIntProp(Node.ISNUMBER_PROP, -1) != -1);
         if (type == Token.SETELEM_OP) {
@@ -5479,7 +5508,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                 addScriptRuntimeInvoke("getObjectElem", OBJECT, OBJECT, OBJECT, CONTEXT, SCRIPTABLE);
             }
         }
-        generateExpression(child, node);
+        generateExpression(child, node); // obj.key = <value>;
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
         if (indexIsNumber) {
