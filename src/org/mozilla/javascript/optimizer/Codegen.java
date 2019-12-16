@@ -2822,6 +2822,38 @@ class BodyCodegen {
                 break;
             }
 
+            case Token.SPREAD: {
+                Object[] alreadyTaken = (Object[]) node.getProp(Node.SPREAD_IDS_PROP);
+
+                if (alreadyTaken == null) {
+                    throw new RuntimeException("Unexpected Token.SPREAD without spread_ids");
+                }
+
+                generateExpression(child, node); // object
+
+                addNewObjectArray(alreadyTaken.length);
+
+                for (int i = 0; i < alreadyTaken.length; i++) {
+                    Object taken = alreadyTaken[i];
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(i);
+
+                    if (taken instanceof String) {
+                        cfw.addPush((String) taken);
+                    } else if (taken instanceof Integer) {
+                        cfw.addPush((int) taken);
+                    } else {
+                        throw new RuntimeException("Unknown constant: " + taken);
+                    }
+
+                    cfw.add(ByteCode.AASTORE);
+                }
+
+                addScriptRuntimeInvoke("handleObjectRest", OBJECT, OBJECT, OBJECT_ARRAY);
+
+                break;
+            }
+
             case Token.GET_REF: {
                 generateExpression(child, node); // reference
                 cfw.addALoad(contextLocal);

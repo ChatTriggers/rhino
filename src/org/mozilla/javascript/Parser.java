@@ -4410,6 +4410,8 @@ public class Parser {
         int setOp = variableType == Token.CONST
                 ? Token.SETCONST : Token.SETNAME;
 
+        List<Object> alreadyTaken = new ArrayList<>();
+
         for (ObjectProperty prop : node.getElements()) {
             int lineno = 0;
             // This function is sometimes called from the IRFactory when
@@ -4432,14 +4434,21 @@ public class Parser {
                     // We're going to need to store ourselves and wait for IR.
                     rightElem = new Node(Token.GETELEM, createName(tempName), id);
                 }
+            } else if (id.getProp(Node.SPREAD_PROP) != null) {
+                Node s = Node.newString(((Name) id).getIdentifier());
+                rightElem = new Node(Token.SPREAD, createName(tempName), s);
+                rightElem.putProp(Node.SPREAD_IDS_PROP, alreadyTaken.toArray());
             } else if (id instanceof Name) {
                 Node s = Node.newString(((Name) id).getIdentifier());
+                alreadyTaken.add(((Name) id).getIdentifier());
                 rightElem = new Node(Token.GETPROP, createName(tempName), s);
             } else if (id instanceof StringLiteral) {
                 Node s = Node.newString(((StringLiteral) id).getValue());
+                alreadyTaken.add(((StringLiteral) id).getValue());
                 rightElem = new Node(Token.GETPROP, createName(tempName), s);
             } else if (id instanceof NumberLiteral) {
                 Node s = createNumber((int) ((NumberLiteral) id).getNumber());
+                alreadyTaken.add((int) ((NumberLiteral) id).getNumber());
                 rightElem = new Node(Token.GETELEM, createName(tempName), s);
             } else {
                 throw codeBug();

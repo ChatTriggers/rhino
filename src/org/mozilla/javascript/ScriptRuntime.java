@@ -23,10 +23,7 @@ import org.mozilla.javascript.xml.XMLObject;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * This is the class that implements the runtime.
@@ -738,6 +735,26 @@ public class ScriptRuntime {
         } catch (NumberFormatException ex) {
             return NaN;
         }
+    }
+
+    public static Object handleObjectRest(Object destructured, Object[] alreadyTaken) {
+        ScriptableObject obj = ScriptableObject.ensureScriptableObject(destructured);
+
+        Object[] ids = obj.getIds();
+        List<Object> taken = Arrays.asList(alreadyTaken);
+        NativeObject newObj = new NativeObject();
+
+        for (Object id : ids) {
+            if (taken.contains(id)) continue;
+
+            if (id instanceof String) {
+                ScriptableObject.putProperty(newObj, (String) id, ScriptableObject.getProperty(obj, id));
+            } else if (id instanceof Integer) {
+                ScriptableObject.putProperty(newObj, (int) id, ScriptableObject.getProperty(obj, id));
+            }
+        }
+
+        return newObj;
     }
 
     public static Object handleRestDestructure(Context cx, Scriptable scope, int startIndex, Object right) {
