@@ -1594,11 +1594,6 @@ class BodyCodegen {
                     }
 
                     generateExpression(defaultValue, cls);
-                    // Wrap decorators are invalid for properties; this call
-                    // throws an error if a wrap decorator exists for the field
-
-                    // TODO:
-//                    generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP));
                     cfw.addALoad(contextLocal);
                     cfw.addPush(cp.isPrivate());
                     addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
@@ -3409,19 +3404,23 @@ class BodyCodegen {
 
         // If the class is no longer a class, initFunction is not called,
         // which means we never bind that to the scope. We do that here
-        // manually
-        int tmp = getNewWordLocal(true);
-        cfw.addAStore(tmp);
+        // manually, assuming the class has a name
+        Name className = cls.getClassName();
 
-        cfw.addALoad(contextLocal);
-        cfw.addALoad(variableObjectLocal);
-        cfw.addPush(cls.getClassName().getIdentifier());
-        addScriptRuntimeInvoke("bind", SCRIPTABLE, CONTEXT, SCRIPTABLE, STRING);
-        cfw.addALoad(tmp);
-        cfw.addALoad(contextLocal);
-        cfw.addALoad(variableObjectLocal);
-        cfw.addPush(cls.getClassName().getIdentifier());
-        addScriptRuntimeInvoke("setName", OBJECT, SCRIPTABLE, OBJECT, CONTEXT, SCRIPTABLE, STRING);
+        if (className != null) {
+            int tmp = getNewWordLocal(true);
+            cfw.addAStore(tmp);
+
+            cfw.addALoad(contextLocal);
+            cfw.addALoad(variableObjectLocal);
+            cfw.addPush(className.getIdentifier());
+            addScriptRuntimeInvoke("bind", SCRIPTABLE, CONTEXT, SCRIPTABLE, STRING);
+            cfw.addALoad(tmp);
+            cfw.addALoad(contextLocal);
+            cfw.addALoad(variableObjectLocal);
+            cfw.addPush(cls.getClassName().getIdentifier());
+            addScriptRuntimeInvoke("setName", OBJECT, SCRIPTABLE, OBJECT, CONTEXT, SCRIPTABLE, STRING);
+        }
 
 
         cfw.markLabel(skipManualScope);
