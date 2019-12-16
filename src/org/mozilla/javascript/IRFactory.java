@@ -699,6 +699,10 @@ public final class IRFactory extends Parser {
             call.putProp(Node.SPREAD_PROP, node.getProp(Node.SPREAD_PROP));
         }
 
+        if (node.getProp(Node.PRIVATE_ACCESS_PROP) != null) {
+            call.putProp(Node.PRIVATE_ACCESS_PROP, true);
+        }
+
         call.setLineno(node.getLineno());
         decompiler.addToken(Token.LP);
         List<AstNode> args = node.getArguments();

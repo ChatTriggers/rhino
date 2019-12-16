@@ -3586,6 +3586,8 @@ class BodyCodegen {
     private void visitStandardCall(Node node, Node child) {
         if (node.getType() != Token.CALL) throw Codegen.badTree();
 
+        boolean isPrivate = child.getProp(Node.PRIVATE_ACCESS_PROP) != null;
+
         Node firstArgChild = child.getNext();
         int childType = child.getType();
 
@@ -3645,6 +3647,8 @@ class BodyCodegen {
                     methodName = "optionalCallProp0";
                 } else if (child.getProp(Node.CHAINING_PROP) != null) {
                     methodName = "optionalAccessCallProp0";
+                } else if (isPrivate) {
+                    methodName = "privateCallProp0";
                 } else {
                     methodName = "callProp0";
                 }
@@ -3653,7 +3657,7 @@ class BodyCodegen {
             } else if (childType == Token.GETPROPNOWARN) {
                 throw Kit.codeBug();
             } else {
-                generateFunctionAndThisObj(child, node);
+                generateFunctionAndThisObj(child, node, true);
                 methodName = "call0";
                 signature = new String[]{ CALLABLE, SCRIPTABLE, CONTEXT, SCRIPTABLE };
             }
@@ -3707,7 +3711,7 @@ class BodyCodegen {
                 return;
             }
 
-            generateFunctionAndThisObj(child, node);
+            generateFunctionAndThisObj(child, node, true);
             // stack: ... functionObj thisObj
             if (argCount == 1) {
                 generateExpression(firstArgChild, node);
@@ -3998,6 +4002,10 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     }
 
     private void generateFunctionAndThisObj(Node node, Node parent) {
+        generateFunctionAndThisObj(node, parent, false);
+    }
+
+    private void generateFunctionAndThisObj(Node node, Node parent, boolean isPrivate) {
         // Place on stack (function object, function this) pair
         int type = node.getType();
         switch (node.getType()) {
@@ -4008,7 +4016,20 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
             case Token.GETELEM: {
                 Node target = node.getFirstChild();
                 generateExpression(target, node);
+                short objLocal = 0;
+                if (isPrivate) {
+                    objLocal = getNewWordLocal();
+                    cfw.add(ByteCode.DUP);
+                    cfw.addAStore(objLocal);
+                }
+
                 Node id = target.getNext();
+
+                if (isPrivate) {
+                    cfw.addALoad(objLocal);
+                    addOptRuntimeInvoke("optionalPrivateToggle", VOID, OBJECT);
+                }
+
                 if (type == Token.GETPROP) {
                     String property = id.getString();
                     cfw.addPush(property);
@@ -4023,6 +4044,12 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                     cfw.addALoad(variableObjectLocal);
                     addScriptRuntimeInvoke("getElemFunctionAndThis", CALLABLE, OBJECT, OBJECT, CONTEXT, SCRIPTABLE);
                 }
+
+                if (isPrivate) {
+                    cfw.addALoad(objLocal);
+                    addOptRuntimeInvoke("optionalPrivateToggle", VOID, OBJECT);
+                }
+
                 break;
             }
 
