@@ -778,10 +778,17 @@ public class ScriptRuntime {
 
         if (instance) {
             clazz = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(clazz, "prototype"));
-        }
 
-        if (method instanceof ScriptableObject) {
-            ((ScriptableObject) method).associateValue(SUPER_KEY, clazz.getPrototype());
+            if (method instanceof ScriptableObject) {
+                Object extended = ScriptableObject.ensureScriptableObject(clazzObj).getAssociatedValue(SUPER_KEY);
+
+                if (extended != null) {
+                    ((ScriptableObject) method).associateValue(
+                            SUPER_KEY,
+                            extended
+                    );
+                }
+            }
         }
 
         if (isPrivate) {
@@ -921,9 +928,21 @@ public class ScriptRuntime {
     }
 
     public static Object accessSuper(Object prop, Scriptable thisObj, NativeFunction method) {
-        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(method.getAssociatedValue(SUPER_KEY));
+        Object superObj = method.getAssociatedValue(SUPER_KEY);
 
-        return ScriptableObject.getProperty(superProto, prop);
+        if (superObj == null) {
+            throw typeError0("msg.class.no.super");
+        }
+
+        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
+
+        Object result = ScriptableObject.getProperty(superProto, prop);
+
+        if (result == Scriptable.NOT_FOUND) {
+            result = Undefined.instance;
+        }
+
+        return result;
     }
 
     public static Object callSuperProp(Object prop, Object[] args, Scriptable scope, Scriptable thisObj, NativeFunction nativeFunction, Context cx) {
@@ -949,6 +968,7 @@ public class ScriptRuntime {
             ScriptableObject newObject = new NativeObject();
             newObject.defineProperty("constructor", clazz, ScriptableObject.NOT_ENUMERABLE);
             ScriptableObject.putProperty(clazz, "prototype", newObject);
+            clazz.associateValue(SUPER_KEY, newObject.getPrototype());
             return clazz;
         }
 
@@ -960,6 +980,8 @@ public class ScriptRuntime {
         newObject.setPrototype(extendedProto);
         newObject.defineProperty("constructor", clazz, ScriptableObject.NOT_ENUMERABLE);
         ScriptableObject.putProperty(clazz, "prototype", newObject);
+
+        clazz.associateValue(SUPER_KEY, extendedProto);
 
         clazz.setPrototype(extended);
 
