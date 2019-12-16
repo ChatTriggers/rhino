@@ -493,8 +493,7 @@ public class Main
                     String newline;
                     try {
                         newline = console.readLine(prompt);
-                    }
-                    catch (IOException ioe) {
+                    } catch (IOException ioe) {
                         console.println(ioe.toString());
                         break;
                     }
@@ -509,6 +508,9 @@ public class Main
                     prompt = prompts[1];
                 }
                 try {
+                    if (source.isEmpty() || source.equals("\n")) {
+                        continue;
+                    }
                     Script script = cx.compileString(source, "<stdin>", lineno, null);
                     if (script != null) {
                         Object result = script.exec(cx, scope);
