@@ -3387,13 +3387,44 @@ class BodyCodegen {
             }
         }
 
-        // TODO: Only when a statement
+        // A decorator can map the class to any value. We need
+        // to make sure it's still a nativefunction before we
+        // call initFunction
+        int skipInit = cfw.acquireLabel();
+        cfw.add(ByteCode.DUP);
+
+        cfw.add(ByteCode.INSTANCEOF, "org/mozilla/javascript/NativeFunction");
+        cfw.add(ByteCode.IFEQ, skipInit);
+
         cfw.add(ByteCode.DUP);
         cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/NativeFunction");
         cfw.addPush(FunctionNode.FUNCTION_STATEMENT);
         cfw.addALoad(variableObjectLocal);
         cfw.addALoad(contextLocal);           // load 'cx'
         addOptRuntimeInvoke("initFunction", VOID, NATIVE_FUNCTION, INTEGER, SCRIPTABLE, CONTEXT);
+
+        int skipManualScope = cfw.acquireLabel();
+        cfw.add(ByteCode.GOTO, skipManualScope);
+        cfw.markLabel(skipInit);
+
+        // If the class is no longer a class, initFunction is not called,
+        // which means we never bind that to the scope. We do that here
+        // manually
+        int tmp = getNewWordLocal(true);
+        cfw.addAStore(tmp);
+
+        cfw.addALoad(contextLocal);
+        cfw.addALoad(variableObjectLocal);
+        cfw.addPush(cls.getClassName().getIdentifier());
+        addScriptRuntimeInvoke("bind", SCRIPTABLE, CONTEXT, SCRIPTABLE, STRING);
+        cfw.addALoad(tmp);
+        cfw.addALoad(contextLocal);
+        cfw.addALoad(variableObjectLocal);
+        cfw.addPush(cls.getClassName().getIdentifier());
+        addScriptRuntimeInvoke("setName", OBJECT, SCRIPTABLE, OBJECT, CONTEXT, SCRIPTABLE, STRING);
+
+
+        cfw.markLabel(skipManualScope);
 
         // Re-loop over all method/properties to apply register decorator
         child = cls.getFirstChild();
