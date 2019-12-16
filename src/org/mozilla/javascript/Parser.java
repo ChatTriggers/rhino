@@ -8,6 +8,7 @@ package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
+import org.mozilla.javascript.decorators.DecoratorType;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -794,6 +795,10 @@ public class Parser {
                     propertyName = ts.getString();
 
                     if (entryKind == FIELD_ENTRY) {
+                        if (decorators.stream().anyMatch(it -> DecoratorType.WRAP == it.getDecoratorType())) {
+                            reportError("msg.decorator.wrap.on.field");
+                        }
+
                         AstNode defaultValue = null;
 
                         int token = peekTokenOrEOL();
@@ -2040,8 +2045,10 @@ public class Parser {
         consumeToken();
         peekToken();
         Name name = createNameNode();
+        name.setIdentifier("@" + name.getIdentifier());
         consumeToken();
         DecoratorNode dn = new DecoratorNode(name);
+        dn.setDecoratorType(DecoratorType.fromDecorator(name.getIdentifier()));
 
         if (peekToken() == Token.LP) {
             AstNode node = memberExprTail(true, dn);
