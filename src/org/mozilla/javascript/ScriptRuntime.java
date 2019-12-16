@@ -8,6 +8,7 @@ package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.decorators.Decorator;
+import org.mozilla.javascript.decorators.DecoratorType;
 import org.mozilla.javascript.decorators.RegisterDecorator;
 import org.mozilla.javascript.decorators.WrapDecorator;
 import org.mozilla.javascript.generator.NativeGenerator;
@@ -203,8 +204,7 @@ public class ScriptRuntime {
         NativeProxy.init(scope, sealed);
 
         // Decorators
-        WrapDecorator.init(scope);
-        RegisterDecorator.init(scope);
+        DecoratorType.init(scope);
 
         NativeWith.init(scope, sealed);
         NativeCall.init(scope, sealed);

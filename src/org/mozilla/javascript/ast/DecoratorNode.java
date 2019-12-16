@@ -1,6 +1,7 @@
 package org.mozilla.javascript.ast;
 
 import org.mozilla.javascript.Token;
+import org.mozilla.javascript.decorators.DecoratorType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 public class DecoratorNode extends ScriptNode {
     private Name name;
     private List<AstNode> arguments = new ArrayList<>();
+    private DecoratorType decoratorType = DecoratorType.UNKNOWN;
 
     {
         type = Token.XMLATTR;
@@ -36,5 +38,13 @@ public class DecoratorNode extends ScriptNode {
 
     public void setArguments(List<AstNode> arguments) {
         this.arguments = arguments;
+    }
+
+    public DecoratorType getDecoratorType() {
+        return decoratorType;
+    }
+
+    public void setDecoratorType(DecoratorType decoratorType) {
+        this.decoratorType = decoratorType;
     }
 }
