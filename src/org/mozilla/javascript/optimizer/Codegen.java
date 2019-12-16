@@ -3167,6 +3167,7 @@ class BodyCodegen {
                 Object targetName = null;
                 if (node instanceof ClassNode) {
                     attributes |= Decorator.CLASS;
+                    targetName = ((ClassNode) node).getClassName().getIdentifier();
                 } else if (node instanceof ClassMethod) {
                     ClassMethod cm = (ClassMethod) node;
                     if (cm.isStatic()) attributes |= Decorator.STATIC;
