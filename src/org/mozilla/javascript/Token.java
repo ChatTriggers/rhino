@@ -240,7 +240,8 @@ public class Token {
             GENEXPR = 169,
             METHOD = 170, // ES6 MethodDefinition
             ARROW = 171,  // ES6 ArrowFunction
-            LAST_TOKEN = 178;
+            HASHTAG = 178,  // ES6 ArrowFunction
+            LAST_TOKEN = 179;
 
     /**
      * Returns a name for the token.  If Rhino is compiled with certain
@@ -601,6 +602,8 @@ public class Token {
                 return "ARROW";
             case OPTIONAL_CHAINING:
                 return "OPTIONAL CHAINING";
+            case HASHTAG:
+                return "HASHTAG";
             case SPREAD:
                 return "SPREAD";
             case NULLISH_COALESCING:

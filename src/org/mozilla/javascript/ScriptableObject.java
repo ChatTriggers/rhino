@@ -114,6 +114,8 @@ public abstract class ScriptableObject implements Scriptable,
      */
     private transient SlotMapContainer slotMap;
 
+    private transient SlotMapContainer privateSlots;
+
     // Where external array data is stored.
     private transient ExternalArrayData externalData;
 
@@ -352,7 +354,7 @@ public abstract class ScriptableObject implements Scriptable,
         }
     }
 
-    private SlotMapContainer createSlotMap(int initialSize) {
+    protected SlotMapContainer createSlotMap(int initialSize) {
         Context cx = Context.getCurrentContext();
         if ((cx != null) && cx.hasFeature(Context.FEATURE_THREAD_SAFE_OBJECTS)) {
             return new ThreadSafeSlotMapContainer(initialSize);
@@ -2880,7 +2882,7 @@ public abstract class ScriptableObject implements Scriptable,
             }
         } else if (!isExtensible) {
             slot = slotMap.query(key, index);
-            if (Context.getContext().isStrictMode() && (slot == null || !(slot instanceof GetterSlot)))
+            if (Context.getContext().isStrictMode() && (!(slot instanceof GetterSlot)))
                 throw ScriptRuntime.typeError0("msg.not.extensible");
             if (slot == null) {
                 return true;
@@ -2892,6 +2894,15 @@ public abstract class ScriptableObject implements Scriptable,
         return slot.setValue(value, this, start);
     }
 
+    public void togglePrivateSlots() {
+        if (privateSlots == null) {
+            privateSlots = createSlotMap(1);
+        }
+
+        SlotMapContainer tmp = privateSlots;
+        privateSlots = slotMap;
+        slotMap = tmp;
+    }
 
     /**
      * @param name

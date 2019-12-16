@@ -52,6 +52,7 @@ public class Parser {
     private static final int FIELD_ENTRY = 32;
     protected int nestingOfFunction;
     protected boolean inUseStrictDirective;
+    protected boolean insideClass;
     CompilerEnvirons compilerEnv;
     boolean calledByCompileFunction;  // ugly - set directly by Context
     // The following are per function variables and should be saved/restored
@@ -77,7 +78,6 @@ public class Parser {
     private Map<String, LabeledStatement> labelSet;
     private List<Loop> loopSet;
     private List<Jump> loopAndSwitchSet;
-    private boolean insideClass = false;
     // Lacking 2-token lookahead, labels become a problem.
     // These vars store the token info of the last matched name,
     // iff it wasn't the last matched token.
@@ -748,12 +748,14 @@ public class Parser {
                 break;
             }
 
-            boolean isStatic = matchToken(Token.STATIC);
             List<DecoratorNode> decorators = new ArrayList<>();
 
             while (matchToken(Token.XMLATTR)) {
                 decorators.add(decorator());
             }
+
+            boolean isStatic = matchToken(Token.STATIC);
+            boolean isPrivate = matchToken(Token.HASHTAG);
 
             AstNode pname = objliteralProperty();
             int pos = ts.tokenBeg;
@@ -810,6 +812,11 @@ public class Parser {
                         if (isStatic) {
                             cp.setIsStatic();
                         }
+
+                        if (isPrivate) {
+                            cp.setPrivate();
+                        }
+
                         cp.setLength(getNodeEnd(defaultValue) - pos);
                         cp.setDecorators(decorators);
                         classProperties.add(cp);
@@ -823,6 +830,9 @@ public class Parser {
                         pname.setJsDocNode(jsdocNode);
                         if (isStatic) {
                             fn.setStatic(true);
+                        }
+                        if (isPrivate) {
+                            fn.setPrivate(true);
                         }
                         ClassMethod cm = new ClassMethod(pname, fn);
                         cm.setDecorators(decorators);
@@ -841,6 +851,9 @@ public class Parser {
 
                         if (isStatic) {
                             cm.setIsStatic();
+                        }
+                        if (isPrivate) {
+                            cm.setPrivate(true);
                         }
 
                         int end = getNodeEnd(fn);
@@ -892,7 +905,6 @@ public class Parser {
         cls.setProperties(classProperties);
         cls.setMethods(classMethods);
         insideClass = false;
-
         return cls;
     }
 
@@ -3009,6 +3021,9 @@ public class Parser {
         int lineno;
 
         lineno = ts.lineno;
+
+
+
         pn = propertyAccess(chaining ? Token.OPTIONAL_CHAINING : Token.DOT, pn);
         pn.setLineno(lineno);
 
@@ -3074,6 +3089,15 @@ public class Parser {
             consumeToken();
         } else {
             tt = Token.DOT;
+        }
+
+        boolean isPrivateAccess = false;
+        if (matchToken(Token.HASHTAG)) {
+            if (!insideClass) {
+                reportError("msg.class.illegal.private.access");
+                return makeErrorNode();
+            }
+            isPrivateAccess = true;
         }
 
         if (tt == Token.DOTDOT) {
@@ -3154,6 +3178,9 @@ public class Parser {
         result.setLineno(pn.getLineno());
         result.setLeft(pn);  // do this after setting position
         result.setRight(ref);
+        if (isPrivateAccess) {
+            result.putProp(Node.PRIVATE_ACCESS_PROP, true);
+        }
         return result;
     }
 
@@ -4482,6 +4509,7 @@ public class Parser {
                 // We could alternately have PropertyGet and ElementGet
                 // override getFirstChild/getLastChild and return the appropriate
                 // field, but that seems just as ugly as this casting.
+                boolean isPrivate = left.getProp(Node.PRIVATE_ACCESS_PROP) != null;
                 if (left instanceof PropertyGet) {
                     obj = ((PropertyGet) left).getTarget();
                     id = ((PropertyGet) left).getProperty();
@@ -4505,7 +4533,11 @@ public class Parser {
                 } else {
                     type = Token.SETELEM;
                 }
-                return new Node(type, obj, id, right);
+                Node node = new Node(type, obj, id, right);
+                if (isPrivate) {
+                    node.putProp(Node.PRIVATE_ACCESS_PROP, true);
+                }
+                return node;
             }
             case Token.GET_REF: {
                 Node ref = left.getFirstChild();

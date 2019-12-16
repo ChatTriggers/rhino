@@ -63,7 +63,8 @@ public class Node implements Iterable<Node> {
             CHAINING_PROP = 30,
             SUPER_PROP = 31,
             SPREAD_IDS_PROP = 32,
-            DECORATOR_PROP = 33;
+            DECORATOR_PROP = 33,
+            PRIVATE_ACCESS_PROP = 34;
 
     // values of ISNUMBER_PROP to specify
     // which of the children are Number types
@@ -469,6 +470,8 @@ public class Node implements Iterable<Node> {
                     return "spread_ids";
                 case DECORATOR_PROP:
                     return "decorator";
+                case PRIVATE_ACCESS_PROP:
+                    return "private_access";
                 default:
                     Kit.codeBug();
             }

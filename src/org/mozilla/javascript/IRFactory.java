@@ -735,6 +735,10 @@ public final class IRFactory extends Parser {
             call.putProp(Node.SPREAD_PROP, node.getProp(Node.SPREAD_PROP));
         }
 
+        if (node.getProp(Node.PRIVATE_ACCESS_PROP) != null) {
+            call.putProp(Node.PRIVATE_ACCESS_PROP, true);
+        }
+
         call.setLineno(node.getLineno());
         decompiler.addToken(Token.LP);
         List<AstNode> args = node.getArguments();
@@ -1148,6 +1152,11 @@ public final class IRFactory extends Parser {
         } else {
             decompiler.addToken(Token.DOT);
         }
+
+        if (node.getProp(Node.PRIVATE_ACCESS_PROP) != null) {
+            decompiler.addToken(Token.HASHTAG);
+        }
+
         decompiler.addName(name);
         return createPropertyGet(target, null, name, 0, node);
     }
@@ -2217,6 +2226,10 @@ public final class IRFactory extends Parser {
 
             if (parent != null && parent.getProp(Node.CHAINING_PROP) != null) {
                 node.putProp(Node.CHAINING_PROP, true);
+            }
+
+            if (parent != null && parent.getProp(Node.PRIVATE_ACCESS_PROP) != null) {
+                node.putProp(Node.PRIVATE_ACCESS_PROP, true);
             }
 
             return node;

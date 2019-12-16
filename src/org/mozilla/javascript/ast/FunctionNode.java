@@ -77,6 +77,7 @@ public class FunctionNode extends ScriptNode {
     private boolean isConstructable = true;
     private boolean isClassConstructor = false;
     private boolean isStatic = false;
+    private boolean isPrivate = false;
     private Form functionForm = Form.FUNCTION;
     private int lp = -1;
     private int rp = -1;
@@ -321,6 +322,14 @@ public class FunctionNode extends ScriptNode {
 
     public void setStatic(boolean aStatic) {
         isStatic = aStatic;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 
     /**

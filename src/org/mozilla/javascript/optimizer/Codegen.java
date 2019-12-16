@@ -106,18 +106,20 @@ public class Codegen implements Evaluator {
             try (FileOutputStream fos = new FileOutputStream(outputTokens)) {
                 StringBuilder sb = new StringBuilder();
 
-                for (int i = 0; i < encodedSource.length(); i++) {
-                    int token = encodedSource.charAt(i);
-                    if (!Token.isValidToken(encodedSource.charAt(i))) continue;
+                try {
+                    for (int i = 0; i < encodedSource.length(); i++) {
+                        int token = encodedSource.charAt(i);
+                        if (!Token.isValidToken(encodedSource.charAt(i))) continue;
 
-                    if (token == Token.NAME || token == Token.STRING || token == Token.REGEXP) {
-                        sb.append(Token.typeToName(token)).append(": ");
-                        i = Decompiler.printSourceString(encodedSource, i + 1, true, sb) - 1;
-                        sb.append("\n");
-                    } else {
-                        sb.append(Token.typeToName(token)).append("\n");
+                        if (token == Token.NAME || token == Token.STRING || token == Token.REGEXP) {
+                            sb.append(Token.typeToName(token)).append(": ");
+                            i = Decompiler.printSourceString(encodedSource, i + 1, true, sb) - 1;
+                            sb.append("\n");
+                        } else {
+                            sb.append(Token.typeToName(token)).append("\n");
+                        }
                     }
-                }
+                } catch (Exception ignored) { }
                 fos.write(sb.toString().getBytes());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -3338,7 +3340,8 @@ class BodyCodegen {
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cm.isStatic());
                 cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
-                addScriptRuntimeInvoke("addClassMethod", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, INTEGER);
+                cfw.addPush(cm.isPrivate());
+                addScriptRuntimeInvoke("addClassMethod", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, INTEGER, BOOLEAN);
 
                 child = child.getNext();
             } else if (child instanceof ClassProperty) {
@@ -3362,7 +3365,8 @@ class BodyCodegen {
                 generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP));
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cp.isStatic());
-                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
+                cfw.addPush(cp.isPrivate());
+                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, BOOLEAN);
 
                 child = child.getNext();
             }
@@ -3767,6 +3771,8 @@ class BodyCodegen {
     private void visitStandardCall(Node node, Node child) {
         if (node.getType() != Token.CALL) throw Codegen.badTree();
 
+        boolean isPrivate = child.getProp(Node.PRIVATE_ACCESS_PROP) != null;
+
         Node firstArgChild = child.getNext();
         int childType = child.getType();
 
@@ -3826,6 +3832,8 @@ class BodyCodegen {
                     methodName = "optionalCallProp0";
                 } else if (child.getProp(Node.CHAINING_PROP) != null) {
                     methodName = "optionalAccessCallProp0";
+                } else if (isPrivate) {
+                    methodName = "privateCallProp0";
                 } else {
                     methodName = "callProp0";
                 }
@@ -3834,7 +3842,7 @@ class BodyCodegen {
             } else if (childType == Token.GETPROPNOWARN) {
                 throw Kit.codeBug();
             } else {
-                generateFunctionAndThisObj(child, node);
+                generateFunctionAndThisObj(child, node, isPrivate);
                 methodName = "call0";
                 signature = new String[]{ CALLABLE, SCRIPTABLE, CONTEXT, SCRIPTABLE };
             }
@@ -3888,7 +3896,7 @@ class BodyCodegen {
                 return;
             }
 
-            generateFunctionAndThisObj(child, node);
+            generateFunctionAndThisObj(child, node, isPrivate);
             // stack: ... functionObj thisObj
             if (argCount == 1) {
                 generateExpression(firstArgChild, node);
@@ -4179,6 +4187,10 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     }
 
     private void generateFunctionAndThisObj(Node node, Node parent) {
+        generateFunctionAndThisObj(node, parent, false);
+    }
+
+    private void generateFunctionAndThisObj(Node node, Node parent, boolean isPrivate) {
         // Place on stack (function object, function this) pair
         int type = node.getType();
         switch (node.getType()) {
@@ -4189,7 +4201,20 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
             case Token.GETELEM: {
                 Node target = node.getFirstChild();
                 generateExpression(target, node);
+                short objLocal = 0;
+                if (isPrivate) {
+                    objLocal = getNewWordLocal();
+                    cfw.add(ByteCode.DUP);
+                    cfw.addAStore(objLocal);
+                }
+
                 Node id = target.getNext();
+
+                if (isPrivate) {
+                    cfw.addALoad(objLocal);
+                    addOptRuntimeInvoke("optionalPrivateToggle", VOID, OBJECT);
+                }
+
                 if (type == Token.GETPROP) {
                     String property = id.getString();
                     cfw.addPush(property);
@@ -4204,6 +4229,12 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                     cfw.addALoad(variableObjectLocal);
                     addScriptRuntimeInvoke("getElemFunctionAndThis", CALLABLE, OBJECT, OBJECT, CONTEXT, SCRIPTABLE);
                 }
+
+                if (isPrivate) {
+                    cfw.addALoad(objLocal);
+                    addOptRuntimeInvoke("optionalPrivateToggle", VOID, OBJECT);
+                }
+
                 break;
             }
 
@@ -5499,6 +5530,8 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     }
 
     private void visitGetProp(Node node, Node child) {
+        boolean isPrivate = node.getProp(Node.PRIVATE_ACCESS_PROP) != null;
+
         if (child.getProp(Node.SUPER_PROP) != null) {
             generateExpression(child.getNext(), node);
             cfw.addALoad(thisObjLocal);
@@ -5508,6 +5541,13 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         }
 
         generateExpression(child, node); // object
+        short objLocal = 0;
+        if (isPrivate) {
+            cfw.add(ByteCode.DUP);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+             objLocal = getNewWordLocal();
+            cfw.addAStore(objLocal);
+        }
         Node nameChild = child.getNext();
         generateExpression(nameChild, node);  // the name
         if (node.getType() == Token.GETPROPNOWARN) {
@@ -5518,6 +5558,11 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         }
 
         String methodName = node.getProp(Node.CHAINING_PROP) != null ? "optionalGetObjectProp" : "getObjectProp";
+
+        if (isPrivate) {
+            cfw.addALoad(objLocal);
+            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
+        }
 
         /*
             for 'this.foo' we call getObjectProp(Scriptable...) which can
@@ -5532,11 +5577,31 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
             cfw.addALoad(variableObjectLocal);
             addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
         }
+
+        if (isPrivate) {
+            cfw.addALoad(objLocal);
+            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
+        }
     }
 
     private void visitSetProp(int type, Node node, Node child) {
+        boolean isPrivate = node.getProp(Node.PRIVATE_ACCESS_PROP) != null;
+
         Node objectChild = child;
-        generateExpression(child, node);
+        boolean isSuper = objectChild.getProp(Node.SUPER_PROP) != null;
+
+        if (!isSuper) {
+            generateExpression(child, node);
+        }
+
+        short objLocal = 0;
+        if (isPrivate) {
+            cfw.add(ByteCode.DUP);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+            objLocal = getNewWordLocal();
+            cfw.addAStore(objLocal);
+        }
+
         child = child.getNext();
         if (type == Token.SETPROP_OP) {
             cfw.add(ByteCode.DUP);
@@ -5544,6 +5609,13 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         Node nameChild = child;
         generateExpression(child, node);
         child = child.getNext();
+
+
+        if (isPrivate) {
+            cfw.addALoad(objLocal);
+            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
+        }
+
         if (type == Token.SETPROP_OP) {
             // stack: ... object object name -> ... object name object name
             cfw.add(ByteCode.DUP_X1);
@@ -5559,19 +5631,49 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                 addScriptRuntimeInvoke("getObjectProp", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
             }
         }
+
+        if (isSuper) {
+            generateExpression(child, node);
+            cfw.addALoad(thisObjLocal);
+            cfw.addALoad(funObjLocal);
+            addScriptRuntimeInvoke("setSuperProp", OBJECT, STRING, OBJECT, SCRIPTABLE, NATIVE_FUNCTION);
+            return;
+        }
+
         generateExpression(child, node);
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
         addScriptRuntimeInvoke("setObjectProp", OBJECT, OBJECT, STRING, OBJECT, CONTEXT, SCRIPTABLE);
+
+        if (isPrivate) {
+            cfw.addALoad(objLocal);
+            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
+        }
     }
 
     private void visitSetElem(int type, Node node, Node child) {
-        generateExpression(child, node);
+        boolean isSuper = child.getProp(Node.SUPER_PROP) != null;
+
+        if (isSuper) {
+            child = child.getNext();
+            generateExpression(child, node); // super.<key> = value;
+
+            child = child.getNext();
+            generateExpression(child, node); // super.key = <value>;
+
+            cfw.addALoad(thisObjLocal);
+            cfw.addALoad(funObjLocal);
+
+            addScriptRuntimeInvoke("setSuperElem", OBJECT, OBJECT, OBJECT, SCRIPTABLE, NATIVE_FUNCTION);
+            return;
+        }
+
+        generateExpression(child, node); // <obj>.key = value;
         child = child.getNext();
         if (type == Token.SETELEM_OP) {
             cfw.add(ByteCode.DUP);
         }
-        generateExpression(child, node);
+        generateExpression(child, node); // obj.<key> = value;
         child = child.getNext();
         boolean indexIsNumber = (node.getIntProp(Node.ISNUMBER_PROP, -1) != -1);
         if (type == Token.SETELEM_OP) {
@@ -5591,7 +5693,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                 addScriptRuntimeInvoke("getObjectElem", OBJECT, OBJECT, OBJECT, CONTEXT, SCRIPTABLE);
             }
         }
-        generateExpression(child, node);
+        generateExpression(child, node); // obj.key = <value>;
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
         if (indexIsNumber) {

@@ -780,15 +780,26 @@ public class ScriptRuntime {
 
     public static final Object SUPER_KEY = new Object();
 
-    public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter) {
+    public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter, boolean isPrivate) {
         ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
 
         if (instance) {
             clazz = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(clazz, "prototype"));
+
+            if (method instanceof ScriptableObject) {
+                Object extended = ScriptableObject.ensureScriptableObject(clazzObj).getAssociatedValue(SUPER_KEY);
+
+                if (extended != null) {
+                    ((ScriptableObject) method).associateValue(
+                            SUPER_KEY,
+                            extended
+                    );
+                }
+            }
         }
 
-        if (method instanceof ScriptableObject) {
-            ((ScriptableObject) method).associateValue(SUPER_KEY, clazz.getPrototype());
+        if (isPrivate) {
+            clazz.togglePrivateSlots();
         }
 
         if (name instanceof String) {
@@ -839,14 +850,22 @@ public class ScriptRuntime {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }
 
+        if (isPrivate) {
+            clazz.togglePrivateSlots();
+        }
+
         return clazzObj;
     }
 
-    public static Object addClassProperty(Object clazzObj, Object name, Object defaultValue, Context cx, boolean instance) {
+    public static Object addClassProperty(Object clazzObj, Object name, Object defaultValue, Context cx, boolean instance, boolean isPrivate) {
         ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
 
         if (instance) {
             clazz = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(clazz, "prototype"));
+        }
+
+        if (isPrivate) {
+            clazz.togglePrivateSlots();
         }
 
         if (name instanceof String) {
@@ -864,11 +883,27 @@ public class ScriptRuntime {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }
 
+        if (isPrivate) {
+            clazz.togglePrivateSlots();
+        }
+
         return clazzObj;
     }
 
     public static Object applyDecorator(Object target, Decorator decorator, int attributes, Object[] descriptorArgs, Object[] metadata, Context cx, Scriptable scope, Scriptable thisObj) {
         return decorator.consume(cx, scope, thisObj, target, attributes, descriptorArgs, metadata);
+    }
+
+    public static void togglePrivateProtoTree(ScriptableObject obj) {
+        while (obj != null) {
+            obj.togglePrivateSlots();
+
+            if (obj.getPrototype() instanceof ScriptableObject && obj.getPrototype() != obj) {
+                obj = (ScriptableObject) obj.getPrototype();
+            } else {
+                obj = null;
+            }
+        }
     }
 
     public static Object callSuper(Object[] args, boolean isReturned, NativeFunction clazz, Scriptable thisObj, Scriptable scope, Context cx) {
@@ -903,10 +938,56 @@ public class ScriptRuntime {
         return instance;
     }
 
-    public static Object accessSuper(Object prop, Scriptable thisObj, NativeFunction method) {
-        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(method.getAssociatedValue(SUPER_KEY));
+    public static Object setSuperElem(Object prop, Object value, Scriptable thisObj, NativeFunction method) {
+        Object superObj = method.getAssociatedValue(SUPER_KEY);
 
-        return ScriptableObject.getProperty(superProto, prop);
+        if (superObj == null) {
+            throw typeError0("msg.class.no.super");
+        }
+
+        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
+
+        if (prop instanceof String) {
+            ScriptableObject.putProperty(superProto, (String) prop, value);
+        } else if (prop instanceof Integer) {
+            ScriptableObject.putProperty(superProto, (Integer) prop, value);
+        } else if (isSymbol(prop)) {
+            ScriptableObject.putProperty(superProto, (Symbol) prop, value);
+        }
+
+        return value;
+    }
+
+    public static Object setSuperProp(String prop, Object value, Scriptable thisObj, NativeFunction method) {
+        Object superObj = method.getAssociatedValue(SUPER_KEY);
+
+        if (superObj == null) {
+            throw typeError0("msg.class.no.super");
+        }
+
+        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
+
+        ScriptableObject.putProperty(superProto, prop, value);
+
+        return value;
+    }
+
+    public static Object accessSuper(Object prop, Scriptable thisObj, NativeFunction method) {
+        Object superObj = method.getAssociatedValue(SUPER_KEY);
+
+        if (superObj == null) {
+            throw typeError0("msg.class.no.super");
+        }
+
+        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
+
+        Object result = ScriptableObject.getProperty(superProto, prop);
+
+        if (result == Scriptable.NOT_FOUND) {
+            result = Undefined.instance;
+        }
+
+        return result;
     }
 
     public static Object callSuperProp(Object prop, Object[] args, Scriptable scope, Scriptable thisObj, NativeFunction nativeFunction, Context cx) {
@@ -943,6 +1024,8 @@ public class ScriptRuntime {
         newObject.setPrototype(extendedProto);
         newObject.defineProperty("constructor", clazz, ScriptableObject.NOT_ENUMERABLE);
         ScriptableObject.putProperty(clazz, "prototype", newObject);
+
+        clazz.associateValue(SUPER_KEY, extendedProto);
 
         clazz.setPrototype(extended);
 
@@ -1851,7 +1934,7 @@ public class ScriptRuntime {
     static Object getIndexObject(double d) {
         int i = (int) d;
         if (i == d) {
-            return Integer.valueOf(i);
+            return i;
         }
         return toString(d);
     }

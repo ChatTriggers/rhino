@@ -35,6 +35,11 @@ public class ClassNode extends ScriptNode {
             name.setParent(this);
     }
 
+    public boolean hasPrivateSlots() {
+        return this.methods.stream().anyMatch(ClassMethod::isPrivate)
+                || this.properties.stream().anyMatch(ClassProperty::isPrivate);
+    }
+
     public Name getClassName() {
         return className;
     }
