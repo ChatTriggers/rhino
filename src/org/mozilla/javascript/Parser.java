@@ -2051,7 +2051,16 @@ public class Parser {
             dn.setArguments(((FunctionCall) node).getArguments());
         }
 
-        if (!insideClass && peekToken() != Token.CLASS && peekToken() != Token.XMLATTR) {
+        // Generate a specific error if there is a semicolon
+        // after a decorator, as it is a fairly common error,
+        // and the source might be hard to find without this error
+        int peeked = peekToken();
+
+        if (peeked == Token.SEMI) {
+            reportError("msg.decorator.semi");
+        }
+
+        if (!insideClass && peeked != Token.CLASS && peeked != Token.XMLATTR) {
             reportError("msg.decorator.invalid.usage");
         }
 

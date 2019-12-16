@@ -190,7 +190,7 @@ exports.tests = [
             passed = proto === A && name === undefined;
           }
 
-          @register(cb);
+          @register(cb)
           class A {}
 
           return passed;
