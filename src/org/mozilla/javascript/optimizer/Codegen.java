@@ -3657,7 +3657,7 @@ class BodyCodegen {
             } else if (childType == Token.GETPROPNOWARN) {
                 throw Kit.codeBug();
             } else {
-                generateFunctionAndThisObj(child, node, true);
+                generateFunctionAndThisObj(child, node, isPrivate);
                 methodName = "call0";
                 signature = new String[]{ CALLABLE, SCRIPTABLE, CONTEXT, SCRIPTABLE };
             }
@@ -3711,7 +3711,7 @@ class BodyCodegen {
                 return;
             }
 
-            generateFunctionAndThisObj(child, node, true);
+            generateFunctionAndThisObj(child, node, isPrivate);
             // stack: ... functionObj thisObj
             if (argCount == 1) {
                 generateExpression(firstArgChild, node);

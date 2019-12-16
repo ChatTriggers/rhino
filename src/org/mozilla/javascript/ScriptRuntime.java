@@ -968,7 +968,6 @@ public class ScriptRuntime {
             ScriptableObject newObject = new NativeObject();
             newObject.defineProperty("constructor", clazz, ScriptableObject.NOT_ENUMERABLE);
             ScriptableObject.putProperty(clazz, "prototype", newObject);
-            clazz.associateValue(SUPER_KEY, newObject.getPrototype());
             return clazz;
         }
 
