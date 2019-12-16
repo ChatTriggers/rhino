@@ -3193,6 +3193,8 @@ class BodyCodegen {
 
             Name name = dn.getName();
             generateExpression(name, node);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/decorators/Decorator");
+            cfw.add(ByteCode.SWAP);
 
             // attributes
             int attributes = 0;
@@ -3243,17 +3245,11 @@ class BodyCodegen {
             cfw.addALoad(variableObjectLocal);
             cfw.addALoad(thisObjLocal);
 
-            addScriptRuntimeInvoke(
-                    "applyDecorator",
-                    OBJECT,
-                    OBJECT,
-                    "Lorg/mozilla/javascript/decorators/Decorator;",
-                    INTEGER,
-                    OBJECT_ARRAY,
-                    OBJECT_ARRAY,
-                    CONTEXT,
-                    SCRIPTABLE,
-                    SCRIPTABLE
+            cfw.addInvoke(
+                    ByteCode.INVOKEINTERFACE,
+                    "org/mozilla/javascript/decorators/Decorator",
+                    "consume",
+                    "(" + OBJECT + INTEGER + OBJECT_ARRAY + OBJECT_ARRAY + CONTEXT + SCRIPTABLE + SCRIPTABLE + ")" + OBJECT
             );
         }
     }
@@ -3270,6 +3266,8 @@ class BodyCodegen {
 
             Name name = dn.getName();
             generateExpression(name, node);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/decorators/Decorator");
+            cfw.add(ByteCode.SWAP);
 
             // attributes
             cfw.addPush(-1);
@@ -3298,17 +3296,11 @@ class BodyCodegen {
             cfw.addALoad(variableObjectLocal);
             cfw.addALoad(thisObjLocal);
 
-            addScriptRuntimeInvoke(
-                    "applyDecorator",
-                    OBJECT,
-                    OBJECT,
-                    "Lorg/mozilla/javascript/decorators/Decorator;",
-                    INTEGER,
-                    OBJECT_ARRAY,
-                    OBJECT_ARRAY,
-                    CONTEXT,
-                    SCRIPTABLE,
-                    SCRIPTABLE
+            cfw.addInvoke(
+                    ByteCode.INVOKEINTERFACE,
+                    "org/mozilla/javascript/decorators/Decorator",
+                    "consume",
+                    "(" + OBJECT + INTEGER + OBJECT_ARRAY + OBJECT_ARRAY + CONTEXT + SCRIPTABLE + SCRIPTABLE + ")" + OBJECT
             );
         }
     }

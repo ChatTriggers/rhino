@@ -12,13 +12,13 @@ public class RegisterDecorator implements Decorator {
     }
 
     @Override
-    public Object consume(Context cx, Scriptable scope, Scriptable thisObj, Object obj, int descriptor, Object[] descriptorArgs, Object[] metadata) {
+    public Object consume(Object target, int descriptor, Object[] descriptorArgs, Object[] metadata, Context cx, Scriptable scope, Scriptable thisObj) {
         Object[] args;
 
         if ((descriptor & CLASS) != 0 || (descriptor & PRIVATE) != 0) {
-            args = new Object[]{ obj };
+            args = new Object[]{ target };
         } else {
-            args = new Object[]{ obj, metadata[0] };
+            args = new Object[]{ target, metadata[0] };
         }
 
         return ((Callable) descriptorArgs[0]).call(cx, scope, thisObj, args);
