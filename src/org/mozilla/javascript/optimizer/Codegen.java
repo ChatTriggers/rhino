@@ -3309,8 +3309,6 @@ class BodyCodegen {
         Node child = cls.getFirstChild();
 
         generateExpression(child, cls);
-        generateApplyWrapDecoratorCall(cls, (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP));
-
         child = child.getNext();
 
         if (cls.getExtended() != null) {
@@ -3337,12 +3335,12 @@ class BodyCodegen {
                 }
 
                 generateExpression(method, cls);
-                generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP));
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cm.isStatic());
                 cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
                 cfw.addPush(cm.isPrivate());
                 addScriptRuntimeInvoke("addClassMethod", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, INTEGER, BOOLEAN);
+                generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP));
 
                 child = child.getNext();
             } else if (child instanceof ClassProperty) {
@@ -3373,6 +3371,8 @@ class BodyCodegen {
                 child = child.getNext();
             }
         }
+
+        generateApplyWrapDecoratorCall(cls, (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP));
 
         // A decorator can map the class to any value. We need
         // to make sure it's still a nativefunction before we
