@@ -10,8 +10,9 @@ public class ClassNode extends ScriptNode {
     private Name className;
     private AstNode extendsName;
     private FunctionNode constructor = null;
-    private List<ClassMethod> classMethods = new ArrayList<>();
-    private List<ClassProperty> classProperties = new ArrayList<>();
+    private List<ClassMethod> methods = new ArrayList<>();
+    private List<ClassProperty> properties = new ArrayList<>();
+    private List<DecoratorNode> decorators = new ArrayList<>();
     private Node parentFn = null;
     private Node extended = null;
 
@@ -58,20 +59,20 @@ public class ClassNode extends ScriptNode {
         this.constructor = constructor;
     }
 
-    public List<ClassMethod> getClassMethods() {
-        return classMethods;
+    public List<ClassMethod> getMethods() {
+        return methods;
     }
 
-    public void setClassMethods(List<ClassMethod> classMethods) {
-        this.classMethods = classMethods;
+    public void setMethods(List<ClassMethod> methods) {
+        this.methods = methods;
     }
 
-    public List<ClassProperty> getClassProperties() {
-        return classProperties;
+    public List<ClassProperty> getProperties() {
+        return properties;
     }
 
-    public void setClassProperties(List<ClassProperty> classProperties) {
-        this.classProperties = classProperties;
+    public void setProperties(List<ClassProperty> properties) {
+        this.properties = properties;
     }
 
     public Node getParentFn() {
@@ -88,5 +89,13 @@ public class ClassNode extends ScriptNode {
 
     public void setExtended(Node extended) {
         this.extended = extended;
+    }
+
+    public List<DecoratorNode> getDecorators() {
+        return decorators;
+    }
+
+    public void setDecorators(List<DecoratorNode> decorators) {
+        this.decorators = decorators;
     }
 }

@@ -77,6 +77,7 @@ public class Parser {
     private Map<String, LabeledStatement> labelSet;
     private List<Loop> loopSet;
     private List<Jump> loopAndSwitchSet;
+    private boolean insideClass = false;
     // Lacking 2-token lookahead, labels become a problem.
     // These vars store the token info of the last matched name,
     // iff it wasn't the last matched token.
@@ -709,8 +710,10 @@ public class Parser {
         return null;
     }
 
-    private ClassNode classExpr() throws IOException {
+    private ClassNode classExpr(List<DecoratorNode> classDecorators) throws IOException {
+        insideClass = true;
         ClassNode cls = new ClassNode(ts.tokenBeg);
+        cls.setDecorators(classDecorators);
 
         if (matchToken(Token.NAME)) {
             cls.setClassName(createNameNode());
@@ -746,6 +749,11 @@ public class Parser {
             }
 
             boolean isStatic = matchToken(Token.STATIC);
+            List<DecoratorNode> decorators = new ArrayList<>();
+
+            while (matchToken(Token.XMLATTR)) {
+                decorators.add(decorator());
+            }
 
             AstNode pname = objliteralProperty();
             int pos = ts.tokenBeg;
@@ -803,6 +811,7 @@ public class Parser {
                             cp.setIsStatic();
                         }
                         cp.setLength(getNodeEnd(defaultValue) - pos);
+                        cp.setDecorators(decorators);
                         classProperties.add(cp);
                     } else {
                         FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION, entryKind);
@@ -816,6 +825,7 @@ public class Parser {
                             fn.setStatic(true);
                         }
                         ClassMethod cm = new ClassMethod(pname, fn);
+                        cm.setDecorators(decorators);
                         switch (entryKind) {
                             case GET_ENTRY:
                                 fn.setFunctionIsGetterMethod();
@@ -879,8 +889,10 @@ public class Parser {
             getAndResetJsDoc();
         }
 
-        cls.setClassProperties(classProperties);
-        cls.setClassMethods(classMethods);
+        cls.setProperties(classProperties);
+        cls.setMethods(classMethods);
+        insideClass = false;
+
         return cls;
     }
 
@@ -2010,6 +2022,28 @@ public class Parser {
         } finally {
             popScope();
         }
+    }
+
+    private DecoratorNode decorator() throws IOException {
+        consumeToken();
+        peekToken();
+        Name name = createNameNode();
+        consumeToken();
+        DecoratorNode dn = new DecoratorNode(name);
+
+        if (peekToken() == Token.LP) {
+            AstNode node = memberExprTail(true, dn);
+            if (!(node instanceof FunctionCall)) {
+                throw codeBug();
+            }
+            dn.setArguments(((FunctionCall) node).getArguments());
+        }
+
+        if (!insideClass && peekToken() != Token.CLASS && peekToken() != Token.XMLATTR) {
+            reportError("msg.decorator.invalid.usage");
+        }
+
+        return dn;
     }
 
     private AstNode defaultXmlNamespace() throws IOException {
@@ -3246,6 +3280,7 @@ public class Parser {
         int tt = ttFlagged & CLEAR_TI_MASK;
 
         AstNode pn = null;
+        List<DecoratorNode> decorators = new ArrayList<>();
 
         switch (tt) {
             case Token.FUNCTION:
@@ -3253,9 +3288,18 @@ public class Parser {
                 pn = function(FunctionNode.FUNCTION_EXPRESSION);
                 break;
 
+            case Token.XMLATTR:
+                // decorator
+                while (tt == Token.XMLATTR) {
+                    decorators.add(decorator());
+                    tt = peekToken();
+                }
+
+                // fallthrough
+
             case Token.CLASS:
                 consumeToken();
-                pn = classExpr();
+                pn = classExpr(decorators);
                 break;
 
             case Token.LB:
@@ -3278,11 +3322,11 @@ public class Parser {
                 pn = parenExpr();
                 break;
 
-            case Token.XMLATTR:
-                consumeToken();
-                mustHaveXML();
-                pn = attributeAccess();
-                break;
+            // case Token.XMLATTR:
+            //     consumeToken();
+            //     mustHaveXML();
+            //     pn = attributeAccess();
+            //     break;
 
             case Token.SUPER:
                 consumeToken();

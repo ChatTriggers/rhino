@@ -2,11 +2,15 @@ package org.mozilla.javascript.ast;
 
 import org.mozilla.javascript.Token;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClassMethod extends InfixExpression {
     private boolean isStatic = false;
     private AstNode name;
     private FunctionNode function;
     private Object nameKey;
+    private List<DecoratorNode> decorators = new ArrayList<>();
 
     {
         type = Token.METHOD;
@@ -56,5 +60,13 @@ public class ClassMethod extends InfixExpression {
 
     public void setNameKey(Object nameKey) {
         this.nameKey = nameKey;
+    }
+
+    public List<DecoratorNode> getDecorators() {
+        return decorators;
+    }
+
+    public void setDecorators(List<DecoratorNode> decorators) {
+        this.decorators = decorators;
     }
 }

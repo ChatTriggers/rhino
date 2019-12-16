@@ -8,6 +8,7 @@ package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
+import org.mozilla.javascript.decorators.Decorator;
 import org.mozilla.javascript.optimizer.Codegen;
 
 import java.io.File;
@@ -209,6 +210,9 @@ public final class IRFactory extends Parser {
                 }
                 if (node instanceof LetNode) {
                     return transformLetNode((LetNode) node);
+                }
+                if (node instanceof DecoratorNode) {
+                    return transformDecoratorNode((DecoratorNode) node);
                 }
                 if (node instanceof XmlRef) {
                     return transformXmlRef((XmlRef) node);
@@ -646,6 +650,14 @@ public final class IRFactory extends Parser {
 
     public static Object GENERATED_SUPER = new Object();
 
+    private Node transformDecoratorNode(DecoratorNode dn) {
+        for (AstNode arg : dn.getArguments()) {
+            dn.addChildToBack(transform(arg));
+        }
+
+        return dn;
+    }
+
     private Node transformClass(ClassNode node) {
         if (node.getExtendsName() != null) {
             node.setExtended(transform(node.getExtendsName()));
@@ -671,19 +683,43 @@ public final class IRFactory extends Parser {
         fn.setFunctionName(node.getClassName());
         fn.setFunctionType(FunctionNode.FUNCTION_EXPRESSION);
         fn.setClassConstructor(true);
+
+        List<Node> decorators = new ArrayList<>();
+
+        for (DecoratorNode dn : node.getDecorators()) {
+            decorators.add(transform(dn));
+        }
+
+        node.putProp(Node.DECORATOR_PROP, decorators);
         Node transformedFn = transform(fn);
         node.addChildToBack(transformedFn);
         node.setParentFn(transformedFn);
 
-        for (ClassMethod cm : node.getClassMethods()) {
+        for (ClassMethod cm : node.getMethods()) {
             cm.setNameKey(getPropKey(cm.getName()));
             cm.addChildToBack(transform(cm.getFunction()));
+
+            decorators = new ArrayList<>();
+
+            for (DecoratorNode dn : cm.getDecorators()) {
+                decorators.add(transform(dn));
+            }
+
+            cm.putProp(Node.DECORATOR_PROP, decorators);
             node.addChildToBack(cm);
         }
 
-        for (ClassProperty cp : node.getClassProperties()) {
+        for (ClassProperty cp : node.getProperties()) {
             cp.setNameKey(getPropKey(cp.getName()));
             cp.addChildToBack(transform(cp.getDefaultValue()));
+
+            decorators = new ArrayList<>();
+
+            for (DecoratorNode dn : cp.getDecorators()) {
+                decorators.add(transform(dn));
+            }
+
+            cp.putProp(Node.DECORATOR_PROP, decorators);
             node.addChildToBack(cp);
         }
 
@@ -959,6 +995,10 @@ public final class IRFactory extends Parser {
     }
 
     private Node transformName(Name node) {
+        if (node.getParent() != null && node.getParent().getProp(Node.DECORATOR_PROP) != null) {
+            node.putProp(Node.DECORATOR_PROP, true);
+            decompiler.addToken(Token.XMLATTR);
+        }
         decompiler.addName(node.getIdentifier());
         return node;
     }

@@ -2,11 +2,15 @@ package org.mozilla.javascript.ast;
 
 import org.mozilla.javascript.Token;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClassProperty extends InfixExpression {
     private boolean isStatic = false;
     private AstNode name;
     private AstNode defaultValue;
     private Object nameKey;
+    private List<DecoratorNode> decorators = new ArrayList<>();
 
     {
         type = Token.GETPROP;
@@ -40,5 +44,13 @@ public class ClassProperty extends InfixExpression {
 
     public AstNode getDefaultValue() {
         return defaultValue;
+    }
+
+    public List<DecoratorNode> getDecorators() {
+        return decorators;
+    }
+
+    public void setDecorators(List<DecoratorNode> decorators) {
+        this.decorators = decorators;
     }
 }

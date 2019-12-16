@@ -7,6 +7,9 @@
 package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.decorators.Decorator;
+import org.mozilla.javascript.decorators.RegisterDecorator;
+import org.mozilla.javascript.decorators.WrapDecorator;
 import org.mozilla.javascript.generator.NativeGenerator;
 import org.mozilla.javascript.generator.NativeGeneratorIterator;
 import org.mozilla.javascript.optimizer.Codegen;
@@ -198,6 +201,10 @@ public class ScriptRuntime {
         NativeJSON.init(scope, sealed);
         NativeReflect.init(scope, sealed);
         NativeProxy.init(scope, sealed);
+
+        // Decorators
+        WrapDecorator.init(scope);
+        RegisterDecorator.init(scope);
 
         NativeWith.init(scope, sealed);
         NativeCall.init(scope, sealed);
@@ -858,6 +865,10 @@ public class ScriptRuntime {
         }
 
         return clazzObj;
+    }
+
+    public static Object applyDecorator(Object target, Decorator decorator, int attributes, Object[] descriptorArgs, Object[] metadata, Context cx, Scriptable scope, Scriptable thisObj) {
+        return decorator.consume(cx, scope, thisObj, target, attributes, descriptorArgs, metadata);
     }
 
     public static Object callSuper(Object[] args, boolean isReturned, NativeFunction clazz, Scriptable thisObj, Scriptable scope, Context cx) {

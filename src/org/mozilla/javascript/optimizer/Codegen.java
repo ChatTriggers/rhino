@@ -11,6 +11,7 @@ import org.mozilla.classfile.ByteCode;
 import org.mozilla.classfile.ClassFileWriter;
 import org.mozilla.javascript.*;
 import org.mozilla.javascript.ast.*;
+import org.mozilla.javascript.decorators.Decorator;
 import org.mozilla.javascript.generator.NativeGenerator;
 
 import java.io.File;
@@ -3137,10 +3138,175 @@ class BodyCodegen {
         }
     }
 
+    private void generateApplyRegisterDecoratorCall(Node node, List<DecoratorNode> decorators) {
+        if (decorators.size() > 0) {
+            for (DecoratorNode dn : decorators) {
+                List<Node> args = new ArrayList<>();
+                for (Node ch = dn.getFirstChild(); ch != null; ch = ch.getNext()) {
+                    args.add(ch);
+                }
+
+                Name name = dn.getName();
+                int decorator = getNewWordLocal();
+                generateExpression(name, node);
+                cfw.addAStore(decorator);
+
+                // REGISTER DECORATOR
+                int notRegister = cfw.acquireLabel();
+                cfw.addALoad(decorator);
+                cfw.add(ByteCode.INSTANCEOF, "org/mozilla/javascript/decorators/RegisterDecorator");
+                // cfw.addPush(0);
+                cfw.add(ByteCode.IFEQ, notRegister);
+                // cfw.add(ByteCode.GOTO, notRegister);
+                cfw.addALoad(decorator);
+
+                // attributes
+                int attributes = 0;
+                Object targetName = null;
+                if (node instanceof ClassNode) {
+                    attributes |= Decorator.CLASS;
+                } else if (node instanceof ClassMethod) {
+                    ClassMethod cm = (ClassMethod) node;
+                    if (cm.isStatic()) attributes |= Decorator.STATIC;
+                    // TODO: Private
+                    attributes |= Decorator.PUBLIC;
+                    targetName = cm.getNameKey();
+                } else if (node instanceof ClassProperty) {
+                    ClassProperty cp = (ClassProperty) node;
+                    if (cp.isStatic()) attributes |= Decorator.STATIC;
+                    // TODO: Private
+                    attributes |= Decorator.PUBLIC;
+                    targetName = cp.getNameKey();
+                }
+                cfw.addPush(attributes);
+
+                // descriptorArgs
+                cfw.addPush(args.size());
+                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+                for (int i = 0, argsSize = args.size(); i < argsSize; i++) {
+                    Node ch = args.get(i);
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(i);
+                    generateExpression(ch, node);
+                    cfw.add(ByteCode.AASTORE);
+                }
+
+                // metadata
+                cfw.addPush(1);
+                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+                cfw.add(ByteCode.DUP);
+                cfw.addPush(0);
+
+                if (!(targetName instanceof String)) {
+                    throw Kit.codeBug();
+                }
+                cfw.addPush((String) targetName);
+                cfw.add(ByteCode.AASTORE);
+
+                cfw.addALoad(contextLocal);
+                cfw.addALoad(variableObjectLocal);
+                cfw.addALoad(thisObjLocal);
+
+                addScriptRuntimeInvoke(
+                        "applyDecorator",
+                        OBJECT,
+                        OBJECT,
+                        "Lorg/mozilla/javascript/decorators/Decorator;",
+                        INTEGER,
+                        OBJECT_ARRAY,
+                        OBJECT_ARRAY,
+                        CONTEXT,
+                        SCRIPTABLE,
+                        SCRIPTABLE
+                );
+
+                cfw.markLabel(notRegister);
+            }
+        }
+    }
+
+    private void generateApplyWrapDecoratorCall(Node node, List<DecoratorNode> decorators) {
+        if (decorators.size() > 0) {
+            for (DecoratorNode dn : decorators) {
+                List<Node> args = new ArrayList<>();
+                for (Node ch = dn.getFirstChild(); ch != null; ch = ch.getNext()) {
+                    args.add(ch);
+                }
+
+                Name name = dn.getName();
+                name.setIdentifier("@" + name.getIdentifier());
+                int decorator = getNewWordLocal();
+                generateExpression(name, node);
+                cfw.addAStore(decorator);
+
+                // WRAP DECORATOR
+                int notWrap = cfw.acquireLabel();
+                cfw.addALoad(decorator);
+                cfw.add(ByteCode.INSTANCEOF, "org/mozilla/javascript/decorators/WrapDecorator");
+                cfw.add(ByteCode.IFEQ, notWrap);
+
+                // If this decorator is a wrap decorator, node
+                // cannot be a class property
+                // TODO: This should be a Parser SyntaxError
+                if (node instanceof ClassProperty) {
+                    cfw.addPush("@wrap cannot be applied to fields");
+                    cfw.addInvoke(
+                            ByteCode.INVOKESTATIC,
+                            "org/mozilla/javascript/ScriptRuntime",
+                            "typeError",
+                            "(Ljava/lang/String;)Lorg/mozilla/javascript/EcmaError;"
+                    );
+                    cfw.add(ByteCode.ATHROW);
+                }
+
+
+                cfw.addALoad(decorator);
+
+                // attributes
+                cfw.addPush(-1);
+
+                // descriptorArgs
+                cfw.addPush(args.size());
+                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+                for (int i = 0, argsSize = args.size(); i < argsSize; i++) {
+                    Node ch = args.get(i);
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(i);
+                    generateExpression(ch, node);
+                    cfw.add(ByteCode.AASTORE);
+                }
+
+                // metadata
+                cfw.addPush(0);
+                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+
+                cfw.addALoad(contextLocal);
+                cfw.addALoad(variableObjectLocal);
+                cfw.addALoad(thisObjLocal);
+
+                addScriptRuntimeInvoke(
+                        "applyDecorator",
+                        OBJECT,
+                        OBJECT,
+                        "Lorg/mozilla/javascript/decorators/Decorator;",
+                        INTEGER,
+                        OBJECT_ARRAY,
+                        OBJECT_ARRAY,
+                        CONTEXT,
+                        SCRIPTABLE,
+                        SCRIPTABLE
+                );
+
+                cfw.markLabel(notWrap);
+            }
+        }
+    }
+
     private void visitClass(ClassNode cls) {
         Node child = cls.getFirstChild();
 
         generateExpression(child, cls);
+        generateApplyWrapDecoratorCall(cls, (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP));
 
         child = child.getNext();
 
@@ -3168,6 +3334,7 @@ class BodyCodegen {
                 }
 
                 generateExpression(method, cls);
+                generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP));
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cm.isStatic());
                 cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
@@ -3190,6 +3357,9 @@ class BodyCodegen {
                 }
 
                 generateExpression(defaultValue, cls);
+                // Wrap decorators are invalid for properties; this call
+                // throws an error if a wrap decorator exists for the field
+                generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP));
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cp.isStatic());
                 addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
@@ -3205,6 +3375,21 @@ class BodyCodegen {
         cfw.addALoad(variableObjectLocal);
         cfw.addALoad(contextLocal);           // load 'cx'
         addOptRuntimeInvoke("initFunction", VOID, NATIVE_FUNCTION, INTEGER, SCRIPTABLE, CONTEXT);
+
+        // Re-loop over all method/properties to apply register decorator
+        child = cls.getFirstChild();
+        while (child != null) {
+            if (child instanceof ClassMethod) {
+                ClassMethod cm = (ClassMethod) child;
+                generateApplyRegisterDecoratorCall(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP));
+            } else if (child instanceof ClassProperty) {
+                ClassProperty cp = (ClassProperty) child;
+                generateApplyRegisterDecoratorCall(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP));
+            }
+            child = child.getNext();
+        }
+
+        generateApplyRegisterDecoratorCall(cls, (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP));
     }
 
     private void visitFunction(OptFunctionNode ofn, int functionType) {
