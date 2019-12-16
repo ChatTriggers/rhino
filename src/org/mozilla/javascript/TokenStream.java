@@ -1105,6 +1105,8 @@ class TokenStream {
                         return Token.OPTIONAL_CHAINING;
                     }
                     return Token.HOOK;
+                case '#':
+                    return Token.HASHTAG;
                 case ':':
                     if (matchChar(':')) {
                         return Token.COLONCOLON;

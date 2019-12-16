@@ -4,6 +4,7 @@ import org.mozilla.javascript.Token;
 
 public class ClassProperty extends InfixExpression {
     private boolean isStatic = false;
+    private boolean isPrivate = false;
     private AstNode name;
     private AstNode defaultValue;
     private Object nameKey;
@@ -40,5 +41,13 @@ public class ClassProperty extends InfixExpression {
 
     public AstNode getDefaultValue() {
         return defaultValue;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate() {
+        isPrivate = true;
     }
 }

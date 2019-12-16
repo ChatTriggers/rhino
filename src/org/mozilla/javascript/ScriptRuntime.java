@@ -773,7 +773,7 @@ public class ScriptRuntime {
 
     public static final Object SUPER_KEY = new Object();
 
-    public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter) {
+    public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter, boolean isPrivate) {
         ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
 
         if (instance) {
@@ -782,6 +782,10 @@ public class ScriptRuntime {
 
         if (method instanceof ScriptableObject) {
             ((ScriptableObject) method).associateValue(SUPER_KEY, clazz.getPrototype());
+        }
+
+        if (isPrivate) {
+            clazz.togglePrivateSlots();
         }
 
         if (name instanceof String) {
@@ -832,14 +836,22 @@ public class ScriptRuntime {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }
 
+        if (isPrivate) {
+            clazz.togglePrivateSlots();
+        }
+
         return clazzObj;
     }
 
-    public static Object addClassProperty(Object clazzObj, Object name, Object defaultValue, Context cx, boolean instance) {
+    public static Object addClassProperty(Object clazzObj, Object name, Object defaultValue, Context cx, boolean instance, boolean isPrivate) {
         ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
 
         if (instance) {
             clazz = ScriptableObject.ensureScriptableObject(ScriptableObject.getProperty(clazz, "prototype"));
+        }
+
+        if (isPrivate) {
+            clazz.togglePrivateSlots();
         }
 
         if (name instanceof String) {
@@ -857,7 +869,23 @@ public class ScriptRuntime {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }
 
+        if (isPrivate) {
+            clazz.togglePrivateSlots();
+        }
+
         return clazzObj;
+    }
+
+    public static void togglePrivateProtoTree(ScriptableObject obj) {
+        while (obj != null) {
+            obj.togglePrivateSlots();
+
+            if (obj.getPrototype() instanceof ScriptableObject && obj.getPrototype() != obj) {
+                obj = (ScriptableObject) obj.getPrototype();
+            } else {
+                obj = null;
+            }
+        }
     }
 
     public static Object callSuper(Object[] args, boolean isReturned, NativeFunction clazz, Scriptable thisObj, Scriptable scope, Context cx) {
@@ -1840,7 +1868,7 @@ public class ScriptRuntime {
     static Object getIndexObject(double d) {
         int i = (int) d;
         if (i == d) {
-            return Integer.valueOf(i);
+            return i;
         }
         return toString(d);
     }

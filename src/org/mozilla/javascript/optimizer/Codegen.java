@@ -105,18 +105,20 @@ public class Codegen implements Evaluator {
             try (FileOutputStream fos = new FileOutputStream(outputTokens)) {
                 StringBuilder sb = new StringBuilder();
 
-                for (int i = 0; i < encodedSource.length(); i++) {
-                    int token = encodedSource.charAt(i);
-                    if (!Token.isValidToken(encodedSource.charAt(i))) continue;
+                try {
+                    for (int i = 0; i < encodedSource.length(); i++) {
+                        int token = encodedSource.charAt(i);
+                        if (!Token.isValidToken(encodedSource.charAt(i))) continue;
 
-                    if (token == Token.NAME || token == Token.STRING || token == Token.REGEXP) {
-                        sb.append(Token.typeToName(token)).append(": ");
-                        i = Decompiler.printSourceString(encodedSource, i + 1, true, sb) - 1;
-                        sb.append("\n");
-                    } else {
-                        sb.append(Token.typeToName(token)).append("\n");
+                        if (token == Token.NAME || token == Token.STRING || token == Token.REGEXP) {
+                            sb.append(Token.typeToName(token)).append(": ");
+                            i = Decompiler.printSourceString(encodedSource, i + 1, true, sb) - 1;
+                            sb.append("\n");
+                        } else {
+                            sb.append(Token.typeToName(token)).append("\n");
+                        }
                     }
-                }
+                } catch (Exception ignored) { }
                 fos.write(sb.toString().getBytes());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -3151,7 +3153,8 @@ class BodyCodegen {
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cm.isStatic());
                 cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
-                addScriptRuntimeInvoke("addClassMethod", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, INTEGER);
+                cfw.addPush(cm.isPrivate());
+                addScriptRuntimeInvoke("addClassMethod", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, INTEGER, BOOLEAN);
 
                 child = child.getNext();
             } else if (child instanceof ClassProperty) {
@@ -3172,7 +3175,8 @@ class BodyCodegen {
                 generateExpression(defaultValue, cls);
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cp.isStatic());
-                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
+                cfw.addPush(cp.isPrivate());
+                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, BOOLEAN);
 
                 child = child.getNext();
             }
@@ -5294,6 +5298,8 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     }
 
     private void visitGetProp(Node node, Node child) {
+        boolean isPrivate = node.getProp(Node.PRIVATE_ACCESS_PROP) != null;
+
         if (child.getProp(Node.SUPER_PROP) != null) {
             generateExpression(child.getNext(), node);
             cfw.addALoad(thisObjLocal);
@@ -5303,6 +5309,13 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         }
 
         generateExpression(child, node); // object
+        short objLocal = 0;
+        if (isPrivate) {
+            cfw.add(ByteCode.DUP);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+             objLocal = getNewWordLocal();
+            cfw.addAStore(objLocal);
+        }
         Node nameChild = child.getNext();
         generateExpression(nameChild, node);  // the name
         if (node.getType() == Token.GETPROPNOWARN) {
@@ -5313,6 +5326,11 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         }
 
         String methodName = node.getProp(Node.CHAINING_PROP) != null ? "optionalGetObjectProp" : "getObjectProp";
+
+        if (isPrivate) {
+            cfw.addALoad(objLocal);
+            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
+        }
 
         /*
             for 'this.foo' we call getObjectProp(Scriptable...) which can
@@ -5327,11 +5345,27 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
             cfw.addALoad(variableObjectLocal);
             addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
         }
+
+        if (isPrivate) {
+            cfw.addALoad(objLocal);
+            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
+        }
     }
 
     private void visitSetProp(int type, Node node, Node child) {
+        boolean isPrivate = node.getProp(Node.PRIVATE_ACCESS_PROP) != null;
+
         Node objectChild = child;
         generateExpression(child, node);
+
+        short objLocal = 0;
+        if (isPrivate) {
+            cfw.add(ByteCode.DUP);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+            objLocal = getNewWordLocal();
+            cfw.addAStore(objLocal);
+        }
+
         child = child.getNext();
         if (type == Token.SETPROP_OP) {
             cfw.add(ByteCode.DUP);
@@ -5339,6 +5373,13 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         Node nameChild = child;
         generateExpression(child, node);
         child = child.getNext();
+
+
+        if (isPrivate) {
+            cfw.addALoad(objLocal);
+            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
+        }
+
         if (type == Token.SETPROP_OP) {
             // stack: ... object object name -> ... object name object name
             cfw.add(ByteCode.DUP_X1);
@@ -5358,6 +5399,11 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
         addScriptRuntimeInvoke("setObjectProp", OBJECT, OBJECT, STRING, OBJECT, CONTEXT, SCRIPTABLE);
+
+        if (isPrivate) {
+            cfw.addALoad(objLocal);
+            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
+        }
     }
 
     private void visitSetElem(int type, Node node, Node child) {

@@ -478,6 +478,10 @@ public class Decompiler {
                     result.append("?.");
                     break;
 
+                case Token.HASHTAG:
+                    result.append("#");
+                    break;
+
                 case Token.SPREAD:
                     result.append("...");
                     break;

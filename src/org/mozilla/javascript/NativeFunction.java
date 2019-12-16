@@ -15,7 +15,6 @@ import org.mozilla.javascript.debug.DebuggableScript;
  * @author Norris Boyd
  */
 public abstract class NativeFunction extends BaseFunction {
-
     private static final long serialVersionUID = 8713897114082216401L;
 
     public final void initScriptFunction(Context cx, Scriptable scope) {

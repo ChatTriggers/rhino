@@ -4,6 +4,7 @@ import org.mozilla.javascript.Token;
 
 public class ClassMethod extends InfixExpression {
     private boolean isStatic = false;
+    private boolean isPrivate = false;
     private AstNode name;
     private FunctionNode function;
     private Object nameKey;
@@ -56,5 +57,13 @@ public class ClassMethod extends InfixExpression {
 
     public void setNameKey(Object nameKey) {
         this.nameKey = nameKey;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 }
