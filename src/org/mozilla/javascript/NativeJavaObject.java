@@ -632,7 +632,8 @@ public class NativeJavaObject
                         return value;
                     reportConversionError(value, type);
                 } else if (type.isInterface() && (value instanceof NativeObject
-                        || value instanceof NativeFunction)) {
+                        || value instanceof NativeFunction
+                        || value instanceof ArrowFunction)) {
                     // Try to use function/object as implementation of Java interface.
                     return createInterfaceAdapter(type, (ScriptableObject) value);
                 } else {
@@ -672,10 +673,10 @@ public class NativeJavaObject
             if (valueClass == ScriptRuntime.CharacterClass) {
                 return value;
             }
-            return Character.valueOf((char) toInteger(value,
+            return (char) toInteger(value,
                     ScriptRuntime.CharacterClass,
                     Character.MIN_VALUE,
-                    Character.MAX_VALUE));
+                    Character.MAX_VALUE);
         }
 
         // Double, Float
@@ -693,18 +694,18 @@ public class NativeJavaObject
             double number = toDouble(value);
             if (Double.isInfinite(number) || Double.isNaN(number)
                     || number == 0.0) {
-                return Float.valueOf((float) number);
+                return (float) number;
             }
 
             double absNumber = Math.abs(number);
             if (absNumber < Float.MIN_VALUE) {
-                return Float.valueOf((number > 0.0) ? +0.0f : -0.0f);
+                return (number > 0.0) ? +0.0f : -0.0f;
             } else if (absNumber > Float.MAX_VALUE) {
-                return Float.valueOf((number > 0.0) ?
+                return (number > 0.0) ?
                         Float.POSITIVE_INFINITY :
-                        Float.NEGATIVE_INFINITY);
+                        Float.NEGATIVE_INFINITY;
             } else {
-                return Float.valueOf((float) number);
+                return (float) number;
             }
         }
 
@@ -713,10 +714,10 @@ public class NativeJavaObject
             if (valueClass == ScriptRuntime.IntegerClass) {
                 return value;
             }
-            return Integer.valueOf((int) toInteger(value,
+            return (int) toInteger(value,
                     ScriptRuntime.IntegerClass,
                     Integer.MIN_VALUE,
-                    Integer.MAX_VALUE));
+                    Integer.MAX_VALUE);
         }
 
         if (type == ScriptRuntime.LongClass || type == Long.TYPE) {
@@ -732,33 +733,33 @@ public class NativeJavaObject
              */
             final double max = Double.longBitsToDouble(0x43dfffffffffffffL);
             final double min = Double.longBitsToDouble(0xc3e0000000000000L);
-            return Long.valueOf(toInteger(value,
+            return toInteger(value,
                     ScriptRuntime.LongClass,
                     min,
-                    max));
+                    max);
         }
 
         if (type == ScriptRuntime.ShortClass || type == Short.TYPE) {
             if (valueClass == ScriptRuntime.ShortClass) {
                 return value;
             }
-            return Short.valueOf((short) toInteger(value,
+            return (short) toInteger(value,
                     ScriptRuntime.ShortClass,
                     Short.MIN_VALUE,
-                    Short.MAX_VALUE));
+                    Short.MAX_VALUE);
         }
 
         if (type == ScriptRuntime.ByteClass || type == Byte.TYPE) {
             if (valueClass == ScriptRuntime.ByteClass) {
                 return value;
             }
-            return Byte.valueOf((byte) toInteger(value,
+            return (byte) toInteger(value,
                     ScriptRuntime.ByteClass,
                     Byte.MIN_VALUE,
-                    Byte.MAX_VALUE));
+                    Byte.MAX_VALUE);
         }
 
-        return new Double(toDouble(value));
+        return toDouble(value);
     }
 
 
@@ -777,18 +778,13 @@ public class NativeJavaObject
             Method meth;
             try {
                 meth = value.getClass().getMethod("doubleValue", (Class[]) null);
-            } catch (NoSuchMethodException e) {
-                meth = null;
-            } catch (SecurityException e) {
+            } catch (NoSuchMethodException | SecurityException e) {
                 meth = null;
             }
             if (meth != null) {
                 try {
                     return ((Number) meth.invoke(value, (Object[]) null)).doubleValue();
-                } catch (IllegalAccessException e) {
-                    // XXX: ignore, or error message?
-                    reportConversionError(value, Double.TYPE);
-                } catch (InvocationTargetException e) {
+                } catch (IllegalAccessException | InvocationTargetException e) {
                     // XXX: ignore, or error message?
                     reportConversionError(value, Double.TYPE);
                 }
