@@ -214,6 +214,9 @@ public class NativeJavaObject
             if (javaObject instanceof Boolean) {
                 hint = ScriptRuntime.BooleanClass;
             }
+            if (javaObject instanceof Number) {
+                hint = ScriptRuntime.NumberClass;
+            }
         }
         if (hint == null || hint == ScriptRuntime.StringClass) {
             value = javaObject.toString();
@@ -234,7 +237,7 @@ public class NativeJavaObject
             } else {
                 if (hint == ScriptRuntime.NumberClass
                         && javaObject instanceof Boolean) {
-                    boolean b = ((Boolean) javaObject).booleanValue();
+                    boolean b = (Boolean) javaObject;
                     value = ScriptRuntime.wrapNumber(b ? 1.0 : 0.0);
                 } else {
                     value = javaObject.toString();
