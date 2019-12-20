@@ -191,7 +191,7 @@ public class EmbeddedSlotMap
                     return slot;
                 }
 
-                newSlot.value = slot.value;
+                newSlot.internalSetValue(null, slot.getValue(null));
                 newSlot.next = slot.next;
 
                 // Replace new slot in linked list, keeping same order

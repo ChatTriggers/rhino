@@ -4001,7 +4001,25 @@ class BodyCodegen {
 
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
-        addOptRuntimeInvoke(methodName, OBJECT, signature);
+
+        if (methodName.equals("callProp0")) {
+            ClassFileWriter.MHandle bootstrap = new ClassFileWriter.MHandle(ByteCode.MH_INVOKESTATIC,
+                    "org/mozilla/javascript/optimizer/InvokeDynamicSupport",
+                    "bootstrapCallProp0",
+                    MethodType.methodType(
+                            CallSite.class, MethodHandles.Lookup.class,
+                            String.class, MethodType.class
+                    ).toMethodDescriptorString()
+            );
+            // Object obj, String property, Context cx, Scriptable scope
+            cfw.addInvokeDynamic(
+                    "callProp0",
+                    "(" + OBJECT + STRING + CONTEXT + SCRIPTABLE + ")" + OBJECT,
+                    bootstrap
+            );
+        } else {
+            addOptRuntimeInvoke(methodName, OBJECT, signature);
+        }
     }
 
     private void visitStandardNew(Node node, Node child) {

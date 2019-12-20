@@ -16,6 +16,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.SwitchPoint;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -116,6 +117,8 @@ public abstract class ScriptableObject implements Scriptable,
 
     private transient SlotMapContainer privateSlots;
 
+    private transient SwitchPoint switchPoint = new SwitchPoint();
+
     // Where external array data is stored.
     private transient ExternalArrayData externalData;
 
@@ -165,6 +168,14 @@ public abstract class ScriptableObject implements Scriptable,
             }
         }
 
+        void internalSetValue(Scriptable owner, Object value) {
+            if (owner instanceof ScriptableObject && this.value instanceof BaseFunction) {
+                ((ScriptableObject) owner).invalidateSwitchPoint();
+            }
+
+            this.value = value;
+        }
+
         boolean setValue(Object value, Scriptable owner, Scriptable start) {
             if ((attributes & NOT_WRITABLE) != 0) {
                 Context cx = Context.getContext();
@@ -177,7 +188,7 @@ public abstract class ScriptableObject implements Scriptable,
                 return true;
             }
             if (owner == start) {
-                this.value = value;
+                internalSetValue(owner, value);
                 return true;
             }
             return false;
@@ -221,11 +232,21 @@ public abstract class ScriptableObject implements Scriptable,
     static final class GetterSlot extends Slot {
         private static final long serialVersionUID = -4900574849788797588L;
 
-        Object getter;
-        Object setter;
+        private Object getter;
+        private Object setter;
 
         GetterSlot(Object name, int indexOrHash, int attributes) {
             super(name, indexOrHash, attributes);
+        }
+
+        void internalSetGetter(ScriptableObject owner, Object getter) {
+            owner.invalidateSwitchPoint();
+            this.getter = getter;
+        }
+
+        void internalSetSetter(ScriptableObject owner, Object setter) {
+            owner.invalidateSwitchPoint();
+            this.setter = setter;
         }
 
         @Override
@@ -334,13 +355,13 @@ public abstract class ScriptableObject implements Scriptable,
                             ScriptRuntime.emptyArgs);
                 }
             }
-            Object val = this.value;
+            Object val = super.getValue(start);
             if (val instanceof LazilyLoadedCtor) {
                 LazilyLoadedCtor initializer = (LazilyLoadedCtor) val;
                 try {
                     initializer.init();
                 } finally {
-                    this.value = val = initializer.getValue();
+                    internalSetValue(start, val = initializer.getValue());
                 }
             }
             return val;
@@ -800,11 +821,11 @@ public abstract class ScriptableObject implements Scriptable,
             }
         }
         if (isSetter) {
-            gslot.setter = getterOrSetter;
+            gslot.internalSetSetter(this, getterOrSetter);
         } else {
-            gslot.getter = getterOrSetter;
+            gslot.internalSetGetter(this, getterOrSetter);
         }
-        gslot.value = Undefined.instance;
+        gslot.internalSetValue(this, Undefined.instance);
     }
 
     public void setGetterOrSetter(Symbol name, int index, Callable getterOrSetter, boolean isSetter) {
@@ -836,11 +857,11 @@ public abstract class ScriptableObject implements Scriptable,
             }
         }
         if (isSetter) {
-            gslot.setter = getterOrSetter;
+            gslot.internalSetSetter(this, getterOrSetter);
         } else {
-            gslot.getter = getterOrSetter;
+            gslot.internalSetGetter(this, getterOrSetter);
         }
-        gslot.value = Undefined.instance;
+        gslot.internalSetValue(this, Undefined.instance);
     }
 
     /**
@@ -875,11 +896,11 @@ public abstract class ScriptableObject implements Scriptable,
             }
         }
         if (isSetter) {
-            gslot.setter = getterOrSetter;
+            gslot.internalSetSetter(this, getterOrSetter);
         } else {
-            gslot.getter = getterOrSetter;
+            gslot.internalSetGetter(this, getterOrSetter);
         }
-        gslot.value = Undefined.instance;
+        gslot.internalSetValue(this, Undefined.instance);
     }
 
     /**
@@ -963,7 +984,7 @@ public abstract class ScriptableObject implements Scriptable,
         gslot.setAttributes(attributes);
         gslot.getter = null;
         gslot.setter = null;
-        gslot.value = init;
+        gslot.internalSetValue(this, init);
     }
 
     /**
@@ -1921,8 +1942,8 @@ public abstract class ScriptableObject implements Scriptable,
         GetterSlot gslot = (GetterSlot) slotMap.get(propertyName, 0,
                 SlotAccess.MODIFY_GETTER_SETTER);
         gslot.setAttributes(attributes);
-        gslot.getter = getterBox;
-        gslot.setter = setterBox;
+        gslot.internalSetGetter(this, getterBox);
+        gslot.internalSetSetter(this, setterBox);
     }
 
     /**
@@ -1998,14 +2019,14 @@ public abstract class ScriptableObject implements Scriptable,
 
             Object getter = getProperty(desc, "get");
             if (getter != NOT_FOUND) {
-                gslot.getter = getter;
+                gslot.internalSetGetter(this, getter);
             }
             Object setter = getProperty(desc, "set");
             if (setter != NOT_FOUND) {
-                gslot.setter = setter;
+                gslot.internalSetSetter(this, setter);
             }
 
-            gslot.value = Undefined.instance;
+            gslot.internalSetValue(this, Undefined.instance);
             gslot.setAttributes(attributes);
         } else {
             if (slot instanceof GetterSlot && isDataDescriptor(desc)) {
@@ -2014,9 +2035,9 @@ public abstract class ScriptableObject implements Scriptable,
 
             Object value = getProperty(desc, "value");
             if (value != NOT_FOUND) {
-                slot.value = value;
+                slot.internalSetValue(this, value);
             } else if (isNew) {
-                slot.value = Undefined.instance;
+                slot.internalSetValue(this, Undefined.instance);
             }
             slot.setAttributes(attributes);
         }
@@ -2329,7 +2350,7 @@ public abstract class ScriptableObject implements Scriptable,
                         try {
                             initializer.init();
                         } finally {
-                            slot.value = initializer.getValue();
+                            slot.internalSetValue(this, initializer.getValue());
                         }
                     }
                 }
@@ -2904,6 +2925,15 @@ public abstract class ScriptableObject implements Scriptable,
         slotMap = tmp;
     }
 
+    public SwitchPoint getSwitchPoint() {
+        return this.switchPoint;
+    }
+
+    public void invalidateSwitchPoint() {
+        SwitchPoint.invalidateAll(new SwitchPoint[]{ this.switchPoint });
+        this.switchPoint = new SwitchPoint();
+    }
+
     /**
      * @param name
      * @param index
@@ -2940,7 +2970,7 @@ public abstract class ScriptableObject implements Scriptable,
             slot = slotMap.get(name, index, SlotAccess.MODIFY_CONST);
             int attr = slot.getAttributes();
             if ((attr & UNINITIALIZED_CONST) != 0) {
-                slot.value = value;
+                slot.internalSetValue(this, value);
                 // clear the bit on const initialization
                 if (constFlag != UNINITIALIZED_CONST) {
                     slot.setAttributes(attr & ~UNINITIALIZED_CONST | INITIALIZED_CONST);
