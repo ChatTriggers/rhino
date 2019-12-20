@@ -17,6 +17,9 @@ import org.mozilla.javascript.generator.NativeGenerator;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
@@ -2500,7 +2503,20 @@ class BodyCodegen {
                     cfw.addALoad(contextLocal);
                     cfw.addALoad(variableObjectLocal);
                     cfw.addALoad(thisObjLocal);
-                    addScriptRuntimeInvoke("callWithTemplateLiteral", OBJECT, OBJECT_ARRAY, INTEGER, OBJECT, CONTEXT, SCRIPTABLE, SCRIPTABLE);
+                    ClassFileWriter.MHandle bootstrap = new ClassFileWriter.MHandle(ByteCode.MH_INVOKESTATIC,
+                            "org/mozilla/javascript/optimizer/InvokeDynamicSupport",
+                            "bootstrapCallWithTemplateLiteral",
+                            MethodType.methodType(
+                                    CallSite.class, MethodHandles.Lookup.class,
+                                    String.class, MethodType.class
+                            ).toMethodDescriptorString()
+                    );
+                    cfw.addInvokeDynamic(
+                            "callWithTemplateLiteral",
+                            "(" + OBJECT_ARRAY + INTEGER + OBJECT + CONTEXT + SCRIPTABLE + SCRIPTABLE + ")" + OBJECT,
+                            bootstrap
+                    );
+//                    addScriptRuntimeInvoke("callWithTemplateLiteral", OBJECT, OBJECT_ARRAY, INTEGER, OBJECT, CONTEXT, SCRIPTABLE, SCRIPTABLE);
                 }
 
                 break;
