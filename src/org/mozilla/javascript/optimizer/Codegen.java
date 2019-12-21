@@ -3482,7 +3482,9 @@ class BodyCodegen {
                     throw Kit.codeBug(targetName == null ? "null" : targetName.getClass().getSimpleName());
                 }
 
-                cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "associateValue", "(" + OBJECT + OBJECT + ")" + OBJECT);
+                cfw.addPush(true);
+
+                cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "associateValue", "(" + OBJECT + OBJECT + BOOLEAN + ")" + OBJECT);
 
                 // Return value doesn't matter
                 cfw.add(ByteCode.POP);

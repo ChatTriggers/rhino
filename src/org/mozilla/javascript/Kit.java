@@ -263,10 +263,10 @@ public class Kit {
         }
     }
 
-    static Object initHash(Map<Object, Object> h, Object key, Object initialValue) {
+    static Object initHash(Map<Object, Object> h, Object key, Object initialValue, boolean override) {
         synchronized (h) {
             Object current = h.get(key);
-            if (current == null) {
+            if (current == null || override) {
                 h.put(key, initialValue);
             } else {
                 initialValue = current;

@@ -2851,13 +2851,30 @@ public abstract class ScriptableObject implements Scriptable,
      * @see #getAssociatedValue(Object key)
      */
     public synchronized final Object associateValue(Object key, Object value) {
+        return associateValue(key, value, false);
+    }
+
+
+    /**
+     * Associate arbitrary application-specific value with this object.
+     * If override is set to false, the method will ignore any attempts
+     * to set a value if it has already been set. Otherwise, the method
+     * will override any existing values.
+     *
+     * @param key   key object to select particular value.
+     * @param value the value to associate
+     * @return the passed value if the method is called first time for the
+     * given key or old value for any subsequent calls.
+     * @see #getAssociatedValue(Object key)
+     */
+    public synchronized final Object associateValue(Object key, Object value, boolean override) {
         if (value == null) throw new IllegalArgumentException();
         Map<Object, Object> h = associatedValues;
         if (h == null) {
             h = new HashMap<>();
             associatedValues = h;
         }
-        return Kit.initHash(h, key, value);
+        return Kit.initHash(h, key, value, override);
     }
 
     /**
