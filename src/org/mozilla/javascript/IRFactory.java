@@ -8,7 +8,6 @@ package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
-import org.mozilla.javascript.decorators.Decorator;
 import org.mozilla.javascript.optimizer.Codegen;
 
 import java.io.File;
@@ -213,6 +212,9 @@ public final class IRFactory extends Parser {
                 }
                 if (node instanceof DecoratorNode) {
                     return transformDecoratorNode((DecoratorNode) node);
+                }
+                if (node instanceof DecoratorDeclarationNode) {
+                    return transformDecoratorDeclaration((DecoratorDeclarationNode) node);
                 }
                 if (node instanceof XmlRef) {
                     return transformXmlRef((XmlRef) node);
@@ -620,6 +622,13 @@ public final class IRFactory extends Parser {
             if (!fn.isExpressionClosure()) {
                 decompiler.addToken(Token.RC);
             }
+
+            if (fn instanceof DecoratorDeclarationNode) {
+                for (DecoratorNode dn : ((DecoratorDeclarationNode) fn).getDecoratorNodes()) {
+                    transformDecoratorNode(dn);
+                }
+            }
+
             fn.setEncodedSourceBounds(start, decompiler.markFunctionEnd(start));
 
             if (functionType != FunctionNode.FUNCTION_EXPRESSION && !fn.isExpressionClosure()) {
@@ -640,6 +649,7 @@ public final class IRFactory extends Parser {
                     pn = createExprStatementNoReturn(pn, fn.getLineno());
                 }
             }
+
             return pn;
 
         } finally {
@@ -649,6 +659,17 @@ public final class IRFactory extends Parser {
     }
 
     public static Object GENERATED_SUPER = new Object();
+
+    private DecoratorDeclarationNode transformDecoratorDeclaration(DecoratorDeclarationNode node) {
+        // Add an empty body so that transformFunction doesn't
+        // crash with an NPE
+        node.setBody(new Block());
+        node.setFunctionType(FunctionNode.FUNCTION_STATEMENT);
+
+        transformFunction(node);
+
+        return node;
+    }
 
     private Node transformDecoratorNode(DecoratorNode dn) {
         for (AstNode arg : dn.getArguments()) {
@@ -687,7 +708,7 @@ public final class IRFactory extends Parser {
         List<Node> decorators = new ArrayList<>();
 
         for (DecoratorNode dn : node.getDecorators()) {
-            decorators.add(transform(dn));
+            decorators.add(transformDecoratorNode(dn));
         }
 
         node.putProp(Node.DECORATOR_PROP, decorators);
@@ -702,21 +723,21 @@ public final class IRFactory extends Parser {
             decorators = new ArrayList<>();
 
             for (DecoratorNode dn : cm.getDecorators()) {
-                decorators.add(transform(dn));
+                decorators.add(transformDecoratorNode(dn));
             }
 
             cm.putProp(Node.DECORATOR_PROP, decorators);
             node.addChildToBack(cm);
         }
 
-        for (ClassProperty cp : node.getProperties()) {
+        for (ClassField cp : node.getProperties()) {
             cp.setNameKey(getPropKey(cp.getName()));
             cp.addChildToBack(transform(cp.getDefaultValue()));
 
             decorators = new ArrayList<>();
 
             for (DecoratorNode dn : cp.getDecorators()) {
-                decorators.add(transform(dn));
+                decorators.add(transformDecoratorNode(dn));
             }
 
             cp.putProp(Node.DECORATOR_PROP, decorators);
@@ -754,6 +775,7 @@ public final class IRFactory extends Parser {
             }
         }
         decompiler.addToken(Token.RP);
+
         return call;
     }
 

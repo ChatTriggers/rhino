@@ -5,7 +5,7 @@ import org.mozilla.javascript.Token;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassMethod extends InfixExpression {
+public class ClassMethod extends InfixExpression implements ClassElement {
     private boolean isStatic = false;
     private boolean isPrivate = false;
     private AstNode name;
@@ -75,7 +75,7 @@ public class ClassMethod extends InfixExpression {
         return isPrivate;
     }
 
-    public void setPrivate(boolean aPrivate) {
-        isPrivate = aPrivate;
+    public void setIsPrivate() {
+        isPrivate = true;
     }
 }

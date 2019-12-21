@@ -772,6 +772,10 @@ public class ScriptRuntime {
         }
     }
 
+    public static boolean isPreInit(Object descriptor) {
+        return (((int) descriptor) & Decorator.PREINIT) != 0;
+    }
+
     public static Object getRestParams(Object[] _args, int index, Context cx, Scriptable scope) {
         Object[] args = new Object[_args.length - index];
 
@@ -792,6 +796,10 @@ public class ScriptRuntime {
         return Undefined.instance;
     }
 
+    public static void debug(Object obj) {
+        System.out.println("test");
+    }
+
     public static final Object SUPER_KEY = new Object();
 
     public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter, boolean isPrivate) {
@@ -804,10 +812,7 @@ public class ScriptRuntime {
                 Object extended = ScriptableObject.ensureScriptableObject(clazzObj).getAssociatedValue(SUPER_KEY);
 
                 if (extended != null) {
-                    ((ScriptableObject) method).associateValue(
-                            SUPER_KEY,
-                            extended
-                    );
+                    ((ScriptableObject) method).associateValue(SUPER_KEY, extended);
                 }
             }
         }
