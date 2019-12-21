@@ -12,6 +12,7 @@ public class DecoratorDeclarationNode extends FunctionNode {
     {
         type = Token.DECORATOR;
         putProp(Node.DECORATOR_PROP, true);
+        setRequiresActivation();
     }
 
     public List<DecoratorNode> getDecoratorNodes() {

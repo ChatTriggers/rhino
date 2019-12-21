@@ -3333,7 +3333,6 @@ class BodyCodegen {
 
                 generateExpression(method, cls);
                 generateApplyDecorator(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP), true);
-                // generateApplyWrapDecoratorCall(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP));
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cm.isStatic());
                 cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
@@ -3546,10 +3545,11 @@ class BodyCodegen {
                     "call",
                     "(" + CONTEXT + SCRIPTABLE + SCRIPTABLE + OBJECT_ARRAY + ")" + OBJECT
             );
-
-
-
         }
+    }
+
+    private void generateDebugCall() {
+        addScriptRuntimeInvoke("debug", VOID, OBJECT);
     }
 
     private void visitFunction(OptFunctionNode ofn, int functionType) {

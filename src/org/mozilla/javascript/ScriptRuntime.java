@@ -799,6 +799,10 @@ public class ScriptRuntime {
         return Undefined.instance;
     }
 
+    public static void debug(Object obj) {
+        System.out.println("test");
+    }
+
     public static final Object SUPER_KEY = new Object();
 
     public static Object addClassMethod(Object clazzObj, Object name, Object method, Context cx, boolean instance, int getterSetter, boolean isPrivate) {
