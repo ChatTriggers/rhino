@@ -3067,9 +3067,17 @@ class BodyCodegen {
             }
 
             case Token.NULLISH_COALESCING: {
+                int endOfIf = cfw.acquireLabel();
                 generateExpression(child, node);
+
+                cfw.add(ByteCode.DUP);
+                addScriptRuntimeInvoke("isNullOrUndefined", BOOLEAN, OBJECT);
+                cfw.add(ByteCode.IFEQ, endOfIf);
+
+                cfw.add(ByteCode.POP);
                 generateExpression(child.getNext(), node);
-                addScriptRuntimeInvoke("nullishCoalesce", OBJECT, OBJECT, OBJECT);
+
+                cfw.markLabel(endOfIf);
                 break;
             }
 
