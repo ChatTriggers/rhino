@@ -149,12 +149,6 @@ public class NativeJavaClass extends NativeJavaObject implements Function {
 
     @Override
     public Scriptable construct(Context cx, Scriptable scope, Object[] args) {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] instanceof ArrowFunction) {
-                args[i] = ((ArrowFunction) args[i]).getTargetFunction();
-            }
-        }
-
         Class<?> classObject = getClassObject();
         int modifiers = classObject.getModifiers();
         if (!(Modifier.isInterface(modifiers) ||

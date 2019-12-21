@@ -397,7 +397,7 @@ public class NativeJavaObject
                     }
                 } else if (to.isInterface()) {
 
-                    if (fromObj instanceof NativeFunction) {
+                    if (fromObj instanceof BaseFunction) {
                         // See comments in createInterfaceAdapter
                         return 1;
                     }

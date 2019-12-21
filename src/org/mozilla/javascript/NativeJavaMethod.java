@@ -127,12 +127,6 @@ public class NativeJavaMethod extends BaseFunction {
             throw new RuntimeException("No methods defined for call");
         }
 
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] instanceof ArrowFunction) {
-                args[i] = ((ArrowFunction) args[i]).getTargetFunction();
-            }
-        }
-
         int index = findCachedFunction(cx, args);
         if (index < 0) {
             Class<?> c = methods[0].method().getDeclaringClass();

@@ -832,6 +832,11 @@ public class Parser {
                         if (name != null && name.length() != 0) {
                             reportError("msg.bad.prop");
                         }
+
+                        if (pname instanceof Name) {
+                            fn.setFunctionName((Name) pname);
+                        }
+
                         pname.setJsDocNode(jsdocNode);
                         if (isStatic) {
                             fn.setStatic(true);
