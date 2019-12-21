@@ -1,26 +1,26 @@
 package org.mozilla.javascript.decorators;
 
-import org.mozilla.javascript.Callable;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 
-public class RegisterDecorator implements Decorator {
+public class RegisterDecorator extends Decorator {
     public static void init(Scriptable scope) {
         RegisterDecorator register = new RegisterDecorator();
         ScriptableObject.defineProperty(scope, "@register", register, ScriptableObject.NOT_ENUMERABLE);
     }
 
     @Override
-    public Object consume(Object target, int descriptor, Object[] descriptorArgs, Object[] metadata, Context cx, Scriptable scope, Scriptable thisObj) {
-        Object[] args;
+    public Object consume(Object target, int descriptor, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if ((descriptor & PREINIT) != 0) return target;
+
+        Object[] callArgs;
 
         if ((descriptor & CLASS) != 0 || (descriptor & PRIVATE) != 0) {
-            args = new Object[]{ target };
+            callArgs = new Object[]{ target };
         } else {
-            args = new Object[]{ target, metadata[0] };
+            callArgs = new Object[]{ target, ((ScriptableObject) target).getAssociatedValue(NAME_KEY) };
         }
 
-        return ((Callable) descriptorArgs[0]).call(cx, scope, thisObj, args);
+        ((Callable) args[0]).call(cx, scope, thisObj, callArgs);
+        return target;
     }
 }

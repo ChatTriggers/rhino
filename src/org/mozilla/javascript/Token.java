@@ -191,6 +191,7 @@ public class Token {
             WITH = 130, // with keyword
             CATCH = 131, // catch keyword
             FINALLY = 132, // finally keyword
+            DECORATOR = 179,
             VOID = 133, // void keyword
             RESERVED = 134, // reserved keywords
 
@@ -241,7 +242,7 @@ public class Token {
             METHOD = 170, // ES6 MethodDefinition
             ARROW = 171,  // ES6 ArrowFunction
             HASHTAG = 178,  // ES6 ArrowFunction
-            LAST_TOKEN = 179;
+            LAST_TOKEN = 180;
 
     /**
      * Returns a name for the token.  If Rhino is compiled with certain
@@ -622,6 +623,8 @@ public class Token {
                 return "EXTENDS";
             case SUPER:
                 return "SUPER";
+            case DECORATOR:
+                return "DECORATOR";
         }
 
         // Token without name
@@ -709,6 +712,8 @@ public class Token {
                 return "super";
             case Token.EXTENDS:
                 return "extends";
+            case Token.DECORATOR:
+                return "decorator";
             default:
                 return null;
         }

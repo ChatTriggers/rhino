@@ -5,7 +5,7 @@ import org.mozilla.javascript.Token;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassProperty extends InfixExpression {
+public class ClassField extends InfixExpression implements ClassElement {
     private boolean isStatic = false;
     private boolean isPrivate = false;
     private AstNode name;
@@ -17,7 +17,7 @@ public class ClassProperty extends InfixExpression {
         type = Token.GETPROP;
     }
 
-    public ClassProperty(AstNode name, AstNode defaultValue) {
+    public ClassField(AstNode name, AstNode defaultValue) {
         super(name, defaultValue);
         this.name = name;
         this.defaultValue = defaultValue;
@@ -59,7 +59,7 @@ public class ClassProperty extends InfixExpression {
         return isPrivate;
     }
 
-    public void setPrivate() {
+    public void setIsPrivate() {
         isPrivate = true;
     }
 }

@@ -11,7 +11,7 @@ public class ClassNode extends ScriptNode {
     private AstNode extendsName;
     private FunctionNode constructor = null;
     private List<ClassMethod> methods = new ArrayList<>();
-    private List<ClassProperty> properties = new ArrayList<>();
+    private List<ClassField> properties = new ArrayList<>();
     private List<DecoratorNode> decorators = new ArrayList<>();
     private Node parentFn = null;
     private Node extended = null;
@@ -37,7 +37,7 @@ public class ClassNode extends ScriptNode {
 
     public boolean hasPrivateSlots() {
         return this.methods.stream().anyMatch(ClassMethod::isPrivate)
-                || this.properties.stream().anyMatch(ClassProperty::isPrivate);
+                || this.properties.stream().anyMatch(ClassField::isPrivate);
     }
 
     public Name getClassName() {
@@ -72,11 +72,11 @@ public class ClassNode extends ScriptNode {
         this.methods = methods;
     }
 
-    public List<ClassProperty> getProperties() {
+    public List<ClassField> getProperties() {
         return properties;
     }
 
-    public void setProperties(List<ClassProperty> properties) {
+    public void setProperties(List<ClassField> properties) {
         this.properties = properties;
     }
 

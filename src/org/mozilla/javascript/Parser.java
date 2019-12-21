@@ -730,7 +730,7 @@ public class Parser {
         Set<String> getterNames = new HashSet<>();
         Set<String> setterNames = new HashSet<>();
         List<ClassMethod> classMethods = new ArrayList<>();
-        List<ClassProperty> classProperties = new ArrayList<>();
+        List<ClassField> classProperties = new ArrayList<>();
 
         while (true) {
             // Eat all useless semicolons and line breaks
@@ -752,7 +752,7 @@ public class Parser {
             List<DecoratorNode> decorators = new ArrayList<>();
 
             while (matchToken(Token.XMLATTR)) {
-                decorators.add(decorator());
+                decorators.add(decorator(false));
             }
 
             boolean isStatic = matchToken(Token.STATIC);
@@ -813,13 +813,13 @@ public class Parser {
                             defaultValue = new Name(ts.tokenBeg, "undefined");
                         }
 
-                        ClassProperty cp = new ClassProperty(pname, defaultValue);
+                        ClassField cp = new ClassField(pname, defaultValue);
                         if (isStatic) {
                             cp.setIsStatic();
                         }
 
                         if (isPrivate) {
-                            cp.setPrivate();
+                            cp.setIsPrivate();
                         }
 
                         cp.setLength(getNodeEnd(defaultValue) - pos);
@@ -858,7 +858,7 @@ public class Parser {
                             cm.setIsStatic();
                         }
                         if (isPrivate) {
-                            cm.setPrivate(true);
+                            cm.setIsPrivate();
                         }
 
                         int end = getNodeEnd(fn);
@@ -1286,6 +1286,11 @@ public class Parser {
 
             case Token.THROW:
                 pn = throwStatement();
+                break;
+
+            case Token.DECORATOR:
+                consumeToken();
+                pn = decoratorDeclaration();
                 break;
 
             case Token.BREAK:
@@ -2041,13 +2046,45 @@ public class Parser {
         }
     }
 
-    private DecoratorNode decorator() throws IOException {
+    private DecoratorDeclarationNode decoratorDeclaration() throws IOException {
+        mustMatchToken(Token.XMLATTR, "msg.decorator.declaration.missing.at");
+        mustMatchToken(Token.NAME, "msg.decorator.declaration.missing.name");
+        Name name = createNameNode();
+        name.setIdentifier("@" + name.getIdentifier());
+        consumeToken();
+
+        DecoratorDeclarationNode dn = new DecoratorDeclarationNode();
+        dn.setFunctionName(name);
+
+        PerFunctionVariables savedVars = new PerFunctionVariables(dn);
+
+        try {
+            if (peekToken() == Token.LP) {
+                consumeToken();
+                parseFunctionParams(dn, false);
+            }
+
+            mustMatchToken(Token.LC, "msg.decorator.declaration.missing.lc");
+
+            while (peekToken() == Token.XMLATTR) {
+                dn.addDecoratorNode(decorator(true));
+            }
+        } finally {
+            savedVars.restore();
+        }
+
+        mustMatchToken(Token.RC, "msg.decorator.declaration.missing.rc");
+        
+        return dn;
+    }
+
+    private DecoratorNode decorator(boolean declaration) throws IOException {
         consumeToken();
         peekToken();
         Name name = createNameNode();
         name.setIdentifier("@" + name.getIdentifier());
         consumeToken();
-        DecoratorNode dn = new DecoratorNode(name);
+        DecoratorNode dn = new DecoratorNode(ts.tokenBeg, name);
         dn.setDecoratorType(DecoratorType.fromDecorator(name.getIdentifier()));
 
         if (peekToken() == Token.LP) {
@@ -2065,9 +2102,10 @@ public class Parser {
 
         if (peeked == Token.SEMI) {
             reportError("msg.decorator.semi");
+            peekToken();
         }
 
-        if (!insideClass && peeked != Token.CLASS && peeked != Token.XMLATTR) {
+        if (!declaration && !insideClass && peeked != Token.CLASS && peeked != Token.XMLATTR) {
             reportError("msg.decorator.invalid.usage");
         }
 
@@ -3334,7 +3372,7 @@ public class Parser {
             case Token.XMLATTR:
                 // decorator
                 while (tt == Token.XMLATTR) {
-                    decorators.add(decorator());
+                    decorators.add(decorator(false));
                     tt = peekToken();
                 }
 

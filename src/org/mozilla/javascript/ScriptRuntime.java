@@ -775,6 +775,10 @@ public class ScriptRuntime {
         }
     }
 
+    public static boolean isPreInit(Object descriptor) {
+        return (((int) descriptor) & Decorator.PREINIT) != 0;
+    }
+
     public static Object getRestParams(Object[] _args, int index, Context cx, Scriptable scope) {
         Object[] args = new Object[_args.length - index];
 
@@ -807,10 +811,7 @@ public class ScriptRuntime {
                 Object extended = ScriptableObject.ensureScriptableObject(clazzObj).getAssociatedValue(SUPER_KEY);
 
                 if (extended != null) {
-                    ((ScriptableObject) method).associateValue(
-                            SUPER_KEY,
-                            extended
-                    );
+                    ((ScriptableObject) method).associateValue(SUPER_KEY, extended);
                 }
             }
         }

@@ -155,7 +155,7 @@ class TokenStream {
 
         int id;
         String s = name;
-// #generated# Last update: 2019-12-14 23:01:17 CST
+// #generated# Last update: 2019-12-17 20:49:04 CST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 2: c=s.charAt(1);
@@ -278,6 +278,7 @@ class TokenStream {
                 Id_const = Token.CONST,
                 Id_continue = Token.CONTINUE,
                 Id_debugger = Token.DEBUGGER,
+                Id_decorator = Token.DECORATOR,
                 Id_default = Token.DEFAULT,
                 Id_delete = Token.DELPROP,
                 Id_do = Token.DO,
@@ -329,7 +330,7 @@ class TokenStream {
 
         int id;
         String s = name;
-// #generated# Last update: 2019-12-14 23:01:17 CST
+// #generated# Last update: 2019-12-17 20:49:04 CST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 2: c=s.charAt(1);
@@ -393,7 +394,8 @@ class TokenStream {
                 else if (c=='f') { X="function";id=Id_function; }
                 break L;
             case 9: c=s.charAt(0);
-                if (c=='i') { X="interface";id=Id_interface; }
+                if (c=='d') { X="decorator";id=Id_decorator; }
+                else if (c=='i') { X="interface";id=Id_interface; }
                 else if (c=='p') { X="protected";id=Id_protected; }
                 break L;
             case 10: c=s.charAt(1);
