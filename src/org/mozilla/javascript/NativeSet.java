@@ -53,16 +53,7 @@ public class NativeSet extends IdScriptableObject {
         final int id = f.methodId();
         switch (id) {
             case Id_constructor:
-                if (thisObj == null) {
-                    NativeSet ns = new NativeSet();
-                    ns.instanceOfSet = true;
-                    if (args.length > 0) {
-                        loadFromIterable(cx, scope, ns, args[0]);
-                    }
-                    return ns;
-                } else {
-                    throw ScriptRuntime.typeError1("msg.no.new", "Set");
-                }
+                return js_constructor(cx, scope, thisObj, args.length > 0 ? args[0] : Undefined.instance);
             case Id_add:
                 return realThis(thisObj, f).js_add(args.length > 0 ? args[0] : Undefined.instance);
             case Id_delete:
@@ -98,10 +89,35 @@ public class NativeSet extends IdScriptableObject {
                 return realThis(thisObj, f).js_reduce(cx, scope, args);
             case Id_some:
                 return realThis(thisObj, f).js_some(cx, scope, args);
+            case Id_intersection:
+                return realThis(thisObj, f).js_intersection(cx, scope, args);
+            case Id_union:
+                return realThis(thisObj, f).js_union(cx, scope, args);
+            case Id_difference:
+                return realThis(thisObj, f).js_difference(cx, scope, args);
+            case Id_symmetricDifference:
+                return realThis(thisObj, f).js_symmetricDifference(cx, scope, args);
+            case Id_isDisjointFrom:
+                return realThis(thisObj, f).js_isDisjointFrom(cx, scope, args);
+            case Id_isSubsetOf:
+                return realThis(thisObj, f).js_isSubsetOf(cx, scope, args);
+            case Id_isSupersetOf:
+                return realThis(thisObj, f).js_isSupersetOf(cx, scope, args);
             case SymbolId_getSize:
                 return realThis(thisObj, f).js_getSize();
         }
         throw new IllegalArgumentException("Set.prototype has no method: " + f.getFunctionName());
+    }
+
+    private NativeSet js_constructor(Context cx, Scriptable scope, Scriptable thisObj, Object arg) {
+        if (thisObj == null) {
+            NativeSet ns = new NativeSet();
+            ns.instanceOfSet = true;
+            loadFromIterable(cx, scope, ns, arg);
+            return ns;
+        } else {
+            throw ScriptRuntime.typeError1("msg.no.new", "Set");
+        }
     }
 
     private Object js_add(Object k) {
@@ -120,7 +136,7 @@ public class NativeSet extends IdScriptableObject {
         return (ov != null);
     }
 
-    private Object js_has(Object arg) {
+    private boolean js_has(Object arg) {
         return entries.has(arg);
     }
 
@@ -133,7 +149,7 @@ public class NativeSet extends IdScriptableObject {
         return entries.size();
     }
 
-    private Object js_iterator(Scriptable scope, NativeCollectionIterator.Type type) {
+    private NativeCollectionIterator js_iterator(Scriptable scope, NativeCollectionIterator.Type type) {
         return new NativeCollectionIterator(scope, ITERATOR_TAG, type, entries.iterator());
     }
 
@@ -343,6 +359,151 @@ public class NativeSet extends IdScriptableObject {
         return false;
     }
 
+    private Object js_intersection(Context cx, Scriptable scope, Object[] args) {
+        Function species = getSpecies(this);
+
+        if (species == null) {
+            throw ScriptRuntime.typeError("'this' is not constructable");
+        }
+
+        NativeSet set = (NativeSet) species.construct(cx, scope, new Object[0]);
+
+        Object arg0 = args.length == 0 ? null : args[0];
+        ES6Iterator it = ScriptRuntime.toIterator(cx, scope, ScriptableObject.ensureScriptable(arg0), false);
+
+        while (!it.isDone(cx, scope)) {
+            Object value = it.nextValue(cx, scope);
+            if (js_has(value)) {
+                set.js_add(value);
+            }
+        }
+
+        return set;
+    }
+
+    private Object js_union(Context cx, Scriptable scope, Object[] args) {
+        Function species = getSpecies(this);
+
+        if (species == null) {
+            throw ScriptRuntime.typeError("'this' is not constructable");
+        }
+
+        NativeSet set = (NativeSet) species.construct(cx, scope, new Object[0]);
+        ES6Iterator it = ScriptRuntime.toIterator(cx, scope, args.length > 0 ? ScriptableObject.ensureScriptable(args[0]) : null, false);
+
+        for (Hashtable.Entry en : entries) {
+            set.entries.put(en.key, en.key);
+        }
+
+        while (!it.isDone(cx, scope)) {
+            Object value = it.nextValue(cx, scope);
+            set.entries.put(value, value);
+        }
+
+        return set;
+    }
+
+    private Object js_difference(Context cx, Scriptable scope, Object[] args) {
+        Function species = getSpecies(this);
+
+        if (species == null) {
+            throw ScriptRuntime.typeError("'this' is not constructable");
+        }
+
+        NativeSet set = (NativeSet) species.construct(cx, scope, new Object[0]);
+
+        for (Hashtable.Entry en : entries) {
+            set.entries.put(en.key, en.key);
+        }
+
+        Object arg0 = args.length == 0 ? null : args[0];
+        ES6Iterator it = ScriptRuntime.toIterator(cx, scope, ScriptableObject.ensureScriptable(arg0), false);
+
+        while (!it.isDone(cx, scope)) {
+            Object value = it.nextValue(cx, scope);
+            set.js_delete(value);
+        }
+
+        return set;
+    }
+
+    private Object js_symmetricDifference(Context cx, Scriptable scope, Object[] args) {
+        Function species = getSpecies(this);
+
+        if (species == null) {
+            throw ScriptRuntime.typeError("'this' is not constructable");
+        }
+
+        NativeSet set = (NativeSet) species.construct(cx, scope, new Object[0]);
+
+        for (Hashtable.Entry en : entries) {
+            set.entries.put(en.key, en.key);
+        }
+
+        Object arg0 = args.length == 0 ? null : args[0];
+        ES6Iterator it = ScriptRuntime.toIterator(cx, scope, ScriptableObject.ensureScriptable(arg0), false);
+
+        while (!it.isDone(cx, scope)) {
+            Object value = it.nextValue(cx, scope);
+            boolean removed = set.js_delete(value);
+
+            if (!removed) {
+                set.js_add(value);
+            }
+        }
+
+        return set;
+    }
+
+    private Object js_isDisjointFrom(Context cx, Scriptable scope, Object[] args) {
+        Object arg0 = args.length == 0 ? null : args[0];
+        ES6Iterator it = ScriptRuntime.toIterator(cx, scope, ScriptableObject.ensureScriptable(arg0), false);
+
+        while (!it.isDone(cx, scope)) {
+            Object value = it.nextValue(cx, scope);
+            if (js_has(value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private Object js_isSubsetOf(Context cx, Scriptable scope, Object[] args) {
+        Object arg0 = args.length == 0 ? null : args[0];
+
+        if (!(arg0 instanceof NativeSet)) {
+            arg0 = js_constructor(cx, scope, null, arg0);
+        }
+
+        NativeSet other = (NativeSet) arg0;
+
+        for (Hashtable.Entry en : entries) {
+            if (!other.entries.has(en.key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private Object js_isSupersetOf(Context cx, Scriptable scope, Object[] args) {
+        Object arg0 = args.length == 0 ? null : args[0];
+
+        if (!(arg0 instanceof NativeSet)) {
+            arg0 = js_constructor(cx, scope, null, arg0);
+        }
+
+        NativeSet other = (NativeSet) arg0;
+
+        for (Hashtable.Entry en : other.entries) {
+            if (!entries.has(en.key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /**
      * If an "iterable" object was passed to the constructor, there are many many things
@@ -478,6 +639,34 @@ public class NativeSet extends IdScriptableObject {
                 arity = 1;
                 s = "some";
                 break;
+            case Id_intersection:
+                arity = 1;
+                s = "intersection";
+                break;
+            case Id_union:
+                arity = 1;
+                s = "union";
+                break;
+            case Id_difference:
+                arity = 1;
+                s = "difference";
+                break;
+            case Id_symmetricDifference:
+                arity = 1;
+                s = "symmetricDifference";
+                break;
+            case Id_isDisjointFrom:
+                arity = 1;
+                s = "isDisjointFrom";
+                break;
+            case Id_isSubsetOf:
+                arity = 1;
+                s = "isSubsetOf";
+                break;
+            case Id_isSupersetOf:
+                arity = 1;
+                s = "isSupersetOf";
+                break;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -503,7 +692,7 @@ public class NativeSet extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-12-22 17:25:28 PST
+// #generated# Last update: 2019-12-22 18:11:48 PST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 3: c=s.charAt(0);
@@ -520,6 +709,7 @@ public class NativeSet extends IdScriptableObject {
             case 5: c=s.charAt(0);
                 if (c=='c') { X="clear";id=Id_clear; }
                 else if (c=='e') { X="every";id=Id_every; }
+                else if (c=='u') { X="union";id=Id_union; }
                 break L;
             case 6: switch (s.charAt(0)) {
                 case 'a': X="addAll";id=Id_addAll; break L;
@@ -533,7 +723,17 @@ public class NativeSet extends IdScriptableObject {
                 else if (c=='f') { X="forEach";id=Id_forEach; }
                 break L;
             case 9: X="deleteAll";id=Id_deleteAll; break L;
+            case 10: c=s.charAt(0);
+                if (c=='d') { X="difference";id=Id_difference; }
+                else if (c=='i') { X="isSubsetOf";id=Id_isSubsetOf; }
+                break L;
             case 11: X="constructor";id=Id_constructor; break L;
+            case 12: c=s.charAt(1);
+                if (c=='n') { X="intersection";id=Id_intersection; }
+                else if (c=='s') { X="isSupersetOf";id=Id_isSupersetOf; }
+                break L;
+            case 14: X="isDisjointFrom";id=Id_isDisjointFrom; break L;
+            case 19: X="symmetricDifference";id=Id_symmetricDifference; break L;
             }
             if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
@@ -565,8 +765,15 @@ public class NativeSet extends IdScriptableObject {
             Id_map = 15,
             Id_reduce = 16,
             Id_some = 17,
-            SymbolId_getSize = 18,
-            SymbolId_toStringTag = 19,
+            Id_intersection = 18,
+            Id_union = 19,
+            Id_difference = 20,
+            Id_symmetricDifference = 21,
+            Id_isDisjointFrom = 22,
+            Id_isSubsetOf = 23,
+            Id_isSupersetOf = 24,
+            SymbolId_getSize = 25,
+            SymbolId_toStringTag = 26,
             MAX_PROTOTYPE_ID = SymbolId_toStringTag;
 
 // #/string_id_map#
