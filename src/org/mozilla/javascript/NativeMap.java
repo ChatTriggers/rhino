@@ -86,9 +86,9 @@ public class NativeMap extends IdScriptableObject {
             case Id_mapValues:
                 return realThis(thisObj, f).js_map(cx, scope, args, id == Id_mapKeys);
             case Id_keyOf:
-                return realThis(thisObj, f).js_keyOf(cx, scope, args);
+                return realThis(thisObj, f).js_keyOf(args);
             case Id_includes:
-                return realThis(thisObj, f).js_includes(cx, scope, args);
+                return realThis(thisObj, f).js_includes(args);
             case Id_find:
             case Id_findKey:
                 return realThis(thisObj, f).js_find(cx, scope, args, id == Id_findKey);
@@ -99,7 +99,7 @@ public class NativeMap extends IdScriptableObject {
             case Id_reduce:
                 return realThis(thisObj, f).js_reduce(cx, scope, args);
             case Id_deleteAll:
-                return realThis(thisObj, f).js_deleteAll(cx, scope, args);
+                return realThis(thisObj, f).js_deleteAll(args);
             case Id_update:
                 return realThis(thisObj, f).js_update(cx, scope, args);
             case Id_filter:
@@ -318,7 +318,7 @@ public class NativeMap extends IdScriptableObject {
         return nm;
     }
 
-    private Object js_keyOf(Context cx, Scriptable scope, Object[] args) {
+    private Object js_keyOf(Object[] args) {
         Object searchElement = args.length > 0 ? args[0] : Undefined.instance;
 
         for (Hashtable.Entry en : entries) {
@@ -330,7 +330,7 @@ public class NativeMap extends IdScriptableObject {
         return Undefined.instance;
     }
 
-    private Object js_includes(Context cx, Scriptable scope, Object[] args) {
+    private Object js_includes(Object[] args) {
         Object searchElement = args.length > 0 ? args[0] : Undefined.instance;
 
         for (Hashtable.Entry en : entries) {
@@ -447,7 +447,7 @@ public class NativeMap extends IdScriptableObject {
         return accumulator;
     }
 
-    private Object js_deleteAll(Context cx, Scriptable scope, Object[] args) {
+    private Object js_deleteAll(Object[] args) {
         for (Object arg : args) {
             js_delete(arg);
         }

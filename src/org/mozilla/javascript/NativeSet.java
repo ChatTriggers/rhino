@@ -79,6 +79,25 @@ public class NativeSet extends IdScriptableObject {
                 return realThis(thisObj, f).js_forEach(cx, scope,
                         args.length > 0 ? args[0] : Undefined.instance,
                         args.length > 1 ? args[1] : Undefined.instance);
+
+            case Id_addAll:
+                return realThis(thisObj, f).js_addAll(args);
+            case Id_deleteAll:
+                return realThis(thisObj, f).js_deleteAll(args);
+            case Id_every:
+                return realThis(thisObj, f).js_every(cx, scope, args);
+            case Id_filter:
+                return realThis(thisObj, f).js_filter(cx, scope, args);
+            case Id_find:
+                return realThis(thisObj, f).js_find(cx, scope, args);
+            case Id_join:
+                return realThis(thisObj, f).js_join(args);
+            case Id_map:
+                return realThis(thisObj, f).js_map(cx, scope, args);
+            case Id_reduce:
+                return realThis(thisObj, f).js_reduce(cx, scope, args);
+            case Id_some:
+                return realThis(thisObj, f).js_some(cx, scope, args);
             case SymbolId_getSize:
                 return realThis(thisObj, f).js_getSize();
         }
@@ -96,7 +115,7 @@ public class NativeSet extends IdScriptableObject {
         return this;
     }
 
-    private Object js_delete(Object arg) {
+    private boolean js_delete(Object arg) {
         final Object ov = entries.delete(arg);
         return (ov != null);
     }
@@ -142,6 +161,188 @@ public class NativeSet extends IdScriptableObject {
         }
         return Undefined.instance;
     }
+
+    private Object js_addAll(Object[] args) {
+        for (Object arg : args) {
+            js_add(arg);
+        }
+
+        return this;
+    }
+
+    private Object js_deleteAll(Object[] args) {
+        boolean allDeleted = true;
+
+        for (Object arg : args) {
+            allDeleted &= js_delete(arg);
+        }
+
+        return allDeleted;
+    }
+
+    private Object js_every(Context cx, Scriptable scope, Object[] args) {
+        Object arg0 = args.length == 0 ? null : args[0];
+        Object arg1 = args.length > 1 ? args[1] : null;
+
+        if (!(arg0 instanceof Callable)) {
+            throw ScriptRuntime.typeError("Callback is not callable");
+        }
+
+        Callable cb = (Callable) arg0;
+        Scriptable thisObj = arg1 instanceof Scriptable ? (Scriptable) arg1 : Undefined.SCRIPTABLE_UNDEFINED;
+
+        for (Hashtable.Entry en : entries) {
+            Object result = cb.call(cx, scope, thisObj, new Object[]{ en.key, en.key, this });
+
+            if (!ScriptRuntime.toBoolean(result)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private Object js_filter(Context cx, Scriptable scope, Object[] args) {
+        Function species = getSpecies(this);
+
+        if (species == null) {
+            throw ScriptRuntime.typeError("'this' is not constructable");
+        }
+
+        NativeSet set = (NativeSet) species.construct(cx, scope, new Object[0]);
+
+        Object arg0 = args.length == 0 ? null : args[0];
+        Object arg1 = args.length > 1 ? args[1] : null;
+
+        if (!(arg0 instanceof Callable)) {
+            throw ScriptRuntime.typeError("Callback is not callable");
+        }
+
+        Callable cb = (Callable) arg0;
+        Scriptable thisObj = arg1 instanceof Scriptable ? (Scriptable) arg1 : Undefined.SCRIPTABLE_UNDEFINED;
+
+        for (Hashtable.Entry en : entries) {
+            Object result = cb.call(cx, scope, thisObj, new Object[]{ en.key, en.key, this });
+
+            if (ScriptRuntime.toBoolean(result)) {
+                set.entries.put(en.key, en.key);
+            }
+        }
+
+        return set;
+    }
+
+    private Object js_find(Context cx, Scriptable scope, Object[] args) {
+        Object arg0 = args.length == 0 ? null : args[0];
+        Object arg1 = args.length > 1 ? args[1] : null;
+
+        if (!(arg0 instanceof Callable)) {
+            throw ScriptRuntime.typeError("Callback is not callable");
+        }
+
+        Callable cb = (Callable) arg0;
+        Scriptable thisObj = arg1 instanceof Scriptable ? (Scriptable) arg1 : Undefined.SCRIPTABLE_UNDEFINED;
+
+        for (Hashtable.Entry en : entries) {
+            Object result = cb.call(cx, scope, thisObj, new Object[]{ en.key, en.key, this });
+
+            if (ScriptRuntime.toBoolean(result)) {
+                return en.key;
+            }
+        }
+
+        return Undefined.instance;
+    }
+
+    private Object js_join(Object[] args) {
+        String separator = args.length > 0 ? ScriptRuntime.toString(args[0]) : ",";
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Hashtable.Entry en : entries) {
+            sb.append(ScriptRuntime.toString(en.key)).append(separator);
+        }
+
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    private Object js_map(Context cx, Scriptable scope, Object[] args) {
+        Function species = getSpecies(this);
+
+        if (species == null) {
+            throw ScriptRuntime.typeError("'this' is not constructable");
+        }
+
+        NativeSet set = (NativeSet) species.construct(cx, scope, new Object[0]);
+
+        Object arg0 = args.length == 0 ? null : args[0];
+        Object arg1 = args.length > 1 ? args[1] : null;
+
+        if (!(arg0 instanceof Callable)) {
+            throw ScriptRuntime.typeError("Callback is not callable");
+        }
+
+        Callable cb = (Callable) arg0;
+        Scriptable thisObj = arg1 instanceof Scriptable ? (Scriptable) arg1 : Undefined.SCRIPTABLE_UNDEFINED;
+
+        for (Hashtable.Entry en : entries) {
+            Object result = cb.call(cx, scope, thisObj, new Object[]{ en.key, en.key, this });
+            set.entries.put(result, result);
+        }
+
+        return set;
+    }
+
+    private Object js_reduce(Context cx, Scriptable scope, Object[] args) {
+        Object arg0 = args.length == 0 ? Undefined.instance : args[0];
+
+        if (!(arg0 instanceof Callable)) {
+            throw ScriptRuntime.typeError1("msg.object.not.callable", ScriptRuntime.toString(arg0));
+        }
+
+        Callable cb = (Callable) arg0;
+        Object accumulator = args.length > 1 ? args[1] : Undefined.instance;
+        boolean first = true;
+
+        for (Hashtable.Entry en : entries) {
+            if (first && Undefined.isUndefined(accumulator)) {
+                accumulator = en.value;
+            } else {
+                accumulator = cb.call(cx, scope, Undefined.SCRIPTABLE_UNDEFINED, new Object[]{ accumulator, en.key, en.key, this });
+            }
+            first = false;
+        }
+
+        if (first && Undefined.isUndefined(accumulator)) {
+            throw ScriptRuntime.typeError("Map is empty and no accumulator was provided to the reduce method");
+        }
+
+        return accumulator;
+    }
+
+    private Object js_some(Context cx, Scriptable scope, Object[] args) {
+        Object arg0 = args.length == 0 ? null : args[0];
+        Object arg1 = args.length > 1 ? args[1] : null;
+
+        if (!(arg0 instanceof Callable)) {
+            throw ScriptRuntime.typeError("Callback is not callable");
+        }
+
+        Callable cb = (Callable) arg0;
+        Scriptable thisObj = arg1 instanceof Scriptable ? (Scriptable) arg1 : Undefined.SCRIPTABLE_UNDEFINED;
+
+        for (Hashtable.Entry en : entries) {
+            Object result = cb.call(cx, scope, thisObj, new Object[]{ en.key, en.key, this });
+
+            if (ScriptRuntime.toBoolean(result)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * If an "iterable" object was passed to the constructor, there are many many things
@@ -241,6 +442,42 @@ public class NativeSet extends IdScriptableObject {
                 arity = 1;
                 s = "forEach";
                 break;
+            case Id_addAll:
+                arity = 0;
+                s = "addAll";
+                break;
+            case Id_deleteAll:
+                arity = 1;
+                s = "deleteAll";
+                break;
+            case Id_every:
+                arity = 1;
+                s = "every";
+                break;
+            case Id_filter:
+                arity = 1;
+                s = "filter";
+                break;
+            case Id_find:
+                arity = 1;
+                s = "find";
+                break;
+            case Id_join:
+                arity = 1;
+                s = "join";
+                break;
+            case Id_map:
+                arity = 1;
+                s = "map";
+                break;
+            case Id_reduce:
+                arity = 1;
+                s = "reduce";
+                break;
+            case Id_some:
+                arity = 1;
+                s = "some";
+                break;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -266,62 +503,39 @@ public class NativeSet extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2018-03-22 00:54:31 MDT
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            L:
-            switch (s.length()) {
-                case 3:
-                    c = s.charAt(0);
-                    if (c == 'a') {
-                        if (s.charAt(2) == 'd' && s.charAt(1) == 'd') {
-                            id = Id_add;
-                            break L0;
-                        }
-                    } else if (c == 'h') {
-                        if (s.charAt(2) == 's' && s.charAt(1) == 'a') {
-                            id = Id_has;
-                            break L0;
-                        }
-                    }
-                    break L;
-                case 4:
-                    X = "keys";
-                    id = Id_keys;
-                    break L;
-                case 5:
-                    X = "clear";
-                    id = Id_clear;
-                    break L;
-                case 6:
-                    c = s.charAt(0);
-                    if (c == 'd') {
-                        X = "delete";
-                        id = Id_delete;
-                    } else if (c == 'v') {
-                        X = "values";
-                        id = Id_values;
-                    }
-                    break L;
-                case 7:
-                    c = s.charAt(0);
-                    if (c == 'e') {
-                        X = "entries";
-                        id = Id_entries;
-                    } else if (c == 'f') {
-                        X = "forEach";
-                        id = Id_forEach;
-                    }
-                    break L;
-                case 11:
-                    X = "constructor";
-                    id = Id_constructor;
-                    break L;
+// #generated# Last update: 2019-12-22 17:25:28 PST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 3: c=s.charAt(0);
+                if (c=='a') { if (s.charAt(2)=='d' && s.charAt(1)=='d') {id=Id_add; break L0;} }
+                else if (c=='h') { if (s.charAt(2)=='s' && s.charAt(1)=='a') {id=Id_has; break L0;} }
+                else if (c=='m') { if (s.charAt(2)=='p' && s.charAt(1)=='a') {id=Id_map; break L0;} }
+                break L;
+            case 4: switch (s.charAt(0)) {
+                case 'f': X="find";id=Id_find; break L;
+                case 'j': X="join";id=Id_join; break L;
+                case 'k': X="keys";id=Id_keys; break L;
+                case 's': X="some";id=Id_some; break L;
+                } break L;
+            case 5: c=s.charAt(0);
+                if (c=='c') { X="clear";id=Id_clear; }
+                else if (c=='e') { X="every";id=Id_every; }
+                break L;
+            case 6: switch (s.charAt(0)) {
+                case 'a': X="addAll";id=Id_addAll; break L;
+                case 'd': X="delete";id=Id_delete; break L;
+                case 'f': X="filter";id=Id_filter; break L;
+                case 'r': X="reduce";id=Id_reduce; break L;
+                case 'v': X="values";id=Id_values; break L;
+                } break L;
+            case 7: c=s.charAt(0);
+                if (c=='e') { X="entries";id=Id_entries; }
+                else if (c=='f') { X="forEach";id=Id_forEach; }
+                break L;
+            case 9: X="deleteAll";id=Id_deleteAll; break L;
+            case 11: X="constructor";id=Id_constructor; break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -342,8 +556,17 @@ public class NativeSet extends IdScriptableObject {
             Id_values = 6,  // These are deliberately the same to match the spec
             Id_entries = 7,
             Id_forEach = 8,
-            SymbolId_getSize = 9,
-            SymbolId_toStringTag = 10,
+            Id_addAll = 9,
+            Id_deleteAll = 10,
+            Id_every = 11,
+            Id_filter = 12,
+            Id_find = 13,
+            Id_join = 14,
+            Id_map = 15,
+            Id_reduce = 16,
+            Id_some = 17,
+            SymbolId_getSize = 18,
+            SymbolId_toStringTag = 19,
             MAX_PROTOTYPE_ID = SymbolId_toStringTag;
 
 // #/string_id_map#
