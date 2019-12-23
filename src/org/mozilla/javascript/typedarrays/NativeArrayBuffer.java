@@ -22,7 +22,7 @@ public class NativeArrayBuffer extends IdScriptableObject {
 
     public static final NativeArrayBuffer EMPTY_BUFFER = new NativeArrayBuffer();
 
-    final byte[] buffer;
+    byte[] buffer;
 
     @Override
     public String getClassName() {
@@ -61,6 +61,10 @@ public class NativeArrayBuffer extends IdScriptableObject {
         } else {
             buffer = new byte[intLen];
         }
+    }
+
+    private NativeArrayBuffer(byte[] buffer) {
+        this.buffer = buffer;
     }
 
     /**
@@ -102,6 +106,12 @@ public class NativeArrayBuffer extends IdScriptableObject {
         return newBuf;
     }
 
+    public NativeArrayBuffer transfer() {
+        NativeArrayBuffer newBuf = new NativeArrayBuffer(this.buffer);
+        this.buffer = EMPTY_BUF;
+        return newBuf;
+    }
+
     // Function-calling dispatcher
 
     @Override
@@ -124,6 +134,10 @@ public class NativeArrayBuffer extends IdScriptableObject {
                 double start = isArg(args, 0) ? ScriptRuntime.toNumber(args[0]) : 0;
                 double end = isArg(args, 1) ? ScriptRuntime.toNumber(args[1]) : self.buffer.length;
                 return self.slice(start, end);
+
+            case Id_transfer:
+                self = realThis(thisObj, f);
+                return self.transfer();
         }
         throw new IllegalArgumentException(String.valueOf(id));
     }
@@ -151,6 +165,10 @@ public class NativeArrayBuffer extends IdScriptableObject {
                 arity = 1;
                 s = "slice";
                 break;
+            case Id_transfer:
+                arity = 0;
+                s = "transfer";
+                break;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -162,20 +180,13 @@ public class NativeArrayBuffer extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2018-07-20 08:21:54 MESZ
-        L0:
-        {
-            id = 0;
-            String X = null;
+// #generated# Last update: 2019-12-22 21:26:25 EST
+        L0: { id = 0; String X = null;
             int s_length = s.length();
-            if (s_length == 5) {
-                X = "slice";
-                id = Id_slice;
-            } else if (s_length == 11) {
-                X = "constructor";
-                id = Id_constructor;
-            }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (s_length==5) { X="slice";id=Id_slice; }
+            else if (s_length==8) { X="transfer";id=Id_transfer; }
+            else if (s_length==11) { X="constructor";id=Id_constructor; }
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -186,7 +197,8 @@ public class NativeArrayBuffer extends IdScriptableObject {
     private static final int
             Id_constructor = 1,
             Id_slice = 2,
-            MAX_PROTOTYPE_ID = Id_slice;
+            Id_transfer = 3,
+            MAX_PROTOTYPE_ID = Id_transfer;
 
 // #/string_id_map#
 
