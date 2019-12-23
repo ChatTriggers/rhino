@@ -1640,53 +1640,6 @@ public class NativeArray extends IdScriptableObject implements List {
         return offset + 1;
     }
 
-    private static BaseFunction getSpecies(Scriptable obj) {
-        if (obj instanceof NativeFunction) {
-            // If obj is an instance of a class, we need
-            // to access the constructor property of the
-            // base class, not the instance
-            obj = obj.getPrototype();
-        }
-
-        if (ScriptableObject.hasProperty(obj, "constructor")) {
-            // If the constructor is a getter, we want to return null
-            // and make sure to NOT access the constructor, as a
-            // get constructor does not influence Symbol.species
-            if (obj instanceof ScriptableObject) {
-                ScriptableObject ctorDesc = ((ScriptableObject) obj).getOwnPropertyDescriptor(Context.getContext(), "constructor");
-
-                if (ctorDesc != null && ScriptableObject.hasProperty(ctorDesc, "get") && !Undefined.isUndefined(ScriptableObject.getProperty(ctorDesc, "get"))) {
-                    return null;
-                }
-            }
-
-            Object ctorObj = ScriptableObject.getProperty(obj, "constructor");
-
-            if (Undefined.isUndefined(ctorObj)) {
-                return null;
-            }
-
-            Scriptable ctor = ScriptableObject.ensureScriptable(ctorObj);
-
-            if (ScriptableObject.hasProperty(ctor, SymbolKey.SPECIES)) {
-                Object species = ScriptableObject.getProperty(ctor, SymbolKey.SPECIES);
-
-                if (Undefined.isUndefined(species) || species == null) {
-                    return null;
-                }
-
-                if (!(species instanceof BaseFunction)) {
-                    // TODO: Error
-                    throw Kit.codeBug();
-                }
-
-                return (BaseFunction) species;
-            }
-        }
-
-        return null;
-    }
-
     /*
      * See Ecma 262v3 15.4.4.4
      */

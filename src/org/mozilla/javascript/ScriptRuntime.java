@@ -3544,6 +3544,8 @@ public class ScriptRuntime {
      * Equality
      * <p>
      * See ECMA 11.9
+     *
+     * ==
      */
     public static boolean eq(Object x, Object y) {
         if (x == null || x == Undefined.instance) {
@@ -3751,6 +3753,7 @@ public class ScriptRuntime {
         }
     }
 
+    // ===
     public static boolean shallowEq(Object x, Object y) {
         if (x == y) {
             if (!(x instanceof Number)) {

@@ -1665,7 +1665,7 @@ public class Context {
      *                 SomeObjectSubclass[].
      * @return the new array object.
      */
-    public Scriptable newArray(Scriptable scope, Object[] elements) {
+    public NativeArray newArray(Scriptable scope, Object[] elements) {
         if (elements.getClass().getComponentType() != ScriptRuntime.ObjectClass)
             throw new IllegalArgumentException();
         NativeArray result = new NativeArray(elements);
