@@ -76,6 +76,7 @@ final class NativeNumber extends IdScriptableObject {
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isNaN, "isNaN", 1);
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isInteger, "isInteger", 1);
         addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_isSafeInteger, "isSafeInteger", 1);
+        addIdFunctionProperty(ctor, NUMBER_TAG, ConstructorId_fromString, "fromString", 1);
 
         Scriptable global = ScriptableObject.getTopLevelScope(this);
 
@@ -255,10 +256,72 @@ final class NativeNumber extends IdScriptableObject {
                     return isSafeInteger((Number) args[0]);
                 }
                 return false;
-
+            case ConstructorId_fromString:
+                return fromString(args);
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
+    }
+
+    private Object fromString(Object[] args) {
+        if (args.length < 1 || !(args[0] instanceof CharSequence)) {
+            throw ScriptRuntime.typeError("1st argument to fromString must be a string");
+        }
+
+        String s = args[0].toString();
+
+        int radix = (1 < args.length) ? ScriptRuntime.toInt32(args[1]) : 10;
+
+        int len = s.length();
+        if (len == 0)
+            throw ScriptRuntime.typeError("Illegal number of length 0");
+
+        boolean negative = false;
+        int start = 0;
+        char c;
+        for (int i = 0; i < s.length(); i++) {
+            c = s.charAt(i);
+
+            if (ScriptRuntime.isStrWhiteSpaceChar(c)) {
+                throw ScriptRuntime.typeError("String passed to fromString has invalid whitespace");
+            }
+
+            if (c >= 'A' && c <= 'Z') {
+                throw ScriptRuntime.typeError("String passed to fromString has capital letters");
+            }
+        }
+
+        c = s.charAt(0);
+
+        if (c == '+' || (negative = (c == '-')))
+            start++;
+
+        if (radix < 2 || radix > 36) {
+            throw ScriptRuntime.rangeError("Illegal radix: " + radix);
+        } else if (radix == 16 && len - start > 1 && s.charAt(start) == '0') {
+            c = s.charAt(start + 1);
+            if (c == 'x' || c == 'X')
+                throw ScriptRuntime.typeError("Illegal prefix '0x' in fromString");
+        }
+
+        if (len - start > 1 && s.charAt(start) == '0') {
+            c = s.charAt(start + 1);
+            if (c == 'x' || c == 'X') {
+                throw ScriptRuntime.typeError("Illegal prefix '0x' in fromString");
+            } else if (c == 'o' || c == 'O') {
+                throw ScriptRuntime.typeError("Illegal prefix '0o' in fromString");
+            }  else if (c == 'b' || c == 'B') {
+                throw ScriptRuntime.typeError("Illegal prefix '0b' in fromString");
+            }
+        }
+
+        double d = ScriptRuntime.stringPrefixToNumber(s, start, radix);
+
+        if (Double.isNaN(d)) {
+            throw ScriptRuntime.typeError("Illegal string passed to fromString");
+        }
+
+        return ScriptRuntime.wrapNumber(negative ? -d : d);
     }
 
     @Override
@@ -398,6 +461,7 @@ final class NativeNumber extends IdScriptableObject {
             ConstructorId_isNaN = -2,
             ConstructorId_isInteger = -3,
             ConstructorId_isSafeInteger = -4,
+            ConstructorId_fromString = -5,
 
     Id_constructor = 1,
             Id_toString = 2,
