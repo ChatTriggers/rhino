@@ -69,6 +69,10 @@ public class NativeJavaClass extends NativeJavaObject implements Function {
         if (name.equals("prototype"))
             return null;
 
+        if (name.equals("class")) {
+            return getClassObject();
+        }
+
         if (staticFieldAndMethods != null) {
             Object result = staticFieldAndMethods.get(name);
             if (result != null)

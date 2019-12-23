@@ -212,11 +212,11 @@
     "pre-strawman›Metadata reflection API›Reflect.metadata": false
   },
   "ES2018": {
-    "_successful": 1,
+    "_successful": 3,
     "_count": 13,
-    "_percent": 0.07692307692307693,
-    "features›object rest/spread properties›object rest properties": "Cannot read property \"a\" from undefined",
-    "features›object rest/spread properties›object spread properties": "\"spread\" is not defined.",
+    "_percent": 0.23076923076923078,
+    "features›object rest/spread properties›object rest properties": true,
+    "features›object rest/spread properties›object spread properties": true,
     "features›Promise.prototype.finally›basic support": "\"Promise\" is not defined.",
     "features›Promise.prototype.finally›don't change resolution value": "\"Promise\" is not defined.",
     "features›Promise.prototype.finally›change rejection value": "\"Promise\" is not defined.",
@@ -317,9 +317,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": true
   },
   "ES2015": {
-    "_successful": 379,
+    "_successful": 381,
     "_count": 689,
-    "_percent": 0.5500725689404935,
+    "_percent": 0.5529753265602322,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -373,8 +373,8 @@
     "syntax›template literals›tagged template literals": true,
     "syntax›template literals›passed array is frozen": true,
     "syntax›template literals›line break normalisation": true,
-    "syntax›template literals›TemplateStrings call site caching": false,
-    "syntax›template literals›TemplateStrings permanent caching": false,
+    "syntax›template literals›TemplateStrings call site caching": true,
+    "syntax›template literals›TemplateStrings permanent caching": true,
     "syntax›RegExp \"y\" and \"u\" flags›\"y\" flag": true,
     "syntax›RegExp \"y\" and \"u\" flags›\"y\" flag, lastIndex": true,
     "syntax›RegExp \"y\" and \"u\" flags›\"u\" flag": "invalid flag after regular expression",
