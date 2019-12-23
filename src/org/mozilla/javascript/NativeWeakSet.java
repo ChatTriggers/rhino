@@ -61,6 +61,10 @@ public class NativeWeakSet extends IdScriptableObject {
                 return realThis(thisObj, f).js_delete(args.length > 0 ? args[0] : Undefined.instance);
             case Id_has:
                 return realThis(thisObj, f).js_has(args.length > 0 ? args[0] : Undefined.instance);
+            case Id_addAll:
+                return realThis(thisObj, f).js_addAll(args);
+            case Id_deleteAll:
+                return realThis(thisObj, f).js_deleteAll(args);
         }
         throw new IllegalArgumentException("WeakMap.prototype has no method: " + f.getFunctionName());
     }
@@ -92,6 +96,22 @@ public class NativeWeakSet extends IdScriptableObject {
             return false;
         }
         return map.containsKey(key);
+    }
+
+    private Object js_addAll(Object[] args) {
+        for (Object arg : args) {
+            js_add(arg);
+        }
+
+        return this;
+    }
+
+    private Object js_deleteAll(Object[] args) {
+        for (Object arg : args) {
+            js_delete(arg);
+        }
+
+        return this;
     }
 
     private NativeWeakSet realThis(Scriptable thisObj, IdFunctionObject f) {
@@ -137,6 +157,14 @@ public class NativeWeakSet extends IdScriptableObject {
                 arity = 1;
                 s = "has";
                 break;
+            case Id_addAll:
+                arity = 0;
+                s = "addAll";
+                break;
+            case Id_deleteAll:
+                arity = 0;
+                s = "deleteAll";
+                break;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -156,34 +184,21 @@ public class NativeWeakSet extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2018-08-27 10:45:54 PDT
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            int s_length = s.length();
-            if (s_length == 3) {
-                c = s.charAt(0);
-                if (c == 'a') {
-                    if (s.charAt(2) == 'd' && s.charAt(1) == 'd') {
-                        id = Id_add;
-                        break L0;
-                    }
-                } else if (c == 'h') {
-                    if (s.charAt(2) == 's' && s.charAt(1) == 'a') {
-                        id = Id_has;
-                        break L0;
-                    }
-                }
-            } else if (s_length == 6) {
-                X = "delete";
-                id = Id_delete;
-            } else if (s_length == 11) {
-                X = "constructor";
-                id = Id_constructor;
+// #generated# Last update: 2019-12-22 17:33:51 PST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 3: c=s.charAt(0);
+                if (c=='a') { if (s.charAt(2)=='d' && s.charAt(1)=='d') {id=Id_add; break L0;} }
+                else if (c=='h') { if (s.charAt(2)=='s' && s.charAt(1)=='a') {id=Id_has; break L0;} }
+                break L;
+            case 6: c=s.charAt(0);
+                if (c=='a') { X="addAll";id=Id_addAll; }
+                else if (c=='d') { X="delete";id=Id_delete; }
+                break L;
+            case 9: X="deleteAll";id=Id_deleteAll; break L;
+            case 11: X="constructor";id=Id_constructor; break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -195,7 +210,9 @@ public class NativeWeakSet extends IdScriptableObject {
             Id_add = 2,
             Id_delete = 3,
             Id_has = 4,
-            SymbolId_toStringTag = 5,
+            Id_addAll = 5,
+            Id_deleteAll = 6,
+            SymbolId_toStringTag = 7,
             MAX_PROTOTYPE_ID = SymbolId_toStringTag;
 
 // #/string_id_map#

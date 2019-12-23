@@ -68,11 +68,13 @@ public class NativeWeakMap extends IdScriptableObject {
                 return realThis(thisObj, f).js_set(
                         args.length > 0 ? args[0] : Undefined.instance,
                         args.length > 1 ? args[1] : Undefined.instance);
+            case Id_deleteAll:
+                return realThis(thisObj, f).js_deleteAll(args);
         }
         throw new IllegalArgumentException("WeakMap.prototype has no method: " + f.getFunctionName());
     }
 
-    private Object js_delete(Object key) {
+    private boolean js_delete(Object key) {
         if (!ScriptRuntime.isObject(key)) {
             return false;
         }
@@ -112,6 +114,14 @@ public class NativeWeakMap extends IdScriptableObject {
         // replace true null here with a marker so that we can re-convert in "get".
         final Object value = (v == null ? NULL_VALUE : v);
         map.put((Scriptable) key, value);
+        return this;
+    }
+
+    private Object js_deleteAll(Object[] args) {
+        for (Object arg : args) {
+            js_delete(arg);
+        }
+
         return this;
     }
 
@@ -162,6 +172,10 @@ public class NativeWeakMap extends IdScriptableObject {
                 arity = 2;
                 s = "set";
                 break;
+            case Id_deleteAll:
+                arity = 0;
+                s = "deleteAll";
+                break;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -181,39 +195,19 @@ public class NativeWeakMap extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2018-08-24 15:27:45 PDT
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            int s_length = s.length();
-            if (s_length == 3) {
-                c = s.charAt(0);
-                if (c == 'g') {
-                    if (s.charAt(2) == 't' && s.charAt(1) == 'e') {
-                        id = Id_get;
-                        break L0;
-                    }
-                } else if (c == 'h') {
-                    if (s.charAt(2) == 's' && s.charAt(1) == 'a') {
-                        id = Id_has;
-                        break L0;
-                    }
-                } else if (c == 's') {
-                    if (s.charAt(2) == 't' && s.charAt(1) == 'e') {
-                        id = Id_set;
-                        break L0;
-                    }
-                }
-            } else if (s_length == 6) {
-                X = "delete";
-                id = Id_delete;
-            } else if (s_length == 11) {
-                X = "constructor";
-                id = Id_constructor;
+// #generated# Last update: 2019-12-22 17:34:06 PST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 3: c=s.charAt(0);
+                if (c=='g') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_get; break L0;} }
+                else if (c=='h') { if (s.charAt(2)=='s' && s.charAt(1)=='a') {id=Id_has; break L0;} }
+                else if (c=='s') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_set; break L0;} }
+                break L;
+            case 6: X="delete";id=Id_delete; break L;
+            case 9: X="deleteAll";id=Id_deleteAll; break L;
+            case 11: X="constructor";id=Id_constructor; break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -226,7 +220,8 @@ public class NativeWeakMap extends IdScriptableObject {
             Id_get = 3,
             Id_has = 4,
             Id_set = 5,
-            SymbolId_toStringTag = 6,
+            Id_deleteAll = 6,
+            SymbolId_toStringTag = 7,
             MAX_PROTOTYPE_ID = SymbolId_toStringTag;
 
 // #/string_id_map#

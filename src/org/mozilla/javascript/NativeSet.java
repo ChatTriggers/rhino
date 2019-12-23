@@ -81,9 +81,9 @@ public class NativeSet extends IdScriptableObject {
                         args.length > 1 ? args[1] : Undefined.instance);
 
             case Id_addAll:
-                return realThis(thisObj, f).js_addAll(cx, scope, args);
+                return realThis(thisObj, f).js_addAll(args);
             case Id_deleteAll:
-                return realThis(thisObj, f).js_deleteAll(cx, scope, args);
+                return realThis(thisObj, f).js_deleteAll(args);
             case Id_every:
                 return realThis(thisObj, f).js_every(cx, scope, args);
             case Id_filter:
@@ -91,7 +91,7 @@ public class NativeSet extends IdScriptableObject {
             case Id_find:
                 return realThis(thisObj, f).js_find(cx, scope, args);
             case Id_join:
-                return realThis(thisObj, f).js_join(cx, scope, args);
+                return realThis(thisObj, f).js_join(args);
             case Id_map:
                 return realThis(thisObj, f).js_map(cx, scope, args);
             case Id_reduce:
@@ -162,7 +162,7 @@ public class NativeSet extends IdScriptableObject {
         return Undefined.instance;
     }
 
-    private Object js_addAll(Context cx, Scriptable scope, Object[] args) {
+    private Object js_addAll(Object[] args) {
         for (Object arg : args) {
             js_add(arg);
         }
@@ -170,7 +170,7 @@ public class NativeSet extends IdScriptableObject {
         return this;
     }
 
-    private Object js_deleteAll(Context cx, Scriptable scope, Object[] args) {
+    private Object js_deleteAll(Object[] args) {
         boolean allDeleted = true;
 
         for (Object arg : args) {
@@ -254,7 +254,7 @@ public class NativeSet extends IdScriptableObject {
         return Undefined.instance;
     }
 
-    private Object js_join(Context cx, Scriptable scope, Object[] args) {
+    private Object js_join(Object[] args) {
         String separator = args.length > 0 ? ScriptRuntime.toString(args[0]) : ",";
 
         StringBuilder sb = new StringBuilder();
