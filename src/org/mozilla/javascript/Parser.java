@@ -60,6 +60,7 @@ public class Parser {
     // during function parsing.  See PerFunctionVariables class below.
     ScriptNode currentScriptOrFn;
     Scope currentScope;
+    private int scopeNesting = 0;
     private ErrorReporter errorReporter;
     private IdeErrorReporter errorCollector;
     private String sourceURI;
@@ -425,6 +426,7 @@ public class Parser {
     }
 
     void pushScope(Scope scope) {
+        scopeNesting++;
         Scope parent = scope.getParentScope();
         // During codegen, parent scope chain may already be initialized,
         // in which case we just need to set currentScope variable.
@@ -439,6 +441,7 @@ public class Parser {
 
     void popScope() {
         currentScope = currentScope.getParentScope();
+        scopeNesting--;
     }
 
     private void enterLoop(Loop loop) {
@@ -1358,7 +1361,12 @@ public class Parser {
                 return function(FunctionNode.FUNCTION_EXPRESSION_STATEMENT);
 
             case Token.DEFAULT:
+                consumeToken();
                 pn = defaultXmlNamespace();
+                break;
+
+            case Token.IMPORT:
+                pn = importStatement();
                 break;
 
             case Token.NAME:
@@ -1379,6 +1387,86 @@ public class Parser {
 
         autoInsertSemicolon(pn);
         return pn;
+    }
+
+    private ImportNode importStatement() throws IOException {
+        if (scopeNesting != 0) {
+            reportError("msg.import.top.level");
+        }
+
+        consumeToken();
+        ImportNode in = new ImportNode();
+        boolean hasTargets;
+
+        if (matchToken(Token.MUL)) {
+            hasTargets = true;
+
+            peekToken();
+            if (!"as".equals(ts.getString())) {
+                reportError("msg.import.expected.as");
+            }
+            consumeToken();
+
+            mustMatchToken(Token.NAME, "msg.import.missing.alias");
+            Name target = createNameNode();
+            in.setModuleImport(target);
+            consumeToken();
+        } else {
+            boolean hasDefault = false;
+            boolean defaultComma = false;
+            boolean hasNamedImports;
+
+            if (matchToken(Token.NAME)) {
+                Name defaultImport = createNameNode();
+                consumeToken();
+                in.setDefaultImport(defaultImport);
+                hasDefault = true;
+                defaultComma = matchToken(Token.COMMA);
+            }
+
+            if (hasDefault) {
+                hasNamedImports = matchToken(Token.LC);
+                if (defaultComma != hasNamedImports) {
+                    reportError(defaultComma ? "msg.import.unexpected.comma" : "msg.import.missing.comma");
+                }
+            } else  {
+                mustMatchToken(Token.LC, "msg.import.unexpected.token");
+                hasNamedImports = true;
+            }
+
+            if (hasNamedImports) {
+                while (!matchToken(Token.RC)) {
+                    mustMatchToken(Token.NAME, "msg.import.malformed.name");
+                    Name targetName = createNameNode();
+                    Name scopeName = null;
+
+                    if (matchToken(Token.NAME)) {
+                        if (!"as".equals(ts.getString())) {
+                            reportError("msg.import.expected.as");
+                        }
+                        mustMatchToken(Token.NAME, "msg.import.missing.alias");
+                        scopeName = createNameNode();
+                    }
+
+                    matchToken(Token.COMMA);
+
+                    in.addNamedImport(targetName, scopeName);
+                }
+            }
+
+            hasTargets = hasNamedImports;
+        }
+
+        peekToken();
+        if (hasTargets && !"from".equals(ts.getString())) {
+            reportError("msg.import.missing.file.path");
+        }
+        consumeToken();
+
+        mustMatchToken(Token.STRING, "msg.import.missing.file.path");
+        in.setFilePath(ts.getString());
+
+        return in;
     }
 
     private void autoInsertSemicolon(AstNode pn) throws IOException {

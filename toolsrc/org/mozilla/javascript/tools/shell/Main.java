@@ -140,6 +140,8 @@ public class Main
 
                 if (files != null) {
                     for (File child : files) {
+                        if (child.getName().contains("scripts")) continue;
+
                         File[] childFiles = child.listFiles();
 
                         if (childFiles != null) {
