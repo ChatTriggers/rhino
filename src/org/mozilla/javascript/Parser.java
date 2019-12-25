@@ -9,6 +9,7 @@ package org.mozilla.javascript;
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
 import org.mozilla.javascript.decorators.DecoratorType;
+import org.mozilla.javascript.tools.shell.Main;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -1366,7 +1367,17 @@ public class Parser {
                 break;
 
             case Token.IMPORT:
+                if (!Main.useRequire) {
+                    reportError("msg.modules.not.supported");
+                }
                 pn = importStatement();
+                break;
+
+            case Token.EXPORT:
+                if (!Main.useRequire) {
+                    reportError("msg.modules.not.supported");
+                }
+                pn = exportStatement();
                 break;
 
             case Token.NAME:
@@ -1465,6 +1476,46 @@ public class Parser {
 
         mustMatchToken(Token.STRING, "msg.import.missing.file.path");
         in.setFilePath(ts.getString());
+
+        return in;
+    }
+
+    private ImportNode exportStatement() throws IOException {
+        if (scopeNesting != 0) {
+            reportError("msg.export.top.level");
+        }
+
+        consumeToken();
+        ImportNode in = new ImportNode();
+        in.setType(Token.EXPORT);
+
+        mustMatchToken(Token.LC, "msg.export.missing.lc");
+
+        do {
+            mustMatchToken(Token.NAME, "msg.export.missing.identifier");
+            Name target = createNameNode();
+            Name scope = null;
+            consumeToken();
+            peekToken();
+
+            if ("as".equals(ts.getString())) {
+                consumeToken();
+
+                if (matchToken(Token.NAME)) {
+                    scope = createNameNode();
+                } else if (matchToken(Token.DEFAULT)) {
+                    scope = new Name();
+                    scope.setIdentifier("default");
+                } else {
+                    reportError("msg.export.unexpected.token");
+                    consumeToken();
+                }
+            }
+
+            in.addNamedImport(target, scope);
+        } while (matchToken(Token.COMMA));
+
+        mustMatchToken(Token.RC, "msg.export.missing.rc");
 
         return in;
     }

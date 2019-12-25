@@ -777,6 +777,63 @@ public class ScriptRuntime {
         return (((int) descriptor) & Decorator.PREINIT) != 0;
     }
 
+    private static final Symbol DEFAULT_EXPORT_KEY = new SymbolKey("DEFAULT_EXPORT_KEY");
+
+    public static void handleImport(Object requireObj, Object[] namedImports, String defaultImport, String moduleImport, Scriptable scope) {
+        if (!(requireObj instanceof Scriptable)) {
+            if (defaultImport == null) {
+                throw ScriptRuntime.typeError0("msg.import.from.non.module");
+            }
+
+            if (namedImports != null) {
+                throw ScriptRuntime.typeError0("msg.file.has.no.named.exports");
+            }
+
+            ScriptableObject.putProperty(scope, defaultImport, requireObj);
+            return;
+        }
+
+        Scriptable require = (Scriptable) requireObj;
+
+        if (defaultImport != null) {
+            if (!ScriptableObject.hasProperty(require, DEFAULT_EXPORT_KEY)) {
+                throw ScriptRuntime.typeError0("msg.file.has.no.default.export");
+            }
+
+            ScriptableObject.putProperty(scope, defaultImport, ScriptableObject.getProperty(require, DEFAULT_EXPORT_KEY));
+        }
+
+        if (moduleImport != null) {
+            ScriptableObject.putProperty(scope, moduleImport, require);
+        }
+
+        for (Object _namedImport : namedImports) {
+            String[] namedImport = (String[]) _namedImport;
+
+            if (!ScriptableObject.hasProperty(require, namedImport[0])) {
+                throw ScriptRuntime.typeError1("msg.file.has.no.named.export", namedImport[0]);
+            }
+
+            ScriptableObject.putProperty(scope, namedImport[1], ScriptableObject.getProperty(require, namedImport[0]));
+        }
+    }
+
+    public static void handleExport(String targetName, String scopeName, Scriptable scope) {
+        if (!ScriptableObject.hasProperty(scope, targetName)) {
+            throw ScriptRuntime.typeError1("msg.export.no.target", targetName);
+        }
+
+        Object value = ScriptableObject.getProperty(scope, targetName);
+        Scriptable module = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(scope, "module"));
+        Scriptable exports = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(module, "exports"));
+
+        if ("default".equals(scopeName)) {
+            ScriptableObject.putProperty(exports, DEFAULT_EXPORT_KEY, value);
+        } else {
+            ScriptableObject.putProperty(exports, scopeName, value);
+        }
+    }
+
     public static Object getRestParams(Object[] _args, int index, Context cx, Scriptable scope) {
         Object[] args = new Object[_args.length - index];
 

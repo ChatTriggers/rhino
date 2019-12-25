@@ -55,7 +55,7 @@ public class Main
     static List<String> modulePath;
     static String mainModule;
     static boolean sandboxed = false;
-    static boolean useRequire = false;
+    public static boolean useRequire = false;
     static Require require;
     private static SecurityProxy securityImpl;
     private final static ScriptCache scriptCache = new ScriptCache(32);

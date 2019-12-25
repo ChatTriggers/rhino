@@ -106,13 +106,21 @@ public class ImportNode extends AstNode {
         this.filePath = filePath;
     }
 
-    static class Import {
+    public static class Import {
         private Name targetName;
         private Name scopeName;
 
         public Import(Name targetName, Name scopeName) {
             this.targetName = targetName;
             this.scopeName = scopeName;
+        }
+
+        public String getTargetIdentifier() {
+            return targetName != null ? targetName.getIdentifier() : null;
+        }
+
+        public String getScopeIdentifier() {
+            return scopeName != null ? scopeName.getIdentifier() : null;
         }
     }
 }
