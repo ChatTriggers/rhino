@@ -30,11 +30,11 @@ public class ImportNode extends AstNode {
         return moduleImport;
     }
 
-    public void addNamedImport(Name targetName, Name scopeName) {
+    public void addNamedImport(String targetName, String scopeName) {
         namedImports.add(new Import(targetName, scopeName));
     }
 
-    public void setDefaultImport(Name scopeName) {
+    public void setDefaultImport(String scopeName) {
         defaultImport = new Import(null, scopeName);
     }
 
@@ -42,7 +42,7 @@ public class ImportNode extends AstNode {
         return defaultImport != null;
     }
 
-    public void setModuleImport(Name scopeName) {
+    public void setModuleImport(String scopeName) {
         moduleImport = new Import(null, scopeName);
     }
 
@@ -58,7 +58,7 @@ public class ImportNode extends AstNode {
             sb.append("* ");
 
             if (defaultImport.scopeName != null) {
-                sb.append(" as ").append(defaultImport.scopeName.getIdentifier());
+                sb.append(" as ").append(defaultImport.scopeName);
             }
         } else if (hasDefaultImport()) {
             sb.append(defaultImport.scopeName);
@@ -77,7 +77,7 @@ public class ImportNode extends AstNode {
                 sb.append(' ').append(imp.targetName);
 
                 if (imp.scopeName != null) {
-                    sb.append(" as ").append(imp.scopeName.getIdentifier());
+                    sb.append(" as ").append(imp.scopeName);
                 }
 
                 if (i != namedImportsSize - 1) {
@@ -107,20 +107,20 @@ public class ImportNode extends AstNode {
     }
 
     public static class Import {
-        private Name targetName;
-        private Name scopeName;
+        private String targetName;
+        private String scopeName;
 
-        public Import(Name targetName, Name scopeName) {
+        public Import(String targetName, String scopeName) {
             this.targetName = targetName;
             this.scopeName = scopeName;
         }
 
-        public String getTargetIdentifier() {
-            return targetName != null ? targetName.getIdentifier() : null;
+        public String getTargetName() {
+            return targetName;
         }
 
-        public String getScopeIdentifier() {
-            return scopeName != null ? scopeName.getIdentifier() : null;
+        public String getScopeName() {
+            return scopeName;
         }
     }
 }

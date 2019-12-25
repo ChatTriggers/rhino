@@ -2108,15 +2108,15 @@ class BodyCodegen {
                 // Default export
                 ImportNode.Import defaultExport = in.getDefaultImport();
                 if (defaultExport != null) {
-                    cfw.addPush(defaultExport.getScopeIdentifier());
+                    cfw.addPush(defaultExport.getScopeName());
                     cfw.addPush("default");
                     cfw.addALoad(variableObjectLocal);
                     addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
                 }
 
                 for (ImportNode.Import namedImport : in.getNamedImports()) {
-                    String target = namedImport.getTargetIdentifier();
-                    String scope = namedImport.getScopeIdentifier();
+                    String target = namedImport.getTargetName();
+                    String scope = namedImport.getScopeName();
                     if (scope == null) {
                         scope = target;
                     }
@@ -2162,13 +2162,13 @@ class BodyCodegen {
 
                     cfw.add(ByteCode.DUP);
                     cfw.addPush(0);
-                    String target = namedImport.getTargetIdentifier();
+                    String target = namedImport.getTargetName();
                     cfw.addPush(target);
                     cfw.add(ByteCode.AASTORE);
 
                     cfw.add(ByteCode.DUP);
                     cfw.addPush(1);
-                    String scope = namedImport.getScopeIdentifier();
+                    String scope = namedImport.getScopeName();
                     if (scope == null) scope = target;
                     cfw.addPush(scope);
                     cfw.add(ByteCode.AASTORE);
@@ -2182,7 +2182,7 @@ class BodyCodegen {
                 if (defaultImport == null) {
                     cfw.add(ByteCode.ACONST_NULL);
                 } else {
-                    cfw.addPush(defaultImport.getScopeIdentifier());
+                    cfw.addPush(defaultImport.getScopeName());
                 }
 
                 // Module import
@@ -2191,7 +2191,7 @@ class BodyCodegen {
                 if (moduleImport == null) {
                     cfw.add(ByteCode.ACONST_NULL);
                 } else {
-                    cfw.addPush(moduleImport.getScopeIdentifier());
+                    cfw.addPush(moduleImport.getScopeName());
                 }
 
                 cfw.addALoad(variableObjectLocal);

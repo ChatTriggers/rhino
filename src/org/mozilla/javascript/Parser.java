@@ -1370,6 +1370,8 @@ public class Parser {
                 if (!Main.useRequire) {
                     reportError("msg.modules.not.supported");
                 }
+
+                consumeToken();
                 pn = importStatement();
                 break;
 
@@ -1377,6 +1379,8 @@ public class Parser {
                 if (!Main.useRequire) {
                     reportError("msg.modules.not.supported");
                 }
+
+                consumeToken();
                 pn = exportStatement();
                 break;
 
@@ -1400,12 +1404,11 @@ public class Parser {
         return pn;
     }
 
-    private ImportNode importStatement() throws IOException {
+    private AstNode importStatement() throws IOException {
         if (scopeNesting != 0) {
             reportError("msg.import.top.level");
         }
 
-        consumeToken();
         ImportNode in = new ImportNode();
         boolean hasTargets;
 
@@ -1419,7 +1422,7 @@ public class Parser {
             consumeToken();
 
             mustMatchToken(Token.NAME, "msg.import.missing.alias");
-            Name target = createNameNode();
+            String target = createNameNode().getIdentifier();
             in.setModuleImport(target);
             consumeToken();
         } else {
@@ -1428,7 +1431,7 @@ public class Parser {
             boolean hasNamedImports;
 
             if (matchToken(Token.NAME)) {
-                Name defaultImport = createNameNode();
+                String defaultImport = createNameNode().getIdentifier();
                 consumeToken();
                 in.setDefaultImport(defaultImport);
                 hasDefault = true;
@@ -1447,16 +1450,25 @@ public class Parser {
 
             if (hasNamedImports) {
                 while (!matchToken(Token.RC)) {
-                    mustMatchToken(Token.NAME, "msg.import.malformed.name");
-                    Name targetName = createNameNode();
-                    Name scopeName = null;
+                    String targetName;
+
+                    if (matchToken(Token.NAME)) {
+                        targetName = createNameNode().getIdentifier();
+                    } else if (matchToken(Token.DEFAULT)) {
+                        targetName = "default";
+                    } else {
+                        reportError("msg.import.malformed.name");
+                        return makeErrorNode();
+                    }
+
+                    String scopeName = null;
 
                     if (matchToken(Token.NAME)) {
                         if (!"as".equals(ts.getString())) {
                             reportError("msg.import.expected.as");
                         }
                         mustMatchToken(Token.NAME, "msg.import.missing.alias");
-                        scopeName = createNameNode();
+                        scopeName = createNameNode().getIdentifier();
                     }
 
                     matchToken(Token.COMMA);
@@ -1480,44 +1492,71 @@ public class Parser {
         return in;
     }
 
-    private ImportNode exportStatement() throws IOException {
+    private AstNode exportStatement() throws IOException {
         if (scopeNesting != 0) {
             reportError("msg.export.top.level");
         }
 
-        consumeToken();
-        ImportNode in = new ImportNode();
-        in.setType(Token.EXPORT);
+        // There are many different things we could do here,
+        // this this could be either a standalone export statement,
+        // or an inline export declaration
 
-        mustMatchToken(Token.LC, "msg.export.missing.lc");
+        if (matchToken(Token.DEFAULT)) {
+            AstNode node = expr();
+            node.putProp(Node.EXPORT_PROP, true);
+            return node;
+        } else {
+            ImportNode in = new ImportNode();
+            in.setType(Token.EXPORT);
 
-        do {
-            mustMatchToken(Token.NAME, "msg.export.missing.identifier");
-            Name target = createNameNode();
-            Name scope = null;
-            consumeToken();
-            peekToken();
+            if (matchToken(Token.MUL)) {
+                in.setModuleImport(null);
+            } else if (matchToken(Token.LC)) {
+                do {
+                    mustMatchToken(Token.NAME, "msg.export.missing.identifier");
+                    String target = createNameNode().getIdentifier();
+                    String scope = null;
+                    consumeToken();
+                    peekToken();
 
-            if ("as".equals(ts.getString())) {
-                consumeToken();
+                    if ("as".equals(ts.getString())) {
+                        consumeToken();
+
+                        if (matchToken(Token.NAME)) {
+                            scope = createNameNode().getIdentifier();
+                        } else if (matchToken(Token.DEFAULT)) {
+                            scope = "default";
+                        } else {
+                            reportError("msg.export.unexpected.token");
+                            consumeToken();
+                        }
+                    }
+
+                    in.addNamedImport(target, scope);
+                } while (matchToken(Token.COMMA));
+
+                mustMatchToken(Token.RC, "msg.export.missing.rc");
 
                 if (matchToken(Token.NAME)) {
-                    scope = createNameNode();
-                } else if (matchToken(Token.DEFAULT)) {
-                    scope = new Name();
-                    scope.setIdentifier("default");
-                } else {
-                    reportError("msg.export.unexpected.token");
-                    consumeToken();
+                    peekToken();
+
+                    if (!"from".equals(ts.getString())) {
+                        throw codeBug();
+                    }
+
+                    mustMatchToken(Token.STRING, "");
+                    in.setFilePath(ts.getString());
+
                 }
+            } else {
+                // TODO: Validate node type
+                AstNode node = statement();
+                node.putProp(Node.EXPORT_PROP, true);
+                return node;
             }
 
-            in.addNamedImport(target, scope);
-        } while (matchToken(Token.COMMA));
-
-        mustMatchToken(Token.RC, "msg.export.missing.rc");
-
-        return in;
+            return in;
+        }
     }
 
     private void autoInsertSemicolon(AstNode pn) throws IOException {

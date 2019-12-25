@@ -777,8 +777,6 @@ public class ScriptRuntime {
         return (((int) descriptor) & Decorator.PREINIT) != 0;
     }
 
-    private static final Symbol DEFAULT_EXPORT_KEY = new SymbolKey("DEFAULT_EXPORT_KEY");
-
     public static void handleImport(Object requireObj, Object[] namedImports, String defaultImport, String moduleImport, Scriptable scope) {
         if (!(requireObj instanceof Scriptable)) {
             if (defaultImport == null) {
@@ -796,11 +794,11 @@ public class ScriptRuntime {
         Scriptable require = (Scriptable) requireObj;
 
         if (defaultImport != null) {
-            if (!ScriptableObject.hasProperty(require, DEFAULT_EXPORT_KEY)) {
+            if (!ScriptableObject.hasProperty(require, "default")) {
                 throw ScriptRuntime.typeError0("msg.file.has.no.default.export");
             }
 
-            ScriptableObject.putProperty(scope, defaultImport, ScriptableObject.getProperty(require, DEFAULT_EXPORT_KEY));
+            ScriptableObject.putProperty(scope, defaultImport, ScriptableObject.getProperty(require, "default"));
         }
 
         if (moduleImport != null) {
@@ -828,7 +826,7 @@ public class ScriptRuntime {
         Scriptable exports = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(module, "exports"));
 
         if ("default".equals(scopeName)) {
-            ScriptableObject.putProperty(exports, DEFAULT_EXPORT_KEY, value);
+            ScriptableObject.putProperty(exports, "default", value);
         } else {
             ScriptableObject.putProperty(exports, scopeName, value);
         }
