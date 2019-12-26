@@ -2153,13 +2153,11 @@ public class ScriptRuntime {
      * @deprecated Use {@link #getObjectPropNoWarn(Object, String, Context, Scriptable)} instead
      */
     @Deprecated
-    public static Object getObjectPropNoWarn(Object obj, String property,
-                                             Context cx) {
+    public static Object getObjectPropNoWarn(Object obj, String property, Context cx) {
         return getObjectPropNoWarn(obj, property, cx, getTopCallScope(cx));
     }
 
-    public static Object getObjectPropNoWarn(Object obj, String property,
-                                             Context cx, Scriptable scope) {
+    public static Object getObjectPropNoWarn(Object obj, String property, Context cx, Scriptable scope) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefReadError(obj, property);

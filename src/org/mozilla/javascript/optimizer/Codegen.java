@@ -5830,37 +5830,36 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         if (isPrivate) {
             cfw.add(ByteCode.DUP);
             cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
-             objLocal = getNewWordLocal();
+            objLocal = getNewWordLocal();
             cfw.addAStore(objLocal);
         }
+
         Node nameChild = child.getNext();
         generateExpression(nameChild, node);  // the name
-        if (node.getType() == Token.GETPROPNOWARN) {
-            cfw.addALoad(contextLocal);
-            cfw.addALoad(variableObjectLocal);
-            addScriptRuntimeInvoke("getObjectPropNoWarn", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
-            return;
-        }
-
-        String methodName = node.getProp(Node.CHAINING_PROP) != null ? "optionalGetObjectProp" : "getObjectProp";
 
         if (isPrivate) {
             cfw.addALoad(objLocal);
             addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
         }
 
-        /*
-            for 'this.foo' we call getObjectProp(Scriptable...) which can
-            skip some casting overhead.
-        */
-        int childType = child.getType();
-        if (childType == Token.THIS && nameChild.getType() == Token.STRING) {
-            cfw.addALoad(contextLocal);
-            addScriptRuntimeInvoke(methodName, OBJECT, SCRIPTABLE, STRING, CONTEXT);
-        } else {
+        if (node.getType() == Token.GETPROPNOWARN) {
             cfw.addALoad(contextLocal);
             cfw.addALoad(variableObjectLocal);
-            addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+            addScriptRuntimeInvoke("getObjectPropNoWarn", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+        } else {
+            String methodName = node.getProp(Node.CHAINING_PROP) != null ? "optionalGetObjectProp" : "getObjectProp";
+
+            // for 'this.foo' we call getObjectProp(Scriptable...) which can
+            // skip some casting overhead.
+            int childType = child.getType();
+            if (childType == Token.THIS && nameChild.getType() == Token.STRING) {
+                cfw.addALoad(contextLocal);
+                addScriptRuntimeInvoke(methodName, OBJECT, SCRIPTABLE, STRING, CONTEXT);
+            } else {
+                cfw.addALoad(contextLocal);
+                cfw.addALoad(variableObjectLocal);
+                addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+            }
         }
 
         if (isPrivate) {
