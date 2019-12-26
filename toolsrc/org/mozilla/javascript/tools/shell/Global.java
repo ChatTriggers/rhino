@@ -158,7 +158,7 @@ public class Global extends ImporterTopLevel
                                   boolean sandboxed) {
         RequireBuilder rb = new RequireBuilder();
         rb.setSandboxed(sandboxed);
-        List<URI> uris = new ArrayList<URI>();
+        List<URI> uris = new ArrayList<>();
         if (modulePath != null) {
             for (String path : modulePath) {
                 try {

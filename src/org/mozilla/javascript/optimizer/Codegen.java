@@ -2102,6 +2102,125 @@ class BodyCodegen {
                 break;
             }
 
+            case Token.EXPORT: {
+                ExportNode en = (ExportNode) node;
+
+                // Inline export statement
+                if (en.getExportedValue() != null) {
+                    generateExpression(en.getFirstChild(), en);
+                    cfw.addPush(en.isDefaultExport());
+                    cfw.addALoad(variableObjectLocal);
+                    addScriptRuntimeInvoke("handleExport", VOID, OBJECT, BOOLEAN, SCRIPTABLE);
+                    break;
+                }
+
+                // Default export
+                ImportNode.ModuleMember defaultExport = en.getDefaultMember();
+                if (defaultExport != null) {
+                    cfw.addPush(defaultExport.getScopeName());
+                    cfw.addPush("default");
+                    cfw.addALoad(variableObjectLocal);
+                    addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
+                }
+
+                for (ImportNode.ModuleMember namedImport : en.getNamedMembers()) {
+                    String target = namedImport.getTargetName();
+                    String scope = namedImport.getScopeName();
+                    if (scope == null) {
+                        scope = target;
+                    }
+
+                    cfw.addPush(target);
+                    cfw.addPush(scope);
+                    cfw.addALoad(variableObjectLocal);
+                    addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
+                }
+
+                break;
+            }
+
+            /*
+
+            const VarFactory = new SavedVariableFactory('MyModule');
+
+            const count = VarFactory.newVar(5);
+
+            count.get()
+            count.set('hello world');
+
+
+
+             */
+
+            case Token.IMPORT: {
+                ImportNode in = (ImportNode) node;
+
+                cfw.addPush(1);
+                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+                cfw.add(ByteCode.DUP);
+                cfw.addPush(0);
+                cfw.addPush(in.getFilePath());
+                cfw.add(ByteCode.AASTORE);
+
+                // Result of require
+                cfw.addPush("require");
+                cfw.addALoad(contextLocal);
+                cfw.addALoad(variableObjectLocal);
+                addOptRuntimeInvoke("callName", OBJECT, OBJECT_ARRAY, STRING, CONTEXT, SCRIPTABLE);
+
+                // Generate namedImports, which is an object array (each object being a string array of length 2)
+                int namedCount = in.getNamedMembers().size();
+                cfw.addPush(namedCount);
+                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+
+                List<ImportNode.ModuleMember> namedImports = in.getNamedMembers();
+                for (int i = 0, namedImportsSize = namedImports.size(); i < namedImportsSize; i++) {
+                    ImportNode.ModuleMember namedImport = namedImports.get(i);
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(i);
+
+                    cfw.addPush(2);
+                    cfw.add(ByteCode.ANEWARRAY, "java/lang/String");
+
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(0);
+                    String target = namedImport.getTargetName();
+                    cfw.addPush(target);
+                    cfw.add(ByteCode.AASTORE);
+
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(1);
+                    String scope = namedImport.getScopeName();
+                    if (scope == null) scope = target;
+                    cfw.addPush(scope);
+                    cfw.add(ByteCode.AASTORE);
+
+                    cfw.add(ByteCode.AASTORE);
+                }
+
+                // Default import
+                ImportNode.ModuleMember defaultImport = in.getDefaultMember();
+
+                if (defaultImport == null) {
+                    cfw.add(ByteCode.ACONST_NULL);
+                } else {
+                    cfw.addPush(defaultImport.getScopeName());
+                }
+
+                // Module import
+                ImportNode.ModuleMember moduleImport = in.getModuleImport();
+
+                if (moduleImport == null) {
+                    cfw.add(ByteCode.ACONST_NULL);
+                } else {
+                    cfw.addPush(moduleImport.getScopeName());
+                }
+
+                cfw.addALoad(variableObjectLocal);
+                addScriptRuntimeInvoke("handleImport", VOID, OBJECT, OBJECT_ARRAY, STRING, STRING, SCRIPTABLE);
+                break;
+            }
+
             case Token.DECORATOR: {
                 if (fnCurrent != null) {
                     visitDecoratorDeclaration((DecoratorDeclarationNode) node);
@@ -5711,37 +5830,36 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         if (isPrivate) {
             cfw.add(ByteCode.DUP);
             cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
-             objLocal = getNewWordLocal();
+            objLocal = getNewWordLocal();
             cfw.addAStore(objLocal);
         }
+
         Node nameChild = child.getNext();
         generateExpression(nameChild, node);  // the name
-        if (node.getType() == Token.GETPROPNOWARN) {
-            cfw.addALoad(contextLocal);
-            cfw.addALoad(variableObjectLocal);
-            addScriptRuntimeInvoke("getObjectPropNoWarn", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
-            return;
-        }
-
-        String methodName = node.getProp(Node.CHAINING_PROP) != null ? "optionalGetObjectProp" : "getObjectProp";
 
         if (isPrivate) {
             cfw.addALoad(objLocal);
             addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
         }
 
-        /*
-            for 'this.foo' we call getObjectProp(Scriptable...) which can
-            skip some casting overhead.
-        */
-        int childType = child.getType();
-        if (childType == Token.THIS && nameChild.getType() == Token.STRING) {
-            cfw.addALoad(contextLocal);
-            addScriptRuntimeInvoke(methodName, OBJECT, SCRIPTABLE, STRING, CONTEXT);
-        } else {
+        if (node.getType() == Token.GETPROPNOWARN) {
             cfw.addALoad(contextLocal);
             cfw.addALoad(variableObjectLocal);
-            addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+            addScriptRuntimeInvoke("getObjectPropNoWarn", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+        } else {
+            String methodName = node.getProp(Node.CHAINING_PROP) != null ? "optionalGetObjectProp" : "getObjectProp";
+
+            // for 'this.foo' we call getObjectProp(Scriptable...) which can
+            // skip some casting overhead.
+            int childType = child.getType();
+            if (childType == Token.THIS && nameChild.getType() == Token.STRING) {
+                cfw.addALoad(contextLocal);
+                addScriptRuntimeInvoke(methodName, OBJECT, SCRIPTABLE, STRING, CONTEXT);
+            } else {
+                cfw.addALoad(contextLocal);
+                cfw.addALoad(variableObjectLocal);
+                addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+            }
         }
 
         if (isPrivate) {
@@ -5976,6 +6094,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     private static final String LONG = "J";
     private static final String DOUBLE = "D";
     private static final String STRING = "Ljava/lang/String;";
+    private static final String STRING_ARRAY = "[Ljava/lang/String;";
 
     private void addScriptRuntimeInvoke(String methodName, String returnValue, String... args) {
         cfw.addInvoke(

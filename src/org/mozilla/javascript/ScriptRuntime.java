@@ -777,6 +777,90 @@ public class ScriptRuntime {
         return (((int) descriptor) & Decorator.PREINIT) != 0;
     }
 
+    public static void handleImport(Object requireObj, Object[] namedImports, String defaultImport, String moduleImport, Scriptable scope) {
+        if (!(requireObj instanceof Scriptable)) {
+            if (defaultImport == null) {
+                throw ScriptRuntime.typeError0("msg.import.from.non.module");
+            }
+
+            if (namedImports != null) {
+                throw ScriptRuntime.typeError0("msg.file.has.no.named.exports");
+            }
+
+            ScriptableObject.putProperty(scope, defaultImport, requireObj);
+            return;
+        }
+
+        Scriptable require = (Scriptable) requireObj;
+
+        if (defaultImport != null) {
+            if (!ScriptableObject.hasProperty(require, "default")) {
+                throw ScriptRuntime.typeError0("msg.file.has.no.default.export");
+            }
+
+            ScriptableObject.putProperty(scope, defaultImport, ScriptableObject.getProperty(require, "default"));
+        }
+
+        if (moduleImport != null) {
+            ScriptableObject.putProperty(scope, moduleImport, require);
+        }
+
+        for (Object _namedImport : namedImports) {
+            String[] namedImport = (String[]) _namedImport;
+
+            if (!ScriptableObject.hasProperty(require, namedImport[0])) {
+                throw ScriptRuntime.typeError1("msg.file.has.no.named.export", namedImport[0]);
+            }
+
+            ScriptableObject.putProperty(scope, namedImport[1], ScriptableObject.getProperty(require, namedImport[0]));
+        }
+    }
+
+    // Export all members from another file
+    public static void handleExport(Object fromRequire, ScriptableObject scope) {
+
+    }
+
+    // Export single member from another file
+    public static void handleExport(String targetName, String scopeName, Object fromRequire, Scriptable scope) {
+
+    }
+
+    // Export single member from current file
+    public static void handleExport(String targetName, String scopeName, Scriptable scope) {
+        if (!ScriptableObject.hasProperty(scope, targetName)) {
+            throw ScriptRuntime.typeError1("msg.export.no.target", targetName);
+        }
+
+        Object value = ScriptableObject.getProperty(scope, targetName);
+        Scriptable module = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(scope, "module"));
+        Scriptable exports = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(module, "exports"));
+
+        if ("default".equals(scopeName)) {
+            ScriptableObject.putProperty(exports, "default", value);
+        } else {
+            ScriptableObject.putProperty(exports, scopeName, value);
+        }
+    }
+
+    // Inline export: export entire value from current file
+    public static void handleExport(Object value, boolean isDefault, Scriptable scope) {
+        if (isDefault) {
+            ScriptableObject.putConstProperty(scope, "default", value);
+        } else {
+            String name;
+
+            if (value instanceof BaseFunction) {
+                name = ((BaseFunction) value).getFunctionName();
+            } else {
+                System.out.println("test");
+                return;
+            }
+
+            ScriptableObject.putConstProperty(scope, name, value);
+        }
+    }
+
     public static Object getRestParams(Object[] _args, int index, Context cx, Scriptable scope) {
         Object[] args = new Object[_args.length - index];
 
@@ -2069,13 +2153,11 @@ public class ScriptRuntime {
      * @deprecated Use {@link #getObjectPropNoWarn(Object, String, Context, Scriptable)} instead
      */
     @Deprecated
-    public static Object getObjectPropNoWarn(Object obj, String property,
-                                             Context cx) {
+    public static Object getObjectPropNoWarn(Object obj, String property, Context cx) {
         return getObjectPropNoWarn(obj, property, cx, getTopCallScope(cx));
     }
 
-    public static Object getObjectPropNoWarn(Object obj, String property,
-                                             Context cx, Scriptable scope) {
+    public static Object getObjectPropNoWarn(Object obj, String property, Context cx, Scriptable scope) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefReadError(obj, property);

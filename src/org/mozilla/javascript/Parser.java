@@ -9,6 +9,7 @@ package org.mozilla.javascript;
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
 import org.mozilla.javascript.decorators.DecoratorType;
+import org.mozilla.javascript.tools.shell.Main;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -60,6 +61,7 @@ public class Parser {
     // during function parsing.  See PerFunctionVariables class below.
     ScriptNode currentScriptOrFn;
     Scope currentScope;
+    private int scopeNesting = 0;
     private ErrorReporter errorReporter;
     private IdeErrorReporter errorCollector;
     private String sourceURI;
@@ -425,6 +427,7 @@ public class Parser {
     }
 
     void pushScope(Scope scope) {
+        scopeNesting++;
         Scope parent = scope.getParentScope();
         // During codegen, parent scope chain may already be initialized,
         // in which case we just need to set currentScope variable.
@@ -439,6 +442,7 @@ public class Parser {
 
     void popScope() {
         currentScope = currentScope.getParentScope();
+        scopeNesting--;
     }
 
     private void enterLoop(Loop loop) {
@@ -1358,7 +1362,26 @@ public class Parser {
                 return function(FunctionNode.FUNCTION_EXPRESSION_STATEMENT);
 
             case Token.DEFAULT:
+                consumeToken();
                 pn = defaultXmlNamespace();
+                break;
+
+            case Token.IMPORT:
+                if (!Main.useRequire) {
+                    reportError("msg.modules.not.supported");
+                }
+
+                consumeToken();
+                pn = importStatement();
+                break;
+
+            case Token.EXPORT:
+                if (!Main.useRequire) {
+                    reportError("msg.modules.not.supported");
+                }
+
+                consumeToken();
+                pn = exportStatement();
                 break;
 
             case Token.NAME:
@@ -1379,6 +1402,202 @@ public class Parser {
 
         autoInsertSemicolon(pn);
         return pn;
+    }
+
+    private AstNode importStatement() throws IOException {
+        if (scopeNesting != 0) {
+            reportError("msg.import.top.level");
+        }
+
+        ImportNode in = new ImportNode();
+        boolean hasTargets;
+
+        if (matchToken(Token.MUL)) {
+            hasTargets = true;
+
+            peekToken();
+            if (!"as".equals(ts.getString())) {
+                reportError("msg.import.expected.as");
+            }
+            consumeToken();
+
+            mustMatchToken(Token.NAME, "msg.import.missing.alias");
+            String target = createNameNode().getIdentifier();
+            in.setModuleMember(target);
+            consumeToken();
+        } else {
+            boolean hasDefault = false;
+            boolean defaultComma = false;
+            boolean hasNamedImports;
+
+            if (matchToken(Token.NAME)) {
+                String defaultImport = createNameNode().getIdentifier();
+                consumeToken();
+                in.setDefaultMember(defaultImport);
+                hasDefault = true;
+                defaultComma = matchToken(Token.COMMA);
+            }
+
+            if (hasDefault) {
+                hasNamedImports = matchToken(Token.LC);
+                if (defaultComma != hasNamedImports) {
+                    reportError(defaultComma ? "msg.import.unexpected.comma" : "msg.import.missing.comma");
+                }
+            } else  {
+                mustMatchToken(Token.LC, "msg.import.unexpected.token");
+                hasNamedImports = true;
+            }
+
+            if (hasNamedImports) {
+                while (!matchToken(Token.RC)) {
+                    String targetName;
+
+                    if (matchToken(Token.XMLATTR)) {
+                        mustMatchToken(Token.NAME, "msg.decorator.malformed");
+                        targetName = "@" + createNameNode().getIdentifier();
+                    } else if (matchToken(Token.NAME)) {
+                        targetName = createNameNode().getIdentifier();
+                    } else if (matchToken(Token.DEFAULT)) {
+                        targetName = "default";
+                    } else {
+                        reportError("msg.import.malformed.name");
+                        return makeErrorNode();
+                    }
+
+                    String scopeName = null;
+
+                    if (matchToken(Token.NAME)) {
+                        if (!"as".equals(ts.getString())) {
+                            reportError("msg.import.expected.as");
+                        }
+                        mustMatchToken(Token.NAME, "msg.import.missing.alias");
+                        scopeName = createNameNode().getIdentifier();
+                    }
+
+                    matchToken(Token.COMMA);
+
+                    in.addNamedMember(targetName, scopeName);
+                }
+            }
+
+            hasTargets = hasNamedImports;
+        }
+
+        peekToken();
+        if (hasTargets && !"from".equals(ts.getString())) {
+            reportError("msg.import.missing.file.path");
+        }
+        consumeToken();
+
+        mustMatchToken(Token.STRING, "msg.import.missing.file.path");
+        in.setFilePath(ts.getString());
+
+        return in;
+    }
+
+    private void validateDefaultExport(AstNode node) {
+        if (!(
+                node instanceof FunctionNode ||
+                node instanceof ClassNode ||
+                node instanceof ConditionalExpression ||
+                node instanceof Assignment
+        )) {
+            reportError("msg.export.invalid.default.export");
+        }
+    }
+
+    private void validateExport(AstNode node) {
+        if (!(
+                node instanceof VariableDeclaration ||
+                node instanceof FunctionNode ||
+                node instanceof ClassNode
+        )) {
+            reportError("msg.export.invalid.export");
+        }
+
+        if (
+            node instanceof FunctionNode && ((FunctionNode) node).getFunctionName() == null ||
+            node instanceof ClassNode && ((ClassNode) node).getClassName() == null
+        ) {
+            reportError("msg.export.no.identifier");
+        }
+    }
+
+    private AstNode exportStatement() throws IOException {
+        if (scopeNesting != 0) {
+            reportError("msg.export.top.level");
+        }
+
+        // There are many different things we could do here,
+        // this this could be either a standalone export statement,
+        // or an inline export declaration
+        ExportNode en = new ExportNode();
+        en.setType(Token.EXPORT);
+
+        if (matchToken(Token.DEFAULT)) {
+            AstNode node = expr();
+            validateDefaultExport(node);
+            en.setExportedValue(node);
+            en.setDefaultExport();
+        } else {
+            boolean needsFrom = false;
+
+            if (matchToken(Token.MUL)) {
+                en.setModuleMember(null);
+                needsFrom = true;
+            } else if (matchToken(Token.LC)) {
+                do {
+                    boolean decorator = matchToken(Token.XMLATTR);
+
+                    mustMatchToken(Token.NAME, "msg.export.missing.identifier");
+                    String target = createNameNode().getIdentifier();
+
+                    if (decorator) {
+                        target = "@" + target;
+                    }
+
+                    String scope = null;
+                    consumeToken();
+                    peekToken();
+
+                    if ("as".equals(ts.getString())) {
+                        consumeToken();
+
+                        if (matchToken(Token.NAME)) {
+                            scope = createNameNode().getIdentifier();
+                        } else if (matchToken(Token.DEFAULT)) {
+                            scope = "default";
+                        } else {
+                            reportError("msg.export.unexpected.token");
+                            consumeToken();
+                        }
+                    }
+
+                    en.addNamedMember(target, scope);
+                } while (matchToken(Token.COMMA));
+
+                mustMatchToken(Token.RC, "msg.export.missing.rc");
+            } else {
+                AstNode node = statement();
+                validateExport(node);
+                en.setExportedValue(node);
+            }
+
+            if (matchToken(Token.NAME)) {
+                peekToken();
+
+                if (!"from".equals(ts.getString())) {
+                    reportError("msg.export.missing.from");
+                }
+
+                mustMatchToken(Token.STRING, "");
+                en.setFilePath(ts.getString());
+            } else if (needsFrom) {
+                reportError("msg.export.missing.from");
+            }
+        }
+
+        return en;
     }
 
     private void autoInsertSemicolon(AstNode pn) throws IOException {

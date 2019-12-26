@@ -5,6 +5,7 @@
 package org.mozilla.javascript.commonjs.module;
 
 import org.mozilla.javascript.*;
+import org.mozilla.javascript.tools.shell.Main;
 
 import java.io.File;
 import java.net.URI;
@@ -167,6 +168,7 @@ public class Require extends BaseFunction {
      */
     public void install(Scriptable scope) {
         ScriptableObject.putProperty(scope, "require", this);
+        Main.useRequire = true;
     }
 
     @Override
