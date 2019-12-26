@@ -2103,10 +2103,19 @@ class BodyCodegen {
             }
 
             case Token.EXPORT: {
-                ImportNode in = (ImportNode) node;
+                ExportNode en = (ExportNode) node;
+
+                // Inline export statement
+                if (en.getExportedValue() != null) {
+                    generateExpression(en.getFirstChild(), en);
+                    cfw.addPush(en.isDefaultExport());
+                    cfw.addALoad(variableObjectLocal);
+                    addScriptRuntimeInvoke("handleExport", VOID, OBJECT, BOOLEAN, SCRIPTABLE);
+                    break;
+                }
 
                 // Default export
-                ImportNode.Import defaultExport = in.getDefaultImport();
+                ImportNode.ModuleMember defaultExport = en.getDefaultMember();
                 if (defaultExport != null) {
                     cfw.addPush(defaultExport.getScopeName());
                     cfw.addPush("default");
@@ -2114,7 +2123,7 @@ class BodyCodegen {
                     addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
                 }
 
-                for (ImportNode.Import namedImport : in.getNamedImports()) {
+                for (ImportNode.ModuleMember namedImport : en.getNamedMembers()) {
                     String target = namedImport.getTargetName();
                     String scope = namedImport.getScopeName();
                     if (scope == null) {
@@ -2129,6 +2138,19 @@ class BodyCodegen {
 
                 break;
             }
+
+            /*
+
+            const VarFactory = new SavedVariableFactory('MyModule');
+
+            const count = VarFactory.newVar(5);
+
+            count.get()
+            count.set('hello world');
+
+
+
+             */
 
             case Token.IMPORT: {
                 ImportNode in = (ImportNode) node;
@@ -2147,13 +2169,13 @@ class BodyCodegen {
                 addOptRuntimeInvoke("callName", OBJECT, OBJECT_ARRAY, STRING, CONTEXT, SCRIPTABLE);
 
                 // Generate namedImports, which is an object array (each object being a string array of length 2)
-                int namedCount = in.getNamedImports().size();
+                int namedCount = in.getNamedMembers().size();
                 cfw.addPush(namedCount);
                 cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
 
-                List<ImportNode.Import> namedImports = in.getNamedImports();
+                List<ImportNode.ModuleMember> namedImports = in.getNamedMembers();
                 for (int i = 0, namedImportsSize = namedImports.size(); i < namedImportsSize; i++) {
-                    ImportNode.Import namedImport = namedImports.get(i);
+                    ImportNode.ModuleMember namedImport = namedImports.get(i);
                     cfw.add(ByteCode.DUP);
                     cfw.addPush(i);
 
@@ -2177,7 +2199,7 @@ class BodyCodegen {
                 }
 
                 // Default import
-                ImportNode.Import defaultImport = in.getDefaultImport();
+                ImportNode.ModuleMember defaultImport = in.getDefaultMember();
 
                 if (defaultImport == null) {
                     cfw.add(ByteCode.ACONST_NULL);
@@ -2186,7 +2208,7 @@ class BodyCodegen {
                 }
 
                 // Module import
-                ImportNode.Import moduleImport = in.getModuleImport();
+                ImportNode.ModuleMember moduleImport = in.getModuleImport();
 
                 if (moduleImport == null) {
                     cfw.add(ByteCode.ACONST_NULL);

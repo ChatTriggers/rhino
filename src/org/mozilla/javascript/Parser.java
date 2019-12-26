@@ -1423,7 +1423,7 @@ public class Parser {
 
             mustMatchToken(Token.NAME, "msg.import.missing.alias");
             String target = createNameNode().getIdentifier();
-            in.setModuleImport(target);
+            in.setModuleMember(target);
             consumeToken();
         } else {
             boolean hasDefault = false;
@@ -1433,7 +1433,7 @@ public class Parser {
             if (matchToken(Token.NAME)) {
                 String defaultImport = createNameNode().getIdentifier();
                 consumeToken();
-                in.setDefaultImport(defaultImport);
+                in.setDefaultMember(defaultImport);
                 hasDefault = true;
                 defaultComma = matchToken(Token.COMMA);
             }
@@ -1452,7 +1452,10 @@ public class Parser {
                 while (!matchToken(Token.RC)) {
                     String targetName;
 
-                    if (matchToken(Token.NAME)) {
+                    if (matchToken(Token.XMLATTR)) {
+                        mustMatchToken(Token.NAME, "msg.decorator.malformed");
+                        targetName = "@" + createNameNode().getIdentifier();
+                    } else if (matchToken(Token.NAME)) {
                         targetName = createNameNode().getIdentifier();
                     } else if (matchToken(Token.DEFAULT)) {
                         targetName = "default";
@@ -1473,7 +1476,7 @@ public class Parser {
 
                     matchToken(Token.COMMA);
 
-                    in.addNamedImport(targetName, scopeName);
+                    in.addNamedMember(targetName, scopeName);
                 }
             }
 
@@ -1492,6 +1495,34 @@ public class Parser {
         return in;
     }
 
+    private void validateDefaultExport(AstNode node) {
+        if (!(
+                node instanceof FunctionNode ||
+                node instanceof ClassNode ||
+                node instanceof ConditionalExpression ||
+                node instanceof Assignment
+        )) {
+            reportError("msg.export.invalid.default.export");
+        }
+    }
+
+    private void validateExport(AstNode node) {
+        if (!(
+                node instanceof VariableDeclaration ||
+                node instanceof FunctionNode ||
+                node instanceof ClassNode
+        )) {
+            reportError("msg.export.invalid.export");
+        }
+
+        if (
+            node instanceof FunctionNode && ((FunctionNode) node).getFunctionName() == null ||
+            node instanceof ClassNode && ((ClassNode) node).getClassName() == null
+        ) {
+            reportError("msg.export.no.identifier");
+        }
+    }
+
     private AstNode exportStatement() throws IOException {
         if (scopeNesting != 0) {
             reportError("msg.export.top.level");
@@ -1500,21 +1531,31 @@ public class Parser {
         // There are many different things we could do here,
         // this this could be either a standalone export statement,
         // or an inline export declaration
+        ExportNode en = new ExportNode();
+        en.setType(Token.EXPORT);
 
         if (matchToken(Token.DEFAULT)) {
             AstNode node = expr();
-            node.putProp(Node.EXPORT_PROP, true);
-            return node;
+            validateDefaultExport(node);
+            en.setExportedValue(node);
+            en.setDefaultExport();
         } else {
-            ImportNode in = new ImportNode();
-            in.setType(Token.EXPORT);
+            boolean needsFrom = false;
 
             if (matchToken(Token.MUL)) {
-                in.setModuleImport(null);
+                en.setModuleMember(null);
+                needsFrom = true;
             } else if (matchToken(Token.LC)) {
                 do {
+                    boolean decorator = matchToken(Token.XMLATTR);
+
                     mustMatchToken(Token.NAME, "msg.export.missing.identifier");
                     String target = createNameNode().getIdentifier();
+
+                    if (decorator) {
+                        target = "@" + target;
+                    }
+
                     String scope = null;
                     consumeToken();
                     peekToken();
@@ -1532,31 +1573,31 @@ public class Parser {
                         }
                     }
 
-                    in.addNamedImport(target, scope);
+                    en.addNamedMember(target, scope);
                 } while (matchToken(Token.COMMA));
 
                 mustMatchToken(Token.RC, "msg.export.missing.rc");
-
-                if (matchToken(Token.NAME)) {
-                    peekToken();
-
-                    if (!"from".equals(ts.getString())) {
-                        throw codeBug();
-                    }
-
-                    mustMatchToken(Token.STRING, "");
-                    in.setFilePath(ts.getString());
-
-                }
             } else {
-                // TODO: Validate node type
                 AstNode node = statement();
-                node.putProp(Node.EXPORT_PROP, true);
-                return node;
+                validateExport(node);
+                en.setExportedValue(node);
             }
 
-            return in;
+            if (matchToken(Token.NAME)) {
+                peekToken();
+
+                if (!"from".equals(ts.getString())) {
+                    reportError("msg.export.missing.from");
+                }
+
+                mustMatchToken(Token.STRING, "");
+                en.setFilePath(ts.getString());
+            } else if (needsFrom) {
+                reportError("msg.export.missing.from");
+            }
         }
+
+        return en;
     }
 
     private void autoInsertSemicolon(AstNode pn) throws IOException {

@@ -5,12 +5,17 @@ import org.mozilla.javascript.Token;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Node used for import statements, as well as
+ * a base class for the ExportNode.
+ */
 public class ImportNode extends AstNode {
-    private List<Import> namedImports = new ArrayList<>();
-    private Import defaultImport = null;
+    private List<ModuleMember> namedMembers = new ArrayList<>();
+    private ModuleMember defaultMember = null;
 
-    // ex: import * as myModule from '...';
-    private Import moduleImport = null;
+    // ex: "import * as myModule from '...';"
+    // or  "export * from '...';"
+    private ModuleMember moduleMember = null;
 
     private String filePath = null;
 
@@ -18,61 +23,61 @@ public class ImportNode extends AstNode {
         type = Token.IMPORT;
     }
 
-    public List<Import> getNamedImports() {
-        return namedImports;
+    public List<ModuleMember> getNamedMembers() {
+        return namedMembers;
     }
 
-    public Import getDefaultImport() {
-        return defaultImport;
+    public ModuleMember getDefaultMember() {
+        return defaultMember;
     }
 
-    public Import getModuleImport() {
-        return moduleImport;
+    public ModuleMember getModuleImport() {
+        return moduleMember;
     }
 
-    public void addNamedImport(String targetName, String scopeName) {
-        namedImports.add(new Import(targetName, scopeName));
+    public void addNamedMember(String targetName, String scopeName) {
+        namedMembers.add(new ModuleMember(targetName, scopeName));
     }
 
-    public void setDefaultImport(String scopeName) {
-        defaultImport = new Import(null, scopeName);
+    public void setDefaultMember(String scopeName) {
+        defaultMember = new ModuleMember(null, scopeName);
     }
 
-    public boolean hasDefaultImport() {
-        return defaultImport != null;
+    public boolean hasDefaultMember() {
+        return defaultMember != null;
     }
 
-    public void setModuleImport(String scopeName) {
-        moduleImport = new Import(null, scopeName);
+    public void setModuleMember(String scopeName) {
+        moduleMember = new ModuleMember(null, scopeName);
     }
 
-    public boolean isModuleImport() {
-        return moduleImport != null;
+    public boolean getModuleMember() {
+        return moduleMember != null;
     }
 
     @Override
     public String toSource(int depth) {
         StringBuilder sb = new StringBuilder("import ");
 
-        if (isModuleImport()) {
+        if (getModuleMember()) {
             sb.append("* ");
 
-            if (defaultImport.scopeName != null) {
-                sb.append(" as ").append(defaultImport.scopeName);
+            if (defaultMember.scopeName != null) {
+                sb.append(" as ").append(defaultMember.scopeName);
             }
-        } else if (hasDefaultImport()) {
-            sb.append(defaultImport.scopeName);
+        } else if (hasDefaultMember()) {
+            sb.append(defaultMember.scopeName);
         }
 
-        if (!isModuleImport()) {
-            if (hasDefaultImport()) {
+        if (!getModuleMember()) {
+            if (hasDefaultMember()) {
                 sb.append(",");
             }
 
             sb.append(" {");
 
-            for (int i = 0, namedImportsSize = namedImports.size(); i < namedImportsSize; i++) {
-                Import imp = namedImports.get(i);
+            for (int i = 0, namedMemberSize = namedMembers.size(); i < namedMemberSize; i++) {
+                ModuleMember imp = namedMembers.get(i);
 
                 sb.append(' ').append(imp.targetName);
 
@@ -80,7 +85,7 @@ public class ImportNode extends AstNode {
                     sb.append(" as ").append(imp.scopeName);
                 }
 
-                if (i != namedImportsSize - 1) {
+                if (i != namedMemberSize - 1) {
                     sb.append(',');
                 }
             }
@@ -106,11 +111,11 @@ public class ImportNode extends AstNode {
         this.filePath = filePath;
     }
 
-    public static class Import {
+    public static class ModuleMember {
         private String targetName;
         private String scopeName;
 
-        public Import(String targetName, String scopeName) {
+        public ModuleMember(String targetName, String scopeName) {
             this.targetName = targetName;
             this.scopeName = scopeName;
         }

@@ -123,8 +123,9 @@ public final class IRFactory extends Parser {
                 return transformDoLoop((DoLoop) node);
             case Token.EMPTY:
             case Token.IMPORT:
-            case Token.EXPORT:
                 return node;
+            case Token.EXPORT:
+                return transformExport((ExportNode) node);
             case Token.FOR:
                 if (node instanceof ForInLoop) {
                     return transformForInLoop((ForInLoop) node);
@@ -494,6 +495,14 @@ public final class IRFactory extends Parser {
         } finally {
             popScope();
         }
+    }
+
+    private Node transformExport(ExportNode node) {
+        if (node.getExportedValue() != null) {
+            node.addChildToBack(transform(node.getExportedValue()));
+        }
+
+        return node;
     }
 
     private Node transformElementGet(ElementGet node) {

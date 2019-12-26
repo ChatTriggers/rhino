@@ -816,6 +816,17 @@ public class ScriptRuntime {
         }
     }
 
+    // Export all members from another file
+    public static void handleExport(Object fromRequire, ScriptableObject scope) {
+
+    }
+
+    // Export single member from another file
+    public static void handleExport(String targetName, String scopeName, Object fromRequire, Scriptable scope) {
+
+    }
+
+    // Export single member from current file
     public static void handleExport(String targetName, String scopeName, Scriptable scope) {
         if (!ScriptableObject.hasProperty(scope, targetName)) {
             throw ScriptRuntime.typeError1("msg.export.no.target", targetName);
@@ -829,6 +840,24 @@ public class ScriptRuntime {
             ScriptableObject.putProperty(exports, "default", value);
         } else {
             ScriptableObject.putProperty(exports, scopeName, value);
+        }
+    }
+
+    // Inline export: export entire value from current file
+    public static void handleExport(Object value, boolean isDefault, Scriptable scope) {
+        if (isDefault) {
+            ScriptableObject.putConstProperty(scope, "default", value);
+        } else {
+            String name;
+
+            if (value instanceof BaseFunction) {
+                name = ((BaseFunction) value).getFunctionName();
+            } else {
+                System.out.println("test");
+                return;
+            }
+
+            ScriptableObject.putConstProperty(scope, name, value);
         }
     }
 
