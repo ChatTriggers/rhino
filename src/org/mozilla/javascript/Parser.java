@@ -783,6 +783,10 @@ public class Parser {
                     } else if ("set".equals(propertyName)) {
                         entryKind = SET_ENTRY;
                     }
+
+                    if (entryKind != PROP_ENTRY) {
+                        isPrivate = matchToken(Token.HASHTAG);
+                    }
                 }
                 if (entryKind == GET_ENTRY || entryKind == SET_ENTRY || entryKind == GENERATOR_ENTRY) {
                     pname = objliteralProperty();
