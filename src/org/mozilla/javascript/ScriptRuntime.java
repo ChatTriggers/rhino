@@ -871,6 +871,19 @@ public class ScriptRuntime {
         return cx.newArray(scope, args);
     }
 
+    public static Object[] paramsToRestParams(Object[] in, int spreadIndex, Context cx, Scriptable scope) {
+        if (spreadIndex >= in.length) {
+            return in;
+        }
+
+        Object[] params = new Object[spreadIndex + 1];
+        System.arraycopy(in, 0, params, 0, spreadIndex);
+
+        params[spreadIndex] = getRestParams(in, spreadIndex, cx, scope);
+
+        return params;
+    }
+
     public static Object getNewTarget(Object constructor, Object thisObj) {
         Scriptable obj = ScriptableObject.ensureScriptable(thisObj);
 

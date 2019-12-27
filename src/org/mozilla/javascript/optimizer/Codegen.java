@@ -948,7 +948,7 @@ public class Codegen implements Evaluator {
 
                     case Do_getParamCount:
                         // Push number of defined parameters
-                        cfw.addPush(n.getParamCount() - (n.hasRest() ? 1 : 0));
+                        cfw.addPush(n.getParamCount());
                         cfw.add(ByteCode.IRETURN);
                         break;
 
@@ -1810,6 +1810,15 @@ class BodyCodegen {
                 cfw.addPush(2);
                 cfw.add(ByteCode.AALOAD);
                 cfw.add(ByteCode.CHECKCAST, "[Ljava/lang/Object;");
+            }
+
+            boolean spread = fnCurrent.fnode.getParams().stream().anyMatch(param -> param.getProp(Node.SPREAD_PROP) != null);
+
+            if (spread) {
+                cfw.addPush(fnCurrent.fnode.getParams().size() - 1);
+                cfw.addALoad(contextLocal);
+                cfw.addALoad(variableObjectLocal);
+                addScriptRuntimeInvoke("paramsToRestParams", OBJECT_ARRAY, OBJECT_ARRAY, INTEGER, CONTEXT, SCRIPTABLE);
             }
 
             String methodName = isArrow ? "createArrowFunctionActivation" : "createFunctionActivation";
