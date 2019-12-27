@@ -1569,45 +1569,6 @@ class BodyCodegen {
             }
         }
 
-        if (currentCtorClass) {
-            ClassNode cls = ((FunctionNode) scriptOrFn).getParentClass();
-            Node child = cls.getFirstChild().getNext();
-
-            cfw.addALoad(3); // this
-
-            while (child != null) {
-                if (child instanceof ClassField) {
-                    ClassField cp = (ClassField) child;
-                    Node defaultValue = cp.getFirstChild();
-                    Object name = cp.getNameKey();
-
-                    if (cp.isStatic()) {
-                        child = child.getNext();
-                        continue;
-                    }
-
-                    if (name instanceof String) {
-                        cfw.addPush((String) name);
-                    } else if (name instanceof Node) {
-                        Node nameNode = (Node) name;
-                        generateExpression(nameNode, cls);
-                    } else {
-                        cfw.addPush((Integer) name);
-                        addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
-                    }
-
-                    generateExpression(defaultValue, cls);
-                    cfw.addALoad(contextLocal);
-                    cfw.addPush(cp.isPrivate());
-                    addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
-                }
-
-                child = child.getNext();
-            }
-
-            cfw.add(ByteCode.POP);
-        }
-
         if (fnCurrent != null) {
             // Use the enclosing scope of the function as our variable object.
             cfw.addALoad(funObjLocal);
@@ -3481,11 +3442,6 @@ class BodyCodegen {
                 Node defaultValue = cp.getFirstChild();
                 Object name = cp.getNameKey();
 
-                if (!cp.isStatic()) {
-                    child = child.getNext();
-                    continue;
-                }
-
                 if (name instanceof String) {
                     cfw.addPush((String) name);
                 } else if (name instanceof Node) {
@@ -3498,8 +3454,9 @@ class BodyCodegen {
 
                 generateExpression(defaultValue, cls);
                 cfw.addALoad(contextLocal);
+                cfw.addPush(!cp.isStatic());
                 cfw.addPush(cp.isPrivate());
-                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
+                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, BOOLEAN);
 
                 child = child.getNext();
             }
