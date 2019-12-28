@@ -1585,6 +1585,38 @@ class BodyCodegen {
                     throw Kit.codeBug();
                 }
 
+                if (child instanceof ClassField && ((ClassField) child).getDecorators().stream().noneMatch(it -> it.getDecoratorType() == DecoratorType.INITIALIZE)) {
+                    ClassField cp = (ClassField) child;
+                    Node defaultValue = cp.getFirstChild();
+                    Object name = cp.getNameKey();
+
+                    if (cp.isStatic()) {
+                        child = child.getNext();
+                        continue;
+                    }
+
+                    cfw.addALoad(thisObjLocal);
+
+                    if (name instanceof String) {
+                        cfw.addPush((String) name);
+                    } else if (name instanceof Node) {
+                        Node nameNode = (Node) name;
+                        generateExpression(nameNode, cls);
+                    } else {
+                        cfw.addPush((Integer) name);
+                        addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
+                    }
+
+                    generateExpression(defaultValue, cls);
+                    cfw.addALoad(contextLocal);
+                    cfw.addPush(cp.isPrivate());
+                    addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
+                    cfw.addAStore(thisObjLocal);
+
+                    child = child.getNext();
+                    continue;
+                }
+
                 for (DecoratorNode dn : decorators) {
                     if (!(dn.getDecoratorType() == DecoratorType.INITIALIZE || dn.getDecoratorType() == DecoratorType.USER_DEFINED)) continue;
 
@@ -3572,8 +3604,7 @@ class BodyCodegen {
                 Node defaultValue = cp.getFirstChild();
                 Object name = cp.getNameKey();
 
-                // Initialized properties are handled purely in the constructor
-                if (cp.getDecorators().stream().anyMatch(d -> d.getDecoratorType() == DecoratorType.INITIALIZE)) {
+                if (!cp.isStatic()) {
                     child = child.getNext();
                     continue;
                 }
@@ -3590,9 +3621,8 @@ class BodyCodegen {
 
                 generateExpression(defaultValue, cls);
                 cfw.addALoad(contextLocal);
-                cfw.addPush(!cp.isStatic());
                 cfw.addPush(cp.isPrivate());
-                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN, BOOLEAN);
+                addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
 
                 child = child.getNext();
             }
