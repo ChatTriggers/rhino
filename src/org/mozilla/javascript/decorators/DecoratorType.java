@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 public enum DecoratorType {
     WRAP(WrapDecorator.class, true, 1),
     REGISTER(RegisterDecorator.class, false, 2),
+    INITIALIZE(InitializeDecorator.class, false, 3),
     USER_DEFINED(null, true, -1);
 
     private Class<? extends Decorator> decoratorClass;

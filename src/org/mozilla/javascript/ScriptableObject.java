@@ -2810,6 +2810,16 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     /**
+     * Get arbitrary application-specific value associated with this object.
+     *
+     * @param key key object to select particular value.
+     * @see #associateValue(Object key, Object value)
+     */
+    public final boolean hasAssociatedValue(Object key) {
+        return associatedValues != null && associatedValues.containsKey(key);
+    }
+
+    /**
      * Get arbitrary application-specific value associated with the top scope
      * of the given scope.
      * The method first calls {@link #getTopLevelScope(Scriptable scope)}
@@ -2868,7 +2878,6 @@ public abstract class ScriptableObject implements Scriptable,
      * @see #getAssociatedValue(Object key)
      */
     public synchronized final Object associateValue(Object key, Object value, boolean override) {
-        if (value == null) throw new IllegalArgumentException();
         Map<Object, Object> h = associatedValues;
         if (h == null) {
             h = new HashMap<>();

@@ -773,10 +773,6 @@ public class ScriptRuntime {
         }
     }
 
-    public static boolean isPreInit(Object descriptor) {
-        return (((int) descriptor) & Decorator.PREINIT) != 0;
-    }
-
     public static void handleImport(Object requireObj, Object[] namedImports, String defaultImport, String moduleImport, Scriptable scope) {
         if (!(requireObj instanceof Scriptable)) {
             if (defaultImport == null) {

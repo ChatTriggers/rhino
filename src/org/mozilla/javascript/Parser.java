@@ -920,7 +920,7 @@ public class Parser {
             getAndResetJsDoc();
         }
 
-        cls.setProperties(classProperties);
+        cls.setFields(classProperties);
         cls.setMethods(classMethods);
         insideClass = false;
         return cls;

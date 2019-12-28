@@ -8,6 +8,8 @@ package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.Symbol;
 import org.mozilla.javascript.ast.*;
+import org.mozilla.javascript.decorators.Decorator;
+import org.mozilla.javascript.decorators.DecoratorType;
 import org.mozilla.javascript.optimizer.Codegen;
 
 import java.io.File;
@@ -433,8 +435,9 @@ public final class IRFactory extends Parser {
         if (node instanceof Scope) {
             pushScope((Scope) node);
         }
+
         try {
-            List<Node> kids = new ArrayList<Node>();
+            List<Node> kids = new ArrayList<>();
             for (Node kid : node) {
                 kids.add(transform((AstNode) kid));
             }
@@ -640,6 +643,31 @@ public final class IRFactory extends Parser {
                 }
             }
 
+            // Any @initialize decorators will be in the INITIALIZE_PROP prop
+            List<AstNode> initializers = (List<AstNode>) fn.getProp(Node.INITIALIZE_PROP);
+
+            if (initializers != null) {
+                for (AstNode initializer : initializers) {
+                    if (initializer instanceof ClassNode) {
+                        List<Node> dns = ((ClassNode) initializer).getDecorators().stream()
+                                .filter(dn -> dn.getDecoratorType() == DecoratorType.INITIALIZE)
+                                .map(this::transformDecoratorNode)
+                                .collect(Collectors.toList());
+
+                        initializer.putProp(Node.DECORATOR_PROP, dns);
+                    } else if (initializer instanceof ClassElement) {
+                        List<Node> dns = ((ClassElement) initializer).getDecorators().stream()
+                                .filter(dn -> dn.getDecoratorType() == DecoratorType.INITIALIZE)
+                                .map(this::transformDecoratorNode)
+                                .collect(Collectors.toList());
+
+                        initializer.putProp(Node.DECORATOR_PROP, dns);
+                    } else {
+                        throw Kit.codeBug();
+                    }
+                }
+            }
+
             fn.setEncodedSourceBounds(start, decompiler.markFunctionEnd(start));
 
             if (functionType != FunctionNode.FUNCTION_EXPRESSION && !fn.isExpressionClosure()) {
@@ -719,10 +747,30 @@ public final class IRFactory extends Parser {
         List<Node> decorators = new ArrayList<>();
 
         for (DecoratorNode dn : node.getDecorators()) {
+            if (dn.getDecoratorType() == DecoratorType.INITIALIZE) continue;
             decorators.add(transformDecoratorNode(dn));
         }
 
+        // @initialize decorators must be attached to the
+        // constructor
+        List<AstNode> initializers = node.getMethods().stream().filter(cm ->
+                cm.getDecorators().stream().anyMatch(dn ->
+                        dn.getDecoratorType() == DecoratorType.INITIALIZE
+                )
+        ).collect(Collectors.toList());
+
+        initializers.addAll(node.getFields().stream().filter(cf ->
+                cf.getDecorators().stream().anyMatch(dn ->
+                        dn.getDecoratorType() == DecoratorType.INITIALIZE
+                )
+        ).collect(Collectors.toList()));
+
+        if (node.getDecorators().stream().anyMatch(dn -> dn.getDecoratorType() == DecoratorType.INITIALIZE)) {
+            initializers.add(node);
+        }
+
         node.putProp(Node.DECORATOR_PROP, decorators);
+        fn.putProp(Node.INITIALIZE_PROP, initializers);
         Node transformedFn = transform(fn);
         node.addChildToBack(transformedFn);
         node.setParentFn(transformedFn);
@@ -734,6 +782,7 @@ public final class IRFactory extends Parser {
             decorators = new ArrayList<>();
 
             for (DecoratorNode dn : cm.getDecorators()) {
+                if (dn.getDecoratorType() == DecoratorType.INITIALIZE) continue;
                 decorators.add(transformDecoratorNode(dn));
             }
 
@@ -741,13 +790,14 @@ public final class IRFactory extends Parser {
             node.addChildToBack(cm);
         }
 
-        for (ClassField cp : node.getProperties()) {
+        for (ClassField cp : node.getFields()) {
             cp.setNameKey(getPropKey(cp.getName()));
             cp.addChildToBack(transform(cp.getDefaultValue()));
 
             decorators = new ArrayList<>();
 
             for (DecoratorNode dn : cp.getDecorators()) {
+                if (dn.getDecoratorType() == DecoratorType.INITIALIZE) continue;
                 decorators.add(transformDecoratorNode(dn));
             }
 

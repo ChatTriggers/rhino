@@ -9,8 +9,8 @@ public class WrapDecorator extends Decorator {
     }
 
     @Override
-    public Object consume(Object target, int descriptor, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        if ((descriptor & PREINIT) == 0) return target;
+    public Object consume(Object target, int descriptor, DecoratorType decoratorType, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (decoratorType != DecoratorType.WRAP) return target;
         if (args.length == 0 || !(args[0] instanceof Callable)) return target;
 
         return ((Callable) args[0]).call(cx, scope, thisObj, new Object[]{ target });

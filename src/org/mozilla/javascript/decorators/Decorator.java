@@ -11,9 +11,9 @@ public abstract class Decorator extends BaseFunction {
     public static int PUBLIC  = 1 << 3;
     public static int PRIVATE = 1 << 4;
     public static int STATIC  = 1 << 5;
-    public static int PREINIT = 1 << 6;
 
     public static final Object NAME_KEY = new Object();
+    public static final Object VALUE_KEY = new Object();
 
     public static void init(Scriptable scope) {
         WrapDecorator.init(scope);
@@ -22,9 +22,8 @@ public abstract class Decorator extends BaseFunction {
 
     @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        Object res = consume(args[0], (int) args[1], cx, scope, thisObj, (Object[]) args[2]);
-        return res;
+        return consume(args[0], (int) args[1], (DecoratorType) args[2], cx, scope, thisObj, (Object[]) args[3]);
     }
 
-    public abstract Object consume(Object target, int descriptor, Context cx, Scriptable scope, Scriptable thisObj, Object[] args);
+    public abstract Object consume(Object target, int descriptor, DecoratorType decoratorType, Context cx, Scriptable scope, Scriptable thisObj, Object[] args);
 }

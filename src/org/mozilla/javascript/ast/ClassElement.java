@@ -1,5 +1,7 @@
 package org.mozilla.javascript.ast;
 
+import java.util.List;
+
 public interface ClassElement {
     void setIsStatic();
 
@@ -12,4 +14,6 @@ public interface ClassElement {
     Object getNameKey();
 
     void setNameKey(Object nameKey);
+
+    List<DecoratorNode> getDecorators();
 }

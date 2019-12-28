@@ -1569,6 +1569,137 @@ class BodyCodegen {
             }
         }
 
+        if (currentCtorClass) {
+            // Handle all @initialize decorators
+            ClassNode cls = ((FunctionNode) scriptOrFn).getParentClass();
+            Node child = cls.getFirstChild().getNext();
+
+            while (child != null) {
+                List<DecoratorNode> decorators;
+
+                if (child instanceof ClassElement) {
+                    decorators = ((ClassElement) child).getDecorators();
+                } else if (child instanceof ClassNode) {
+                    decorators = ((ClassNode) child).getDecorators();
+                } else {
+                    throw Kit.codeBug();
+                }
+
+                for (DecoratorNode dn : decorators) {
+                    if (!(dn.getDecoratorType() == DecoratorType.INITIALIZE || dn.getDecoratorType() == DecoratorType.USER_DEFINED)) continue;
+
+                    Name decorator = (Name) dn.getTarget();
+                    generateExpression(decorator, child);
+                    cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/BaseFunction");
+
+                    // Associate the name
+                    if (child instanceof ClassElement) {
+                        cfw.addALoad(thisObjLocal);
+                        cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+                        cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "NAME_KEY", OBJECT);
+                        Object targetName = ((ClassElement) child).getNameKey();
+
+                        if (targetName instanceof String) {
+                            cfw.addPush((String) targetName);
+                        } else if (targetName instanceof Integer) {
+                            cfw.addPush((int) targetName);
+                        } else if (targetName instanceof Node) {
+                            generateExpression((Node) targetName, child);
+                        } else {
+                            throw Kit.codeBug(targetName == null ? "null" : targetName.getClass().getSimpleName());
+                        }
+
+                        cfw.addPush(true);
+                        cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "associateValue", "(" + OBJECT + OBJECT + BOOLEAN + ")" + OBJECT);
+                        // Return value doesn't matter
+                        cfw.add(ByteCode.POP);
+                    }
+
+                    // Associate the value, only if this is a field
+                    if (child instanceof ClassField) {
+                        cfw.addALoad(thisObjLocal);
+                        cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+                        cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "VALUE_KEY", OBJECT);
+                        Node targetValue = child.getFirstChild();
+                        generateExpression(targetValue, child);
+                        cfw.addPush(true);
+                        cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "associateValue", "(" + OBJECT + OBJECT + BOOLEAN + ")" + OBJECT);
+                        // Return value doesn't matter
+                        cfw.add(ByteCode.POP);
+                    }
+
+                    cfw.addALoad(contextLocal);
+                    cfw.addALoad(variableObjectLocal);
+                    cfw.addALoad(thisObjLocal);
+
+                    // BaseFunction args array
+                    cfw.addPush(4);
+                    cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+
+                    // Target
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(0);
+                    cfw.addALoad(thisObjLocal);
+                    cfw.add(ByteCode.AASTORE);
+
+                    // descriptor
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(1);
+                    generateDecoratorDescriptor(child);
+                    generateIntegerWrap();
+                    cfw.add(ByteCode.AASTORE);
+
+                    // type
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(2);
+                    // We only ever want to call @initialize, so we get that type here
+                    cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/DecoratorType", DecoratorType.INITIALIZE.name(), "Lorg/mozilla/javascript/decorators/DecoratorType;");
+                    cfw.add(ByteCode.AASTORE);
+
+                    // descriptorArgs
+                    List<Node> args = new ArrayList<>();
+                    for (Node ch = dn.getFirstChild(); ch != null; ch = ch.getNext()) {
+                        args.add(ch);
+                    }
+
+                    cfw.add(ByteCode.DUP);
+                    cfw.addPush(3);
+
+                    cfw.addPush(args.size());
+                    cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+
+                    for (int i = 0; i < args.size(); i++) {
+                        cfw.add(ByteCode.DUP);
+                        cfw.addPush(i);
+                        Node ch = args.get(i);
+                        generateExpression(ch, child);
+
+                        cfw.add(ByteCode.AASTORE);
+                    }
+
+                    cfw.add(ByteCode.AASTORE);
+
+                    cfw.addInvoke(
+                            ByteCode.INVOKEVIRTUAL,
+                            "org/mozilla/javascript/BaseFunction",
+                            "call",
+                            "(" + CONTEXT + SCRIPTABLE + SCRIPTABLE + OBJECT_ARRAY + ")" + OBJECT
+                    );
+                }
+
+                // We want to run through all of the ClassNode's children,
+                // and then at the very end, execute the same code for the
+                // class itself
+                if (child instanceof ClassNode) break;
+
+                child = child.getNext();
+
+                if (child == null) {
+                    child = cls;
+                }
+            }
+        }
+
         if (fnCurrent != null) {
             // Use the enclosing scope of the function as our variable object.
             cfw.addALoad(funObjLocal);
@@ -1764,11 +1895,11 @@ class BodyCodegen {
             cfw.addALoad(variableObjectLocal);
 
             // Decorators have additional information, so the activation
-            // args we wants are actually in argsLocal[2]
+            // args we wants are actually in argsLocal[3]
             cfw.addALoad(argsLocal);
 
             if (fnCurrent.fnode instanceof DecoratorDeclarationNode) {
-                cfw.addPush(2);
+                cfw.addPush(3);
                 cfw.add(ByteCode.AALOAD);
                 cfw.add(ByteCode.CHECKCAST, "[Ljava/lang/Object;");
             }
@@ -2480,8 +2611,7 @@ class BodyCodegen {
             case Token.FUNCTION:
                 if (fnCurrent != null || parent.getType() != Token.SCRIPT) {
                     int fnIndex = node.getExistingIntProp(Node.FUNCTION_PROP);
-                    OptFunctionNode ofn = OptFunctionNode.get(scriptOrFn,
-                            fnIndex);
+                    OptFunctionNode ofn = OptFunctionNode.get(scriptOrFn, fnIndex);
                     int t = ofn.fnode.getFunctionType();
                     if (t != FunctionNode.FUNCTION_EXPRESSION &&
                             t != FunctionNode.ARROW_FUNCTION) {
@@ -3357,10 +3487,10 @@ class BodyCodegen {
             cfw.addALoad(variableObjectLocal);
             cfw.addALoad(thisObjLocal);
 
-            // Load decorator arguments into the third slot of argsLocal
+            // Load decorator arguments into the fourth slot of argsLocal
             cfw.addALoad(argsLocal);
             cfw.add(ByteCode.DUP);
-            cfw.addPush(2);
+            cfw.addPush(3);
 
             List<Node> args = new ArrayList<>();
             for (Node ch = dn.getFirstChild(); ch != null; ch = ch.getNext()) {
@@ -3429,7 +3559,7 @@ class BodyCodegen {
                 }
 
                 generateExpression(method, cls);
-                generateApplyDecorator(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP), true);
+                generateApplyDecorator(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP), DecoratorType.WRAP);
                 cfw.addALoad(contextLocal);
                 cfw.addPush(!cm.isStatic());
                 cfw.addPush(cm.isGetterMethod() ? 2 : cm.isSetterMethod() ? 1 : 0);
@@ -3441,6 +3571,12 @@ class BodyCodegen {
                 ClassField cp = (ClassField) child;
                 Node defaultValue = cp.getFirstChild();
                 Object name = cp.getNameKey();
+
+                // Initialized properties are handled purely in the constructor
+                if (cp.getDecorators().stream().anyMatch(d -> d.getDecoratorType() == DecoratorType.INITIALIZE)) {
+                    child = child.getNext();
+                    continue;
+                }
 
                 if (name instanceof String) {
                     cfw.addPush((String) name);
@@ -3462,7 +3598,7 @@ class BodyCodegen {
             }
         }
 
-        generateApplyDecorator(cls.getFirstChild(), (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP), true);
+        generateApplyDecorator(cls.getFirstChild(), (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP), DecoratorType.WRAP);
 
         // A decorator can map the class to any value. We need
         // to make sure it's still a nativefunction before we
@@ -3512,20 +3648,20 @@ class BodyCodegen {
         while (child != null) {
             if (child instanceof ClassMethod) {
                 ClassMethod cm = (ClassMethod) child;
-                generateApplyDecorator(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP), false);
+                generateApplyDecorator(child, (List<DecoratorNode>) cm.getProp(Node.DECORATOR_PROP), DecoratorType.REGISTER);
             } else if (child instanceof ClassField) {
                 ClassField cp = (ClassField) child;
-                generateApplyDecorator(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP), false);
+                generateApplyDecorator(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP), DecoratorType.REGISTER);
             }
             child = child.getNext();
         }
 
-        generateApplyDecorator(cls.getFirstChild(), (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP), false);
+        generateApplyDecorator(cls.getFirstChild(), (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP), DecoratorType.REGISTER);
     }
 
     // Returns the target
-    private void generateDecoratorDescriptor(Node node, boolean preInit) {
-        int descriptor = preInit ? Decorator.PREINIT : 0;
+    private void generateDecoratorDescriptor(Node node) {
+        int descriptor = 0;
 
         if (node instanceof ClassElement) {
             ClassElement ce = (ClassElement) node;
@@ -3544,11 +3680,11 @@ class BodyCodegen {
         cfw.addPush(descriptor);
     }
 
-    private void generateApplyDecorator(Node node, List<DecoratorNode> decoratorNodes, boolean preInit) {
+    private void generateApplyDecorator(Node node, List<DecoratorNode> decoratorNodes, DecoratorType decoratorType) {
         for (DecoratorNode dn : decoratorNodes) {
             DecoratorType type = dn.getDecoratorType();
-            if (!preInit && type == DecoratorType.WRAP) continue;
-            if (preInit && type == DecoratorType.REGISTER) continue;
+
+            if (type != decoratorType) continue;
 
             int target = getNewWordLocal();
             cfw.addAStore(target);
@@ -3592,11 +3728,8 @@ class BodyCodegen {
             cfw.addALoad(thisObjLocal);
 
             // BaseFunction args array
-            cfw.addPush(3);
+            cfw.addPush(4);
             cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
-            int decArgs = getNewWordLocal();
-            cfw.add(ByteCode.DUP);
-            cfw.addAStore(decArgs);
 
             // Target
             cfw.add(ByteCode.DUP);
@@ -3607,8 +3740,14 @@ class BodyCodegen {
             // descriptor
             cfw.add(ByteCode.DUP);
             cfw.addPush(1);
-            generateDecoratorDescriptor(node, preInit);
+            generateDecoratorDescriptor(node);
             generateIntegerWrap();
+            cfw.add(ByteCode.AASTORE);
+
+            // DecoratorType
+            cfw.add(ByteCode.DUP);
+            cfw.addPush(2);
+            cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/DecoratorType", type.name(), "Lorg/mozilla/javascript/decorators/DecoratorType;");
             cfw.add(ByteCode.AASTORE);
 
             // descriptorArgs
@@ -3618,7 +3757,7 @@ class BodyCodegen {
             }
 
             cfw.add(ByteCode.DUP);
-            cfw.addPush(2);
+            cfw.addPush(3);
 
             cfw.addPush(args.size());
             cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");

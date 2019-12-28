@@ -9,8 +9,8 @@ public class RegisterDecorator extends Decorator {
     }
 
     @Override
-    public Object consume(Object target, int descriptor, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        if ((descriptor & PREINIT) != 0) return target;
+    public Object consume(Object target, int descriptor, DecoratorType decoratorType, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (decoratorType != DecoratorType.REGISTER) return Undefined.instance;
 
         Object[] callArgs;
         Object realTarget = target;
@@ -25,7 +25,13 @@ public class RegisterDecorator extends Decorator {
             callArgs = new Object[]{ realTarget, ((ScriptableObject) target).getAssociatedValue(NAME_KEY) };
         }
 
-        ((Callable) args[0]).call(cx, scope, thisObj, callArgs);
-        return target;
+        Object result = ((Callable) args[0]).call(cx, scope, thisObj, callArgs);
+
+        // Ensure result is undefined
+        if (!Undefined.isUndefined(result)) {
+            throw ScriptRuntime.typeError("The function provided to @register must return undefined");
+        }
+
+        return Undefined.instance;
     }
 }
