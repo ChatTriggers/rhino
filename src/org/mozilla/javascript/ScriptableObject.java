@@ -2810,7 +2810,8 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     /**
-     * Get arbitrary application-specific value associated with this object.
+     * Whether or not this object has a certain application-specific value
+     * associated with it
      *
      * @param key key object to select particular value.
      * @see #associateValue(Object key, Object value)

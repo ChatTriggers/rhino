@@ -7,19 +7,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public enum DecoratorType {
-    WRAP(WrapDecorator.class, true, 1),
-    REGISTER(RegisterDecorator.class, false, 2),
-    INITIALIZE(InitializeDecorator.class, false, 3),
-    USER_DEFINED(null, true, -1);
+    WRAP(WrapDecorator.class),
+    REGISTER(RegisterDecorator.class),
+    INITIALIZE(InitializeDecorator.class),
+    USER_DEFINED(null);
 
     private Class<? extends Decorator> decoratorClass;
-    private boolean applyBeforeInit;
-    private int argCount;
 
-    DecoratorType(Class<? extends Decorator> decoratorClass, boolean applyBeforeInit, int argCount) {
+    DecoratorType(Class<? extends Decorator> decoratorClass) {
         this.decoratorClass = decoratorClass;
-        this.applyBeforeInit = applyBeforeInit;
-        this.argCount = argCount;
     }
 
     public Class<? extends Decorator> getDecoratorClass() {
@@ -50,13 +46,5 @@ public enum DecoratorType {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw Kit.codeBug();
         }
-    }
-
-    public boolean isApplyBeforeInit() {
-        return applyBeforeInit;
-    }
-
-    public int getArgCount() {
-        return argCount;
     }
 }
