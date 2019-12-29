@@ -1434,8 +1434,17 @@ public class Parser {
             boolean defaultComma = false;
             boolean hasNamedImports;
 
+            if (matchToken(Token.DEFAULT)) {
+                reportError("msg.import.invalid.default");
+            }
+
+            boolean decorator = matchToken(Token.XMLATTR);
+
             if (matchToken(Token.NAME)) {
                 String defaultImport = createNameNode().getIdentifier();
+                if (decorator) {
+                    defaultImport = "@" + defaultImport;
+                }
                 consumeToken();
                 in.setDefaultMember(defaultImport);
                 hasDefault = true;
@@ -1456,11 +1465,13 @@ public class Parser {
                 while (!matchToken(Token.RC)) {
                     String targetName;
 
-                    if (matchToken(Token.XMLATTR)) {
-                        mustMatchToken(Token.NAME, "msg.decorator.malformed");
-                        targetName = "@" + createNameNode().getIdentifier();
-                    } else if (matchToken(Token.NAME)) {
+                    decorator = matchToken(Token.XMLATTR);
+
+                    if (matchToken(Token.NAME)) {
                         targetName = createNameNode().getIdentifier();
+                        if (decorator) {
+                            targetName = "@" + targetName;
+                        }
                     } else if (matchToken(Token.DEFAULT)) {
                         targetName = "default";
                     } else {
@@ -1474,8 +1485,17 @@ public class Parser {
                         if (!"as".equals(ts.getString())) {
                             reportError("msg.import.expected.as");
                         }
+
+                        if (matchToken(Token.DEFAULT)) {
+                            reportError("msg.import.invalid.default");
+                        }
+
+                        decorator = matchToken(Token.XMLATTR);
                         mustMatchToken(Token.NAME, "msg.import.missing.alias");
                         scopeName = createNameNode().getIdentifier();
+                        if (decorator) {
+                            scopeName = "@" + scopeName;
+                        }
                     }
 
                     matchToken(Token.COMMA);
@@ -1539,10 +1559,11 @@ public class Parser {
         en.setType(Token.EXPORT);
 
         if (matchToken(Token.DEFAULT)) {
-            AstNode node = expr();
-            validateDefaultExport(node);
-            en.setExportedValue(node);
-            en.setDefaultExport();
+            reportError("msg.export.inline.not.supported");
+            // AstNode node = expr();
+            // validateDefaultExport(node);
+            // en.setExportedValue(node);
+            // en.setDefaultExport();
         } else {
             boolean needsFrom = false;
 
@@ -1566,10 +1587,15 @@ public class Parser {
 
                     if ("as".equals(ts.getString())) {
                         consumeToken();
+                        decorator = matchToken(Token.XMLATTR);
 
                         if (matchToken(Token.NAME)) {
                             scope = createNameNode().getIdentifier();
+                            if (decorator) {
+                                scope = "@" + scope;
+                            }
                         } else if (matchToken(Token.DEFAULT)) {
+                            if (decorator) reportError("msg.export.invalid.default");
                             scope = "default";
                         } else {
                             reportError("msg.export.unexpected.token");
@@ -1582,9 +1608,10 @@ public class Parser {
 
                 mustMatchToken(Token.RC, "msg.export.missing.rc");
             } else {
-                AstNode node = statement();
-                validateExport(node);
-                en.setExportedValue(node);
+                reportError("msg.export.inline.not.supported");
+                // AstNode node = statement();
+                // validateExport(node);
+                // en.setExportedValue(node);
             }
 
             if (matchToken(Token.NAME)) {
