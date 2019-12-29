@@ -2640,6 +2640,18 @@ public abstract class ScriptableObject implements Scriptable,
         base.put(index, obj, value);
     }
 
+    public static void putProperty(Scriptable obj, Object key, Object value) {
+        if (key instanceof String) {
+            putProperty(obj, (String) key, value);
+        } else if (key instanceof Integer) {
+            putProperty(obj, (int) key, value);
+        } else if (key instanceof Symbol) {
+            putProperty(obj, (Symbol) key, value);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     /**
      * Removes the property from an object or its prototype chain.
      * <p>

@@ -38,46 +38,28 @@ public class NativeObject extends IdScriptableObject implements Map {
 
     @Override
     protected void fillConstructorProperties(IdFunctionObject ctor) {
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getPrototypeOf,
-                "getPrototypeOf", 1);
         if (Context.getCurrentContext().version >= Context.VERSION_ES6) {
-            addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_setPrototypeOf,
-                    "setPrototypeOf", 2);
+            addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_setPrototypeOf, "setPrototypeOf", 2);
         }
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_keys,
-                "keys", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getOwnPropertyNames,
-                "getOwnPropertyNames", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getOwnPropertySymbols,
-                "getOwnPropertySymbols", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getOwnPropertyDescriptor,
-                "getOwnPropertyDescriptor", 2);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_defineProperty,
-                "defineProperty", 3);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_isExtensible,
-                "isExtensible", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_preventExtensions,
-                "preventExtensions", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_defineProperties,
-                "defineProperties", 2);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_create,
-                "create", 2);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_isSealed,
-                "isSealed", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_isFrozen,
-                "isFrozen", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_seal,
-                "seal", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_freeze,
-                "freeze", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_assign,
-                "assign", 2);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_is,
-                "is", 2);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_values,
-                "values", 1);
-        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_entries,
-                "entries", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getPrototypeOf, "getPrototypeOf", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_keys, "keys", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getOwnPropertyNames, "getOwnPropertyNames", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getOwnPropertySymbols, "getOwnPropertySymbols", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getOwnPropertyDescriptor, "getOwnPropertyDescriptor", 2);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_getOwnPropertyDescriptors, "getOwnPropertyDescriptors", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_defineProperty, "defineProperty", 3);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_isExtensible, "isExtensible", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_preventExtensions, "preventExtensions", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_defineProperties, "defineProperties", 2);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_create, "create", 2);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_isSealed, "isSealed", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_isFrozen, "isFrozen", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_seal, "seal", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_freeze, "freeze", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_assign, "assign", 2);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_is, "is", 2);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_values, "values", 1);
+        addIdFunctionProperty(ctor, OBJECT_TAG, ConstructorId_entries, "entries", 1);
         super.fillConstructorProperties(ctor);
     }
 
@@ -439,6 +421,21 @@ public class NativeObject extends IdScriptableObject implements Map {
                 Object nameArg = args.length < 2 ? Undefined.instance : args[1];
                 Scriptable desc = obj.getOwnPropertyDescriptor(cx, nameArg);
                 return desc == null ? Undefined.instance : desc;
+            }
+            case ConstructorId_getOwnPropertyDescriptors: {
+                Object argObj = args.length < 1 ? Undefined.instance : args[0];
+                NativeObject descriptors = cx.newObject(scope);
+
+                if (argObj instanceof ScriptableObject) {
+                    ScriptableObject arg = (ScriptableObject) argObj;
+                    Object[] keys = arg.getIds(true, true);
+
+                    for (Object key : keys) {
+                        ScriptableObject.putProperty(descriptors, key, arg.getOwnPropertyDescriptor(cx, key));
+                    }
+                }
+
+                return descriptors;
             }
             case ConstructorId_defineProperty: {
                 Object arg = args.length < 1 ? Undefined.instance : args[0];
@@ -969,6 +966,7 @@ public class NativeObject extends IdScriptableObject implements Map {
             ConstructorId_setPrototypeOf = -17,
             ConstructorId_values = -18,
             ConstructorId_entries = -19,
+            ConstructorId_getOwnPropertyDescriptors = -20,
 
     Id_constructor = 1,
             Id_toString = 2,

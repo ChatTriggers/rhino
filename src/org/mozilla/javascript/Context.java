@@ -1594,7 +1594,7 @@ public class Context {
      *              against
      * @return the new object
      */
-    public Scriptable newObject(Scriptable scope) {
+    public NativeObject newObject(Scriptable scope) {
         NativeObject result = new NativeObject();
         ScriptRuntime.setBuiltinProtoAndParent(result, scope,
                 TopLevel.Builtins.Object);
