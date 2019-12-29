@@ -15,7 +15,7 @@ public class RegisterDecorator extends Decorator {
         Object[] callArgs;
         Object realTarget = target;
 
-        if ((descriptor & STATIC) == 0) {
+        if ((descriptor & STATIC) == 0 && (descriptor & CLASS) == 0) {
             realTarget = ScriptableObject.getProperty(ScriptableObject.ensureScriptable(target), "prototype");
         }
 
