@@ -28,8 +28,24 @@ final class Arguments extends IdScriptableObject {
         setParentScope(parent);
         setPrototype(ScriptableObject.getObjectPrototype(parent));
 
-        args = activation.originalArgs;
-        lengthObj = Integer.valueOf(args.length);
+        Object[] origArgs = activation.originalArgs;
+
+        if (activation.function.hasRest() && activation.function.getParamCount() <= origArgs.length) {
+            Object restObj = origArgs[origArgs.length - 1];
+
+            if (!(restObj instanceof NativeArray))
+                throw Kit.codeBug();
+
+            NativeArray rest = (NativeArray) restObj;
+            Object[] restItems = rest.toArray();
+            args = new Object[origArgs.length - 1 + restItems.length];
+            System.arraycopy(origArgs, 0, args, 0, origArgs.length - 1);
+            System.arraycopy(restItems, 0, args, origArgs.length - 1, restItems.length);
+        } else {
+            args = origArgs;
+        }
+
+        lengthObj = args.length;
 
         NativeFunction f = activation.function;
         calleeObj = f;
