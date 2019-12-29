@@ -1591,6 +1591,10 @@ class BodyCodegen {
                         if (!(dn.getDecoratorType() == DecoratorType.INITIALIZE || dn.getDecoratorType() == DecoratorType.USER_DEFINED))
                             continue;
 
+                        if (dn.getDecoratorType() == DecoratorType.INITIALIZE && child instanceof ClassField && ((ClassField) child).isStatic()) {
+                            throw ScriptRuntime.typeError0("msg.decorator.initialize.on.static.field");
+                        }
+
                         Name decorator = (Name) dn.getTarget();
                         generateExpression(decorator, child);
                         cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/BaseFunction");
@@ -1693,41 +1697,38 @@ class BodyCodegen {
 
                 // See if the result of the decorator call has an associated
                 // HAS_INITIALIZE key. If so, skip creating the class field
-                if (child instanceof ClassField) {
+                if (child instanceof ClassField && !((ClassField) child).isStatic()) {
                     int L1 = cfw.acquireLabel();
 
-                    if (!decorators.isEmpty()) {
-                        cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
-                        cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "HAS_INITIALIZE", OBJECT);
-                        cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "getAssociatedValue", "(" + OBJECT + ")" + OBJECT);
-                        cfw.add(ByteCode.CHECKCAST, "java/lang/Boolean");
-                        cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "TRUE", "Ljava/lang/Boolean;");
-                        cfw.add(ByteCode.IF_ACMPEQ, L1);
-                    }
+                    cfw.addALoad(thisObjLocal);
+                    cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+                    cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "HAS_INITIALIZE", OBJECT);
+                    cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "getAssociatedValue", "(" + OBJECT + ")" + OBJECT);
+                    cfw.add(ByteCode.CHECKCAST, "java/lang/Boolean");
+                    cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "TRUE", "Ljava/lang/Boolean;");
+                    cfw.add(ByteCode.IF_ACMPEQ, L1);
 
                     ClassField cp = (ClassField) child;
                     Node defaultValue = cp.getFirstChild();
                     Object name = cp.getNameKey();
 
-                    if (!cp.isStatic()) {
-                        cfw.addALoad(thisObjLocal);
+                    cfw.addALoad(thisObjLocal);
 
-                        if (name instanceof String) {
-                            cfw.addPush((String) name);
-                        } else if (name instanceof Node) {
-                            Node nameNode = (Node) name;
-                            generateExpression(nameNode, cls);
-                        } else {
-                            cfw.addPush((Integer) name);
-                            addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
-                        }
-
-                        generateExpression(defaultValue, cls);
-                        cfw.addALoad(contextLocal);
-                        cfw.addPush(cp.isPrivate());
-                        addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
-                        cfw.addAStore(thisObjLocal);
+                    if (name instanceof String) {
+                        cfw.addPush((String) name);
+                    } else if (name instanceof Node) {
+                        Node nameNode = (Node) name;
+                        generateExpression(nameNode, cls);
+                    } else {
+                        cfw.addPush((Integer) name);
+                        addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
                     }
+
+                    generateExpression(defaultValue, cls);
+                    cfw.addALoad(contextLocal);
+                    cfw.addPush(cp.isPrivate());
+                    addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
+                    cfw.addAStore(thisObjLocal);
 
                     cfw.markLabel(L1);
 
@@ -3535,6 +3536,29 @@ class BodyCodegen {
         for (DecoratorNode dn : node.getDecoratorNodes()) {
             if (dn.getDecoratorType() == DecoratorType.INITIALIZE) {
                 hasInitialize = true;
+
+                // Make sure this isn't a static field
+                int L1 = cfw.acquireLabel();
+
+                cfw.addALoad(descriptor);
+                cfw.add(ByteCode.CHECKCAST, "java/lang/Integer");
+                generateIntegerUnwrap();
+                cfw.addPush(Decorator.FIELD);
+                cfw.add(ByteCode.IAND);
+                cfw.add(ByteCode.IFEQ, L1);
+
+                cfw.addALoad(descriptor);
+                cfw.add(ByteCode.CHECKCAST, "java/lang/Integer");
+                generateIntegerUnwrap();
+                cfw.addPush(Decorator.STATIC);
+                cfw.add(ByteCode.IAND);
+                cfw.add(ByteCode.IFEQ, L1);
+
+                cfw.addPush("msg.decorator.initialize.on.static.field");
+                addScriptRuntimeInvoke("typeError0", "Lorg/mozilla/javascript/EcmaError;", STRING);
+                cfw.add(ByteCode.ATHROW);
+
+                cfw.markLabel(L1);
             }
 
             generateExpression(dn.getTarget(), node);

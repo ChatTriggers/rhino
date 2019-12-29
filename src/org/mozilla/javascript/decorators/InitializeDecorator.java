@@ -10,6 +10,8 @@ public class InitializeDecorator extends Decorator {
 
     @Override
     public Object consume(Object target, int descriptor, DecoratorType decoratorType, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (decoratorType != DecoratorType.INITIALIZE) return target;
+
         if ((descriptor & STATIC) != 0) {
             // The proposal is not clear what this behavior should be,
             // so I have chosen to disallow it. The whole point of
@@ -19,7 +21,6 @@ public class InitializeDecorator extends Decorator {
             throw ScriptRuntime.typeError("@initialize is not allowed on static class members");
         }
 
-        if (decoratorType != DecoratorType.INITIALIZE) return target;
 
         if (args.length == 0 || !(args[0] instanceof Callable)) {
             throw ScriptRuntime.typeError1("msg.object.not.callable", ScriptRuntime.toString(args[0]));
