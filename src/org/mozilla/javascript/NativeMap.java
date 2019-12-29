@@ -106,6 +106,8 @@ public class NativeMap extends IdScriptableObject {
                 return realThis(thisObj, f).js_filter(cx, scope, args);
             case Id_merge:
                 return realThis(thisObj, f).js_merge(cx, scope, args);
+            case Id_upsert:
+                return realThis(thisObj, f).js_upsert(cx, scope, args);
             case SymbolId_getSize:
                 return realThis(thisObj, f).js_getSize();
         }
@@ -540,6 +542,46 @@ public class NativeMap extends IdScriptableObject {
         return map;
     }
 
+    private Object js_upsert(Context cx, Scriptable scope, Object[] args) {
+        if (args.length == 0) {
+            throw ScriptRuntime.typeError("Key must be specified for upsert");
+        } else if (args.length == 1) {
+            throw ScriptRuntime.typeError("Update function must be specified for upsert");
+        }
+
+        Object key = args[0];
+        Object updateFnObj = args[1];
+        Object insertFnObj = args.length > 2 ? args[2] : null;
+
+        if (!(updateFnObj instanceof Callable) && !(insertFnObj instanceof Callable)) {
+            throw ScriptRuntime.typeError("The updater and inserter provided to upsert are both not functions");
+        }
+
+        Callable updateFn = updateFnObj instanceof Callable ? (Callable) updateFnObj : null;
+        Callable insertFn = insertFnObj instanceof Callable ? (Callable) insertFnObj : null;
+
+        for (Hashtable.Entry en : entries) {
+            if (ScriptRuntime.sameZero(en.key, key)) {
+                Object value = en.value;
+
+                if (updateFn != null) {
+                    value = updateFn.call(cx, scope, Undefined.SCRIPTABLE_UNDEFINED, new Object[]{ value, key, this });
+                    entries.put(key, value);
+                }
+
+                return value;
+            }
+        }
+
+        if (insertFn != null) {
+            Object insertionValue = insertFn.call(cx, scope, Undefined.SCRIPTABLE_UNDEFINED, new Object[]{ key, this });
+            entries.put(key, insertionValue);
+            return insertionValue;
+        }
+
+        return Undefined.instance;
+    }
+
     /**
      * If an "iterable" object was passed to the constructor, there are many many things
      * to do... Make this static because NativeWeakMap has the exact same requirement.
@@ -708,6 +750,10 @@ public class NativeMap extends IdScriptableObject {
                 arity = 1;
                 s = "merge";
                 break;
+            case Id_upsert:
+                arity = 3;
+                s = "upsert";
+                break;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -736,7 +782,7 @@ public class NativeMap extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-12-22 16:16:03 PST
+// #generated# Last update: 2019-12-29 14:32:27 PST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 3: c=s.charAt(0);
@@ -759,7 +805,10 @@ public class NativeMap extends IdScriptableObject {
                 case 'd': X="delete";id=Id_delete; break L;
                 case 'f': X="filter";id=Id_filter; break L;
                 case 'r': X="reduce";id=Id_reduce; break L;
-                case 'u': X="update";id=Id_update; break L;
+                case 'u': c=s.charAt(5);
+                    if (c=='e') { X="update";id=Id_update; }
+                    else if (c=='t') { X="upsert";id=Id_upsert; }
+                    break L;
                 case 'v': X="values";id=Id_values; break L;
                 } break L;
             case 7: switch (s.charAt(1)) {
@@ -811,8 +860,9 @@ public class NativeMap extends IdScriptableObject {
             Id_update = 21,
             Id_filter = 22,
             Id_merge = 23,
-            SymbolId_getSize = 24,
-            SymbolId_toStringTag = 25,
+            Id_upsert = 24,
+            SymbolId_getSize = 25,
+            SymbolId_toStringTag = 26,
             MAX_PROTOTYPE_ID = SymbolId_toStringTag;
 
 // #/string_id_map#

@@ -8,6 +8,7 @@ package org.mozilla.javascript;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -70,6 +71,8 @@ public class NativeWeakMap extends IdScriptableObject {
                         args.length > 1 ? args[1] : Undefined.instance);
             case Id_deleteAll:
                 return realThis(thisObj, f).js_deleteAll(args);
+            case Id_upsert:
+                return realThis(thisObj, f).js_upsert(cx, scope, args);
         }
         throw new IllegalArgumentException("WeakMap.prototype has no method: " + f.getFunctionName());
     }
@@ -125,6 +128,46 @@ public class NativeWeakMap extends IdScriptableObject {
         return this;
     }
 
+    private Object js_upsert(Context cx, Scriptable scope, Object[] args) {
+        if (args.length == 0) {
+            throw ScriptRuntime.typeError("Key must be specified for upsert");
+        } else if (args.length == 1) {
+            throw ScriptRuntime.typeError("Update function must be specified for upsert");
+        }
+
+        Scriptable key = ScriptableObject.ensureScriptable(args[0]);
+        Object updateFnObj = args[1];
+        Object insertFnObj = args.length > 2 ? args[2] : null;
+
+        if (!(updateFnObj instanceof Callable) && !(insertFnObj instanceof Callable)) {
+            throw ScriptRuntime.typeError("The updater and inserter provided to upsert are both not functions");
+        }
+
+        Callable updateFn = updateFnObj instanceof Callable ? (Callable) updateFnObj : null;
+        Callable insertFn = insertFnObj instanceof Callable ? (Callable) insertFnObj : null;
+
+        for (Map.Entry<Scriptable, Object> en : map.entrySet()) {
+            if (ScriptRuntime.sameZero(en.getKey(), key)) {
+                Object value = en.getValue();
+
+                if (updateFn != null) {
+                    value = updateFn.call(cx, scope, Undefined.SCRIPTABLE_UNDEFINED, new Object[]{ value, key, this });
+                    map.put(key, value);
+                }
+
+                return value;
+            }
+        }
+
+        if (insertFn != null) {
+            Object insertionValue = insertFn.call(cx, scope, Undefined.SCRIPTABLE_UNDEFINED, new Object[]{ key, this });
+            map.put(key, insertionValue);
+            return insertionValue;
+        }
+
+        return Undefined.instance;
+    }
+
     private NativeWeakMap realThis(Scriptable thisObj, IdFunctionObject f) {
         if (thisObj == null) {
             throw incompatibleCallError(f);
@@ -176,6 +219,10 @@ public class NativeWeakMap extends IdScriptableObject {
                 arity = 0;
                 s = "deleteAll";
                 break;
+            case Id_upsert:
+                arity = 3;
+                s = "upsert";
+                break;
             default:
                 throw new IllegalArgumentException(String.valueOf(id));
         }
@@ -195,7 +242,7 @@ public class NativeWeakMap extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-12-22 17:34:06 PST
+// #generated# Last update: 2019-12-29 14:45:06 PST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 3: c=s.charAt(0);
@@ -203,7 +250,10 @@ public class NativeWeakMap extends IdScriptableObject {
                 else if (c=='h') { if (s.charAt(2)=='s' && s.charAt(1)=='a') {id=Id_has; break L0;} }
                 else if (c=='s') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_set; break L0;} }
                 break L;
-            case 6: X="delete";id=Id_delete; break L;
+            case 6: c=s.charAt(0);
+                if (c=='d') { X="delete";id=Id_delete; }
+                else if (c=='u') { X="upsert";id=Id_upsert; }
+                break L;
             case 9: X="deleteAll";id=Id_deleteAll; break L;
             case 11: X="constructor";id=Id_constructor; break L;
             }
@@ -221,7 +271,8 @@ public class NativeWeakMap extends IdScriptableObject {
             Id_has = 4,
             Id_set = 5,
             Id_deleteAll = 6,
-            SymbolId_toStringTag = 7,
+            Id_upsert = 7,
+            SymbolId_toStringTag = 8,
             MAX_PROTOTYPE_ID = SymbolId_toStringTag;
 
 // #/string_id_map#
