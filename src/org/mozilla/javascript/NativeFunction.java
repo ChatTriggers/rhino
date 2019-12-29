@@ -36,9 +36,13 @@ public abstract class NativeFunction extends BaseFunction {
         return Decompiler.decompile(encodedSource, flags, properties);
     }
 
+    public boolean hasRest() {
+        return false;
+    }
+
     @Override
     public int getLength() {
-        int paramCount = getParamCount();
+        int paramCount = getParamCount() - (hasRest() ? 1 : 0);
         if (getLanguageVersion() != Context.VERSION_1_2) {
             return paramCount;
         }

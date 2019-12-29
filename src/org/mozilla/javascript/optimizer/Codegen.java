@@ -856,7 +856,8 @@ public class Codegen implements Evaluator {
         final int Do_getEncodedSource = 4;
         final int Do_getParamOrVarConst = 5;
         final int Do_construct = 6;
-        final int SWITCH_COUNT = 7;
+        final int Do_hasRest = 7;
+        final int SWITCH_COUNT = 8;
 
         for (int methodIndex = 0; methodIndex != SWITCH_COUNT; ++methodIndex) {
             if (methodIndex == Do_getEncodedSource && encodedSource == null) {
@@ -902,6 +903,10 @@ public class Codegen implements Evaluator {
                             "(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Lorg/mozilla/javascript/Scriptable;",
                             ACC_PUBLIC
                     );
+                    break;
+                case Do_hasRest:
+                    methodLocals = 1;
+                    cfw.startMethod("hasRest", "()Z", ACC_PUBLIC);
                     break;
                 default:
                     throw Kit.codeBug();
@@ -1071,6 +1076,11 @@ public class Codegen implements Evaluator {
                             );
                             cfw.add(ByteCode.ARETURN);
                         }
+                        break;
+
+                    case Do_hasRest:
+                        cfw.addPush(n.hasRest());
+                        cfw.add(ByteCode.IRETURN);
                         break;
 
                     default:
