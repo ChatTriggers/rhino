@@ -1585,6 +1585,11 @@ class BodyCodegen {
                     throw Kit.codeBug();
                 }
 
+                if (decorators.isEmpty()) {
+                    child = child.getNext();
+                    continue;
+                }
+
                 for (DecoratorNode dn : decorators) {
                     if (!(dn.getDecoratorType() == DecoratorType.INITIALIZE || dn.getDecoratorType() == DecoratorType.USER_DEFINED)) continue;
 
