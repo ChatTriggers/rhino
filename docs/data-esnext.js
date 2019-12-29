@@ -278,7 +278,7 @@ exports.tests = [
           var passed = false;
 
           function cb(target, name) {
-            passed = new target()[name] === 4;
+            passed = target === A.prototype && name === 'x';
           }
 
           class A {
@@ -427,7 +427,7 @@ exports.tests = [
           var passed = false;
 
           function cb(proto, name) {
-            passed = new proto()[name]() === 5;
+            passed = proto[name]() === 5;
           }
 
           class A {
