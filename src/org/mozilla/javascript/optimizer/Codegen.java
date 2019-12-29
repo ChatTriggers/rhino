@@ -3634,6 +3634,8 @@ class BodyCodegen {
                 Node defaultValue = cp.getFirstChild();
                 Object name = cp.getNameKey();
 
+                generateApplyDecorator(child, (List<DecoratorNode>) cp.getProp(Node.DECORATOR_PROP), DecoratorType.WRAP);
+
                 if (!cp.isStatic()) {
                     child = child.getNext();
                     continue;
@@ -3699,7 +3701,6 @@ class BodyCodegen {
             cfw.addPush(cls.getClassName().getIdentifier());
             addScriptRuntimeInvoke("setName", OBJECT, SCRIPTABLE, OBJECT, CONTEXT, SCRIPTABLE, STRING);
         }
-
 
         cfw.markLabel(skipManualScope);
 
