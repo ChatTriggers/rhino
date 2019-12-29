@@ -3572,19 +3572,19 @@ class BodyCodegen {
             cfw.addPush(0);
             cfw.add(ByteCode.SWAP);
             cfw.add(ByteCode.AASTORE);
-
-            cfw.addALoad(argsLocal);
-            cfw.addPush(0);
-            cfw.add(ByteCode.AALOAD);
-            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
-            cfw.add(ByteCode.DUP);
-            cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "HAS_INITIALIZE", OBJECT);
-            cfw.addPush(hasInitialize);
-            generateBooleanWrap();
-            cfw.addPush(true);
-            cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "associateValue", "(" + OBJECT + OBJECT + BOOLEAN + ")" + OBJECT);
-            cfw.add(ByteCode.POP);
         }
+
+        cfw.addALoad(argsLocal);
+        cfw.addPush(0);
+        cfw.add(ByteCode.AALOAD);
+        cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+        cfw.add(ByteCode.DUP);
+        cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "HAS_INITIALIZE", OBJECT);
+        cfw.addPush(hasInitialize);
+        generateBooleanWrap();
+        cfw.addPush(true);
+        cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "associateValue", "(" + OBJECT + OBJECT + BOOLEAN + ")" + OBJECT);
+        cfw.add(ByteCode.POP);
 
         cfw.addALoad(argsLocal);
         cfw.addPush(0);
