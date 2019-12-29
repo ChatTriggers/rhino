@@ -43,7 +43,7 @@
               </th>
               <th class="version v1">1.7.16
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">71% complete</sub><sub class="unflagged">52% complete</sub>
+                </div><sub class="flagged">70% complete</sub><sub class="unflagged">51% complete</sub>
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
@@ -620,7 +620,7 @@ return Math.max(...Object.create(iterable)) === 3;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -638,7 +638,7 @@ return [&quot;a&quot;, ...Object.create(iterable), &quot;e&quot;][3] === &quot;d
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -10516,7 +10516,7 @@ return foo.bind({}).name === &quot;bound foo&quot; &amp;&amp;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -17986,7 +17986,7 @@ return tag`\01\1\xg\xAg\u0\u0g\u00g\u000g\u{g\u{0\u{110000}${0}\0`;</div>}
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">22% complete</sub><sub class="unflagged">21% complete</sub>
+                </div><sub class="flagged">39% complete</sub><sub class="unflagged">22% complete</sub>
               </th>
             </tr>
           </table>
@@ -18753,7 +18753,7 @@ return passed;</div>}
                 <div class="code">var passed = false;
 
 function cb(target, name) {
-  passed = new target()[name] === 4;
+  passed = target === A.prototype &amp;&amp; name === 'x';
 }
 
 class A {
@@ -18981,7 +18981,7 @@ return A.method === undefined;</div>}
                 <div class="code">var passed = false;
 
 function cb(proto, name) {
-  passed = new proto()[name]() === 5;
+  passed = proto[name]() === 5;
 }
 
 class A {
@@ -19159,7 +19159,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function intersection in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function intersection in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function intersection in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function intersection in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -19180,7 +19180,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function union in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function union in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function union in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function union in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -19200,7 +19200,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function difference in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function difference in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function difference in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function difference in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -19220,7 +19220,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function symmetricDifference in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function symmetricDifference in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function symmetricDifference in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function symmetricDifference in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -19237,7 +19237,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isDisjointFrom in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isDisjointFrom in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isDisjointFrom in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isDisjointFrom in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -19254,7 +19254,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSubsetOf in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSubsetOf in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSubsetOf in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSubsetOf in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -19271,7 +19271,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSupersetOf in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSupersetOf in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSupersetOf in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSupersetOf in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -19298,7 +19298,7 @@ return buffer1.byteLength === 0
           <td class="result"><div class="Error unflagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div><div class="Error flagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div><div class="Error flagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div><div class="Error flagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div><div class="Error flagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21447,8 +21447,7 @@ return map.size === 2
 .">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function groupBy in object function Map() { [native code for Map.Map, arity=0] }
 .">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function groupBy in object function Map() { [native code for Map.Map, arity=0] }
-.">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21474,8 +21473,7 @@ return map.size === 2
 .">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyBy in object function Map() { [native code for Map.Map, arity=0] }
 .">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyBy in object function Map() { [native code for Map.Map, arity=0] }
-.">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21496,7 +21494,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21513,7 +21511,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21533,7 +21531,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21550,7 +21548,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21567,7 +21565,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function findKey in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function findKey in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function findKey in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function findKey in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21585,7 +21583,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function includes in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function includes in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function includes in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function includes in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21603,7 +21601,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyOf in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyOf in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyOf in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyOf in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21624,7 +21622,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapKeys in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapKeys in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapKeys in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapKeys in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21645,7 +21643,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapValues in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapValues in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapValues in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapValues in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21666,7 +21664,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function merge in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function merge in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function merge in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function merge in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21683,7 +21681,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21700,7 +21698,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21721,7 +21719,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21742,7 +21740,7 @@ return set.deleteAll(2, 3) === true
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21759,7 +21757,7 @@ return set.deleteAll(2, 3) === true
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21779,7 +21777,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21796,7 +21794,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21813,7 +21811,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function join in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function join in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function join in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function join in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21834,7 +21832,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function map in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function map in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function map in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function map in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21851,7 +21849,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21868,7 +21866,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Set].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Set].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21894,7 +21892,7 @@ return !map.has(a)
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakMap].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakMap].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakMap].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakMap].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21920,7 +21918,7 @@ return set.has(a)
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object WeakSet].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object WeakSet].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object WeakSet].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object WeakSet].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21946,7 +21944,7 @@ return !set.has(a)
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakSet].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakSet].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakSet].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakSet].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -21982,9 +21980,7 @@ return !set.has(a)
           <td class="result"><div class="Error unflagged " title="Cannot find function fromString in object function Number() { [native code for Number.Number, arity=1] }
 .">Error</div><div class="Error flagged " title="Cannot find function fromString in object function Number() { [native code for Number.Number, arity=1] }
 .">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function fromString in object function Number() { [native code for Number.Number, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function fromString in object function Number() { [native code for Number.Number, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
