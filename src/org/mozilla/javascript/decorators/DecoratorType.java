@@ -22,6 +22,10 @@ public enum DecoratorType {
         return decoratorClass;
     }
 
+    public boolean shouldTrigger(DecoratorType type) {
+        return type == USER_DEFINED || this == type;
+    }
+
     public static DecoratorType fromDecorator(String decorator) {
         decorator = decorator.replaceAll("@", "");
 

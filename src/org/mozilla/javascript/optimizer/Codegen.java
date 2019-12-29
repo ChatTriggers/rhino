@@ -1585,38 +1585,6 @@ class BodyCodegen {
                     throw Kit.codeBug();
                 }
 
-                if (child instanceof ClassField && ((ClassField) child).getDecorators().stream().noneMatch(it -> it.getDecoratorType() == DecoratorType.INITIALIZE)) {
-                    ClassField cp = (ClassField) child;
-                    Node defaultValue = cp.getFirstChild();
-                    Object name = cp.getNameKey();
-
-                    if (cp.isStatic()) {
-                        child = child.getNext();
-                        continue;
-                    }
-
-                    cfw.addALoad(thisObjLocal);
-
-                    if (name instanceof String) {
-                        cfw.addPush((String) name);
-                    } else if (name instanceof Node) {
-                        Node nameNode = (Node) name;
-                        generateExpression(nameNode, cls);
-                    } else {
-                        cfw.addPush((Integer) name);
-                        addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
-                    }
-
-                    generateExpression(defaultValue, cls);
-                    cfw.addALoad(contextLocal);
-                    cfw.addPush(cp.isPrivate());
-                    addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
-                    cfw.addAStore(thisObjLocal);
-
-                    child = child.getNext();
-                    continue;
-                }
-
                 for (DecoratorNode dn : decorators) {
                     if (!(dn.getDecoratorType() == DecoratorType.INITIALIZE || dn.getDecoratorType() == DecoratorType.USER_DEFINED)) continue;
 
@@ -1717,6 +1685,48 @@ class BodyCodegen {
                             "call",
                             "(" + CONTEXT + SCRIPTABLE + SCRIPTABLE + OBJECT_ARRAY + ")" + OBJECT
                     );
+                }
+
+                // See if the result of the decorator call has an associated
+                // HAS_INITIALIZE key. If so, skip creating the class field
+                if (child instanceof ClassField) {
+                    int L1 = cfw.acquireLabel();
+
+                    cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+                    cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "HAS_INITIALIZE", OBJECT);
+                    cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "getAssociatedValue", "(" + OBJECT + ")" + OBJECT);
+                    cfw.add(ByteCode.CHECKCAST, "java/lang/Boolean");
+                    cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean", "TRUE", "Ljava/lang/Boolean;");
+                    cfw.add(ByteCode.IF_ACMPEQ, L1);
+
+                    ClassField cp = (ClassField) child;
+                    Node defaultValue = cp.getFirstChild();
+                    Object name = cp.getNameKey();
+
+                    if (!cp.isStatic()) {
+                        cfw.addALoad(thisObjLocal);
+
+                        if (name instanceof String) {
+                            cfw.addPush((String) name);
+                        } else if (name instanceof Node) {
+                            Node nameNode = (Node) name;
+                            generateExpression(nameNode, cls);
+                        } else {
+                            cfw.addPush((Integer) name);
+                            addScriptRuntimeInvoke("wrapInt", "Ljava/lang/Integer;", INTEGER);
+                        }
+
+                        generateExpression(defaultValue, cls);
+                        cfw.addALoad(contextLocal);
+                        cfw.addPush(cp.isPrivate());
+                        addScriptRuntimeInvoke("addClassProperty", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, BOOLEAN);
+                        cfw.addAStore(thisObjLocal);
+                    }
+
+                    cfw.markLabel(L1);
+
+                    child = child.getNext();
+                    continue;
                 }
 
                 // We want to run through all of the ClassNode's children,
@@ -2598,12 +2608,14 @@ class BodyCodegen {
                 "(I)Ljava/lang/Integer;");
     }
 
-
     private void generateIntegerUnwrap() {
         cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "java/lang/Integer",
                 "intValue", "()I");
     }
 
+    private void generateBooleanWrap() {
+        cfw.addInvoke(ByteCode.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;");
+    }
 
     private void generateThrowJavaScriptException() {
         cfw.add(ByteCode.NEW,
@@ -3505,6 +3517,8 @@ class BodyCodegen {
     }
 
     private void visitDecoratorDeclaration(DecoratorDeclarationNode node) {
+        boolean hasInitialize = false;
+
         int descriptor = getNewWordLocal();
         cfw.addALoad(argsLocal);
         cfw.addPush(1);
@@ -3512,6 +3526,10 @@ class BodyCodegen {
         cfw.addAStore(descriptor);
 
         for (DecoratorNode dn : node.getDecoratorNodes()) {
+            if (dn.getDecoratorType() == DecoratorType.INITIALIZE) {
+                hasInitialize = true;
+            }
+
             generateExpression(dn.getTarget(), node);
             cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/BaseFunction");
 
@@ -3554,6 +3572,18 @@ class BodyCodegen {
             cfw.addPush(0);
             cfw.add(ByteCode.SWAP);
             cfw.add(ByteCode.AASTORE);
+
+            cfw.addALoad(argsLocal);
+            cfw.addPush(0);
+            cfw.add(ByteCode.AALOAD);
+            cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
+            cfw.add(ByteCode.DUP);
+            cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "HAS_INITIALIZE", OBJECT);
+            cfw.addPush(hasInitialize);
+            generateBooleanWrap();
+            cfw.addPush(true);
+            cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "associateValue", "(" + OBJECT + OBJECT + BOOLEAN + ")" + OBJECT);
+            cfw.add(ByteCode.POP);
         }
 
         cfw.addALoad(argsLocal);
@@ -3714,7 +3744,7 @@ class BodyCodegen {
         for (DecoratorNode dn : decoratorNodes) {
             DecoratorType type = dn.getDecoratorType();
 
-            if (type != decoratorType) continue;
+            if (!decoratorType.shouldTrigger(type)) continue;
 
             int target = getNewWordLocal();
             cfw.addAStore(target);
@@ -3777,7 +3807,7 @@ class BodyCodegen {
             // DecoratorType
             cfw.add(ByteCode.DUP);
             cfw.addPush(2);
-            cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/DecoratorType", type.name(), "Lorg/mozilla/javascript/decorators/DecoratorType;");
+            cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/DecoratorType", decoratorType.name(), "Lorg/mozilla/javascript/decorators/DecoratorType;");
             cfw.add(ByteCode.AASTORE);
 
             // descriptorArgs

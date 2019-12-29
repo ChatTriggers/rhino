@@ -19,7 +19,7 @@ public class InitializeDecorator extends Decorator {
             throw ScriptRuntime.typeError("@initialize is not allowed on static class members");
         }
 
-        if (decoratorType != DecoratorType.INITIALIZE) return Undefined.instance;
+        if (decoratorType != DecoratorType.INITIALIZE) return target;
 
         if (args.length == 0 || !(args[0] instanceof Callable)) {
             throw ScriptRuntime.typeError1("msg.object.not.callable", ScriptRuntime.toString(args[0]));
@@ -48,6 +48,6 @@ public class InitializeDecorator extends Decorator {
             throw ScriptRuntime.typeError("The function provided to @initialize must return undefined");
         }
 
-        return Undefined.instance;
+        return target;
     }
 }

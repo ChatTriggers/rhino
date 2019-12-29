@@ -12,8 +12,15 @@ public abstract class Decorator extends BaseFunction {
     public static int PRIVATE = 1 << 4;
     public static int STATIC  = 1 << 5;
 
+    // Used to associate a class member's name
     public static final Object NAME_KEY = new Object();
+
+    // Used to associate a class member's value
     public static final Object VALUE_KEY = new Object();
+
+    // Used to associate whether or not a user-defined
+    // decorator includes an @initialize decorator
+    public static final Object HAS_INITIALIZE = new Object();
 
     public static void init(Scriptable scope) {
         WrapDecorator.init(scope);

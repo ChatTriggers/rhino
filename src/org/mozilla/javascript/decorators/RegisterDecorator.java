@@ -10,7 +10,7 @@ public class RegisterDecorator extends Decorator {
 
     @Override
     public Object consume(Object target, int descriptor, DecoratorType decoratorType, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        if (decoratorType != DecoratorType.REGISTER) return Undefined.instance;
+        if (decoratorType != DecoratorType.REGISTER) return target;
 
         Object[] callArgs;
         Object realTarget = target;
@@ -32,6 +32,6 @@ public class RegisterDecorator extends Decorator {
             throw ScriptRuntime.typeError("The function provided to @register must return undefined");
         }
 
-        return Undefined.instance;
+        return target;
     }
 }
