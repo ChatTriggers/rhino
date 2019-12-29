@@ -179,6 +179,7 @@ public class NativeArray extends IdScriptableObject implements List {
         addIdFunctionProperty(ctor, ARRAY_TAG, ConstructorId_isArray, "isArray", 1);
         addIdFunctionProperty(ctor, ARRAY_TAG, ConstructorId_of, "of", 0);
         addIdFunctionProperty(ctor, ARRAY_TAG, ConstructorId_from, "from", 1);
+        addIdFunctionProperty(ctor, ARRAY_TAG, ConstructorId_isTemplateObject, "isTemplateObject", 1);
 
         addCtorSpecies(ctor);
 
@@ -382,6 +383,10 @@ public class NativeArray extends IdScriptableObject implements List {
 
                 case ConstructorId_from: {
                     return js_from(cx, scope, thisObj, args);
+                }
+
+                case ConstructorId_isTemplateObject: {
+                    return args.length > 0 && args[0] instanceof NativeArray && ((NativeArray) args[0]).isTemplateObj();
                 }
 
                 case Id_constructor: {
@@ -2409,6 +2414,14 @@ public class NativeArray extends IdScriptableObject implements List {
         return 0;
     }
 
+    public boolean isTemplateObj() {
+        return templateObj;
+    }
+
+    public void setTemplateObj() {
+        this.templateObj = true;
+    }
+
     // Comparators for the js_sort method. Putting them here lets us unit-test them better.
 
     private static final Comparator<Object> STRING_COMPARATOR = new StringLikeComparator();
@@ -2693,7 +2706,8 @@ public class NativeArray extends IdScriptableObject implements List {
             ConstructorId_reduceRight = -Id_reduceRight,
             ConstructorId_isArray = -26,
             ConstructorId_of = -27,
-            ConstructorId_from = -28;
+            ConstructorId_from = -28,
+            ConstructorId_isTemplateObject = -29;
 
     /**
      * Internal representation of the JavaScript array's length property.
@@ -2715,6 +2729,12 @@ public class NativeArray extends IdScriptableObject implements List {
      * True if all numeric properties are stored in <code>dense</code>.
      */
     private boolean denseOnly;
+
+    /**
+     * True if this array was created as the result of a template literal
+     * call.
+     */
+    private boolean templateObj = false;
 
     /**
      * The maximum size of <code>dense</code> that will be allocated initially.

@@ -1227,8 +1227,8 @@ public class ScriptRuntime {
 
         Callable fn = (Callable) target;
 
-        // NativeArray parts = new NativeArray(Arrays.copyOfRange(args, 0, boundary));
-        ScriptableObject parts = ScriptableObject.ensureScriptableObject(cx.newArray(scope, Arrays.copyOfRange(args, 0, boundary)));
+        NativeArray parts = cx.newArray(scope, Arrays.copyOfRange(args, 0, boundary));
+        parts.setTemplateObj();
         Object[] rawArgs = new Object[boundary];
 
         for (int i = 0; i < boundary; i++) {
