@@ -12,6 +12,7 @@ import org.mozilla.javascript.decorators.DecoratorType;
 import org.mozilla.javascript.generator.NativeGenerator;
 import org.mozilla.javascript.generator.NativeGeneratorIterator;
 import org.mozilla.javascript.optimizer.Codegen;
+import org.mozilla.javascript.optimizer.OptRuntime;
 import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
 import org.mozilla.javascript.v8dtoa.FastDtoa;
@@ -22,6 +23,8 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 /**
  * This is the class that implements the runtime.
@@ -1416,7 +1419,7 @@ public class ScriptRuntime {
                 return numberToString(((Number) val).doubleValue(), 10);
             }
             if (val instanceof Symbol) {
-                throw typeError0("msg.not.a.string");
+                return val.toString();
             }
             if (val instanceof Scriptable) {
                 val = ((Scriptable) val).getDefaultValue(StringClass);
@@ -3341,6 +3344,12 @@ public class ScriptRuntime {
      * The typeof operator
      */
     public static String typeof(Object value) {
+        Object opResult = applyUnaryOperator(value, "typeof", Context.getContext());
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return toString(opResult);
+        }
+
         if (value == null)
             return "object";
         if (value == Undefined.instance)
@@ -3386,19 +3395,17 @@ public class ScriptRuntime {
         return false;
     }
 
-    // neg:
-    // implement the '-' operator inline in the caller
-    // as "-toNumber(val)"
-
-    // not:
-    // implement the '!' operator inline in the caller
-    // as "!toBoolean(val)"
-
-    // bitnot:
-    // implement the '~' operator inline in the caller
-    // as "~toInt32(val)"
+    ////////////////
+    // ARITHMETIC //
+    ////////////////
 
     public static Object add(Object val1, Object val2, Context cx) {
+        Object opResult = applyOperator(val1, val2, "+", cx);
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return opResult;
+        }
+
         if (val1 instanceof Number && val2 instanceof Number) {
             return wrapNumber(((Number) val1).doubleValue() +
                     ((Number) val2).doubleValue());
@@ -3439,19 +3446,153 @@ public class ScriptRuntime {
         return new ConsString(toCharSequence(val1), val2);
     }
 
+    public static Object subtract(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "-", () -> OptRuntime.wrapDouble(toNumber(v1) - toNumber(v2)), cx);
+    }
+
+    public static Object multiply(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "*", () -> OptRuntime.wrapDouble(toNumber(v1) * toNumber(v2)), cx);
+    }
+
+    public static Object divide(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "/", () -> OptRuntime.wrapDouble(toNumber(v1) / toNumber(v2)), cx);
+    }
+
+    public static Object modulo(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "%", () -> OptRuntime.wrapDouble(toNumber(v1) % toNumber(v2)), cx);
+    }
+
+    public static Object exp(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "**", () -> OptRuntime.wrapDouble(Math.pow(toNumber(v1), toNumber(v2))), cx);
+    }
+
+    public static Object lsh(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "<<", () -> OptRuntime.wrapDouble(toInt32(v1) << toInt32(v2)), cx);
+    }
+
+    public static Object rsh(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, ">>", () -> OptRuntime.wrapDouble(toInt32(v1) >> toInt32(v2)), cx);
+    }
+
+    public static Object ursh(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, ">>>", () -> OptRuntime.wrapDouble(toInt32(v1) >>> toInt32(v2)), cx);
+    }
+
+    public static Object bitAnd(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "&", () -> OptRuntime.wrapDouble(toInt32(v1) & toInt32(v2)), cx);
+    }
+
+    public static Object bitOr(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "|", () -> OptRuntime.wrapDouble(toInt32(v1) | toInt32(v2)), cx);
+    }
+
+    public static Object bitXor(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "^", () -> OptRuntime.wrapDouble((toInt32(v1) ^ toInt32(v2))), cx);
+    }
+
+    public static Object bitNot(Object v, Context cx) {
+        return doUnaryArithmetic(v, "~", () -> OptRuntime.wrapDouble(~toInt32(v)), cx);
+    }
+
+    public static Object pos(Object v, Context cx) {
+        return doUnaryArithmetic(v, "+", () -> OptRuntime.wrapDouble(toNumber(v)), cx);
+    }
+
+    public static Object neg(Object v, Context cx) {
+        return doUnaryArithmetic(v, "-", () -> OptRuntime.wrapDouble(-toNumber(v)), cx);
+    }
+
+    public static Object not(Object v, Context cx) {
+        return doUnaryArithmetic(v, "!", () -> !toBoolean(v), cx);
+    }
+
+    public static Object lt(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "<", () -> cmp_LT(v1, v2), cx);
+    }
+
+    public static Object lte(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "<=", () -> cmp_LE(v1, v2), cx);
+    }
+
+    public static Object gt(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, ">", () -> !cmp_LE(v1, v2), cx);
+    }
+
+    public static Object gte(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, ">=", () -> !cmp_LT(v1, v2), cx);
+    }
+
+    public static Object and(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "&&", () -> toBoolean(v1) && toBoolean(v2), cx);
+    }
+
+    public static Object or(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "||", () -> toBoolean(v1) || toBoolean(v2), cx);
+    }
+
+    private static Object doArithmetic(Object val1, Object val2, String op, Supplier<Object> fn, Context cx) {
+        Object opResult = applyOperator(val1, val2, op, cx);
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return opResult;
+        }
+
+        return fn.get();
+    }
+
+    private static Object doUnaryArithmetic(Object val1, String op, Supplier<Object> fn, Context cx) {
+        Object opResult = applyUnaryOperator(val1, op, cx);
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return opResult;
+        }
+
+        return fn.get();
+    }
+
+    private static Object applyOperator(Object lho, Object rho, String operator, Context cx) {
+        NativeSymbol sym = NativeSymbol.operator(cx, operator);
+
+        if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
+            Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
+
+            if (!(fn instanceof Callable)) {
+                throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
+            }
+
+            return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[]{ rho });
+        }
+
+        return UniqueTag.NOT_FOUND;
+    }
+
+    private static Object applyUnaryOperator(Object lho, String operator, Context cx) {
+        NativeSymbol sym = NativeSymbol.unaryOperator(cx, operator);
+
+        if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
+            Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
+
+            if (!(fn instanceof Callable)) {
+                throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
+            }
+
+            return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[0]);
+        }
+
+        return UniqueTag.NOT_FOUND;
+    }
+
     /**
      * The method is only present for compatibility.
      *
      * @deprecated Use {@link #nameIncrDecr(Scriptable, String, Context, int)} instead
      */
     @Deprecated
-    public static Object nameIncrDecr(Scriptable scopeChain, String id,
-                                      int incrDecrMask) {
+    public static Object nameIncrDecr(Scriptable scopeChain, String id, int incrDecrMask) {
         return nameIncrDecr(scopeChain, id, Context.getContext(), incrDecrMask);
     }
 
-    public static Object nameIncrDecr(Scriptable scopeChain, String id,
-                                      Context cx, int incrDecrMask) {
+    public static Object nameIncrDecr(Scriptable scopeChain, String id, Context cx, int incrDecrMask) {
         Scriptable target;
         Object value;
         search:
@@ -3476,8 +3617,7 @@ public class ScriptRuntime {
             } while (scopeChain != null);
             throw notFoundError(scopeChain, id);
         }
-        return doScriptableIncrDecr(target, id, scopeChain, value,
-                incrDecrMask);
+        return doScriptableIncrDecr(target, id, scopeChain, value, incrDecrMask);
     }
 
     /**
@@ -3515,11 +3655,13 @@ public class ScriptRuntime {
                 incrDecrMask);
     }
 
-    private static Object doScriptableIncrDecr(Scriptable target,
-                                               String id,
-                                               Scriptable protoChainStart,
-                                               Object value,
-                                               int incrDecrMask) {
+    private static Object doScriptableIncrDecr(Scriptable target, String id, Scriptable protoChainStart, Object value, int incrDecrMask) {
+        Object opResult = applyUnaryOperator(value, (incrDecrMask & Node.DECR_FLAG) == 0 ? "++" : "--", Context.getContext());
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return opResult;
+        }
+
         boolean post = ((incrDecrMask & Node.POST_FLAG) != 0);
         double number;
         if (value instanceof Number) {
@@ -3639,6 +3781,12 @@ public class ScriptRuntime {
      * ==
      */
     public static boolean eq(Object x, Object y) {
+        Object opResult = applyOperator(x, y, "==", Context.getContext());
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return toBoolean(opResult);
+        }
+
         if (x == null || x == Undefined.instance) {
             if (y == null || y == Undefined.instance) {
                 return true;
