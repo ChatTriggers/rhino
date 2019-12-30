@@ -1419,7 +1419,7 @@ public class ScriptRuntime {
                 return numberToString(((Number) val).doubleValue(), 10);
             }
             if (val instanceof Symbol) {
-                return val.toString();
+                throw typeError0("msg.not.a.string");
             }
             if (val instanceof Scriptable) {
                 val = ((Scriptable) val).getDefaultValue(StringClass);
@@ -3519,32 +3519,36 @@ public class ScriptRuntime {
     }
 
     private static Object applyOperator(Object lho, Object rho, String operator, Context cx) {
-        NativeSymbol sym = NativeSymbol.operator(cx, operator);
+        if (cx.getLanguageVersion() >= Context.VERSION_ES6) {
+            NativeSymbol sym = NativeSymbol.operator(cx, operator);
 
-        if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
-            Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
+            if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
+                Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
 
-            if (!(fn instanceof Callable)) {
-                throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
+                if (!(fn instanceof Callable)) {
+                    throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
+                }
+
+                return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[]{ rho });
             }
-
-            return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[]{ rho });
         }
 
         return UniqueTag.NOT_FOUND;
     }
 
     private static Object applyUnaryOperator(Object lho, String operator, Context cx) {
-        NativeSymbol sym = NativeSymbol.unaryOperator(cx, operator);
+        if (cx.getLanguageVersion() >= Context.VERSION_ES6) {
+            NativeSymbol sym = NativeSymbol.unaryOperator(cx, operator);
 
-        if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
-            Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
+            if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
+                Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
 
-            if (!(fn instanceof Callable)) {
-                throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
+                if (!(fn instanceof Callable)) {
+                    throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
+                }
+
+                return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[0]);
             }
-
-            return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[0]);
         }
 
         return UniqueTag.NOT_FOUND;
