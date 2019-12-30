@@ -857,7 +857,8 @@ public class Codegen implements Evaluator {
         final int Do_getParamOrVarConst = 5;
         final int Do_construct = 6;
         final int Do_hasRest = 7;
-        final int SWITCH_COUNT = 8;
+        final int Do_isCallable = 8;
+        final int SWITCH_COUNT = 9;
 
         for (int methodIndex = 0; methodIndex != SWITCH_COUNT; ++methodIndex) {
             if (methodIndex == Do_getEncodedSource && encodedSource == null) {
@@ -907,6 +908,10 @@ public class Codegen implements Evaluator {
                 case Do_hasRest:
                     methodLocals = 1;
                     cfw.startMethod("hasRest", "()Z", ACC_PUBLIC);
+                    break;
+                case Do_isCallable:
+                    methodLocals = 1;
+                    cfw.startMethod("isCallable", "()Z", ACC_PUBLIC);
                     break;
                 default:
                     throw Kit.codeBug();
@@ -1080,6 +1085,17 @@ public class Codegen implements Evaluator {
 
                     case Do_hasRest:
                         cfw.addPush(n.hasRest());
+                        cfw.add(ByteCode.IRETURN);
+                        break;
+
+                    case Do_isCallable:
+                        if (n instanceof FunctionNode) {
+                            cfw.addPush(!((FunctionNode) n).isClassConstructor());
+                        } else {
+                            // delegate to super call
+                            cfw.add(ByteCode.ALOAD_0);
+                            cfw.addInvoke(ByteCode.INVOKESPECIAL, "org/mozilla/javascript/BaseFunction", "isCallable", "()Z");
+                        }
                         cfw.add(ByteCode.IRETURN);
                         break;
 

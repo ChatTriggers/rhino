@@ -437,6 +437,14 @@ public class BaseFunction extends IdScriptableObject implements Function {
         return result;
     }
 
+    public boolean isCallable() {
+        return true;
+    }
+
+    public boolean isConstructable() {
+        return true;
+    }
+
     /**
      * Creates new script object.
      * The default implementation of {@link #construct} uses the method to

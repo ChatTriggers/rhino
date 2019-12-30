@@ -76,6 +76,14 @@ public class NativeReflect extends IdScriptableObject {
                 arity = 2;
                 name = "setPrototypeOf";
                 break;
+            case Id_isCallable:
+                arity = 1;
+                name = "isCallable";
+                break;
+            case Id_isConstructor:
+                arity = 1;
+                name = "isConstructor";
+                break;
             default:
                 throw new IllegalStateException(String.valueOf(id));
         }
@@ -116,6 +124,10 @@ public class NativeReflect extends IdScriptableObject {
                 return js_set(args);
             case Id_setPrototypeOf:
                 return js_setPrototypeOf(args, cx, scope);
+            case Id_isCallable:
+                return args.length > 0 && args[0] instanceof BaseFunction && ((BaseFunction) args[0]).isCallable();
+            case Id_isConstructor:
+                return args.length > 0 && args[0] instanceof BaseFunction && ((BaseFunction) args[0]).isConstructable();
             default:
                 return null;
         }
@@ -338,78 +350,33 @@ public class NativeReflect extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-11-19 22:24:21 CST
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            L:
-            switch (s.length()) {
-                case 3:
-                    c = s.charAt(0);
-                    if (c == 'g') {
-                        if (s.charAt(2) == 't' && s.charAt(1) == 'e') {
-                            id = Id_get;
-                            break L0;
-                        }
-                    } else if (c == 'h') {
-                        if (s.charAt(2) == 's' && s.charAt(1) == 'a') {
-                            id = Id_has;
-                            break L0;
-                        }
-                    } else if (c == 's') {
-                        if (s.charAt(2) == 't' && s.charAt(1) == 'e') {
-                            id = Id_set;
-                            break L0;
-                        }
-                    }
-                    break L;
-                case 5:
-                    X = "apply";
-                    id = Id_apply;
-                    break L;
-                case 7:
-                    X = "ownKeys";
-                    id = Id_ownKeys;
-                    break L;
-                case 9:
-                    X = "construct";
-                    id = Id_construct;
-                    break L;
-                case 12:
-                    X = "isExtensible";
-                    id = Id_isExtensible;
-                    break L;
-                case 14:
-                    c = s.charAt(0);
-                    if (c == 'd') {
-                        c = s.charAt(2);
-                        if (c == 'f') {
-                            X = "defineProperty";
-                            id = Id_defineProperty;
-                        } else if (c == 'l') {
-                            X = "deleteProperty";
-                            id = Id_deleteProperty;
-                        }
-                    } else if (c == 'g') {
-                        X = "getPrototypeOf";
-                        id = Id_getPrototypeOf;
-                    } else if (c == 's') {
-                        X = "setPrototypeOf";
-                        id = Id_setPrototypeOf;
-                    }
-                    break L;
-                case 17:
-                    X = "preventExtensions";
-                    id = Id_preventExtensions;
-                    break L;
-                case 24:
-                    X = "getOwnPropertyDescriptor";
-                    id = Id_getOwnPropertyDescriptor;
-                    break L;
+// #generated# Last update: 2019-12-29 15:46:17 PST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 3: c=s.charAt(0);
+                if (c=='g') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_get; break L0;} }
+                else if (c=='h') { if (s.charAt(2)=='s' && s.charAt(1)=='a') {id=Id_has; break L0;} }
+                else if (c=='s') { if (s.charAt(2)=='t' && s.charAt(1)=='e') {id=Id_set; break L0;} }
+                break L;
+            case 5: X="apply";id=Id_apply; break L;
+            case 7: X="ownKeys";id=Id_ownKeys; break L;
+            case 9: X="construct";id=Id_construct; break L;
+            case 10: X="isCallable";id=Id_isCallable; break L;
+            case 12: X="isExtensible";id=Id_isExtensible; break L;
+            case 13: X="isConstructor";id=Id_isConstructor; break L;
+            case 14: c=s.charAt(0);
+                if (c=='d') {
+                    c=s.charAt(2);
+                    if (c=='f') { X="defineProperty";id=Id_defineProperty; }
+                    else if (c=='l') { X="deleteProperty";id=Id_deleteProperty; }
+                }
+                else if (c=='g') { X="getPrototypeOf";id=Id_getPrototypeOf; }
+                else if (c=='s') { X="setPrototypeOf";id=Id_setPrototypeOf; }
+                break L;
+            case 17: X="preventExtensions";id=Id_preventExtensions; break L;
+            case 24: X="getOwnPropertyDescriptor";id=Id_getOwnPropertyDescriptor; break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -430,7 +397,9 @@ public class NativeReflect extends IdScriptableObject {
             Id_preventExtensions = 11,
             Id_set = 12,
             Id_setPrototypeOf = 13,
-            LAST_METHOD_ID = Id_setPrototypeOf;
+            Id_isCallable = 14,
+            Id_isConstructor = 15,
+            LAST_METHOD_ID = Id_isConstructor;
 
 // #/string_id_map#
 }

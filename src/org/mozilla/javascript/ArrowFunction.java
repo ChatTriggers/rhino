@@ -47,6 +47,11 @@ public class ArrowFunction extends BaseFunction {
     }
 
     @Override
+    public boolean isConstructable() {
+        return false;
+    }
+
+    @Override
     public boolean hasInstance(Scriptable instance) {
         if (targetFunction instanceof Function) {
             return ((Function) targetFunction).hasInstance(instance);
