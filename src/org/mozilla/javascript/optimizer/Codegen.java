@@ -2935,6 +2935,22 @@ class BodyCodegen {
                 visitIncDec(node);
                 break;
 
+            case Token.OR:
+            case Token.AND: {
+                generateExpression(child, node);
+                cfw.add(ByteCode.DUP);
+                addScriptRuntimeInvoke("toBoolean", BOOLEAN, OBJECT);
+                int falseTarget = cfw.acquireLabel();
+                if (type == Token.AND)
+                    cfw.add(ByteCode.IFEQ, falseTarget);
+                else
+                    cfw.add(ByteCode.IFNE, falseTarget);
+                cfw.add(ByteCode.POP);
+                generateExpression(child.getNext(), node);
+                cfw.markLabel(falseTarget);
+            }
+            break;
+
             case Token.HOOK: {
                 Node ifThen = child.getNext();
                 Node ifElse = ifThen.getNext();
@@ -2997,8 +3013,6 @@ class BodyCodegen {
             case Token.LT:
             case Token.GE:
             case Token.GT:
-            case Token.AND:
-            case Token.OR:
                 visitOperator(node, type, child);
                 break;
 

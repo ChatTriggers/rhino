@@ -3474,10 +3474,6 @@ public class ScriptRuntime {
                 return doArithmetic(val1, val2, ">", () -> !cmp_LE(val1, val2), cx);
             case Token.GE:
                 return doArithmetic(val1, val2, ">=", () -> !cmp_LT(val1, val2), cx);
-            case Token.AND:
-                return doArithmetic(val1, val2, "&&", () -> toBoolean(val1) && toBoolean(val2), cx);
-            case Token.OR:
-                return doArithmetic(val1, val2, "||", () -> toBoolean(val1) || toBoolean(val2), cx);
             default:
                 throw Kit.codeBug("Unexpected binary operator token: " + op);
         }
