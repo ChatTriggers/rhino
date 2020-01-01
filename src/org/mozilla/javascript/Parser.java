@@ -2034,14 +2034,6 @@ public class Parser {
                     }
                 }
 
-                AstNode catchCond = null;
-                if (matchToken(Token.IF)) {
-                    guardPos = ts.tokenBeg;
-                    catchCond = expr();
-                } else {
-                    sawDefaultCatch = true;
-                }
-
                 if (mustMatchToken(Token.RP, "msg.bad.catchcond"))
                     rp = ts.tokenBeg;
                 mustMatchToken(Token.LC, "msg.no.brace.catchblock");
@@ -2050,11 +2042,7 @@ public class Parser {
                 tryEnd = getNodeEnd(catchBlock);
                 CatchClause catchNode = new CatchClause(catchPos);
                 catchNode.setVarName(varName);
-                catchNode.setCatchCondition(catchCond);
                 catchNode.setBody(catchBlock);
-                if (guardPos != -1) {
-                    catchNode.setIfPosition(guardPos - catchPos);
-                }
                 catchNode.setParens(lp, rp);
                 catchNode.setLineno(catchLineNum);
 
@@ -2062,7 +2050,7 @@ public class Parser {
                     tryEnd = ts.tokenEnd;
                 catchNode.setLength(tryEnd - catchPos);
                 if (clauses == null)
-                    clauses = new ArrayList<CatchClause>();
+                    clauses = new ArrayList<>();
                 clauses.add(catchNode);
             }
         } else if (peek != Token.FINALLY) {

@@ -1430,23 +1430,13 @@ public final class IRFactory extends Parser {
             String varName = cc.getVarName().getIdentifier();
             decompiler.addName(varName);
 
-            Node catchCond = null;
-            AstNode ccc = cc.getCatchCondition();
-            if (ccc != null) {
-                decompiler.addName(" ");
-                decompiler.addToken(Token.IF);
-                catchCond = transform(ccc);
-            } else {
-                catchCond = new EmptyExpression();
-            }
             decompiler.addToken(Token.RP);
             decompiler.addEOL(Token.LC);
 
             Node body = transform(cc.getBody());
             decompiler.addEOL(Token.RC);
 
-            catchBlocks.addChildToBack(createCatch(varName, catchCond,
-                    body, cc.getLineno()));
+            catchBlocks.addChildToBack(createCatch(varName, body, cc.getLineno()));
         }
         Node finallyBlock = null;
         if (node.getFinallyBlock() != null) {
@@ -1724,22 +1714,14 @@ public final class IRFactory extends Parser {
      * Catch clause of try/catch/finally
      *
      * @param varName   the name of the variable to bind to the exception
-     * @param catchCond the condition under which to catch the exception.
-     *                  May be null if no condition is given.
      * @param stmts     the statements in the catch clause
      * @param lineno    the starting line number of the catch clause
      */
-    private Node createCatch(String varName, Node catchCond, Node stmts,
-                             int lineno) {
-        if (catchCond == null) {
-            catchCond = new Node(Token.EMPTY);
-        }
-        return new Node(Token.CATCH, createName(varName),
-                catchCond, stmts, lineno);
+    private Node createCatch(String varName, Node stmts, int lineno) {
+        return new Node(Token.CATCH, createName(varName), stmts, lineno);
     }
 
-    private Node initFunction(FunctionNode fnNode, int functionIndex,
-                              Node statements, int functionType) {
+    private Node initFunction(FunctionNode fnNode, int functionIndex, Node statements, int functionType) {
         fnNode.setFunctionType(functionType);
         fnNode.addChildToBack(statements);
 
@@ -2045,10 +2027,8 @@ public final class IRFactory extends Parser {
                 int catchLineNo = cb.getLineno();
 
                 Node name = cb.getFirstChild();
-                Node cond = name.getNext();
-                Node catchStatement = cond.getNext();
+                Node catchStatement = name.getNext();
                 cb.removeChild(name);
-                cb.removeChild(cond);
                 cb.removeChild(catchStatement);
 
                 // Add goto to the catch statement to jump out of catch
@@ -2059,14 +2039,7 @@ public final class IRFactory extends Parser {
                 catchStatement.addChildToBack(makeJump(Token.GOTO, endCatch));
 
                 // Create condition "if" when present
-                Node condStmt;
-                if (cond.getType() == Token.EMPTY) {
-                    condStmt = catchStatement;
-                    hasDefault = true;
-                } else {
-                    condStmt = createIf(cond, catchStatement, null,
-                            catchLineNo);
-                }
+                hasDefault = true;
 
                 // Generate code to create the scope object and store
                 // it in catchScopeBlock register
@@ -2077,9 +2050,7 @@ public final class IRFactory extends Parser {
                 catchScopeBlock.addChildToBack(catchScope);
 
                 // Add with statement based on catch scope object
-                catchScopeBlock.addChildToBack(
-                        createWith(createUseLocal(catchScopeBlock), condStmt,
-                                catchLineNo));
+                catchScopeBlock.addChildToBack(createWith(createUseLocal(catchScopeBlock), catchStatement, catchLineNo));
 
                 // move to next cb
                 cb = cb.getNext();

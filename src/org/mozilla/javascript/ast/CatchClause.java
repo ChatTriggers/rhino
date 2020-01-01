@@ -18,7 +18,6 @@ import org.mozilla.javascript.Token;
 public class CatchClause extends AstNode {
 
     private Name varName;
-    private AstNode catchCondition;
     private Block body;
     private int ifPosition = -1;
     private int lp = -1;
@@ -58,26 +57,6 @@ public class CatchClause extends AstNode {
         assertNotNull(varName);
         this.varName = varName;
         varName.setParent(this);
-    }
-
-    /**
-     * Returns catch condition node, if present
-     *
-     * @return catch condition node, {@code null} if not present
-     */
-    public AstNode getCatchCondition() {
-        return catchCondition;
-    }
-
-    /**
-     * Sets catch condition node, and sets its parent to this node.
-     *
-     * @param catchCondition catch condition node.  Can be {@code null}.
-     */
-    public void setCatchCondition(AstNode catchCondition) {
-        this.catchCondition = catchCondition;
-        if (catchCondition != null)
-            catchCondition.setParent(this);
     }
 
     /**
@@ -158,10 +137,6 @@ public class CatchClause extends AstNode {
         sb.append(makeIndent(depth));
         sb.append("catch (");
         sb.append(varName.toSource(0));
-        if (catchCondition != null) {
-            sb.append(" if ");
-            sb.append(catchCondition.toSource(0));
-        }
         sb.append(") ");
         sb.append(body.toSource(0));
         return sb.toString();
@@ -175,9 +150,6 @@ public class CatchClause extends AstNode {
     public void visit(NodeVisitor v) {
         if (v.visit(this)) {
             varName.visit(v);
-            if (catchCondition != null) {
-                catchCondition.visit(v);
-            }
             body.visit(v);
         }
     }
