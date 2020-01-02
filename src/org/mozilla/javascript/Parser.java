@@ -888,23 +888,13 @@ public class Parser {
                 switch (entryKind) {
                     case PROP_ENTRY:
                     case METHOD_ENTRY:
-                        if (getterNames.contains(propertyName)
-                                || setterNames.contains(propertyName)) {
-                            addError("msg.dup.obj.lit.prop.strict", propertyName);
-                        }
                         getterNames.add(propertyName);
                         setterNames.add(propertyName);
                         break;
                     case GET_ENTRY:
-                        if (getterNames.contains(propertyName)) {
-                            addError("msg.dup.obj.lit.prop.strict", propertyName);
-                        }
                         getterNames.add(propertyName);
                         break;
                     case SET_ENTRY:
-                        if (setterNames.contains(propertyName)) {
-                            addError("msg.dup.obj.lit.prop.strict", propertyName);
-                        }
                         setterNames.add(propertyName);
                         break;
                 }
@@ -3769,23 +3759,13 @@ public class Parser {
                 switch (entryKind) {
                     case PROP_ENTRY:
                     case METHOD_ENTRY:
-                        if (getterNames.contains(propertyName)
-                                || setterNames.contains(propertyName)) {
-                            addError("msg.dup.obj.lit.prop.strict", propertyName);
-                        }
                         getterNames.add(propertyName);
                         setterNames.add(propertyName);
                         break;
                     case GET_ENTRY:
-                        if (getterNames.contains(propertyName)) {
-                            addError("msg.dup.obj.lit.prop.strict", propertyName);
-                        }
                         getterNames.add(propertyName);
                         break;
                     case SET_ENTRY:
-                        if (setterNames.contains(propertyName)) {
-                            addError("msg.dup.obj.lit.prop.strict", propertyName);
-                        }
                         setterNames.add(propertyName);
                         break;
                 }
