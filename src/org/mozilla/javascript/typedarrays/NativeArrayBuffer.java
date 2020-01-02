@@ -112,11 +112,12 @@ public class NativeArrayBuffer extends IdScriptableObject {
         return newBuf;
     }
 
+
+
     // Function-calling dispatcher
 
     @Override
-    public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope,
-                             Scriptable thisObj, Object[] args) {
+    public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         if (!f.hasTag(CLASS_NAME)) {
             return super.execIdCall(f, cx, scope, thisObj, args);
         }
@@ -126,6 +127,9 @@ public class NativeArrayBuffer extends IdScriptableObject {
                 return (isArg(args, 0) && (args[0] instanceof NativeArrayBufferView));
 
             case Id_constructor:
+                if (thisObj != null) {
+                    throw ScriptRuntime.typeError1("msg.builtin.no.new", "ArrayBuffer");
+                }
                 double length = isArg(args, 0) ? ScriptRuntime.toNumber(args[0]) : 0;
                 return new NativeArrayBuffer(length);
 

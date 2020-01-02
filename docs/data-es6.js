@@ -6484,9 +6484,7 @@ exports.tests = [
         ];
         return constructors.every(function (constructor) {
           try {
-            if (constructor in global) {
-              global[constructor](constructor === "ArrayBuffer" ? 64 : buffer);
-            }
+            this[constructor](constructor === "ArrayBuffer" ? 64 : buffer);
             return false;
           } catch(e) {
             return true;

@@ -1716,7 +1716,7 @@ return e === 9 &amp;&amp; f === 10 &amp;&amp; g === undefined
           <td class="result"><div class="Error unflagged " title="invalid catch block condition">Error</div><div class="Error flagged " title="invalid catch block condition">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid catch block condition">Error</div><div class="Error flagged " title="invalid catch block condition">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid catch block condition">Error</div><div class="Error flagged " title="invalid catch block condition">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="invalid catch block condition">Error</div><div class="Error flagged " title="invalid catch block condition">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ) after catch">Error</div><div class="Error flagged " title="missing ) after catch">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -5747,9 +5747,7 @@ var constructors = [
 ];
 return constructors.every(function (constructor) {
   try {
-    if (constructor in global) {
-      global[constructor](constructor === &quot;ArrayBuffer&quot; ? 64 : buffer);
-    }
+    this[constructor](constructor === &quot;ArrayBuffer&quot; ? 64 : buffer);
     return false;
   } catch(e) {
     return true;
@@ -5764,7 +5762,7 @@ return constructors.every(function (constructor) {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -16058,7 +16056,7 @@ return (get + '' === &quot;length,1,2&quot;);</div>}
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">35% complete</sub><sub class="unflagged">29% complete</sub>
+                </div><sub class="flagged">39% complete</sub><sub class="unflagged">32% complete</sub>
               </th>
             </tr>
           </table>
@@ -16163,9 +16161,7 @@ return D.a.value === 1 &amp;&amp; D.a.enumerable === true &amp;&amp; D.a.configu
           <td class="result"><div class="Error unflagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
 .">Error</div><div class="Error flagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
 .">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -16191,9 +16187,7 @@ return !Object.getOwnPropertyDescriptors(P).hasOwnProperty('a');</div>}
           <td class="result"><div class="Error unflagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
 .">Error</div><div class="Error flagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
 .">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -17986,7 +17980,7 @@ return tag`\01\1\xg\xAg\u0\u0g\u00g\u000g\u{g\u{0\u{110000}${0}\0`;</div>}
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">39% complete</sub><sub class="unflagged">22% complete</sub>
+                </div><sub class="flagged">41% complete</sub><sub class="unflagged">24% complete</sub>
               </th>
             </tr>
           </table>
@@ -18502,9 +18496,7 @@ return result === 'tromple';</div>}
           <td class="result"><div class="Error unflagged " title="Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }
 .">Error</div><div class="Error flagged " title="Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }
 .">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }
-.">Error</div><div class="Error flagged " title="Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }
-.">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -19345,7 +19337,7 @@ return Array.from(map).join() === 'a,2,b,3';</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object Map].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object Map].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -19366,7 +19358,7 @@ return map.get(a) === 2 &amp;&amp; map.get(b) === 3;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object WeakMap].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object WeakMap].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object WeakMap].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object WeakMap].">Error</div></td>
+          <td class="result flag"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
@@ -22030,7 +22022,7 @@ return typeof obj::foo === &quot;function&quot; &amp;&amp; obj::foo().garply ===
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="missing ; before statement">Error</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -22214,7 +22206,7 @@ return Array.isArray(arr)
           <td class="result"><div class="Error unflagged " title="missing ) after argument list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) after argument list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function isCallable in object [object Reflect].">Error</div><div class="Error flagged " title="Cannot find function isCallable in object [object Reflect].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function isCallable in object [object Reflect].">Error</div><div class="Error flagged " title="Cannot find function isCallable in object [object Reflect].">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -22233,7 +22225,7 @@ return Array.isArray(arr)
           <td class="result"><div class="Error unflagged " title="missing ) after argument list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) after argument list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function isConstructor in object [object Reflect].">Error</div><div class="Error flagged " title="Cannot find function isConstructor in object [object Reflect].">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot find function isConstructor in object [object Reflect].">Error</div><div class="Error flagged " title="Cannot find function isConstructor in object [object Reflect].">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">

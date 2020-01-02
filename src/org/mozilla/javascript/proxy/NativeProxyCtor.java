@@ -26,7 +26,7 @@ public class NativeProxyCtor extends BaseFunction {
 
     @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        throw ScriptRuntime.typeError0("msg.proxy.no.new");
+        throw ScriptRuntime.typeError1("msg.builtin.no.new", "Proxy");
     }
 
     @Override

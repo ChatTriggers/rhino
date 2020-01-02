@@ -166,6 +166,9 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
         int id = f.methodId();
         switch (id) {
             case Id_constructor:
+                if (thisObj != null) {
+                    throw ScriptRuntime.typeError1("msg.builtin.no.new", "TypedArray");
+                }
                 return js_constructor(cx, scope, args);
 
             case Id_toString:

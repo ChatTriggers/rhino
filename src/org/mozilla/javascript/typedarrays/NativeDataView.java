@@ -240,6 +240,9 @@ public class NativeDataView
         int id = f.methodId();
         switch (id) {
             case Id_constructor:
+                if (thisObj != null) {
+                    throw ScriptRuntime.typeError1("msg.builtin.no.new", "ArrayBuffer");
+                }
                 return js_constructor(args);
             case Id_getInt8:
                 return realThis(thisObj, f).js_getInt(1, true, args);
