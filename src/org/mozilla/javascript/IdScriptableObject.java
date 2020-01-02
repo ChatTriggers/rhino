@@ -736,9 +736,6 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
 
             if (initPrototype) {
                 setPrototype(getObjectPrototype(scope));
-            } else {
-                // setPrototype(null);
-                // ScriptableObject.putProperty(this, "prototype", Undefined.instance);
             }
         }
 

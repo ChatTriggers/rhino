@@ -2918,15 +2918,12 @@ public class ScriptRuntime {
      * The caller must call ScriptRuntime.lastStoredScriptable() immediately
      * after calling this method.
      */
-    public static Callable getPropFunctionAndThis(Object obj,
-                                                  String property,
-                                                  Context cx, Scriptable scope) {
+    public static Callable getPropFunctionAndThis(Object obj, String property, Context cx, Scriptable scope) {
         Scriptable thisObj = toObjectOrNull(cx, obj, scope);
         return getPropFunctionAndThisHelper(obj, property, cx, thisObj);
     }
 
-    private static Callable getPropFunctionAndThisHelper(Object obj,
-                                                         String property, Context cx, Scriptable thisObj) {
+    private static Callable getPropFunctionAndThisHelper(Object obj, String property, Context cx, Scriptable thisObj) {
         if (thisObj == null) {
             throw undefCallError(obj, property);
         }

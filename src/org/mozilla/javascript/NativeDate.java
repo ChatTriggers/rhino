@@ -354,7 +354,7 @@ final class NativeDate extends IdScriptableObject {
 
         // The rest of Date.prototype methods require thisObj to be Date
 
-        if (!(thisObj instanceof NativeDate))
+        if (!(thisObj instanceof NativeDate) || !((NativeDate) thisObj).isInstance)
             throw incompatibleCallError(f);
         NativeDate realThis = (NativeDate) thisObj;
         double t = realThis.date;
@@ -1431,6 +1431,7 @@ final class NativeDate extends IdScriptableObject {
     /* the javascript constructor */
     private static Object jsConstructor(Object[] args) {
         NativeDate obj = new NativeDate();
+        obj.isInstance = true;
 
         // if called as a constructor with no args,
         // return a new Date with the current time.
@@ -2153,5 +2154,6 @@ final class NativeDate extends IdScriptableObject {
     private static DateFormat localeTimeFormatter;
 
     private double date;
+    private boolean isInstance = false;
 }
 

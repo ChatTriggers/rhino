@@ -26,7 +26,9 @@ public class RegExpImpl implements RegExpProxy {
     @Override
     public Scriptable wrapRegExp(Context cx, Scriptable scope,
                                  Object compiled) {
-        return new NativeRegExp(scope, (RECompiled) compiled);
+        NativeRegExp re = new NativeRegExp(scope, (RECompiled) compiled);
+        re.isInstance = true;
+        return re;
     }
 
     @Override
@@ -165,14 +167,13 @@ public class RegExpImpl implements RegExpProxy {
         }
     }
 
-    private static NativeRegExp createRegExp(Context cx, Scriptable scope,
-                                             Object[] args, int optarg,
-                                             boolean forceFlat) {
+    private static NativeRegExp createRegExp(Context cx, Scriptable scope, Object[] args, int optarg, boolean forceFlat) {
         NativeRegExp re;
         Scriptable topScope = ScriptableObject.getTopLevelScope(scope);
         if (args.length == 0 || args[0] == Undefined.instance) {
             RECompiled compiled = NativeRegExp.compileRE(cx, "", "", false);
             re = new NativeRegExp(topScope, compiled);
+            re.isInstance = true;
         } else if (args[0] instanceof NativeRegExp) {
             re = (NativeRegExp) args[0];
         } else {
@@ -186,6 +187,7 @@ public class RegExpImpl implements RegExpProxy {
             }
             RECompiled compiled = NativeRegExp.compileRE(cx, src, opt, forceFlat);
             re = new NativeRegExp(topScope, compiled);
+            re.isInstance = true;
         }
         return re;
     }
@@ -193,10 +195,7 @@ public class RegExpImpl implements RegExpProxy {
     /**
      * Analog of C match_or_replace.
      */
-    private static Object matchOrReplace(Context cx, Scriptable scope,
-                                         Scriptable thisObj, Object[] args,
-                                         RegExpImpl reImpl,
-                                         GlobData data, NativeRegExp re) {
+    private static Object matchOrReplace(Context cx, Scriptable scope, Scriptable thisObj, Object[] args, RegExpImpl reImpl, GlobData data, NativeRegExp re) {
         String str = data.str;
         data.global = (re.getFlags() & NativeRegExp.JSREG_GLOB) != 0;
         int[] indexp = {0};
