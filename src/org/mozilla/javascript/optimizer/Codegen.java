@@ -638,6 +638,27 @@ public class Codegen implements Evaluator {
                     cfw.add(ByteCode.POP);
                     Codegen.pushUndefined(cfw);
                     cfw.add(ByteCode.SWAP);
+                } else if (fnode.isInStrictMode()) {
+                    // If this is a non-new call, and the function is
+                    // in strict mode, 'this' needs to be set to
+                    // undefined
+                    int callableLabel = cfw.acquireLabel();
+                    cfw.addALoad(3);
+                    cfw.addPush("new.target");
+                    cfw.addInvoke(
+                            ByteCode.INVOKESTATIC,
+                            "org/mozilla/javascript/ScriptableObject",
+                            "hasProperty",
+                            "(Lorg/mozilla/javascript/Scriptable;Ljava/lang/String;)Z"
+                    );
+                    cfw.add(ByteCode.IFNE, callableLabel);
+
+                    cfw.add(ByteCode.SWAP);
+                    cfw.add(ByteCode.POP);
+                    Codegen.pushScriptableUndefined(cfw);
+                    cfw.add(ByteCode.SWAP);
+
+                    cfw.markLabel(callableLabel);
                 }
 
                 if (ofn.isTargetOfDirectCall()) {
@@ -1281,8 +1302,11 @@ public class Codegen implements Evaluator {
     }
 
     static void pushUndefined(ClassFileWriter cfw) {
-        cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/Undefined",
-                "instance", "Ljava/lang/Object;");
+        cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/Undefined", "instance", "Ljava/lang/Object;");
+    }
+
+    static void pushScriptableUndefined(ClassFileWriter cfw) {
+        cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/Undefined", "SCRIPTABLE_UNDEFINED", "Lorg/mozilla/javascript/Scriptable;");
     }
 
     int getIndex(ScriptNode n) {

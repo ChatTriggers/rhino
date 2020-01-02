@@ -4363,8 +4363,7 @@ public class ScriptRuntime {
                 if (!fromEvalCode) {
                     // ECMA specifies that functions defined in global and
                     // function scope outside eval should have DONTDELETE set.
-                    ScriptableObject.defineProperty
-                            (scope, name, function, ScriptableObject.NOT_CONFIGURABLE);
+                    ScriptableObject.defineProperty(scope, name, function, ScriptableObject.NOT_CONFIGURABLE);
                 } else {
                     scope.put(name, scope, function);
                 }
@@ -4385,9 +4384,7 @@ public class ScriptRuntime {
         }
     }
 
-    public static Scriptable newArrayLiteral(Object[] objects,
-                                             int[] skipIndices,
-                                             Context cx, Scriptable scope) {
+    public static Scriptable newArrayLiteral(Object[] objects, int[] skipIndices, Context cx, Scriptable scope) {
         final int SKIP_DENSITY = 2;
         int count = objects.length;
         int skipCount = 0;
