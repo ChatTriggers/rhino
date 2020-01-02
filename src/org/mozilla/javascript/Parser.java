@@ -3570,7 +3570,7 @@ public class Parser {
     }
 
     /**
-     * May return an {@link ArrayLiteral} or {@link ArrayComprehension}.
+     * May return an {@link ArrayLiteral}
      */
     private AstNode arrayLiteral() throws IOException {
         if (currentToken != Token.LB) codeBug();
@@ -3606,8 +3606,6 @@ public class Parser {
                 if (afterComma != -1)
                     warnTrailingComma(pos, elements, afterComma);
                 break;
-            } else if (tt == Token.FOR && !after_lb_or_comma && elements.size() == 1) {
-                return arrayComprehension(elements.get(0), pos);
             } else if (tt == Token.SPREAD) {
                 consumeToken();
                 AstNode expr = assignExpr();
@@ -3640,116 +3638,6 @@ public class Parser {
         }
         pn.setLength(end - pos);
         return pn;
-    }
-
-    /**
-     * Parse a JavaScript 1.7 Array comprehension.
-     *
-     * @param result the first expression after the opening left-bracket
-     * @param pos    start of LB token that begins the array comprehension
-     * @return the array comprehension or an error node
-     */
-    private AstNode arrayComprehension(AstNode result, int pos) throws IOException {
-        List<ArrayComprehensionLoop> loops =
-                new ArrayList<ArrayComprehensionLoop>();
-        while (peekToken() == Token.FOR) {
-            loops.add(arrayComprehensionLoop());
-        }
-        int ifPos = -1;
-        ConditionData data = null;
-        if (peekToken() == Token.IF) {
-            consumeToken();
-            ifPos = ts.tokenBeg - pos;
-            data = condition();
-        }
-        mustMatchToken(Token.RB, "msg.no.bracket.arg");
-        ArrayComprehension pn = new ArrayComprehension(pos, ts.tokenEnd - pos);
-        pn.setResult(result);
-        pn.setLoops(loops);
-        if (data != null) {
-            pn.setIfPosition(ifPos);
-            pn.setFilter(data.condition);
-            pn.setFilterLp(data.lp - pos);
-            pn.setFilterRp(data.rp - pos);
-        }
-        return pn;
-    }
-
-    private ArrayComprehensionLoop arrayComprehensionLoop() throws IOException {
-        if (nextToken() != Token.FOR) codeBug();
-        int pos = ts.tokenBeg;
-        int eachPos = -1, lp = -1, rp = -1, inPos = -1;
-        boolean isForOf = false;
-        ArrayComprehensionLoop pn = new ArrayComprehensionLoop(pos);
-
-        pushScope(pn);
-        try {
-            if (matchToken(Token.NAME)) {
-                if (ts.getString().equals("each")) {
-                    eachPos = ts.tokenBeg - pos;
-                } else {
-                    reportError("msg.no.paren.for");
-                }
-            }
-            if (mustMatchToken(Token.LP, "msg.no.paren.for")) {
-                lp = ts.tokenBeg - pos;
-            }
-
-            AstNode iter = null;
-            switch (peekToken()) {
-                case Token.LB:
-                case Token.LC:
-                    // handle destructuring assignment
-                    iter = destructuringPrimaryExpr();
-                    markDestructuring(iter);
-                    break;
-                case Token.NAME:
-                    consumeToken();
-                    iter = createNameNode();
-                    break;
-                default:
-                    reportError("msg.bad.var");
-            }
-
-            // Define as a let since we want the scope of the variable to
-            // be restricted to the array comprehension
-            if (iter.getType() == Token.NAME) {
-                defineSymbol(Token.LET, ts.getString(), true);
-            }
-
-            switch (nextToken()) {
-                case Token.IN:
-                    inPos = ts.tokenBeg - pos;
-                    break;
-                case Token.NAME:
-                    if ("of".equals(ts.getString())) {
-                        if (eachPos != -1) {
-                            reportError("msg.invalid.for.each");
-                        }
-                        inPos = ts.tokenBeg - pos;
-                        isForOf = true;
-                        break;
-                    }
-                    // fall through
-                default:
-                    reportError("msg.in.after.for.name");
-            }
-            AstNode obj = expr();
-            if (mustMatchToken(Token.RP, "msg.no.paren.for.ctrl"))
-                rp = ts.tokenBeg - pos;
-
-            pn.setLength(ts.tokenEnd - pos);
-            pn.setIterator(iter);
-            pn.setIteratedObject(obj);
-            pn.setInPosition(inPos);
-            pn.setEachPosition(eachPos);
-            pn.setIsForEach(eachPos != -1);
-            pn.setParens(lp, rp);
-            pn.setIsForOf(isForOf);
-            return pn;
-        } finally {
-            popScope();
-        }
     }
 
     private AstNode generatorExpression(AstNode result, int pos) throws IOException {
