@@ -15,10 +15,6 @@ import org.mozilla.javascript.Token;
  * from the operator to the end of the operand (for prefix operators) or from
  * the start of the operand to the operator (for postfix).<p>
  * <p>
- * The {@code default xml namespace = &lt;expr&gt;} statement in E4X
- * (JavaScript 1.6) is represented as a {@code UnaryExpression} of node
- * type {@link Token#DEFAULTNAMESPACE}, wrapped with an
- * {@link ExpressionStatement}.
  */
 public class UnaryExpression extends AstNode {
 

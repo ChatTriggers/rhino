@@ -128,17 +128,6 @@ public class Context {
     public static final int FEATURE_NON_ECMA_GET_YEAR = 1;
 
     /**
-     * Control if member expression as function name extension is available.
-     * If <tt>hasFeature(FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME)</tt> returns
-     * true, allow <tt>function memberExpression(args) { body }</tt> to be
-     * syntax sugar for <tt>memberExpression = function(args) { body }</tt>,
-     * when memberExpression is not a simple identifier.
-     * See ECMAScript-262, section 11.2 for definition of memberExpression.
-     * By default {@link #hasFeature(int)} returns false.
-     */
-    public static final int FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME = 2;
-
-    /**
      * Control if reserved keywords are treated as identifiers.
      * If <tt>hasFeature(RESERVED_KEYWORD_AS_IDENTIFIER)</tt> returns true,
      * treat future reserved keyword (see  Ecma-262, section 7.5.3) as ordinary
@@ -146,7 +135,7 @@ public class Context {
      * <p>
      * By default {@link #hasFeature(int)} returns false.
      */
-    public static final int FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER = 3;
+    public static final int FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER = 2;
 
     /**
      * Control if <tt>toString()</tt> should returns the same result
@@ -161,7 +150,7 @@ public class Context {
      * By default {@link #hasFeature(int)} returns true only if
      * the current JS version is set to {@link #VERSION_1_2}.
      */
-    public static final int FEATURE_TO_STRING_AS_SOURCE = 4;
+    public static final int FEATURE_TO_STRING_AS_SOURCE = 3;
 
     /**
      * Control if properties <tt>__proto__</tt> and <tt>__parent__</tt>
@@ -179,7 +168,7 @@ public class Context {
      * <p>
      * By default {@link #hasFeature(int)} returns true.
      */
-    public static final int FEATURE_PARENT_PROTO_PROPERTIES = 5;
+    public static final int FEATURE_PARENT_PROTO_PROPERTIES = 4;
 
     /**
      * @deprecated In previous releases, this name was given to
@@ -2222,11 +2211,9 @@ public class Context {
      * @param featureIndex feature index to check
      * @return true if the <code>featureIndex</code> feature is turned on
      * @see #FEATURE_NON_ECMA_GET_YEAR
-     * @see #FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME
      * @see #FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER
      * @see #FEATURE_TO_STRING_AS_SOURCE
      * @see #FEATURE_PARENT_PROTO_PROPRTIES
-     * @see #FEATURE_E4X
      * @see #FEATURE_DYNAMIC_SCOPE
      * @see #FEATURE_STRICT_VARS
      * @see #FEATURE_STRICT_EVAL

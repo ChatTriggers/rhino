@@ -88,7 +88,6 @@ public class FunctionNode extends ScriptNode {
     private boolean isGenerator;
     private List<Node> generatorResumePoints = new ArrayList<>();
     private Map<Node, int[]> liveLocals;
-    private AstNode memberExprNode;
 
     {
         type = Token.FUNCTION;
@@ -429,26 +428,6 @@ public class FunctionNode extends ScriptNode {
         functionForm = Form.METHOD;
     }
 
-    /**
-     * Rhino supports a nonstandard Ecma extension that allows you to
-     * say, for instance, function a.b.c(arg1, arg) {...}, and it will
-     * be rewritten at codegen time to:  a.b.c = function(arg1, arg2) {...}
-     * If we detect an expression other than a simple Name in the position
-     * where a function name was expected, we record that expression here.
-     * <p>
-     * This extension is only available by setting the CompilerEnv option
-     * "isAllowMemberExprAsFunctionName" in the Parser.
-     */
-    public void setMemberExprNode(AstNode node) {
-        memberExprNode = node;
-        if (node != null)
-            node.setParent(this);
-    }
-
-    public AstNode getMemberExprNode() {
-        return memberExprNode;
-    }
-
     @Override
     public String toSource(int depth) {
         StringBuilder sb = new StringBuilder();
@@ -514,15 +493,7 @@ public class FunctionNode extends ScriptNode {
             for (AstNode param : getParams()) {
                 param.visit(v);
             }
-//            for (AstNode defaultParam : getDefaultParams().values()) {
-//                defaultParam.visit(v);
-//            }
             getBody().visit(v);
-            if (!isExpressionClosure) {
-                if (memberExprNode != null) {
-                    memberExprNode.visit(v);
-                }
-            }
         }
     }
 }

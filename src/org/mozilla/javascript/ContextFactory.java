@@ -233,61 +233,36 @@ public class ContextFactory {
                  * version...
                  */
                 version = cx.getLanguageVersion();
-                return (version == Context.VERSION_1_0
-                        || version == Context.VERSION_1_1
-                        || version == Context.VERSION_1_2);
-
-            case Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME:
-                return false;
+                return (version == Context.VERSION_1_0 || version == Context.VERSION_1_1 || version == Context.VERSION_1_2);
 
             case Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER:
+
+            case Context.FEATURE_PARENT_PROTO_PROPERTIES:
+
+            case Context.FEATURE_V8_EXTENSIONS:
                 return true;
 
             case Context.FEATURE_TO_STRING_AS_SOURCE:
                 version = cx.getLanguageVersion();
                 return version == Context.VERSION_1_2;
 
-            case Context.FEATURE_PARENT_PROTO_PROPERTIES:
-                return true;
-
             case Context.FEATURE_DYNAMIC_SCOPE:
-                return false;
-
             case Context.FEATURE_STRICT_VARS:
-                return false;
-
             case Context.FEATURE_STRICT_EVAL:
-                return false;
-
             case Context.FEATURE_LOCATION_INFORMATION_IN_ERROR:
-                return false;
-
             case Context.FEATURE_STRICT_MODE:
-                return false;
-
             case Context.FEATURE_WARNING_AS_ERROR:
-                return false;
-
             case Context.FEATURE_ENHANCED_JAVA_ACCESS:
+            case Context.FEATURE_THREAD_SAFE_OBJECTS:
+            case Context.FEATURE_INTEGER_WITHOUT_DECIMAL_PLACE:
+            case Context.FEATURE_LITTLE_ENDIAN:
                 return false;
-
-            case Context.FEATURE_V8_EXTENSIONS:
-                return true;
 
             case Context.FEATURE_OLD_UNDEF_NULL_THIS:
                 return cx.getLanguageVersion() <= Context.VERSION_1_7;
 
             case Context.FEATURE_ENUMERATE_IDS_FIRST:
                 return cx.getLanguageVersion() >= Context.VERSION_ES6;
-
-            case Context.FEATURE_THREAD_SAFE_OBJECTS:
-                return false;
-
-            case Context.FEATURE_INTEGER_WITHOUT_DECIMAL_PLACE:
-                return false;
-
-            case Context.FEATURE_LITTLE_ENDIAN:
-                return false;
         }
         // It is a bug to call the method with unknown featureIndex
         throw new IllegalArgumentException(String.valueOf(featureIndex));

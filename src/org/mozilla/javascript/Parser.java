@@ -991,7 +991,6 @@ public class Parser {
         int baseLineno = ts.lineno;  // line number where source starts
         int functionSourceStart = ts.tokenBeg;  // start of "function" kwd
         Name name = null;
-        AstNode memberExprNode = null;
         boolean generator = objEntryKind == GENERATOR_ENTRY;
 
         if (matchToken(Token.MUL)) {
@@ -1007,32 +1006,16 @@ public class Parser {
                 }
             }
             if (!matchToken(Token.LP)) {
-                if (compilerEnv.isAllowMemberExprAsFunctionName()) {
-                    AstNode memberExprHead = name;
-                    name = null;
-                    memberExprNode = memberExprTail(false, memberExprHead);
-                }
                 mustMatchToken(Token.LP, "msg.no.paren.parms");
             }
         } else if (matchToken(Token.LP)) {
             // Anonymous function:  leave name as null
         } else {
-            if (compilerEnv.isAllowMemberExprAsFunctionName()) {
-                // Note that memberExpr can not start with '(' like
-                // in function (1+2).toString(), because 'function (' already
-                // processed as anonymous function
-                memberExprNode = memberExpr(false);
-            }
             mustMatchToken(Token.LP, "msg.no.paren.parms");
         }
         int lpPos = currentToken == Token.LP ? ts.tokenBeg : -1;
 
-        if (memberExprNode != null) {
-            syntheticType = FunctionNode.FUNCTION_EXPRESSION;
-        }
-
-        if (syntheticType != FunctionNode.FUNCTION_EXPRESSION
-                && name != null && name.length() > 0) {
+        if (syntheticType != FunctionNode.FUNCTION_EXPRESSION && name != null && name.length() > 0) {
             // Function statements define a symbol in the enclosing scope
             defineSymbol(Token.FUNCTION, name.getIdentifier());
         }
@@ -1063,21 +1046,6 @@ public class Parser {
             }
         } finally {
             savedVars.restore();
-        }
-
-        if (memberExprNode != null) {
-            // TODO(stevey): fix missing functionality
-            Kit.codeBug();
-            fnNode.setMemberExprNode(memberExprNode);  // rewrite later
-            /* old code:
-            if (memberExprNode != null) {
-                pn = nf.createAssignment(Token.ASSIGN, memberExprNode, pn);
-                if (functionType != FunctionNode.FUNCTION_EXPRESSION) {
-                    // XXX check JScript behavior: should it be createExprStatement?
-                    pn = nf.createExprStatementNoReturn(pn, baseLineno);
-                }
-            }
-            */
         }
 
         fnNode.setSourceName(sourceURI);
@@ -4488,9 +4456,9 @@ public class Parser {
     // explicit left-hand side) that doesn't use the normal JavaScript
     // Object (i.e. ScriptableObject) get/set/delete functions, but wants
     // to provide its own versions instead.  It will ultimately implement
-    // Ref, and currently SpecialRef (for __proto__ etc.) and XmlName
-    // (for E4X XML objects) are the only implementations.  The runtime
-    // notices these bytecodes and delegates get/set/delete to the object.
+    // Ref, and currently SpecialRef (for __proto__ etc.) is the only
+    // implementation.  The runtime notices these bytecodes and delegates
+    // get/set/delete to the object.
     //
     // BINDNAME:  used in assignments.  LHS is evaluated first to get a
     // specific object containing the property ("binding" the property

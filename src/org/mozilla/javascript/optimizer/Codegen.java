@@ -61,10 +61,7 @@ public class Codegen implements Evaluator {
     }
 
     @Override
-    public Object compile(CompilerEnvirons compilerEnv,
-                          ScriptNode tree,
-                          String encodedSource,
-                          boolean returnFunction) {
+    public Object compile(CompilerEnvirons compilerEnv, ScriptNode tree, String encodedSource, boolean returnFunction) {
         int serial;
         synchronized (globalLock) {
             serial = ++globalSerialClassCounter;

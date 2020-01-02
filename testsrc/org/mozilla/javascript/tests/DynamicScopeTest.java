@@ -26,7 +26,6 @@ public class DynamicScopeTest extends TestCase {
         {
             if (featureIndex == Context.FEATURE_DYNAMIC_SCOPE ||
                     featureIndex == Context.FEATURE_STRICT_VARS ||
-                    featureIndex == Context.FEATURE_E4X ||
                     featureIndex == Context.FEATURE_STRICT_EVAL ||
                     featureIndex == Context.FEATURE_LOCATION_INFORMATION_IN_ERROR ||
                     featureIndex == Context.FEATURE_STRICT_MODE

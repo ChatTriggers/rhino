@@ -16,7 +16,6 @@ public class CompilerEnvirons {
         languageVersion = Context.VERSION_DEFAULT;
         generateDebugInfo = true;
         reservedKeywordAsIdentifier = true;
-        allowMemberExprAsFunctionName = false;
         optimizationLevel = 0;
         generatingSource = true;
         strictMode = false;
@@ -30,7 +29,6 @@ public class CompilerEnvirons {
         languageVersion = cx.getLanguageVersion();
         generateDebugInfo = (!cx.isGeneratingDebugChanged() || cx.isGeneratingDebug());
         reservedKeywordAsIdentifier = cx.hasFeature(Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER);
-        allowMemberExprAsFunctionName = cx.hasFeature(Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME);
         strictMode = cx.hasFeature(Context.FEATURE_STRICT_MODE);
         warningAsError = cx.hasFeature(Context.FEATURE_WARNING_AS_ERROR);
 
@@ -75,18 +73,6 @@ public class CompilerEnvirons {
 
     public void setReservedKeywordAsIdentifier(boolean flag) {
         reservedKeywordAsIdentifier = flag;
-    }
-
-    /**
-     * Extension to ECMA: if 'function &lt;name&gt;' is not followed
-     * by '(', assume &lt;name&gt; starts a {@code memberExpr}
-     */
-    public final boolean isAllowMemberExprAsFunctionName() {
-        return allowMemberExprAsFunctionName;
-    }
-
-    public void setAllowMemberExprAsFunctionName(boolean flag) {
-        allowMemberExprAsFunctionName = flag;
     }
 
     public final int getOptimizationLevel() {
@@ -242,7 +228,6 @@ public class CompilerEnvirons {
     private int languageVersion;
     private boolean generateDebugInfo;
     private boolean reservedKeywordAsIdentifier;
-    private boolean allowMemberExprAsFunctionName;
     private int optimizationLevel;
     private boolean generatingSource;
     private boolean strictMode;

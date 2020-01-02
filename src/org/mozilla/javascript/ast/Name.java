@@ -14,8 +14,7 @@ import org.mozilla.javascript.Token;
  * <p>
  * This node type is also used to represent certain non-identifier names that
  * are part of the language syntax.  It's used for the "get" and "set"
- * pseudo-keywords for object-initializer getter/setter properties, and it's
- * also used for the "*" wildcard in E4X XML namespace and name expressions.
+ * pseudo-keywords for object-initializer getter/setter properties.
  */
 public class Name extends AstNode {
 

@@ -455,7 +455,7 @@ public final class IRFactory extends Parser {
     private Node transformFunction(FunctionNode fn) {
         int functionType = fn.getFunctionType();
         int start = decompiler.markFunctionStart(functionType);
-        Node mexpr = decompileFunctionHeader(fn);
+        decompileFunctionHeader(fn);
         int index = currentScriptOrFn.addFunction(fn);
 
         PerFunctionVariables savedVars = new PerFunctionVariables(fn);
@@ -524,12 +524,6 @@ public final class IRFactory extends Parser {
 
             int syntheticType = fn.getFunctionType();
             Node pn = initFunction(fn, index, body, syntheticType);
-            if (mexpr != null) {
-                pn = createAssignment(Token.ASSIGN, mexpr, pn);
-                if (syntheticType != FunctionNode.FUNCTION_EXPRESSION) {
-                    pn = createExprStatementNoReturn(pn, fn.getLineno());
-                }
-            }
 
             return pn;
 
@@ -693,7 +687,7 @@ public final class IRFactory extends Parser {
 
         int functionType = fn.getFunctionType();
         int start = decompiler.markFunctionStart(functionType);
-        Node mexpr = decompileFunctionHeader(fn);
+        decompileFunctionHeader(fn);
         int index = currentScriptOrFn.addFunction(fn);
 
         PerFunctionVariables savedVars = new PerFunctionVariables(fn);
@@ -725,12 +719,6 @@ public final class IRFactory extends Parser {
 
             int syntheticType = fn.getFunctionType();
             pn = initFunction(fn, index, body, syntheticType);
-            if (mexpr != null) {
-                pn = createAssignment(Token.ASSIGN, mexpr, pn);
-                if (syntheticType != FunctionNode.FUNCTION_EXPRESSION) {
-                    pn = createExprStatementNoReturn(pn, fn.getLineno());
-                }
-            }
         } finally {
             --nestingOfFunction;
             savedVars.restore();
@@ -2283,12 +2271,9 @@ public final class IRFactory extends Parser {
                 && ((DestructuringForm) n).isDestructuring();
     }
 
-    Node decompileFunctionHeader(FunctionNode fn) {
-        Node mexpr = null;
+    void decompileFunctionHeader(FunctionNode fn) {
         if (fn.getFunctionName() != null) {
             decompiler.addName(fn.getName());
-        } else if (fn.getMemberExprNode() != null) {
-            mexpr = transform(fn.getMemberExprNode());
         }
         boolean isArrow = fn.getFunctionType() == FunctionNode.ARROW_FUNCTION;
         boolean noParen = isArrow && fn.getLp() == -1;
@@ -2324,7 +2309,6 @@ public final class IRFactory extends Parser {
         if (!fn.isExpressionClosure()) {
             decompiler.addEOL(Token.LC);
         }
-        return mexpr;
     }
 
     void decompile(AstNode node) {

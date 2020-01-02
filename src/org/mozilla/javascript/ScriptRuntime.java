@@ -2482,8 +2482,6 @@ public class ScriptRuntime {
         setFunctionNameIfApplicable(value, id);
 
         if (bound != null) {
-            // TODO: we used to special-case XMLObject here, but putProperty
-            // seems to work for E4X and it's better to optimize  the common case
             ScriptableObject.putProperty(bound, id, value);
         } else {
             // "newname = 7;", where 'newname' has not yet
@@ -2513,8 +2511,6 @@ public class ScriptRuntime {
             // {[[Put]]:undefined}, nor to a non-existent property of an
             // object whose [[Extensible]] internal property has the value
             // false. In these cases a TypeError exception is thrown (11.13.1).
-            // TODO: we used to special-case XMLObject here, but putProperty
-            // seems to work for E4X and we should optimize  the common case
             ScriptableObject.putProperty(bound, id, value);
             return value;
         }
