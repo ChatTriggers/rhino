@@ -250,11 +250,6 @@ public class ContextFactory {
             case Context.FEATURE_PARENT_PROTO_PROPERTIES:
                 return true;
 
-            case Context.FEATURE_E4X:
-                version = cx.getLanguageVersion();
-                return (version == Context.VERSION_DEFAULT
-                        || version >= Context.VERSION_1_6);
-
             case Context.FEATURE_DYNAMIC_SCOPE:
                 return false;
 
@@ -293,9 +288,6 @@ public class ContextFactory {
 
             case Context.FEATURE_LITTLE_ENDIAN:
                 return false;
-
-            case Context.FEATURE_ENABLE_XML_SECURE_PARSING:
-                return true;
         }
         // It is a bug to call the method with unknown featureIndex
         throw new IllegalArgumentException(String.valueOf(featureIndex));
@@ -313,34 +305,6 @@ public class ContextFactory {
             return false;
         }
     }
-
-    /**
-     * Provides a default
-     * {@link org.mozilla.javascript.xml.XMLLib.Factory XMLLib.Factory}
-     * to be used by the <code>Context</code> instances produced by this
-     * factory. See {@link Context#getE4xImplementationFactory} for details.
-     * <p>
-     * May return null, in which case E4X functionality is not supported in
-     * Rhino.
-     * <p>
-     * The default implementation now prefers the DOM3 E4X implementation.
-     */
-    protected org.mozilla.javascript.xml.XMLLib.Factory
-    getE4xImplementationFactory() {
-        // Must provide default implementation, rather than abstract method,
-        // so that past implementors of ContextFactory do not fail at runtime
-        // upon invocation of this method.
-        // Note that the default implementation returns null if we
-        // neither have XMLBeans nor a DOM3 implementation present.
-
-        if (isDom3Present()) {
-            return org.mozilla.javascript.xml.XMLLib.Factory.create(
-                    "org.mozilla.javascript.xmlimpl.XMLLibImpl"
-            );
-        }
-        return null;
-    }
-
 
     /**
      * Create class loader for generated classes.

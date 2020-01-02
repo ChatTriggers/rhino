@@ -1849,29 +1849,6 @@ public final class Interpreter extends Icode implements Evaluator {
                                         cx, frame.scope);
                                 continue Loop;
                             }
-                            case Token.REF_MEMBER: {
-                                //indexReg: flags
-                                stackTop = doRefMember(cx, stack, sDbl, stackTop, indexReg);
-                                continue Loop;
-                            }
-                            case Token.REF_NS_MEMBER: {
-                                //indexReg: flags
-                                stackTop = doRefNsMember(cx, stack, sDbl, stackTop, indexReg);
-                                continue Loop;
-                            }
-                            case Token.REF_NAME: {
-                                //indexReg: flags
-                                Object name = stack[stackTop];
-                                if (name == DBL_MRK) name = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-                                stack[stackTop] = ScriptRuntime.nameRef(name, cx, frame.scope,
-                                        indexReg);
-                                continue Loop;
-                            }
-                            case Token.REF_NS_NAME: {
-                                //indexReg: flags
-                                stackTop = doRefNsName(cx, frame, stack, sDbl, stackTop, indexReg);
-                                continue Loop;
-                            }
                             case Icode_SCOPE_LOAD:
                                 indexReg += frame.localShift;
                                 frame.scope = (Scriptable) stack[indexReg];
@@ -1955,44 +1932,24 @@ public final class Interpreter extends Icode implements Evaluator {
                                 continue Loop;
                             }
                             case Icode_ENTERDQ: {
-                                Object lhs = stack[stackTop];
-                                if (lhs == DBL_MRK) lhs = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-                                --stackTop;
-                                frame.scope = ScriptRuntime.enterDotQuery(lhs, frame.scope);
-                                continue Loop;
+                                // Object lhs = stack[stackTop];
+                                // if (lhs == DBL_MRK) lhs = ScriptRuntime.wrapNumber(sDbl[stackTop]);
+                                // --stackTop;
+                                // frame.scope = ScriptRuntime.enterDotQuery(lhs, frame.scope);
+                                // continue Loop;
                             }
                             case Icode_LEAVEDQ: {
-                                boolean valBln = stack_boolean(frame, stackTop);
-                                Object x = ScriptRuntime.updateDotQuery(valBln, frame.scope);
-                                if (x != null) {
-                                    stack[stackTop] = x;
-                                    frame.scope = ScriptRuntime.leaveDotQuery(frame.scope);
-                                    frame.pc += 2;
-                                    continue Loop;
-                                }
-                                // reset stack and PC to code after ENTERDQ
-                                --stackTop;
-                                break jumplessRun;
-                            }
-                            case Token.DEFAULTNAMESPACE: {
-                                Object value = stack[stackTop];
-                                if (value == DBL_MRK) value = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-                                stack[stackTop] = ScriptRuntime.setDefaultNamespace(value, cx);
-                                continue Loop;
-                            }
-                            case Token.ESCXMLATTR: {
-                                Object value = stack[stackTop];
-                                if (value != DBL_MRK) {
-                                    stack[stackTop] = ScriptRuntime.escapeAttributeValue(value, cx);
-                                }
-                                continue Loop;
-                            }
-                            case Token.ESCXMLTEXT: {
-                                Object value = stack[stackTop];
-                                if (value != DBL_MRK) {
-                                    stack[stackTop] = ScriptRuntime.escapeTextValue(value, cx);
-                                }
-                                continue Loop;
+                                // boolean valBln = stack_boolean(frame, stackTop);
+                                // Object x = ScriptRuntime.updateDotQuery(valBln, frame.scope);
+                                // if (x != null) {
+                                //     stack[stackTop] = x;
+                                //     frame.scope = ScriptRuntime.leaveDotQuery(frame.scope);
+                                //     frame.pc += 2;
+                                //     continue Loop;
+                                // }
+                                // // reset stack and PC to code after ENTERDQ
+                                // --stackTop;
+                                // break jumplessRun;
                             }
                             case Icode_DEBUGGER:
                                 if (frame.debuggerFrame != null) {
@@ -2575,50 +2532,10 @@ public final class Interpreter extends Icode implements Evaluator {
         return stackTop;
     }
 
-    private static int doRefMember(Context cx, Object[] stack, double[] sDbl,
-                                   int stackTop, int flags) {
-        Object elem = stack[stackTop];
-        if (elem == DOUBLE_MARK) elem = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-        --stackTop;
-        Object obj = stack[stackTop];
-        if (obj == DOUBLE_MARK) obj = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-        stack[stackTop] = ScriptRuntime.memberRef(obj, elem, cx, flags);
-        return stackTop;
-    }
-
-    private static int doRefNsMember(Context cx, Object[] stack, double[] sDbl,
-                                     int stackTop, int flags) {
-        Object elem = stack[stackTop];
-        if (elem == DOUBLE_MARK) elem = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-        --stackTop;
-        Object ns = stack[stackTop];
-        if (ns == DOUBLE_MARK) ns = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-        --stackTop;
-        Object obj = stack[stackTop];
-        if (obj == DOUBLE_MARK) obj = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-        stack[stackTop] = ScriptRuntime.memberRef(obj, ns, elem, cx, flags);
-        return stackTop;
-    }
-
-    private static int doRefNsName(Context cx, CallFrame frame,
-                                   Object[] stack, double[] sDbl,
-                                   int stackTop, int flags) {
-        Object name = stack[stackTop];
-        if (name == DOUBLE_MARK) name = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-        --stackTop;
-        Object ns = stack[stackTop];
-        if (ns == DOUBLE_MARK) ns = ScriptRuntime.wrapNumber(sDbl[stackTop]);
-        stack[stackTop] = ScriptRuntime.nameRef(ns, name, cx, frame.scope, flags);
-        return stackTop;
-    }
-
     /**
      * Call __noSuchMethod__.
      */
-    private static CallFrame initFrameForNoSuchMethod(Context cx,
-                                                      CallFrame frame, int indexReg, Object[] stack, double[] sDbl,
-                                                      int stackTop, int op, Scriptable funThisObj, Scriptable calleeScope,
-                                                      NoSuchMethodShim noSuchMethodShim, InterpretedFunction ifun) {
+    private static CallFrame initFrameForNoSuchMethod(Context cx, CallFrame frame, int indexReg, Object[] stack, double[] sDbl, int stackTop, int op, Scriptable funThisObj, Scriptable calleeScope, NoSuchMethodShim noSuchMethodShim, InterpretedFunction ifun) {
         // create an args array from the stack
         Object[] argsArray = null;
         // exactly like getArgsArray except that the first argument

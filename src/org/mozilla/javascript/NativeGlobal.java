@@ -6,8 +6,6 @@
 
 package org.mozilla.javascript;
 
-import org.mozilla.javascript.xml.XMLLib;
-
 import java.io.Serializable;
 
 import static org.mozilla.javascript.ScriptableObject.*;
@@ -54,9 +52,6 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
                     break;
                 case Id_isNaN:
                     name = "isNaN";
-                    break;
-                case Id_isXMLName:
-                    name = "isXMLName";
                     break;
                 case Id_parseFloat:
                     name = "parseFloat";
@@ -163,14 +158,6 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
                         result = Double.isNaN(d);
                     }
                     return ScriptRuntime.wrapBoolean(result);
-                }
-
-                case Id_isXMLName: {
-                    Object name = (args.length == 0)
-                            ? Undefined.instance : args[0];
-                    XMLLib xmlLib = XMLLib.extractFromScope(scope);
-                    return ScriptRuntime.wrapBoolean(
-                            xmlLib.isXMLName(cx, name));
                 }
 
                 case Id_parseFloat:
@@ -763,13 +750,12 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
             Id_eval = 6,
             Id_isFinite = 7,
             Id_isNaN = 8,
-            Id_isXMLName = 9,
-            Id_parseFloat = 10,
-            Id_parseInt = 11,
-            Id_unescape = 12,
-            Id_uneval = 13,
+            Id_parseFloat = 9,
+            Id_parseInt = 10,
+            Id_unescape = 11,
+            Id_uneval = 12,
 
-    LAST_SCOPE_FUNCTION_ID = 13,
+    LAST_SCOPE_FUNCTION_ID = 12,
 
-    Id_new_CommonError = 14;
+    Id_new_CommonError = 13;
 }

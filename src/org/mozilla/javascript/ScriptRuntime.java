@@ -16,8 +16,6 @@ import org.mozilla.javascript.optimizer.OptRuntime;
 import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
 import org.mozilla.javascript.v8dtoa.FastDtoa;
-import org.mozilla.javascript.xml.XMLLib;
-import org.mozilla.javascript.xml.XMLObject;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -215,59 +213,22 @@ public class ScriptRuntime {
         NativeStringIterator.init(scope, sealed);
         NativeGeneratorIterator.init(scope, sealed);
 
-        boolean withXml = cx.hasFeature(Context.FEATURE_E4X) &&
-                cx.getE4xImplementationFactory() != null;
-
         // define lazy-loaded properties using their class name
-        new LazilyLoadedCtor(scope, "RegExp",
-                "org.mozilla.javascript.regexp.NativeRegExp", sealed, true);
-        new LazilyLoadedCtor(scope, "Continuation",
-                "org.mozilla.javascript.NativeContinuation", sealed, true);
+        new LazilyLoadedCtor(scope, "RegExp", "org.mozilla.javascript.regexp.NativeRegExp", sealed, true);
+        new LazilyLoadedCtor(scope, "Continuation", "org.mozilla.javascript.NativeContinuation", sealed, true);
 
-        if (withXml) {
-            String xmlImpl = cx.getE4xImplementationFactory().getImplementationClassName();
-            new LazilyLoadedCtor(scope, "XML", xmlImpl, sealed, true);
-            new LazilyLoadedCtor(scope, "XMLList", xmlImpl, sealed, true);
-            new LazilyLoadedCtor(scope, "Namespace", xmlImpl, sealed, true);
-            new LazilyLoadedCtor(scope, "QName", xmlImpl, sealed, true);
-        }
-
-        if (((cx.getLanguageVersion() >= Context.VERSION_1_8) &&
-                cx.hasFeature(Context.FEATURE_V8_EXTENSIONS)) ||
-                (cx.getLanguageVersion() >= Context.VERSION_ES6)) {
-            new LazilyLoadedCtor(scope, "ArrayBuffer",
-                    "org.mozilla.javascript.typedarrays.NativeArrayBuffer",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Int8Array",
-                    "org.mozilla.javascript.typedarrays.NativeInt8Array",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Uint8Array",
-                    "org.mozilla.javascript.typedarrays.NativeUint8Array",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Uint8ClampedArray",
-                    "org.mozilla.javascript.typedarrays.NativeUint8ClampedArray",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Int16Array",
-                    "org.mozilla.javascript.typedarrays.NativeInt16Array",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Uint16Array",
-                    "org.mozilla.javascript.typedarrays.NativeUint16Array",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Int32Array",
-                    "org.mozilla.javascript.typedarrays.NativeInt32Array",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Uint32Array",
-                    "org.mozilla.javascript.typedarrays.NativeUint32Array",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Float32Array",
-                    "org.mozilla.javascript.typedarrays.NativeFloat32Array",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "Float64Array",
-                    "org.mozilla.javascript.typedarrays.NativeFloat64Array",
-                    sealed, true);
-            new LazilyLoadedCtor(scope, "DataView",
-                    "org.mozilla.javascript.typedarrays.NativeDataView",
-                    sealed, true);
+        if (((cx.getLanguageVersion() >= Context.VERSION_1_8) && cx.hasFeature(Context.FEATURE_V8_EXTENSIONS)) || (cx.getLanguageVersion() >= Context.VERSION_ES6)) {
+            new LazilyLoadedCtor(scope, "ArrayBuffer", "org.mozilla.javascript.typedarrays.NativeArrayBuffer", sealed, true);
+            new LazilyLoadedCtor(scope, "Int8Array", "org.mozilla.javascript.typedarrays.NativeInt8Array", sealed, true);
+            new LazilyLoadedCtor(scope, "Uint8Array", "org.mozilla.javascript.typedarrays.NativeUint8Array", sealed, true);
+            new LazilyLoadedCtor(scope, "Uint8ClampedArray", "org.mozilla.javascript.typedarrays.NativeUint8ClampedArray", sealed, true);
+            new LazilyLoadedCtor(scope, "Int16Array", "org.mozilla.javascript.typedarrays.NativeInt16Array", sealed, true);
+            new LazilyLoadedCtor(scope, "Uint16Array", "org.mozilla.javascript.typedarrays.NativeUint16Array", sealed, true);
+            new LazilyLoadedCtor(scope, "Int32Array", "org.mozilla.javascript.typedarrays.NativeInt32Array", sealed, true);
+            new LazilyLoadedCtor(scope, "Uint32Array", "org.mozilla.javascript.typedarrays.NativeUint32Array", sealed, true);
+            new LazilyLoadedCtor(scope, "Float32Array", "org.mozilla.javascript.typedarrays.NativeFloat32Array", sealed, true);
+            new LazilyLoadedCtor(scope, "Float64Array", "org.mozilla.javascript.typedarrays.NativeFloat64Array", sealed, true);
+            new LazilyLoadedCtor(scope, "DataView", "org.mozilla.javascript.typedarrays.NativeDataView", sealed, true);
         }
 
         if (cx.getLanguageVersion() >= Context.VERSION_ES6) {
@@ -292,18 +253,13 @@ public class ScriptRuntime {
                                                        boolean sealed) {
         ScriptableObject s = initSafeStandardObjects(cx, scope, sealed);
 
-        new LazilyLoadedCtor(s, "Packages",
-                "org.mozilla.javascript.NativeJavaTopPackage", sealed, true);
-        new LazilyLoadedCtor(s, "getClass",
-                "org.mozilla.javascript.NativeJavaTopPackage", sealed, true);
-        new LazilyLoadedCtor(s, "JavaAdapter",
-                "org.mozilla.javascript.JavaAdapter", sealed, true);
-        new LazilyLoadedCtor(s, "JavaImporter",
-                "org.mozilla.javascript.ImporterTopLevel", sealed, true);
+        new LazilyLoadedCtor(s, "Packages", "org.mozilla.javascript.NativeJavaTopPackage", sealed, true);
+        new LazilyLoadedCtor(s, "getClass", "org.mozilla.javascript.NativeJavaTopPackage", sealed, true);
+        new LazilyLoadedCtor(s, "JavaAdapter", "org.mozilla.javascript.JavaAdapter", sealed, true);
+        new LazilyLoadedCtor(s, "JavaImporter", "org.mozilla.javascript.ImporterTopLevel", sealed, true);
 
         for (String packageName : getTopPackageNames()) {
-            new LazilyLoadedCtor(s, packageName,
-                    "org.mozilla.javascript.NativeJavaTopPackage", sealed, true);
+            new LazilyLoadedCtor(s, packageName, "org.mozilla.javascript.NativeJavaTopPackage", sealed, true);
         }
 
         return s;
@@ -1866,63 +1822,12 @@ public class ScriptRuntime {
         return (char) DoubleConversion.doubleToInt32(d);
     }
 
-    // XXX: this is until setDefaultNamespace will learn how to store NS
-    // properly and separates namespace form Scriptable.get etc.
-    private static final String DEFAULT_NS_TAG = "__default_namespace__";
-
-    public static Object setDefaultNamespace(Object namespace, Context cx) {
-        Scriptable scope = cx.currentActivationCall;
-        if (scope == null) {
-            scope = getTopCallScope(cx);
-        }
-
-        XMLLib xmlLib = currentXMLLib(cx);
-        Object ns = xmlLib.toDefaultXmlNamespace(cx, namespace);
-
-        // XXX : this should be in separated namesapce from Scriptable.get/put
-        if (!scope.has(DEFAULT_NS_TAG, scope)) {
-            // XXX: this is racy of cause
-            ScriptableObject.defineProperty(scope, DEFAULT_NS_TAG, ns,
-                    ScriptableObject.NOT_CONFIGURABLE
-                            | ScriptableObject.NOT_ENUMERABLE);
-        } else {
-            scope.put(DEFAULT_NS_TAG, scope, ns);
-        }
-
-        return Undefined.instance;
-    }
-
-    public static Object searchDefaultNamespace(Context cx) {
-        Scriptable scope = cx.currentActivationCall;
-        if (scope == null) {
-            scope = getTopCallScope(cx);
-        }
-        Object nsObject;
-        for (; ; ) {
-            Scriptable parent = scope.getParentScope();
-            if (parent == null) {
-                nsObject = ScriptableObject.getProperty(scope, DEFAULT_NS_TAG);
-                if (nsObject == Scriptable.NOT_FOUND) {
-                    return null;
-                }
-                break;
-            }
-            nsObject = scope.get(DEFAULT_NS_TAG, scope);
-            if (nsObject != Scriptable.NOT_FOUND) {
-                break;
-            }
-            scope = parent;
-        }
-        return nsObject;
-    }
-
     public static Object getTopLevelProp(Scriptable scope, String id) {
         scope = ScriptableObject.getTopLevelScope(scope);
         return ScriptableObject.getProperty(scope, id);
     }
 
-    static Function getExistingCtor(Context cx, Scriptable scope,
-                                    String constructorName) {
+    static Function getExistingCtor(Context cx, Scriptable scope, String constructorName) {
         Object ctorVal = ScriptableObject.getProperty(scope, constructorName);
         if (ctorVal instanceof Function) {
             return (Function) ctorVal;
@@ -2100,9 +2005,7 @@ public class ScriptRuntime {
     public static Object getObjectElem(Scriptable obj, Object elem, Context cx) {
         Object result;
 
-        if (obj instanceof XMLObject) {
-            result = ((XMLObject) obj).get(cx, elem);
-        } else if (isSymbol(elem)) {
+        if (isSymbol(elem)) {
             result = ScriptableObject.getProperty(obj, (Symbol) elem);
         } else if (obj instanceof NativeGenerator) {
             NativeGenerator gen = (NativeGenerator) obj;
@@ -2188,8 +2091,7 @@ public class ScriptRuntime {
      * @deprecated Use {@link #getObjectIndex(Object, double, Context, Scriptable)} instead
      */
     @Deprecated
-    public static Object getObjectIndex(Object obj, double dblIndex,
-                                        Context cx) {
+    public static Object getObjectIndex(Object obj, double dblIndex, Context cx) {
         return getObjectIndex(obj, dblIndex, cx, getTopCallScope(cx));
     }
 
@@ -2197,8 +2099,7 @@ public class ScriptRuntime {
      * A cheaper and less general version of the above for well-known argument
      * types.
      */
-    public static Object getObjectIndex(Object obj, double dblIndex,
-                                        Context cx, Scriptable scope) {
+    public static Object getObjectIndex(Object obj, double dblIndex, Context cx, Scriptable scope) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefReadError(obj, toString(dblIndex));
@@ -2212,8 +2113,7 @@ public class ScriptRuntime {
         return getObjectProp(sobj, s, cx);
     }
 
-    public static Object getObjectIndex(Scriptable obj, int index,
-                                        Context cx) {
+    public static Object getObjectIndex(Scriptable obj, int index, Context cx) {
         Object result = ScriptableObject.getProperty(obj, index);
         if (result == Scriptable.NOT_FOUND) {
             result = Undefined.instance;
@@ -2228,8 +2128,7 @@ public class ScriptRuntime {
      * @deprecated Use {@link #setObjectElem(Object, Object, Object, Context, Scriptable)} instead
      */
     @Deprecated
-    public static Object setObjectElem(Object obj, Object elem, Object value,
-                                       Context cx) {
+    public static Object setObjectElem(Object obj, Object elem, Object value, Context cx) {
         return setObjectElem(obj, elem, value, cx, getTopCallScope(cx));
     }
 
@@ -2246,9 +2145,7 @@ public class ScriptRuntime {
     }
 
     public static Object setObjectElem(Scriptable obj, Object elem, Object value, Context cx) {
-        if (obj instanceof XMLObject) {
-            ((XMLObject) obj).put(cx, elem, value);
-        } else if (isSymbol(elem)) {
+        if (isSymbol(elem)) {
             ScriptableObject.putProperty(obj, (Symbol) elem, value);
         } else {
             String s = toStringIdOrIndex(cx, elem);
@@ -2340,8 +2237,7 @@ public class ScriptRuntime {
         return !target.has(s, target);
     }
 
-    public static boolean hasObjectElem(Scriptable target, Object elem,
-                                        Context cx) {
+    public static boolean hasObjectElem(Scriptable target, Object elem, Context cx) {
         boolean result;
 
         if (isSymbol(elem)) {
@@ -2371,8 +2267,7 @@ public class ScriptRuntime {
         return refSet(ref, value, cx, getTopCallScope(cx));
     }
 
-    public static Object refSet(Ref ref, Object value, Context cx,
-                                Scriptable scope) {
+    public static Object refSet(Ref ref, Object value, Context cx, Scriptable scope) {
         return ref.set(cx, scope, value);
     }
 
@@ -2388,13 +2283,11 @@ public class ScriptRuntime {
      * @deprecated Use {@link #specialRef(Object, String, Context, Scriptable)} instead
      */
     @Deprecated
-    public static Ref specialRef(Object obj, String specialProperty,
-                                 Context cx) {
+    public static Ref specialRef(Object obj, String specialProperty, Context cx) {
         return specialRef(obj, specialProperty, cx, getTopCallScope(cx));
     }
 
-    public static Ref specialRef(Object obj, String specialProperty,
-                                 Context cx, Scriptable scope) {
+    public static Ref specialRef(Object obj, String specialProperty, Context cx, Scriptable scope) {
         return SpecialRef.createSpecial(cx, scope, obj, specialProperty);
     }
 
@@ -2467,34 +2360,18 @@ public class ScriptRuntime {
         return nameOrFunction(cx, scope, parent, name, false);
     }
 
-    private static Object nameOrFunction(Context cx, Scriptable scope,
-                                         Scriptable parentScope, String name,
-                                         boolean asFunctionCall) {
+    private static Object nameOrFunction(Context cx, Scriptable scope, Scriptable parentScope, String name, boolean asFunctionCall) {
         Object result;
         Scriptable thisObj = scope; // It is used only if asFunctionCall==true.
 
-        XMLObject firstXMLObject = null;
         for (; ; ) {
             if (scope instanceof NativeWith) {
                 Scriptable withObj = scope.getPrototype();
-                if (withObj instanceof XMLObject) {
-                    XMLObject xmlObj = (XMLObject) withObj;
-                    if (xmlObj.has(name, xmlObj)) {
-                        // function this should be the target object of with
-                        thisObj = xmlObj;
-                        result = xmlObj.get(name, xmlObj);
-                        break;
-                    }
-                    if (firstXMLObject == null) {
-                        firstXMLObject = xmlObj;
-                    }
-                } else {
-                    result = ScriptableObject.getProperty(withObj, name);
-                    if (result != Scriptable.NOT_FOUND) {
-                        // function this should be the target object of with
-                        thisObj = withObj;
-                        break;
-                    }
+                result = ScriptableObject.getProperty(withObj, name);
+                if (result != Scriptable.NOT_FOUND) {
+                    // function this should be the target object of with
+                    thisObj = withObj;
+                    break;
                 }
             } else if (scope instanceof NativeCall) {
                 // NativeCall does not prototype chain and Scriptable.get
@@ -2523,14 +2400,7 @@ public class ScriptRuntime {
             if (parentScope == null) {
                 result = topScopeName(cx, scope, name);
                 if (result == Scriptable.NOT_FOUND) {
-                    if (firstXMLObject == null || asFunctionCall) {
-                        throw notFoundError(scope, name);
-                    }
-                    // The name was not found, but we did find an XML
-                    // object in the scope chain and we are looking for name,
-                    // not function. The result should be an empty XMLList
-                    // in name context.
-                    result = firstXMLObject.get(name, firstXMLObject);
+                    throw notFoundError(scope, name);
                 }
                 // For top scope thisObj for functions is always scope itself.
                 thisObj = scope;
@@ -2548,8 +2418,7 @@ public class ScriptRuntime {
         return result;
     }
 
-    private static Object topScopeName(Context cx, Scriptable scope,
-                                       String name) {
+    private static Object topScopeName(Context cx, Scriptable scope, String name) {
         if (cx.useDynamicScope) {
             scope = checkDynamicScope(cx.topCallScope, scope);
         }
@@ -2571,25 +2440,14 @@ public class ScriptRuntime {
      * See ECMA 10.1.4
      */
     public static Scriptable bind(Context cx, Scriptable scope, String id) {
-        Scriptable firstXMLObject = null;
         Scriptable parent = scope.getParentScope();
         childScopesChecks:
         if (parent != null) {
             // Check for possibly nested "with" scopes first
             while (scope instanceof NativeWith) {
                 Scriptable withObj = scope.getPrototype();
-                if (withObj instanceof XMLObject) {
-                    XMLObject xmlObject = (XMLObject) withObj;
-                    if (xmlObject.has(cx, id)) {
-                        return xmlObject;
-                    }
-                    if (firstXMLObject == null) {
-                        firstXMLObject = xmlObject;
-                    }
-                } else {
-                    if (ScriptableObject.hasProperty(withObj, id)) {
-                        return withObj;
-                    }
+                if (ScriptableObject.hasProperty(withObj, id)) {
+                    return withObj;
                 }
                 scope = parent;
                 parent = parent.getParentScope();
@@ -2617,7 +2475,7 @@ public class ScriptRuntime {
         }
         // Nothing was found, but since XML objects always bind
         // return one if found
-        return firstXMLObject;
+        return null;
     }
 
     public static Object setName(Scriptable bound, Object value, Context cx, Scriptable scope, String id) {
@@ -2667,11 +2525,7 @@ public class ScriptRuntime {
 
     public static Object setConst(Scriptable bound, Object value,
                                   Context cx, String id) {
-        if (bound instanceof XMLObject) {
-            bound.put(id, bound, value);
-        } else {
-            ScriptableObject.putConstProperty(bound, id, value);
-        }
+        ScriptableObject.putConstProperty(bound, id, value);
         return value;
     }
 
@@ -3406,18 +3260,6 @@ public class ScriptRuntime {
             return wrapNumber(((Number) val1).doubleValue() +
                     ((Number) val2).doubleValue());
         }
-        if (val1 instanceof XMLObject) {
-            Object test = ((XMLObject) val1).addValues(cx, true, val2);
-            if (test != Scriptable.NOT_FOUND) {
-                return test;
-            }
-        }
-        if (val2 instanceof XMLObject) {
-            Object test = ((XMLObject) val2).addValues(cx, false, val1);
-            if (test != Scriptable.NOT_FOUND) {
-                return test;
-            }
-        }
         if ((val1 instanceof Symbol) || (val2 instanceof Symbol)) {
             throw typeError0("msg.not.a.number");
         }
@@ -3571,10 +3413,6 @@ public class ScriptRuntime {
                 }
                 target = scopeChain;
                 do {
-                    if (target instanceof NativeWith &&
-                            target.getPrototype() instanceof XMLObject) {
-                        break;
-                    }
                     value = target.get(id, scopeChain);
                     if (value != Scriptable.NOT_FOUND) {
                         break search;
@@ -3592,14 +3430,11 @@ public class ScriptRuntime {
      * @deprecated Use {@link #propIncrDecr(Object, String, Context, Scriptable, int)} instead
      */
     @Deprecated
-    public static Object propIncrDecr(Object obj, String id,
-                                      Context cx, int incrDecrMask) {
+    public static Object propIncrDecr(Object obj, String id, Context cx, int incrDecrMask) {
         return propIncrDecr(obj, id, cx, getTopCallScope(cx), incrDecrMask);
     }
 
-    public static Object propIncrDecr(Object obj, String id,
-                                      Context cx, Scriptable scope,
-                                      int incrDecrMask) {
+    public static Object propIncrDecr(Object obj, String id, Context cx, Scriptable scope, int incrDecrMask) {
         Scriptable start = toObjectOrNull(cx, obj, scope);
         if (start == null) {
             throw undefReadError(obj, id);
@@ -3658,14 +3493,11 @@ public class ScriptRuntime {
      * @deprecated Use {@link #elemIncrDecr(Object, Object, Context, Scriptable, int)} instead
      */
     @Deprecated
-    public static Object elemIncrDecr(Object obj, Object index,
-                                      Context cx, int incrDecrMask) {
+    public static Object elemIncrDecr(Object obj, Object index, Context cx, int incrDecrMask) {
         return elemIncrDecr(obj, index, cx, getTopCallScope(cx), incrDecrMask);
     }
 
-    public static Object elemIncrDecr(Object obj, Object index,
-                                      Context cx, Scriptable scope,
-                                      int incrDecrMask) {
+    public static Object elemIncrDecr(Object obj, Object index, Context cx, Scriptable scope, int incrDecrMask) {
         Object value = getObjectElem(obj, index, cx, scope);
         boolean post = ((incrDecrMask & Node.POST_FLAG) != 0);
         double number;
@@ -3699,8 +3531,7 @@ public class ScriptRuntime {
         return refIncrDecr(ref, cx, getTopCallScope(cx), incrDecrMask);
     }
 
-    public static Object refIncrDecr(Ref ref, Context cx, Scriptable scope,
-                                     int incrDecrMask) {
+    public static Object refIncrDecr(Ref ref, Context cx, Scriptable scope, int incrDecrMask) {
         Object value = ref.get(cx);
         boolean post = ((incrDecrMask & Node.POST_FLAG) != 0);
         double number;
@@ -3762,7 +3593,7 @@ public class ScriptRuntime {
             if (y instanceof ScriptableObject) {
                 Object test = ((ScriptableObject) y).equivalentValues(x);
                 if (test != Scriptable.NOT_FOUND) {
-                    return ((Boolean) test).booleanValue();
+                    return (Boolean) test;
                 }
             }
             return false;
@@ -3773,14 +3604,14 @@ public class ScriptRuntime {
         } else if (x instanceof CharSequence) {
             return eqString((CharSequence) x, y);
         } else if (x instanceof Boolean) {
-            boolean b = ((Boolean) x).booleanValue();
+            boolean b = (Boolean) x;
             if (y instanceof Boolean) {
-                return b == ((Boolean) y).booleanValue();
+                return b == (Boolean) y;
             }
             if (y instanceof ScriptableObject) {
                 Object test = ((ScriptableObject) y).equivalentValues(x);
                 if (test != Scriptable.NOT_FOUND) {
-                    return ((Boolean) test).booleanValue();
+                    return (Boolean) test;
                 }
             }
             return eqNumber(b ? 1.0 : 0.0, y);
@@ -4169,7 +4000,6 @@ public class ScriptRuntime {
         } finally {
             cx.topCallScope = null;
             // Cleanup cached references
-            cx.cachedXMLLib = null;
             cx.isTopLevelStrict = previousTopLevelStrict;
 
             if (cx.currentActivationCall != null) {
@@ -4501,33 +4331,10 @@ public class ScriptRuntime {
         if (sobj == null) {
             throw typeError1("msg.undef.with", toString(obj));
         }
-        if (sobj instanceof XMLObject) {
-            XMLObject xmlObject = (XMLObject) sobj;
-            return xmlObject.enterWith(scope);
-        }
         return new NativeWith(scope, sobj);
     }
 
     public static Scriptable leaveWith(Scriptable scope) {
-        NativeWith nw = (NativeWith) scope;
-        return nw.getParentScope();
-    }
-
-    public static Scriptable enterDotQuery(Object value, Scriptable scope) {
-        if (!(value instanceof XMLObject)) {
-            throw notXmlError(value);
-        }
-        XMLObject object = (XMLObject) value;
-        return object.enterDotQuery(scope);
-    }
-
-    public static Object updateDotQuery(boolean value, Scriptable scope) {
-        // Return null to continue looping
-        NativeWith nw = (NativeWith) scope;
-        return nw.updateDotQuery(value);
-    }
-
-    public static Scriptable leaveDotQuery(Scriptable scope) {
         NativeWith nw = (NativeWith) scope;
         return nw.getParentScope();
     }
@@ -4546,18 +4353,14 @@ public class ScriptRuntime {
         object.setPrototype(proto);
     }
 
-    public static void setBuiltinProtoAndParent(ScriptableObject object,
-                                                Scriptable scope,
-                                                TopLevel.Builtins type) {
+    public static void setBuiltinProtoAndParent(ScriptableObject object, Scriptable scope, TopLevel.Builtins type) {
         scope = ScriptableObject.getTopLevelScope(scope);
         object.setParentScope(scope);
         object.setPrototype(TopLevel.getBuiltinPrototype(scope, type));
     }
 
 
-    public static void initFunction(Context cx, Scriptable scope,
-                                    NativeFunction function, int type,
-                                    boolean fromEvalCode) {
+    public static void initFunction(Context cx, Scriptable scope, NativeFunction function, int type, boolean fromEvalCode) {
         if (type == FunctionNode.FUNCTION_STATEMENT) {
             String name = function.getFunctionName();
             if (name != null && name.length() != 0) {
@@ -4978,77 +4781,8 @@ public class ScriptRuntime {
         return result;
     }
 
-    public static Scriptable wrapRegExp(Context cx, Scriptable scope,
-                                        Object compiled) {
+    public static Scriptable wrapRegExp(Context cx, Scriptable scope, Object compiled) {
         return cx.getRegExpProxy().wrapRegExp(cx, scope, compiled);
-    }
-
-    private static XMLLib currentXMLLib(Context cx) {
-        // Scripts should be running to access this
-        if (cx.topCallScope == null)
-            throw new IllegalStateException();
-
-        XMLLib xmlLib = cx.cachedXMLLib;
-        if (xmlLib == null) {
-            xmlLib = XMLLib.extractFromScope(cx.topCallScope);
-            if (xmlLib == null)
-                throw new IllegalStateException();
-            cx.cachedXMLLib = xmlLib;
-        }
-
-        return xmlLib;
-    }
-
-    /**
-     * Escapes the reserved characters in a value of an attribute
-     *
-     * @param value Unescaped text
-     * @return The escaped text
-     */
-    public static String escapeAttributeValue(Object value, Context cx) {
-        XMLLib xmlLib = currentXMLLib(cx);
-        return xmlLib.escapeAttributeValue(value);
-    }
-
-    /**
-     * Escapes the reserved characters in a value of a text node
-     *
-     * @param value Unescaped text
-     * @return The escaped text
-     */
-    public static String escapeTextValue(Object value, Context cx) {
-        XMLLib xmlLib = currentXMLLib(cx);
-        return xmlLib.escapeTextValue(value);
-    }
-
-    public static Ref memberRef(Object obj, Object elem,
-                                Context cx, int memberTypeFlags) {
-        if (!(obj instanceof XMLObject)) {
-            throw notXmlError(obj);
-        }
-        XMLObject xmlObject = (XMLObject) obj;
-        return xmlObject.memberRef(cx, elem, memberTypeFlags);
-    }
-
-    public static Ref memberRef(Object obj, Object namespace, Object elem,
-                                Context cx, int memberTypeFlags) {
-        if (!(obj instanceof XMLObject)) {
-            throw notXmlError(obj);
-        }
-        XMLObject xmlObject = (XMLObject) obj;
-        return xmlObject.memberRef(cx, namespace, elem, memberTypeFlags);
-    }
-
-    public static Ref nameRef(Object name, Context cx,
-                              Scriptable scope, int memberTypeFlags) {
-        XMLLib xmlLib = currentXMLLib(cx);
-        return xmlLib.nameRef(cx, name, scope, memberTypeFlags);
-    }
-
-    public static Ref nameRef(Object namespace, Object name, Context cx,
-                              Scriptable scope, int memberTypeFlags) {
-        XMLLib xmlLib = currentXMLLib(cx);
-        return xmlLib.nameRef(cx, namespace, name, scope, memberTypeFlags);
     }
 
     private static void storeIndexResult(Context cx, int index) {

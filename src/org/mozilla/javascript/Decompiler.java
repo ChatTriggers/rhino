@@ -806,19 +806,7 @@ public class Decompiler {
                     result.append(" % ");
                     break;
 
-                case Token.COLONCOLON:
-                    result.append("::");
-                    break;
-
-                case Token.DOTDOT:
-                    result.append("..");
-                    break;
-
-                case Token.DOTQUERY:
-                    result.append(".(");
-                    break;
-
-                case Token.XMLATTR:
+                case Token.AT:
                     result.append('@');
                     break;
 

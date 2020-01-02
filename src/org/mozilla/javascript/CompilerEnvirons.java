@@ -17,7 +17,6 @@ public class CompilerEnvirons {
         generateDebugInfo = true;
         reservedKeywordAsIdentifier = true;
         allowMemberExprAsFunctionName = false;
-        xmlAvailable = true;
         optimizationLevel = 0;
         generatingSource = true;
         strictMode = false;
@@ -29,17 +28,11 @@ public class CompilerEnvirons {
     public void initFromContext(Context cx) {
         setErrorReporter(cx.getErrorReporter());
         languageVersion = cx.getLanguageVersion();
-        generateDebugInfo = (!cx.isGeneratingDebugChanged()
-                || cx.isGeneratingDebug());
-        reservedKeywordAsIdentifier
-                = cx.hasFeature(Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER);
-        allowMemberExprAsFunctionName
-                = cx.hasFeature(Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME);
-        strictMode
-                = cx.hasFeature(Context.FEATURE_STRICT_MODE);
+        generateDebugInfo = (!cx.isGeneratingDebugChanged() || cx.isGeneratingDebug());
+        reservedKeywordAsIdentifier = cx.hasFeature(Context.FEATURE_RESERVED_KEYWORD_AS_IDENTIFIER);
+        allowMemberExprAsFunctionName = cx.hasFeature(Context.FEATURE_MEMBER_EXPR_AS_FUNCTION_NAME);
+        strictMode = cx.hasFeature(Context.FEATURE_STRICT_MODE);
         warningAsError = cx.hasFeature(Context.FEATURE_WARNING_AS_ERROR);
-        xmlAvailable
-                = cx.hasFeature(Context.FEATURE_E4X);
 
         optimizationLevel = cx.getOptimizationLevel();
 
@@ -94,14 +87,6 @@ public class CompilerEnvirons {
 
     public void setAllowMemberExprAsFunctionName(boolean flag) {
         allowMemberExprAsFunctionName = flag;
-    }
-
-    public final boolean isXmlAvailable() {
-        return xmlAvailable;
-    }
-
-    public void setXmlAvailable(boolean flag) {
-        xmlAvailable = flag;
     }
 
     public final int getOptimizationLevel() {
@@ -258,7 +243,6 @@ public class CompilerEnvirons {
     private boolean generateDebugInfo;
     private boolean reservedKeywordAsIdentifier;
     private boolean allowMemberExprAsFunctionName;
-    private boolean xmlAvailable;
     private int optimizationLevel;
     private boolean generatingSource;
     private boolean strictMode;

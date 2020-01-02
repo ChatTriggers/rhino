@@ -3236,73 +3236,6 @@ class BodyCodegen {
                 cfw.addALoad(contextLocal);
                 cfw.addALoad(variableObjectLocal);
                 addScriptRuntimeInvoke("specialRef", REF, OBJECT, STRING, CONTEXT, SCRIPTABLE);
-            }
-            break;
-
-            case Token.REF_MEMBER:
-            case Token.REF_NS_MEMBER:
-            case Token.REF_NAME:
-            case Token.REF_NS_NAME: {
-                int memberTypeFlags
-                        = node.getIntProp(Node.MEMBER_TYPE_PROP, 0);
-                // generate possible target, possible namespace and member
-                do {
-                    generateExpression(child, node);
-                    child = child.getNext();
-                } while (child != null);
-                cfw.addALoad(contextLocal);
-                String methodName;
-                String[] signature;
-
-                switch (type) {
-                    case Token.REF_MEMBER:
-                        methodName = "memberRef";
-                        signature = new String[]{ OBJECT, OBJECT, CONTEXT, INTEGER };
-                        break;
-                    case Token.REF_NS_MEMBER:
-                        methodName = "memberRef";
-                        signature = new String[]{ OBJECT, OBJECT, OBJECT, CONTEXT, INTEGER };
-                        break;
-                    case Token.REF_NAME:
-                        methodName = "nameRef";
-                        signature = new String[]{ OBJECT, CONTEXT, SCRIPTABLE, INTEGER };
-                        cfw.addALoad(variableObjectLocal);
-                        break;
-                    case Token.REF_NS_NAME:
-                        methodName = "nameRef";
-                        signature = new String[]{ OBJECT, OBJECT, CONTEXT, SCRIPTABLE, INTEGER };
-                        cfw.addALoad(variableObjectLocal);
-                        break;
-                    default:
-                        throw Kit.codeBug();
-                }
-                cfw.addPush(memberTypeFlags);
-                addScriptRuntimeInvoke(methodName, REF, signature);
-            }
-            break;
-
-            case Token.DOTQUERY:
-                visitDotQuery(node, child);
-                break;
-
-            case Token.ESCXMLATTR: {
-                generateExpression(child, node);
-                cfw.addALoad(contextLocal);
-                addScriptRuntimeInvoke("escapeAttributeValue", STRING, OBJECT, CONTEXT);
-                break;
-            }
-
-            case Token.ESCXMLTEXT: {
-                generateExpression(child, node);
-                cfw.addALoad(contextLocal);
-                addScriptRuntimeInvoke("escapeTextValue", STRING, OBJECT, CONTEXT);
-                break;
-            }
-
-            case Token.DEFAULTNAMESPACE: {
-                generateExpression(child, node);
-                cfw.addALoad(contextLocal);
-                addScriptRuntimeInvoke("setDefaultNamespace", OBJECT, OBJECT, CONTEXT);
                 break;
             }
 
@@ -6068,33 +6001,6 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         } else {
             addScriptRuntimeInvoke("setObjectElem", OBJECT, OBJECT, OBJECT, OBJECT, CONTEXT, SCRIPTABLE);
         }
-    }
-
-    private void visitDotQuery(Node node, Node child) {
-        updateLineNumber(node);
-        generateExpression(child, node);
-        cfw.addALoad(variableObjectLocal);
-        addScriptRuntimeInvoke("enterDotQuery", SCRIPTABLE, OBJECT, SCRIPTABLE);
-        cfw.addAStore(variableObjectLocal);
-
-        // add push null/pop with label in between to simplify code for loop
-        // continue when it is necessary to pop the null result from
-        // updateDotQuery
-        cfw.add(ByteCode.ACONST_NULL);
-        int queryLoopStart = cfw.acquireLabel();
-        cfw.markLabel(queryLoopStart); // loop continue jumps here
-        cfw.add(ByteCode.POP);
-
-        generateExpression(child.getNext(), node);
-        addScriptRuntimeInvoke("toBoolean", BOOLEAN, OBJECT);
-        cfw.addALoad(variableObjectLocal);
-        addScriptRuntimeInvoke("updateDotQuery", OBJECT, BOOLEAN, SCRIPTABLE);
-        cfw.add(ByteCode.DUP);
-        cfw.add(ByteCode.IFNULL, queryLoopStart);
-        // stack: ... non_null_result_of_updateDotQuery
-        cfw.addALoad(variableObjectLocal);
-        addScriptRuntimeInvoke("leaveDotQuery", SCRIPTABLE, SCRIPTABLE);
-        cfw.addAStore(variableObjectLocal);
     }
 
     private int getLocalBlockRegister(Node node) {

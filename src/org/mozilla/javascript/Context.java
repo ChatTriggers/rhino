@@ -13,7 +13,6 @@ import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.debug.DebuggableScript;
 import org.mozilla.javascript.debug.Debugger;
-import org.mozilla.javascript.xml.XMLLib;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -190,18 +189,6 @@ public class Context {
     public static final int FEATURE_PARENT_PROTO_PROPRTIES = 5;
 
     /**
-     * Control if support for E4X(ECMAScript for XML) extension is available.
-     * If hasFeature(FEATURE_E4X) returns true, the XML syntax is available.
-     * <p>
-     * By default {@link #hasFeature(int)} returns true if
-     * the current JS version is set to {@link #VERSION_DEFAULT}
-     * or is at least {@link #VERSION_1_6}.
-     *
-     * @since 1.6 Release 1
-     */
-    public static final int FEATURE_E4X = 6;
-
-    /**
      * Control if dynamic scope should be used for name access.
      * If hasFeature(FEATURE_DYNAMIC_SCOPE) returns true, then the name lookup
      * during name resolution will use the top scope of the script or function
@@ -217,7 +204,7 @@ public class Context {
      *
      * @since 1.6 Release 1
      */
-    public static final int FEATURE_DYNAMIC_SCOPE = 7;
+    public static final int FEATURE_DYNAMIC_SCOPE = 6;
 
     /**
      * Control if strict variable mode is enabled.
@@ -230,7 +217,7 @@ public class Context {
      *
      * @since 1.6 Release 1
      */
-    public static final int FEATURE_STRICT_VARS = 8;
+    public static final int FEATURE_STRICT_VARS = 7;
 
     /**
      * Control if strict eval mode is enabled.
@@ -243,7 +230,7 @@ public class Context {
      *
      * @since 1.6 Release 1
      */
-    public static final int FEATURE_STRICT_EVAL = 9;
+    public static final int FEATURE_STRICT_EVAL = 8;
 
     /**
      * When the feature is on Rhino will add a "fileName" and "lineNumber"
@@ -261,7 +248,7 @@ public class Context {
      *
      * @since 1.6 Release 6
      */
-    public static final int FEATURE_LOCATION_INFORMATION_IN_ERROR = 10;
+    public static final int FEATURE_LOCATION_INFORMATION_IN_ERROR = 9;
 
     /**
      * Controls whether JS 1.5 'strict mode' is enabled.
@@ -273,14 +260,14 @@ public class Context {
      *
      * @since 1.6 Release 6
      */
-    public static final int FEATURE_STRICT_MODE = 11;
+    public static final int FEATURE_STRICT_MODE = 10;
 
     /**
      * Controls whether a warning should be treated as an error.
      *
      * @since 1.6 Release 6
      */
-    public static final int FEATURE_WARNING_AS_ERROR = 12;
+    public static final int FEATURE_WARNING_AS_ERROR = 11;
 
     /**
      * Enables enhanced access to Java.
@@ -293,7 +280,7 @@ public class Context {
      *
      * @since 1.7 Release 1
      */
-    public static final int FEATURE_ENHANCED_JAVA_ACCESS = 13;
+    public static final int FEATURE_ENHANCED_JAVA_ACCESS = 12;
 
     /**
      * Enables access to JavaScript features from ECMAscript 6 that are present in
@@ -302,7 +289,7 @@ public class Context {
      *
      * @since 1.7 Release 3
      */
-    public static final int FEATURE_V8_EXTENSIONS = 14;
+    public static final int FEATURE_V8_EXTENSIONS = 13;
 
     /**
      * Defines how an undefined  "this" parameter is handled in certain calls. Previously Rhino
@@ -311,7 +298,7 @@ public class Context {
      *
      * @since 1.7.7
      */
-    public static final int FEATURE_OLD_UNDEF_NULL_THIS = 15;
+    public static final int FEATURE_OLD_UNDEF_NULL_THIS = 14;
 
     /**
      * If set, then the order of property key enumeration will be first numeric keys in numeric order,
@@ -320,7 +307,7 @@ public class Context {
      *
      * @since 1.7.7.1
      */
-    public static final int FEATURE_ENUMERATE_IDS_FIRST = 16;
+    public static final int FEATURE_ENUMERATE_IDS_FIRST = 15;
 
     /**
      * If set, then all objects will have a thread-safe property map. (Note that this doesn't make
@@ -331,7 +318,7 @@ public class Context {
      *
      * @since 1.7.8
      */
-    public static final int FEATURE_THREAD_SAFE_OBJECTS = 17;
+    public static final int FEATURE_THREAD_SAFE_OBJECTS = 16;
 
     /**
      * If set, then all integer numbers will be returned without decimal place. For instance
@@ -339,7 +326,7 @@ public class Context {
      * <code>function foo() {return 5;}</code>
      * 5 will be returned if feature is set, 5.0 otherwise.
      */
-    public static final int FEATURE_INTEGER_WITHOUT_DECIMAL_PLACE = 18;
+    public static final int FEATURE_INTEGER_WITHOUT_DECIMAL_PLACE = 17;
 
     /**
      * TypedArray buffer uses little/big endian depending on the platform.
@@ -347,15 +334,7 @@ public class Context {
      *
      * @since 1.7 Release 11
      */
-    public static final int FEATURE_LITTLE_ENDIAN = 19;
-
-    /**
-     * Configure the XMLProcessor to parse XML with security features or not.
-     * Security features include not fetching remote entity references and disabling XIncludes
-     *
-     * @since 1.7 Release 12
-     */
-    public static final int FEATURE_ENABLE_XML_SECURE_PARSING = 20;
+    public static final int FEATURE_LITTLE_ENDIAN = 18;
 
     public static final String languageVersionProperty = "language version";
     public static final String errorReporterProperty = "error reporter";
@@ -2262,21 +2241,6 @@ public class Context {
     }
 
     /**
-     * Returns an object which specifies an E4X implementation to use within
-     * this <code>Context</code>. Note that the XMLLib.Factory interface should
-     * be considered experimental.
-     * <p>
-     * The default implementation uses the implementation provided by this
-     * <code>Context</code>'s {@link ContextFactory}.
-     *
-     * @return An XMLLib.Factory. Should not return <code>null</code> if
-     * {@link #FEATURE_E4X} is enabled. See {@link #hasFeature}.
-     */
-    public XMLLib.Factory getE4xImplementationFactory() {
-        return getFactory().getE4xImplementationFactory();
-    }
-
-    /**
      * Get threshold of executed instructions counter that triggers call to
      * <code>observeInstructionCount()</code>.
      * When the threshold is zero, instruction counting is disabled,
@@ -2651,7 +2615,6 @@ public class Context {
     Scriptable topCallScope;
     boolean isContinuationsTopCall;
     NativeCall currentActivationCall;
-    XMLLib cachedXMLLib;
     BaseFunction typeErrorThrower;
 
     // for Objects, Arrays to tag themselves as being printed out,

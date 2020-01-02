@@ -120,17 +120,8 @@ public class Token {
             YIELD = 74,  // JS 1.7 yield pseudo keyword
             STRICT_SETNAME = 75,
 
-            // For XML support:
-            DEFAULTNAMESPACE = 76, // default xml namespace =
-            ESCXMLATTR = 77,
-            ESCXMLTEXT = 78,
-            REF_MEMBER = 79, // Reference for x.@y, x..y etc.
-            REF_NS_MEMBER = 80, // Reference for x.ns::y, x..ns::y etc.
-            REF_NAME = 81, // Reference for @y, @[y] etc.
-            REF_NS_NAME = 82, // Reference for ns::y, @ns::y@[y] etc.
-
             // End of interpreter bytecodes
-            LAST_BYTECODE_TOKEN = REF_NS_NAME,
+            LAST_BYTECODE_TOKEN = STRICT_SETNAME,
 
             TRY = 83,
             SEMI = 84,  // semicolon
@@ -215,13 +206,7 @@ public class Token {
             LOCAL_BLOCK = 148,
             SET_REF_OP = 149, // *reference op= something
 
-            // For XML support:
-            DOTDOT = 150,  // member operator (..)
-            COLONCOLON = 151,  // namespace::name
-            XML = 152,  // XML type
-            DOTQUERY = 153,  // .() -- e.g., x.emps.emp.(name == "terry")
-            XMLATTR = 154,  // @
-            XMLEND = 155,
+            AT = 154,  // @
 
             // Optimizer-only-tokens
             TO_OBJECT = 156,
@@ -415,20 +400,6 @@ public class Token {
                 return "REF_CALL";
             case REF_SPECIAL:
                 return "REF_SPECIAL";
-            case DEFAULTNAMESPACE:
-                return "DEFAULTNAMESPACE";
-            case ESCXMLTEXT:
-                return "ESCXMLTEXT";
-            case ESCXMLATTR:
-                return "ESCXMLATTR";
-            case REF_MEMBER:
-                return "REF_MEMBER";
-            case REF_NS_MEMBER:
-                return "REF_NS_MEMBER";
-            case REF_NAME:
-                return "REF_NAME";
-            case REF_NS_NAME:
-                return "REF_NS_NAME";
             case TRY:
                 return "TRY";
             case SEMI:
@@ -555,18 +526,8 @@ public class Token {
                 return "LOCAL_BLOCK";
             case SET_REF_OP:
                 return "SET_REF_OP";
-            case DOTDOT:
-                return "DOTDOT";
-            case COLONCOLON:
-                return "COLONCOLON";
-            case XML:
-                return "XML";
-            case DOTQUERY:
-                return "DOTQUERY";
-            case XMLATTR:
-                return "XMLATTR";
-            case XMLEND:
-                return "XMLEND";
+            case AT:
+                return "AT";
             case TO_OBJECT:
                 return "TO_OBJECT";
             case TO_DOUBLE:
