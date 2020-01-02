@@ -84,105 +84,105 @@ public class Token {
             NAME = 40,
             NUMBER = 41,
             STRING = 42,
-            TEMPLATE = 172,
-            TEMPLATE_EXPR = 173,
-            NULL = 43,
-            THIS = 44,
-            FALSE = 45,
-            TRUE = 46,
-            SHEQ = 47,   // shallow equality (===)
-            SHNE = 48,   // shallow inequality (!==)
-            REGEXP = 49,
-            BINDNAME = 50,
-            THROW = 51,
-            RETHROW = 52, // rethrow caught exception: catch (e if ) use it
-            IN = 53,
-            INSTANCEOF = 54,
-            LOCAL_LOAD = 55,
-            GETVAR = 56,
-            SETVAR = 57,
-            CATCH_SCOPE = 58,
-            ENUM_INIT_KEYS = 59,
-            ENUM_INIT_VALUES = 60,
-            ENUM_INIT_ARRAY = 61,
-            ENUM_INIT_VALUES_IN_ORDER = 62,
-            ENUM_NEXT = 63,
-            ENUM_ID = 64,
-            THISFN = 65,
-            RETURN_RESULT = 66, // to return previously stored return result
-            ARRAYLIT = 67, // array literal
-            OBJECTLIT = 68, // object literal
-            GET_REF = 69, // *reference
-            SET_REF = 70, // *reference    = something
-            DEL_REF = 71, // delete reference
-            REF_CALL = 72, // f(args)    = something or f(args)++
-            REF_SPECIAL = 73, // reference for special properties like __proto
-            YIELD = 74,  // JS 1.7 yield pseudo keyword
-            STRICT_SETNAME = 75,
+            TEMPLATE = 43,
+            TEMPLATE_EXPR = 44,
+            NULL = 45,
+            THIS = 46,
+            FALSE = 47,
+            TRUE = 48,
+            SHEQ = 49,   // shallow equality (===)
+            SHNE = 50,   // shallow inequality (!==)
+            REGEXP = 51,
+            BINDNAME = 52,
+            THROW = 53,
+            RETHROW = 54, // rethrow caught exception: catch (e if ) use it
+            IN = 55,
+            INSTANCEOF = 56,
+            LOCAL_LOAD = 57,
+            GETVAR = 58,
+            SETVAR = 59,
+            CATCH_SCOPE = 60,
+            ENUM_INIT_KEYS = 61,
+            ENUM_INIT_VALUES = 62,
+            ENUM_INIT_ARRAY = 63,
+            ENUM_INIT_VALUES_IN_ORDER = 64,
+            ENUM_NEXT = 65,
+            ENUM_ID = 66,
+            THISFN = 67,
+            RETURN_RESULT = 68, // to return previously stored return result
+            ARRAYLIT = 69, // array literal
+            OBJECTLIT = 70, // object literal
+            GET_REF = 71, // *reference
+            SET_REF = 72, // *reference    = something
+            DEL_REF = 73, // delete reference
+            REF_CALL = 74, // f(args)    = something or f(args)++
+            REF_SPECIAL = 75, // reference for special properties like __proto
+            YIELD = 76,  // JS 1.7 yield pseudo keyword
+            STRICT_SETNAME = 77,
 
             // End of interpreter bytecodes
             LAST_BYTECODE_TOKEN = STRICT_SETNAME,
 
-            TRY = 83,
-            SEMI = 84,  // semicolon
-            LB = 85,  // left and right brackets
-            RB = 86,
-            LC = 87,  // left and right curlies (braces)
-            RC = 88,
-            LP = 89,  // left and right parentheses
-            RP = 90,
-            COMMA = 91,  // comma operator
+            TRY = 78,
+            SEMI = 79,  // semicolon
+            LB = 80,  // left and right brackets
+            RB = 81,
+            LC = 82,  // left and right curlies (braces)
+            RC = 83,
+            LP = 84,  // left and right parentheses
+            RP = 85,
+            COMMA = 86,  // comma operator
 
-            ASSIGN = 92,  // simple assignment  (=)
-            ASSIGN_BITOR = 93,  // |=
-            ASSIGN_BITXOR = 94,  // ^=
-            ASSIGN_BITAND = 95,  // |=
-            ASSIGN_LSH = 96,  // <<=
-            ASSIGN_RSH = 97,  // >>=
-            ASSIGN_URSH = 98,  // >>>=
-            ASSIGN_ADD = 99,  // +=
-            ASSIGN_SUB = 100, // -=
-            ASSIGN_MUL = 101,  // *=
-            ASSIGN_DIV = 102,  // /=
-            ASSIGN_MOD = 103,  // %=
-            ASSIGN_EXP = 104,  // **=
+            ASSIGN = 87,  // simple assignment  (=)
+            ASSIGN_BITOR = 88,  // |=
+            ASSIGN_BITXOR = 89,  // ^=
+            ASSIGN_BITAND = 90,  // |=
+            ASSIGN_LSH = 91,  // <<=
+            ASSIGN_RSH = 92,  // >>=
+            ASSIGN_URSH = 93, // >>>=
+            ASSIGN_ADD = 94,  // +=
+            ASSIGN_SUB = 95,  // -=
+            ASSIGN_MUL = 96,  // *=
+            ASSIGN_DIV = 97,  // /=
+            ASSIGN_MOD = 98,  // %=
+            ASSIGN_EXP = 99,  // **=
 
             FIRST_ASSIGN = ASSIGN,
             LAST_ASSIGN = ASSIGN_EXP,
 
-            HOOK = 105, // conditional (?:)
-            COLON = 106,
-            OR = 107, // logical or (||)
-            AND = 108, // logical and (&&)
-            INC = 109, // increment/decrement (++ --)
-            DEC = 110,
-            DOT = 111, // member operator (.)
-            SPREAD = 112,
-            OPTIONAL_CHAINING = 113, // optional chaining member operator (?.) https://tc39.es/proposal-optional-chaining/
-            PIPELINE = 114, // pipeline operator (|>) https://tc39.es/proposal-pipeline-operator
-            NULLISH_COALESCING = 115, // pipeline operator (??) https://tc39.es/proposal-nullish-coalescing/
-            FUNCTION = 116, // function keyword
-            CLASS = 174,
-            EXTENDS = 175,
-            STATIC = 176,
-            SUPER = 177,
-            EXPORT = 117, // export keyword
-            IMPORT = 118, // import keyword
-            IF = 119, // if keyword
-            ELSE = 120, // else keyword
-            SWITCH = 121, // switch keyword
-            CASE = 122, // case keyword
-            DEFAULT = 123, // default keyword
-            WHILE = 124, // while keyword
-            DO = 125, // do keyword
-            FOR = 126, // for keyword
-            BREAK = 127, // break keyword
-            CONTINUE = 128, // continue keyword
-            VAR = 129, // var keyword
-            WITH = 130, // with keyword
-            CATCH = 131, // catch keyword
-            FINALLY = 132, // finally keyword
-            DECORATOR = 179,
+            HOOK = 100, // conditional (?:)
+            COLON = 101,
+            OR = 102, // logical or (||)
+            AND = 103, // logical and (&&)
+            INC = 104, // increment/decrement (++ --)
+            DEC = 105,
+            DOT = 106, // member operator (.)
+            SPREAD = 107,
+            OPTIONAL_CHAINING = 108, // optional chaining member operator (?.) https://tc39.es/proposal-optional-chaining/
+            PIPELINE = 109, // pipeline operator (|>) https://tc39.es/proposal-pipeline-operator
+            NULLISH_COALESCING = 110, // pipeline operator (??) https://tc39.es/proposal-nullish-coalescing/
+            FUNCTION = 111, // function keyword
+            CLASS = 112,
+            EXTENDS = 113,
+            STATIC = 114,
+            SUPER = 115,
+            EXPORT = 116, // export keyword
+            IMPORT = 117, // import keyword
+            IF = 118, // if keyword
+            ELSE = 119, // else keyword
+            SWITCH = 120, // switch keyword
+            CASE = 121, // case keyword
+            DEFAULT = 122, // default keyword
+            WHILE = 123, // while keyword
+            DO = 124, // do keyword
+            FOR = 125, // for keyword
+            BREAK = 126, // break keyword
+            CONTINUE = 127, // continue keyword
+            VAR = 128, // var keyword
+            WITH = 129, // with keyword
+            CATCH = 130, // catch keyword
+            FINALLY = 131, // finally keyword
+            DECORATOR = 132,
             VOID = 133, // void keyword
             RESERVED = 134, // reserved keywords
 
@@ -206,28 +206,28 @@ public class Token {
             LOCAL_BLOCK = 148,
             SET_REF_OP = 149, // *reference op= something
 
-            AT = 154,  // @
+            AT = 150,  // @
 
             // Optimizer-only-tokens
-            TO_OBJECT = 156,
-            TO_DOUBLE = 157,
+            TO_OBJECT = 151,
+            TO_DOUBLE = 152,
 
-            GET = 158,  // JS 1.5 get pseudo keyword
-            SET = 159,  // JS 1.5 set pseudo keyword
-            LET = 160,  // JS 1.7 let pseudo keyword
-            CONST = 161,
-            SETCONST = 162,
-            SETCONSTVAR = 163,
-            ARRAYCOMP = 164,  // array comprehension
-            LETEXPR = 165,
-            WITHEXPR = 166,
-            DEBUGGER = 167,
-            COMMENT = 168,
-            GENEXPR = 169,
-            METHOD = 170, // ES6 MethodDefinition
-            ARROW = 171,  // ES6 ArrowFunction
-            HASHTAG = 178,  // ES6 ArrowFunction
-            LAST_TOKEN = 180;
+            GET = 153,  // JS 1.5 get pseudo keyword
+            SET = 154,  // JS 1.5 set pseudo keyword
+            LET = 155,  // JS 1.7 let pseudo keyword
+            CONST = 156,
+            SETCONST = 157,
+            SETCONSTVAR = 158,
+            ARRAYCOMP = 159,  // array comprehension
+            LETEXPR = 160,
+            WITHEXPR = 161,
+            DEBUGGER = 162,
+            COMMENT = 163,
+            GENEXPR = 164,
+            METHOD = 165, // ES6 MethodDefinition
+            ARROW = 166,  // ES6 ArrowFunction
+            HASHTAG = 167,  // ES6 ArrowFunction
+            LAST_TOKEN = 168;
 
     /**
      * Returns a name for the token.  If Rhino is compiled with certain
@@ -338,6 +338,10 @@ public class Token {
                 return "NUMBER";
             case STRING:
                 return "STRING";
+            case TEMPLATE:
+                return "TEMPLATE";
+            case TEMPLATE_EXPR:
+                return "TEMPLATE_EXPR";
             case NULL:
                 return "NULL";
             case THIS:
@@ -400,6 +404,10 @@ public class Token {
                 return "REF_CALL";
             case REF_SPECIAL:
                 return "REF_SPECIAL";
+            case YIELD:
+                return "YIELD";
+            case STRICT_SETNAME:
+                return "STRICT_SETNAME";
             case TRY:
                 return "TRY";
             case SEMI:
@@ -458,8 +466,24 @@ public class Token {
                 return "DEC";
             case DOT:
                 return "DOT";
+            case SPREAD:
+                return "SPREAD";
+            case OPTIONAL_CHAINING:
+                return "OPTIONAL CHAINING";
+            case PIPELINE:
+                return "PIPELINE";
+            case NULLISH_COALESCING:
+                return "NULLISH_COALESCING";
             case FUNCTION:
                 return "FUNCTION";
+            case CLASS:
+                return "CLASS";
+            case EXTENDS:
+                return "EXTENDS";
+            case STATIC:
+                return "STATIC";
+            case SUPER:
+                return "SUPER";
             case EXPORT:
                 return "EXPORT";
             case IMPORT:
@@ -492,6 +516,8 @@ public class Token {
                 return "CATCH";
             case FINALLY:
                 return "FINALLY";
+            case DECORATOR:
+                return "DECORATOR";
             case VOID:
                 return "VOID";
             case RESERVED:
@@ -538,8 +564,6 @@ public class Token {
                 return "SET";
             case LET:
                 return "LET";
-            case YIELD:
-                return "YIELD";
             case CONST:
                 return "CONST";
             case SETCONST:
@@ -548,10 +572,10 @@ public class Token {
                 return "SETCONSTVAR";
             case ARRAYCOMP:
                 return "ARRAYCOMP";
-            case WITHEXPR:
-                return "WITHEXPR";
             case LETEXPR:
                 return "LETEXPR";
+            case WITHEXPR:
+                return "WITHEXPR";
             case DEBUGGER:
                 return "DEBUGGER";
             case COMMENT:
@@ -562,30 +586,8 @@ public class Token {
                 return "METHOD";
             case ARROW:
                 return "ARROW";
-            case OPTIONAL_CHAINING:
-                return "OPTIONAL CHAINING";
             case HASHTAG:
                 return "HASHTAG";
-            case SPREAD:
-                return "SPREAD";
-            case NULLISH_COALESCING:
-                return "NULLISH_COALESCING";
-            case PIPELINE:
-                return "PIPELINE";
-            case TEMPLATE:
-                return "TEMPLATE";
-            case TEMPLATE_EXPR:
-                return "TEMPLATE_EXPR";
-            case CLASS:
-                return "CLASS";
-            case STATIC:
-                return "STATIC";
-            case EXTENDS:
-                return "EXTENDS";
-            case SUPER:
-                return "SUPER";
-            case DECORATOR:
-                return "DECORATOR";
         }
 
         // Token without name
