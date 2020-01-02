@@ -1902,6 +1902,9 @@ public class Parser {
                 init = new EmptyExpression(ts.tokenBeg, 1);
                 init.setLineno(ts.lineno);
             } else if (tt == Token.VAR || tt == Token.LET) {
+                if (inUseStrictDirective) {
+                    reportError("msg.for.in.assignment.in.strict.mode");
+                }
                 consumeToken();
                 init = variables(tt, ts.tokenBeg, false);
             } else {
