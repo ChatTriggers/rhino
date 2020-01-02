@@ -383,8 +383,6 @@ public final class IRFactory extends Parser {
 
     private Node transformForInLoop(ForInLoop loop) {
         decompiler.addToken(Token.FOR);
-        if (loop.isForEach())
-            decompiler.addName("each ");
         decompiler.addToken(Token.LP);
 
         loop.setType(Token.LOOP);
@@ -406,8 +404,7 @@ public final class IRFactory extends Parser {
             decompiler.addEOL(Token.LC);
             Node body = transform(loop.getBody());
             decompiler.addEOL(Token.RC);
-            return createForIn(declType, loop, lhs, obj, body,
-                    loop.isForEach(), loop.isForOf());
+            return createForIn(declType, loop, lhs, obj, body, loop.isForOf());
         } finally {
             popScope();
         }
@@ -816,13 +813,7 @@ public final class IRFactory extends Parser {
                         acl.getLineno());
                 pushScope(loop);
                 pushed++;
-                body = createForIn(Token.LET,
-                        loop,
-                        iterators[i],
-                        iteratedObjs[i],
-                        body,
-                        acl.isForEach(),
-                        acl.isForOf());
+                body = createForIn(Token.LET, loop, iterators[i], iteratedObjs[i], body, acl.isForOf());
             }
         } finally {
             for (int i = 0; i < pushed; i++) {
@@ -1583,8 +1574,7 @@ public final class IRFactory extends Parser {
     /**
      * Generate IR for a for..in loop.
      */
-    private Node createForIn(int declType, Node loop, Node lhs,
-                             Node obj, Node body, boolean isForEach, boolean isForOf) {
+    private Node createForIn(int declType, Node loop, Node lhs, Node obj, Node body, boolean isForOf) {
         int destructuring = -1;
         int destructuringLen = 0;
         Node lvalue;
@@ -1619,8 +1609,7 @@ public final class IRFactory extends Parser {
         }
 
         Node localBlock = new Node(Token.LOCAL_BLOCK);
-        int initType = isForEach ? Token.ENUM_INIT_VALUES
-                : isForOf ? Token.ENUM_INIT_VALUES_IN_ORDER
+        int initType = isForOf ? Token.ENUM_INIT_VALUES_IN_ORDER
                 : (destructuring != -1
                 ? Token.ENUM_INIT_ARRAY
                 : Token.ENUM_INIT_KEYS);
@@ -1635,9 +1624,7 @@ public final class IRFactory extends Parser {
         Node assign;
         if (destructuring != -1) {
             assign = createDestructuringAssignment(declType, lvalue, id);
-            if (!isForEach && !isForOf &&
-                    (destructuring == Token.OBJECTLIT ||
-                            destructuringLen != 2)) {
+            if (!isForOf && (destructuring == Token.OBJECTLIT || destructuringLen != 2)) {
                 // destructuring assignment is only allowed in for..each or
                 // with an array type of length 2 (to hold key and value)
                 reportError("msg.bad.for.in.destruct");

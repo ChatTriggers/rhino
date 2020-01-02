@@ -22,7 +22,6 @@ public class ForInLoop extends Loop {
     protected AstNode iteratedObject;
     protected int inPosition = -1;
     protected int eachPosition = -1;
-    protected boolean isForEach;
     protected boolean isForOf;
 
     {
@@ -78,20 +77,6 @@ public class ForInLoop extends Loop {
     }
 
     /**
-     * Returns whether the loop is a for-each loop
-     */
-    public boolean isForEach() {
-        return isForEach;
-    }
-
-    /**
-     * Sets whether the loop is a for-each loop
-     */
-    public void setIsForEach(boolean isForEach) {
-        this.isForEach = isForEach;
-    }
-
-    /**
      * Returns whether the loop is a for-of loop
      */
     public boolean isForOf() {
@@ -144,9 +129,6 @@ public class ForInLoop extends Loop {
         StringBuilder sb = new StringBuilder();
         sb.append(makeIndent(depth));
         sb.append("for ");
-        if (isForEach()) {
-            sb.append("each ");
-        }
         sb.append("(");
         sb.append(iterator.toSource(0));
         if (isForOf) {

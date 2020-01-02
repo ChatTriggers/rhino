@@ -1835,7 +1835,7 @@ public class Parser {
         if (currentToken != Token.FOR) codeBug();
         consumeToken();
         int forPos = ts.tokenBeg, lineno = ts.lineno;
-        boolean isForEach = false, isForIn = false, isForOf = false;
+        boolean isForIn = false, isForOf = false;
         int eachPos = -1, inPos = -1, lp = -1, rp = -1;
         AstNode init;  // init is also foo in 'foo in object'
         AstNode cond;  // cond is also object in 'foo in object'
@@ -1845,16 +1845,6 @@ public class Parser {
         Scope tempScope = new Scope();
         pushScope(tempScope);  // decide below what AST class to use
         try {
-            // See if this is a for each () instead of just a for ()
-            if (matchToken(Token.NAME)) {
-                if ("each".equals(ts.getString())) {
-                    isForEach = true;
-                    eachPos = ts.tokenBeg - forPos;
-                } else {
-                    reportError("msg.no.paren.for");
-                }
-            }
-
             if (mustMatchToken(Token.LP, "msg.no.paren.for"))
                 lp = ts.tokenBeg - forPos;
             int tt = peekToken();
@@ -1900,13 +1890,9 @@ public class Parser {
                         reportError("msg.mult.index");
                     }
                 }
-                if (isForOf && isForEach) {
-                    reportError("msg.invalid.for.each");
-                }
                 fis.setIterator(init);
                 fis.setIteratedObject(cond);
                 fis.setInPosition(inPos);
-                fis.setIsForEach(isForEach);
                 fis.setEachPosition(eachPos);
                 fis.setIsForOf(isForOf);
                 pn = fis;
