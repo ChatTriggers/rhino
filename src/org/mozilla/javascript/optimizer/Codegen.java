@@ -1074,7 +1074,8 @@ public class Codegen implements Evaluator {
                         break;
 
                     case Do_construct:
-                        if (n instanceof FunctionNode && !((FunctionNode) n).isConstructable()) {
+                        if (n instanceof FunctionNode && (!((FunctionNode) n).isConstructable() ||
+                                ((FunctionNode) n).isGetterMethod() || ((FunctionNode) n).isSetterMethod())) {
                             // Throw a type error, since this function was called with "new"
                             cfw.addPush("msg.not.ctor");
                             cfw.addPush(((FunctionNode) n).getName());
