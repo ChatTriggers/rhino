@@ -3242,6 +3242,10 @@ public class ScriptRuntime {
         return false;
     }
 
+    ////////////////
+    // ARITHMETIC //
+    ////////////////
+
     public static Object add(Object val1, Object val2, Context cx) {
         Object opResult = applyOperator(val1, val2, "+", cx);
 
@@ -3277,60 +3281,88 @@ public class ScriptRuntime {
         return new ConsString(toCharSequence(val1), val2);
     }
 
-    public static Object binaryOperator(Object val1, Object val2, int op, Context cx) {
-        switch (op) {
-            case Token.SUB:
-                return doArithmetic(val1, val2, "-", () -> OptRuntime.wrapDouble(toNumber(val1) - toNumber(val2)), cx);
-            case Token.MUL:
-                return doArithmetic(val1, val2, "*", () -> OptRuntime.wrapDouble(toNumber(val1) * toNumber(val2)), cx);
-            case Token.DIV:
-                return doArithmetic(val1, val2, "/", () -> OptRuntime.wrapDouble(toNumber(val1) / toNumber(val2)), cx);
-            case Token.MOD:
-                return doArithmetic(val1, val2, "%", () -> OptRuntime.wrapDouble(toNumber(val1) % toNumber(val2)), cx);
-            case Token.EXP:
-                return doArithmetic(val1, val2, "**", () -> OptRuntime.wrapDouble(Math.pow(toNumber(val1), toNumber(val2))), cx);
-            case Token.LSH:
-                return doArithmetic(val1, val2, "<<", () -> OptRuntime.wrapDouble(toInt32(val1) << toInt32(val2)), cx);
-            case Token.RSH:
-                return doArithmetic(val1, val2, ">>", () -> OptRuntime.wrapDouble(toInt32(val1) >> toInt32(val2)), cx);
-            case Token.URSH:
-                return doArithmetic(val1, val2, ">>>", () -> OptRuntime.wrapDouble(toInt32(val1) >>> toInt32(val2)), cx);
-            case Token.BITAND:
-                return doArithmetic(val1, val2, "&", () -> OptRuntime.wrapDouble(toInt32(val1) & toInt32(val2)), cx);
-            case Token.BITOR:
-                return doArithmetic(val1, val2, "|", () -> OptRuntime.wrapDouble(toInt32(val1) | toInt32(val2)), cx);
-            case Token.BITXOR:
-                return doArithmetic(val1, val2, "^", () -> OptRuntime.wrapDouble((toInt32(val1) ^ toInt32(val2))), cx);
-            case Token.LT:
-                return doArithmetic(val1, val2, "<", () -> cmp_LT(val1, val2), cx);
-            case Token.LE:
-                return doArithmetic(val1, val2, "<=", () -> cmp_LE(val1, val2), cx);
-            case Token.GT:
-                return doArithmetic(val1, val2, ">", () -> !cmp_LE(val1, val2), cx);
-            case Token.GE:
-                return doArithmetic(val1, val2, ">=", () -> !cmp_LT(val1, val2), cx);
-            case Token.AND:
-                return doArithmetic(val1, val2, "&&", () -> toBoolean(val1) && toBoolean(val2), cx);
-            case Token.OR:
-                return doArithmetic(val1, val2, "||", () -> toBoolean(val1) || toBoolean(val2), cx);
-            default:
-                throw Kit.codeBug("Unexpected binary operator token: " + op);
-        }
+    public static Object subtract(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "-", () -> OptRuntime.wrapDouble(toNumber(v1) - toNumber(v2)), cx);
     }
 
-    public static Object unaryOperator(Object val, int op, Context cx) {
-        switch (op) {
-            case Token.BITNOT:
-                return doArithmetic(val, "~", () -> OptRuntime.wrapDouble(~toInt32(val)), cx);
-            case Token.POS:
-                return doArithmetic(val, "+", () -> OptRuntime.wrapDouble(toNumber(val)), cx);
-            case Token.NEG:
-                return doArithmetic(val, "-", () -> OptRuntime.wrapDouble(-toNumber(val)), cx);
-            case Token.NOT:
-                return doArithmetic(val, "!", () -> !toBoolean(val), cx);
-            default:
-                throw Kit.codeBug("Unexpected unary operator token: " + op);
-        }
+    public static Object multiply(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "*", () -> OptRuntime.wrapDouble(toNumber(v1) * toNumber(v2)), cx);
+    }
+
+    public static Object divide(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "/", () -> OptRuntime.wrapDouble(toNumber(v1) / toNumber(v2)), cx);
+    }
+
+    public static Object modulo(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "%", () -> OptRuntime.wrapDouble(toNumber(v1) % toNumber(v2)), cx);
+    }
+
+    public static Object exp(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "**", () -> OptRuntime.wrapDouble(Math.pow(toNumber(v1), toNumber(v2))), cx);
+    }
+
+    public static Object lsh(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "<<", () -> OptRuntime.wrapDouble(toInt32(v1) << toInt32(v2)), cx);
+    }
+
+    public static Object rsh(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, ">>", () -> OptRuntime.wrapDouble(toInt32(v1) >> toInt32(v2)), cx);
+    }
+
+    public static Object ursh(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, ">>>", () -> OptRuntime.wrapDouble(toInt32(v1) >>> toInt32(v2)), cx);
+    }
+
+    public static Object bitAnd(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "&", () -> OptRuntime.wrapDouble(toInt32(v1) & toInt32(v2)), cx);
+    }
+
+    public static Object bitOr(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "|", () -> OptRuntime.wrapDouble(toInt32(v1) | toInt32(v2)), cx);
+    }
+
+    public static Object bitXor(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "^", () -> OptRuntime.wrapDouble((toInt32(v1) ^ toInt32(v2))), cx);
+    }
+
+    public static Object bitNot(Object v, Context cx) {
+        return doUnaryArithmetic(v, "~", () -> OptRuntime.wrapDouble(~toInt32(v)), cx);
+    }
+
+    public static Object pos(Object v, Context cx) {
+        return doUnaryArithmetic(v, "+", () -> OptRuntime.wrapDouble(toNumber(v)), cx);
+    }
+
+    public static Object neg(Object v, Context cx) {
+        return doUnaryArithmetic(v, "-", () -> OptRuntime.wrapDouble(-toNumber(v)), cx);
+    }
+
+    public static Object not(Object v, Context cx) {
+        return doUnaryArithmetic(v, "!", () -> !toBoolean(v), cx);
+    }
+
+    public static Object lt(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "<", () -> cmp_LT(v1, v2), cx);
+    }
+
+    public static Object lte(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "<=", () -> cmp_LE(v1, v2), cx);
+    }
+
+    public static Object gt(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, ">", () -> !cmp_LE(v1, v2), cx);
+    }
+
+    public static Object gte(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, ">=", () -> !cmp_LT(v1, v2), cx);
+    }
+
+    public static Object and(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "&&", () -> toBoolean(v1) && toBoolean(v2), cx);
+    }
+
+    public static Object or(Object v1, Object v2, Context cx) {
+        return doArithmetic(v1, v2, "||", () -> toBoolean(v1) || toBoolean(v2), cx);
     }
 
     private static Object doArithmetic(Object val1, Object val2, String op, Supplier<Object> fn, Context cx) {
@@ -3343,8 +3375,8 @@ public class ScriptRuntime {
         return fn.get();
     }
 
-    private static Object doArithmetic(Object val, String op, Supplier<Object> fn, Context cx) {
-        Object opResult = applyUnaryOperator(val, op, cx);
+    private static Object doUnaryArithmetic(Object val1, String op, Supplier<Object> fn, Context cx) {
+        Object opResult = applyUnaryOperator(val1, op, cx);
 
         if (opResult != UniqueTag.NOT_FOUND) {
             return opResult;

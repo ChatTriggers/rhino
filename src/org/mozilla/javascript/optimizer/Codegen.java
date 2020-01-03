@@ -5425,29 +5425,89 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     }
 
     private void visitOperator(Node node, int token, Node child) {
+        String methodName;
         boolean unary = false;
 
         switch (token) {
+            case Token.SUB:
+                methodName = "subtract";
+                break;
+            case Token.MUL:
+                methodName = "multiply";
+                break;
+            case Token.DIV:
+                methodName = "divide";
+                break;
+            case Token.MOD:
+                methodName = "modulo";
+                break;
+            case Token.EXP:
+                methodName = "exp";
+                break;
+            case Token.LSH:
+                methodName = "lsh";
+                break;
+            case Token.RSH:
+                methodName = "rsh";
+                break;
+            case Token.URSH:
+                methodName = "ursh";
+                break;
+            case Token.BITAND:
+                methodName = "bitAnd";
+                break;
+            case Token.BITOR:
+                methodName = "bitOr";
+                break;
+            case Token.BITXOR:
+                methodName = "bitXor";
+                break;
             case Token.BITNOT:
-            case Token.POS:
-            case Token.NEG:
-            case Token.NOT:
+                methodName = "bitNot";
                 unary = true;
                 break;
+            case Token.POS:
+                methodName = "pos";
+                unary = true;
+                break;
+            case Token.NEG:
+                methodName = "neg";
+                unary = true;
+                break;
+            case Token.NOT:
+                methodName = "not";
+                unary = true;
+                break;
+            case Token.LT:
+                methodName = "lt";
+                break;
+            case Token.LE:
+                methodName = "lte";
+                break;
+            case Token.GT:
+                methodName = "gt";
+                break;
+            case Token.GE:
+                methodName = "gte";
+                break;
+            case Token.AND:
+                methodName = "and";
+                break;
+            case Token.OR:
+                methodName = "or";
+                break;
+            default:
+                throw Codegen.badTree();
         }
 
         generateExpression(child, node);
-        if (!unary) {
-            generateExpression(child.getNext(), node);
-        }
-
-        cfw.addPush(token);
-        cfw.addALoad(contextLocal);
-
         if (unary) {
-            addScriptRuntimeInvoke("unaryOperator", OBJECT, OBJECT, INTEGER, CONTEXT);
+            cfw.addALoad(contextLocal);
+            addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, CONTEXT);
         } else {
-            addScriptRuntimeInvoke("binaryOperator", OBJECT, OBJECT, OBJECT, INTEGER, CONTEXT);
+            generateExpression(child.getNext(), node);
+            cfw.addALoad(contextLocal);
+            addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, OBJECT, CONTEXT);
         }
     }
 
