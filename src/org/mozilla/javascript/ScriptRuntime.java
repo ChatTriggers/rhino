@@ -12,7 +12,6 @@ import org.mozilla.javascript.decorators.DecoratorType;
 import org.mozilla.javascript.generator.NativeGenerator;
 import org.mozilla.javascript.generator.NativeGeneratorIterator;
 import org.mozilla.javascript.optimizer.Codegen;
-import org.mozilla.javascript.optimizer.OptRuntime;
 import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
 import org.mozilla.javascript.v8dtoa.FastDtoa;
@@ -21,8 +20,6 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 /**
  * This is the class that implements the runtime.
@@ -3191,12 +3188,6 @@ public class ScriptRuntime {
      * The typeof operator
      */
     public static String typeof(Object value) {
-        Object opResult = applyUnaryOperator(value, "typeof", Context.getContext());
-
-        if (opResult != UniqueTag.NOT_FOUND) {
-            return toString(opResult);
-        }
-
         if (value == null)
             return "object";
         if (value == Undefined.instance)
@@ -3242,13 +3233,19 @@ public class ScriptRuntime {
         return false;
     }
 
+    // neg:
+    // implement the '-' operator inline in the caller
+    // as "-toNumber(val)"
+
+    // not:
+    // implement the '!' operator inline in the caller
+    // as "!toBoolean(val)"
+
+    // bitnot:
+    // implement the '~' operator inline in the caller
+    // as "~toInt32(val)"
+
     public static Object add(Object val1, Object val2, Context cx) {
-        Object opResult = applyOperator(val1, val2, "+", cx);
-
-        if (opResult != UniqueTag.NOT_FOUND) {
-            return opResult;
-        }
-
         if (val1 instanceof Number && val2 instanceof Number) {
             return wrapNumber(((Number) val1).doubleValue() +
                     ((Number) val2).doubleValue());
@@ -3277,125 +3274,19 @@ public class ScriptRuntime {
         return new ConsString(toCharSequence(val1), val2);
     }
 
-    public static Object binaryOperator(Object val1, Object val2, int op, Context cx) {
-        switch (op) {
-            case Token.SUB:
-                return doArithmetic(val1, val2, "-", () -> OptRuntime.wrapDouble(toNumber(val1) - toNumber(val2)), cx);
-            case Token.MUL:
-                return doArithmetic(val1, val2, "*", () -> OptRuntime.wrapDouble(toNumber(val1) * toNumber(val2)), cx);
-            case Token.DIV:
-                return doArithmetic(val1, val2, "/", () -> OptRuntime.wrapDouble(toNumber(val1) / toNumber(val2)), cx);
-            case Token.MOD:
-                return doArithmetic(val1, val2, "%", () -> OptRuntime.wrapDouble(toNumber(val1) % toNumber(val2)), cx);
-            case Token.EXP:
-                return doArithmetic(val1, val2, "**", () -> OptRuntime.wrapDouble(Math.pow(toNumber(val1), toNumber(val2))), cx);
-            case Token.LSH:
-                return doArithmetic(val1, val2, "<<", () -> OptRuntime.wrapDouble(toInt32(val1) << toInt32(val2)), cx);
-            case Token.RSH:
-                return doArithmetic(val1, val2, ">>", () -> OptRuntime.wrapDouble(toInt32(val1) >> toInt32(val2)), cx);
-            case Token.URSH:
-                return doArithmetic(val1, val2, ">>>", () -> OptRuntime.wrapDouble(toInt32(val1) >>> toInt32(val2)), cx);
-            case Token.BITAND:
-                return doArithmetic(val1, val2, "&", () -> OptRuntime.wrapDouble(toInt32(val1) & toInt32(val2)), cx);
-            case Token.BITOR:
-                return doArithmetic(val1, val2, "|", () -> OptRuntime.wrapDouble(toInt32(val1) | toInt32(val2)), cx);
-            case Token.BITXOR:
-                return doArithmetic(val1, val2, "^", () -> OptRuntime.wrapDouble((toInt32(val1) ^ toInt32(val2))), cx);
-            case Token.LT:
-                return doArithmetic(val1, val2, "<", () -> cmp_LT(val1, val2), cx);
-            case Token.LE:
-                return doArithmetic(val1, val2, "<=", () -> cmp_LE(val1, val2), cx);
-            case Token.GT:
-                return doArithmetic(val1, val2, ">", () -> !cmp_LE(val1, val2), cx);
-            case Token.GE:
-                return doArithmetic(val1, val2, ">=", () -> !cmp_LT(val1, val2), cx);
-            default:
-                throw Kit.codeBug("Unexpected binary operator token: " + op);
-        }
-    }
-
-    public static Object unaryOperator(Object val, int op, Context cx) {
-        switch (op) {
-            case Token.BITNOT:
-                return doArithmetic(val, "~", () -> OptRuntime.wrapDouble(~toInt32(val)), cx);
-            case Token.POS:
-                return doArithmetic(val, "+", () -> OptRuntime.wrapDouble(toNumber(val)), cx);
-            case Token.NEG:
-                return doArithmetic(val, "-", () -> OptRuntime.wrapDouble(-toNumber(val)), cx);
-            case Token.NOT:
-                return doArithmetic(val, "!", () -> !toBoolean(val), cx);
-            default:
-                throw Kit.codeBug("Unexpected unary operator token: " + op);
-        }
-    }
-
-    private static Object doArithmetic(Object val1, Object val2, String op, Supplier<Object> fn, Context cx) {
-        Object opResult = applyOperator(val1, val2, op, cx);
-
-        if (opResult != UniqueTag.NOT_FOUND) {
-            return opResult;
-        }
-
-        return fn.get();
-    }
-
-    private static Object doArithmetic(Object val, String op, Supplier<Object> fn, Context cx) {
-        Object opResult = applyUnaryOperator(val, op, cx);
-
-        if (opResult != UniqueTag.NOT_FOUND) {
-            return opResult;
-        }
-
-        return fn.get();
-    }
-
-    private static Object applyOperator(Object lho, Object rho, String operator, Context cx) {
-        if (cx.getLanguageVersion() >= Context.VERSION_ES6) {
-            NativeSymbol sym = NativeSymbol.operator(cx, operator);
-
-            if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
-                Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
-
-                if (!(fn instanceof Callable)) {
-                    throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
-                }
-
-                return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[]{ rho });
-            }
-        }
-
-        return UniqueTag.NOT_FOUND;
-    }
-
-    private static Object applyUnaryOperator(Object lho, String operator, Context cx) {
-        if (cx.getLanguageVersion() >= Context.VERSION_ES6) {
-            NativeSymbol sym = NativeSymbol.unaryOperator(cx, operator);
-
-            if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
-                Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
-
-                if (!(fn instanceof Callable)) {
-                    throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
-                }
-
-                return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[0]);
-            }
-        }
-
-        return UniqueTag.NOT_FOUND;
-    }
-
     /**
      * The method is only present for compatibility.
      *
      * @deprecated Use {@link #nameIncrDecr(Scriptable, String, Context, int)} instead
      */
     @Deprecated
-    public static Object nameIncrDecr(Scriptable scopeChain, String id, int incrDecrMask) {
+    public static Object nameIncrDecr(Scriptable scopeChain, String id,
+                                      int incrDecrMask) {
         return nameIncrDecr(scopeChain, id, Context.getContext(), incrDecrMask);
     }
 
-    public static Object nameIncrDecr(Scriptable scopeChain, String id, Context cx, int incrDecrMask) {
+    public static Object nameIncrDecr(Scriptable scopeChain, String id,
+                                      Context cx, int incrDecrMask) {
         Scriptable target;
         Object value;
         search:
@@ -3416,7 +3307,8 @@ public class ScriptRuntime {
             } while (scopeChain != null);
             throw notFoundError(scopeChain, id);
         }
-        return doScriptableIncrDecr(target, id, scopeChain, value, incrDecrMask);
+        return doScriptableIncrDecr(target, id, scopeChain, value,
+                incrDecrMask);
     }
 
     /**
@@ -3451,13 +3343,11 @@ public class ScriptRuntime {
                 incrDecrMask);
     }
 
-    private static Object doScriptableIncrDecr(Scriptable target, String id, Scriptable protoChainStart, Object value, int incrDecrMask) {
-        Object opResult = applyUnaryOperator(value, (incrDecrMask & Node.DECR_FLAG) == 0 ? "++" : "--", Context.getContext());
-
-        if (opResult != UniqueTag.NOT_FOUND) {
-            return opResult;
-        }
-
+    private static Object doScriptableIncrDecr(Scriptable target,
+                                               String id,
+                                               Scriptable protoChainStart,
+                                               Object value,
+                                               int incrDecrMask) {
         boolean post = ((incrDecrMask & Node.POST_FLAG) != 0);
         double number;
         if (value instanceof Number) {
@@ -3573,12 +3463,6 @@ public class ScriptRuntime {
      * ==
      */
     public static boolean eq(Object x, Object y) {
-        Object opResult = applyOperator(x, y, "==", Context.getContext());
-
-        if (opResult != UniqueTag.NOT_FOUND) {
-            return toBoolean(opResult);
-        }
-
         if (x == null || x == Undefined.instance) {
             if (y == null || y == Undefined.instance) {
                 return true;

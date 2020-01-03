@@ -22,8 +22,6 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
     public static final String TYPE_NAME = "symbol";
 
     private static final Object GLOBAL_TABLE_KEY = new Object();
-    private static final Object OPERATOR_KEY = new Object();
-    private static final Object UNARY_OPERATOR_KEY = new Object();
     private static final Object CONSTRUCTOR_SLOT = new Object();
 
     private final SymbolKey key;
@@ -102,8 +100,6 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
         super.fillConstructorProperties(ctor);
         addIdFunctionProperty(ctor, CLASS_NAME, ConstructorId_for, "for", 1);
         addIdFunctionProperty(ctor, CLASS_NAME, ConstructorId_keyFor, "keyFor", 1);
-        addIdFunctionProperty(ctor, CLASS_NAME, ConstructorId_operator, "operator", 1);
-        addIdFunctionProperty(ctor, CLASS_NAME, ConstructorId_unaryOperator, "unaryOperator", 1);
     }
 
     private static void createStandardSymbol(Context cx, Scriptable scope,
@@ -152,8 +148,6 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
     }
 
     private static final int
-            ConstructorId_unaryOperator = -4,
-            ConstructorId_operator = -3,
             ConstructorId_keyFor = -2,
             ConstructorId_for = -1,
             Id_constructor = 1,
@@ -201,10 +195,6 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
                 return js_for(cx, scope, args);
             case ConstructorId_keyFor:
                 return js_keyFor(cx, scope, args);
-            case ConstructorId_operator:
-                return js_operator(cx, args);
-            case ConstructorId_unaryOperator:
-                return js_unaryOperator(cx, args);
 
             case Id_constructor:
                 if (thisObj == null) {
@@ -259,57 +249,15 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
         return symbolData;
     }
 
-    private NativeSymbol getSymbol(Context cx, Scriptable scope, Object[] args, Object mapKey) {
+    private Object js_for(Context cx, Scriptable scope, Object[] args) {
         String name = (args.length > 0 ? ScriptRuntime.toString(args[0]) : ScriptRuntime.toString(Undefined.instance));
 
-        Map<String, NativeSymbol> table = getSymbolMap(this, mapKey);
+        Map<String, NativeSymbol> table = getGlobalMap();
         NativeSymbol ret = table.get(name);
 
         if (ret == null) {
             ret = construct(cx, scope, new Object[]{name});
             table.put(name, ret);
-        }
-        return ret;
-    }
-
-    private NativeSymbol js_for(Context cx, Scriptable scope, Object[] args) {
-        return getSymbol(cx, scope, args, GLOBAL_TABLE_KEY);
-    }
-
-    public NativeSymbol js_operator(Context cx, Object[] args) {
-        if (args.length == 0) {
-            throw ScriptRuntime.typeError("Symbol.operator requires one string argument");
-        }
-
-        return operator(cx, ScriptRuntime.toString(args[0]));
-    }
-
-    public NativeSymbol js_unaryOperator(Context cx, Object[] args) {
-        if (args.length == 0) {
-            throw ScriptRuntime.typeError("Symbol.unaryOperator requires one string argument");
-        }
-
-        return unaryOperator(cx, ScriptRuntime.toString(args[0]));
-    }
-
-    public static NativeSymbol operator(Context cx, String op) {
-        Map<String, NativeSymbol> table = getSymbolMap(cx.topCallScope, OPERATOR_KEY);
-        NativeSymbol ret = table.get(op);
-
-        if (ret == null) {
-            ret = construct(cx, cx.topCallScope, new Object[]{op});
-            table.put(op, ret);
-        }
-        return ret;
-    }
-
-    public static NativeSymbol unaryOperator(Context cx, String op) {
-        Map<String, NativeSymbol> table = getSymbolMap(cx.topCallScope, UNARY_OPERATOR_KEY);
-        NativeSymbol ret = table.get(op);
-
-        if (ret == null) {
-            ret = construct(cx, cx.topCallScope, new Object[]{op});
-            table.put(op, ret);
         }
         return ret;
     }
@@ -401,25 +349,13 @@ public class NativeSymbol extends IdScriptableObject implements Symbol {
         return key;
     }
 
-    private static Map<String, NativeSymbol> getSymbolMap(Scriptable scope, Object key) {
-        ScriptableObject top = (ScriptableObject) getTopLevelScope(scope);
-        Map<String, NativeSymbol> map = (Map<String, NativeSymbol>) top.getAssociatedValue(key);
+    private Map<String, NativeSymbol> getGlobalMap() {
+        ScriptableObject top = (ScriptableObject) getTopLevelScope(this);
+        Map<String, NativeSymbol> map = (Map<String, NativeSymbol>) top.getAssociatedValue(GLOBAL_TABLE_KEY);
         if (map == null) {
             map = new HashMap<>();
-            top.associateValue(key, map);
+            top.associateValue(GLOBAL_TABLE_KEY, map);
         }
         return map;
-    }
-
-    private Map<String, NativeSymbol> getGlobalMap() {
-        return getSymbolMap(this, GLOBAL_TABLE_KEY);
-    }
-
-    private Map<String, NativeSymbol> getOperatorMap() {
-        return getSymbolMap(this, OPERATOR_KEY);
-    }
-
-    private Map<String, NativeSymbol> getUnaryOperatorMap() {
-        return getSymbolMap(this, UNARY_OPERATOR_KEY);
     }
 }
