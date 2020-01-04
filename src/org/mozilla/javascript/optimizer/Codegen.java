@@ -4193,8 +4193,7 @@ class BodyCodegen {
         }
     }
 
-    private void visitSpecialCall(Node node, int type, int specialType,
-                                  Node child) {
+    private void visitSpecialCall(Node node, int type, int specialType, Node child) {
         cfw.addALoad(contextLocal);
 
         if (type == Token.NEW) {
@@ -4235,12 +4234,21 @@ class BodyCodegen {
         if (node.getType() != Token.CALL) throw Codegen.badTree();
 
         boolean isPrivate = child.getProp(Node.PRIVATE_ACCESS_PROP) != null;
+        boolean isPartial = node.getProp(Node.PARTIAL_PROP) != null;
+
+        if (isPartial) {
+            cfw.add(ByteCode.NEW, "org/mozilla/javascript/PartialFunction");
+            cfw.add(ByteCode.DUP);
+            cfw.addALoad(contextLocal);
+            cfw.addALoad(variableObjectLocal);
+        }
 
         Node firstArgChild = child.getNext();
         int childType = child.getType();
 
         String methodName;
         String[] signature;
+
 
         if (firstArgChild == null) {
             if (childType == Token.NAME) {
@@ -4315,9 +4323,19 @@ class BodyCodegen {
             // resolution
             // is not affected by arguments evaluation and currently
             // there are no checks for it
-            String name = child.getString();
+            if (isPartial) {
+                generateExpression(child, node);
+                cfw.addALoad(thisObjLocal);
+            }
+
             generateCallArgArray(node, firstArgChild, false);
 
+            if (isPartial) {
+                cfw.addInvoke(ByteCode.INVOKESPECIAL, "org/mozilla/javascript/PartialFunction", "<init>", "(" + CONTEXT + SCRIPTABLE + CALLABLE + SCRIPTABLE + "[I" + OBJECT_ARRAY + ")V");
+                return;
+            }
+
+            String name = child.getString();
             if (child.getProp(Node.SUPER_PROP) != null) {
                 boolean isReturned = node.getNext() != null && node.getNext().getType() == Token.RETURN;
                 cfw.addPush(isReturned);
@@ -4339,6 +4357,13 @@ class BodyCodegen {
             methodName = "callName";
             signature = new String[]{ OBJECT_ARRAY, STRING, CONTEXT, SCRIPTABLE };
         } else {
+            if (isPartial) {
+                generateFunctionAndThisObj(child, node, isPrivate);
+                generateCallArgArray(node, firstArgChild, false);
+                cfw.addInvoke(ByteCode.INVOKESPECIAL, "org/mozilla/javascript/PartialFunction", "<init>", "(" + CONTEXT + SCRIPTABLE + CALLABLE + SCRIPTABLE + "[I" + OBJECT_ARRAY + ")V");
+                return;
+            }
+
             int argCount = 0;
             for (Node arg = firstArgChild; arg != null; arg = arg.getNext()) {
                 if (arg.getProp(Node.SPREAD_PROP) != null) {
@@ -4503,9 +4528,10 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         cfw.markLabel(beyond);
     }
 
-    class ArgGroups {
+    static class ArgGroups {
         public List<List<Node>> groups = new ArrayList<>();
         public Set<Integer> isSpread = new HashSet<>();
+        public Set<Integer> isPartial = new HashSet<>();
         public int totalArgs;
 
         private int cursor = 0;
@@ -4516,6 +4542,10 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
 
         public void put(Node node, boolean isSpread) {
             totalArgs++;
+            if (node.getType() == Token.HOOK && node instanceof EmptyExpression) {
+                this.isPartial.add(totalArgs - 1);
+                return;
+            }
             groups.get(cursor).add(node);
             if (isSpread) {
                 this.isSpread.add(cursor);
@@ -4585,13 +4615,27 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
     private void generateCallArgArray(Node node, Node argChild, boolean directCall) {
         ArgGroups groups = populateArgGroups(argChild);
 
+        if (groups.isPartial.size() > 0) {
+            cfw.addPush(groups.isPartial.size());
+            cfw.add(ByteCode.NEWARRAY, ByteCode.T_INT);
+
+            int i = 0;
+            for (int partialIndex : groups.isPartial) {
+                cfw.add(ByteCode.DUP);
+                cfw.addPush(i);
+                cfw.addPush(partialIndex);
+                cfw.add(ByteCode.IASTORE);
+                i++;
+            }
+        }
+
         // load array object to set arguments
         if (groups.totalArgs == 1 && itsOneArgArray >= 0) {
             cfw.addALoad(itsOneArgArray);
         } else if (groups.isSpread.size() > 0) {
             addNewObjectArray(groups.groupCount());
         } else {
-            addNewObjectArray(groups.totalArgs);
+            addNewObjectArray(groups.totalArgs - groups.isPartial.size());
         }
 
         if (groups.isSpread.size() > 0) {
@@ -4600,7 +4644,13 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         }
 
         // Copy arguments into it
-        for (int i = 0; i != groups.totalArgs; ++i) {
+        for (int i = 0; i < groups.totalArgs - groups.isPartial.size(); ++i) {
+            if (argChild.getType() == Token.HOOK && argChild instanceof EmptyExpression) {
+                argChild = argChild.getNext();
+                --i;
+                continue;
+            }
+
             // If we are compiling a generator an argument could be the result
             // of a yield. In that case we will have an immediate on the stack
             // which we need to avoid

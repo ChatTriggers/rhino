@@ -66,7 +66,8 @@ public class Node implements Iterable<Node> {
             DECORATOR_PROP = 33,
             PRIVATE_ACCESS_PROP = 34,
             EXPORT_PROP = 35,
-            INITIALIZE_PROP = 36;
+            INITIALIZE_PROP = 36,
+            PARTIAL_PROP = 37;
 
     // values of ISNUMBER_PROP to specify
     // which of the children are Number types
@@ -478,6 +479,8 @@ public class Node implements Iterable<Node> {
                     return "export_prop";
                 case INITIALIZE_PROP:
                     return "initialize_prop";
+                case PARTIAL_PROP:
+                    return "partial_prop";
                 default:
                     throw Kit.codeBug();
             }

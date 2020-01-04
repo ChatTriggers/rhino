@@ -2997,7 +2997,7 @@ public class Parser {
         }
     }
 
-    private List<AstNode> argumentList() throws IOException {
+    private List<AstNode> argumentList(boolean allowPartial) throws IOException {
         if (matchToken(Token.RP))
             return null;
 
@@ -3014,16 +3014,20 @@ public class Parser {
                 if (tt == Token.YIELD) {
                     reportError("msg.yield.parenthesized");
                 }
-                AstNode en = assignExpr();
-                if (tt == Token.FOR) {
-                    try {
-                        result.add(generatorExpression(en, 0, true));
-                    } catch (IOException ex) {
-                        // #TODO
+                AstNode en;
+
+                if (tt == Token.HOOK) {
+                    if (!allowPartial) {
+                        reportError("msg.partial.application.with.new");
                     }
+                    consumeToken();
+                    en = new EmptyExpression();
+                    en.setType(Token.HOOK);
                 } else {
-                    result.add(en);
+                    en = assignExpr();
                 }
+
+                result.add(en);
             } while (matchToken(Token.COMMA));
         } finally {
             inForInit = wasInForInit;
@@ -3080,7 +3084,7 @@ public class Parser {
             int lp;
             if (matchToken(Token.LP)) {
                 lp = ts.tokenBeg;
-                List<AstNode> args = argumentList();
+                List<AstNode> args = argumentList(false);
                 if (args != null && args.size() > ARGC_LIMIT)
                     reportError("msg.too.many.constructor.args");
                 int rp = ts.tokenBeg;
@@ -3227,7 +3231,7 @@ public class Parser {
         // the paren appeared, not where the name expression started.
         f.setLineno(lineno);
         f.setLp(ts.tokenBeg - pos);
-        List<AstNode> args = argumentList();
+        List<AstNode> args = argumentList(true);
         if (args != null && args.size() > ARGC_LIMIT)
             reportError("msg.too.many.function.args");
         f.setArguments(args);
@@ -3588,10 +3592,6 @@ public class Parser {
     }
 
     private AstNode generatorExpression(AstNode result, int pos) throws IOException {
-        return generatorExpression(result, pos, false);
-    }
-
-    private AstNode generatorExpression(AstNode result, int pos, boolean inFunctionParams) throws IOException {
         List<GeneratorExpressionLoop> loops =
                 new ArrayList<GeneratorExpressionLoop>();
         while (peekToken() == Token.FOR) {
@@ -3604,9 +3604,7 @@ public class Parser {
             ifPos = ts.tokenBeg - pos;
             data = condition();
         }
-        if (!inFunctionParams) {
-            mustMatchToken(Token.RP, "msg.no.paren.let");
-        }
+        mustMatchToken(Token.RP, "msg.no.paren.let");
         GeneratorExpression pn = new GeneratorExpression(pos, ts.tokenEnd - pos);
         pn.setResult(result);
         pn.setLoops(loops);

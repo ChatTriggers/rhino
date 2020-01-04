@@ -662,6 +662,12 @@ public final class IRFactory extends Parser {
         List<AstNode> args = node.getArguments();
         for (int i = 0; i < args.size(); i++) {
             AstNode arg = args.get(i);
+            if (arg.getType() == Token.HOOK && arg instanceof EmptyExpression) {
+                call.putProp(Node.PARTIAL_PROP, true);
+                call.addChildToBack(arg);
+                decompiler.addToken(Token.HOOK);
+                continue;
+            }
             Node child = transform(arg);
             if (arg.getProp(Node.SPREAD_PROP) != null) {
                 child.putProp(Node.SPREAD_PROP, true);
