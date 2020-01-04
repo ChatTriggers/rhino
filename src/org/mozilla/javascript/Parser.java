@@ -1807,7 +1807,7 @@ public class Parser {
                 lp = ts.tokenBeg - forPos;
             int tt = peekToken();
 
-            init = forLoopInit(tt);
+            init = forLoopInit(tt, isForIn || isForOf);
             if (matchToken(Token.IN)) {
                 isForIn = true;
                 inPos = ts.tokenBeg - forPos;
@@ -1894,7 +1894,7 @@ public class Parser {
     // the peeked token was not a name.  Side effect:  sets scanner token
     // information for the label identifier (tokenBeg, tokenEnd, etc.)
 
-    private AstNode forLoopInit(int tt) throws IOException {
+    private AstNode forLoopInit(int tt, boolean noAssignment) throws IOException {
         try {
             inForInit = true;  // checked by variables() and relExpr()
             AstNode init;
@@ -1902,7 +1902,7 @@ public class Parser {
                 init = new EmptyExpression(ts.tokenBeg, 1);
                 init.setLineno(ts.lineno);
             } else if (tt == Token.VAR || tt == Token.LET) {
-                if (inUseStrictDirective) {
+                if (noAssignment && inUseStrictDirective) {
                     reportError("msg.for.in.assignment.in.strict.mode");
                 }
                 consumeToken();
