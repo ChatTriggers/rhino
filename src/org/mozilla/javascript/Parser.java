@@ -75,6 +75,7 @@ public class Parser {
     private Comment currentJsDocComment;
     private LabeledStatement currentLabel;
     private boolean inDestructuringAssignment;
+    private boolean assumeDestructuring;
     private int endFlags;
     // end of per function variables
     private boolean inForInit;  // bound temporarily during forStatement()
@@ -3783,6 +3784,16 @@ public class Parser {
         }
 
         mustMatchToken(Token.RC, "msg.no.brace.prop");
+
+        if (assumeDestructuring) {
+            if (peekToken() != Token.ASSIGN) {
+                reportError("msg.unexpected.object.init");
+            }
+
+            assumeDestructuring = false;
+            inDestructuringAssignment = false;
+        }
+
         ObjectLiteral pn = new ObjectLiteral(pos, ts.tokenEnd - pos);
         if (objJsdocNode != null) {
             pn.setJsDocNode(objJsdocNode);
@@ -3865,15 +3876,18 @@ public class Parser {
                 && compilerEnv.getLanguageVersion() >= Context.VERSION_1_8) {
             if (!inDestructuringAssignment) {
                 if (tt == Token.ASSIGN) {
-                    reportError("msg.unexpected.object.init");
+                    assumeDestructuring = true;
+                    inDestructuringAssignment = true;
+
+//                    reportError("msg.unexpected.object.init");
                 } else if (property.getProp(Node.COMPUTED_PROP) != null) {
                     reportError("msg.bad.object.init");
+                } else {
+                    AstNode nn = new Name(property.getPosition(), property.getString());
+                    ObjectProperty pn = new ObjectProperty();
+                    pn.setLeftAndRight(property, nn);
+                    return pn;
                 }
-
-                AstNode nn = new Name(property.getPosition(), property.getString());
-                ObjectProperty pn = new ObjectProperty();
-                pn.setLeftAndRight(property, nn);
-                return pn;
             }
             AstNode nn = new Name(property.getPosition(), property.getString());
             ObjectProperty pn = new ObjectProperty();
