@@ -2739,8 +2739,8 @@ class BodyCodegen {
                 cfw.addALoad(variableObjectLocal);
                 cfw.addPush(node.getString());
                 addScriptRuntimeInvoke("name", OBJECT, CONTEXT, SCRIPTABLE, STRING);
+                break;
             }
-            break;
 
             case Token.CALL:
             case Token.NEW: {
@@ -2935,34 +2935,6 @@ class BodyCodegen {
                 visitObjectLiteral(node, child, false);
                 break;
 
-            case Token.NOT: {
-                int trueTarget = cfw.acquireLabel();
-                int falseTarget = cfw.acquireLabel();
-                int beyond = cfw.acquireLabel();
-                generateIfJump(child, node, trueTarget, falseTarget);
-
-                cfw.markLabel(trueTarget);
-                cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean",
-                        "FALSE", "Ljava/lang/Boolean;");
-                cfw.add(ByteCode.GOTO, beyond);
-                cfw.markLabel(falseTarget);
-                cfw.add(ByteCode.GETSTATIC, "java/lang/Boolean",
-                        "TRUE", "Ljava/lang/Boolean;");
-                cfw.markLabel(beyond);
-                cfw.adjustStackTop(-1);
-                break;
-            }
-
-            case Token.BITNOT: {
-                generateExpression(child, node);
-                addScriptRuntimeInvoke("toInt32", INTEGER, OBJECT);
-                cfw.addPush(-1);         // implement ~a as (a ^ -1)
-                cfw.add(ByteCode.IXOR);
-                cfw.add(ByteCode.I2D);
-                addDoubleWrap();
-                break;
-            }
-
             case Token.VOID: {
                 generateExpression(child, node);
                 cfw.add(ByteCode.POP);
@@ -3045,41 +3017,26 @@ class BodyCodegen {
             break;
 
             case Token.MUL:
-                visitArithmetic(node, ByteCode.DMUL, child, parent);
-                break;
-
             case Token.SUB:
-                visitArithmetic(node, ByteCode.DSUB, child, parent);
-                break;
-
             case Token.DIV:
             case Token.MOD:
-                visitArithmetic(node, type == Token.DIV ? ByteCode.DDIV : ByteCode.DREM, child, parent);
-                break;
-
             case Token.EXP:
-                visitExponentiation(node, child, parent);
-                break;
-
             case Token.BITOR:
             case Token.BITXOR:
             case Token.BITAND:
+            case Token.BITNOT:
             case Token.LSH:
             case Token.RSH:
             case Token.URSH:
-                visitBitOp(node, type, child);
-                break;
-
             case Token.POS:
-            case Token.NEG: {
-                generateExpression(child, node);
-                addObjectToDouble();
-                if (type == Token.NEG) {
-                    cfw.add(ByteCode.DNEG);
-                }
-                addDoubleWrap();
+            case Token.NEG:
+            case Token.NOT:
+            case Token.LE:
+            case Token.LT:
+            case Token.GE:
+            case Token.GT:
+                visitOperator(node, child, type);
                 break;
-            }
 
             case Token.TO_DOUBLE: {
                 // cnvt to double (not Double)
@@ -3106,11 +3063,7 @@ class BodyCodegen {
             }
 
             case Token.IN:
-            case Token.INSTANCEOF:
-            case Token.LE:
-            case Token.LT:
-            case Token.GE:
-            case Token.GT: {
+            case Token.INSTANCEOF: {
                 int trueGOTO = cfw.acquireLabel();
                 int falseGOTO = cfw.acquireLabel();
                 visitIfJumpRelOp(node, child, trueGOTO, falseGOTO);
@@ -5548,108 +5501,32 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
                 || (type == Token.MUL);
     }
 
-    private void visitArithmetic(Node node, int opCode, Node child, Node parent) {
-        int childNumberFlag = node.getIntProp(Node.ISNUMBER_PROP, -1);
-        if (childNumberFlag != -1) {
-            generateExpression(child, node);
-            generateExpression(child.getNext(), node);
-            cfw.add(opCode);
-        } else {
-            boolean childOfArithmetic = isArithmeticNode(parent);
-            generateExpression(child, node);
-            if (!isArithmeticNode(child))
-                addObjectToDouble();
-            generateExpression(child.getNext(), node);
-            if (!isArithmeticNode(child.getNext()))
-                addObjectToDouble();
-            cfw.add(opCode);
-            if (!childOfArithmetic) {
-                addDoubleWrap();
-            }
+    private void visitOperator(Node node, Node child, int op) {
+        boolean unary = false;
+
+        switch (op) {
+            case Token.NOT:
+            case Token.BITNOT:
+            case Token.POS:
+            case Token.NEG:
+            case Token.TYPEOF:
+                unary = true;
+                break;
         }
-    }
 
-    private void visitExponentiation(Node node, Node child, Node parent) {
-        int childNumberFlag = node.getIntProp(Node.ISNUMBER_PROP, -1);
-
-        if (childNumberFlag != -1) {
-            generateExpression(child, node);
-            generateExpression(child.getNext(), node);
-            cfw.addInvoke(
-                    ByteCode.INVOKESTATIC,
-                    "java/lang/Math",
-                    "pow",
-                    "(DD)D"
-            );
-        } else {
-            boolean childOfArithmetic = isArithmeticNode(parent);
-            generateExpression(child, node);
-            if (!isArithmeticNode(child))
-                addObjectToDouble();
-            generateExpression(child.getNext(), node);
-            if (!isArithmeticNode(child.getNext()))
-                addObjectToDouble();
-            cfw.addInvoke(
-                    ByteCode.INVOKESTATIC,
-                    "java/lang/Math",
-                    "pow",
-                    "(DD)D"
-            );
-            addDoubleWrap();
-        }
-    }
-
-    private void visitBitOp(Node node, int type, Node child) {
-        int childNumberFlag = node.getIntProp(Node.ISNUMBER_PROP, -1);
         generateExpression(child, node);
 
-        // special-case URSH; work with the target arg as a long, so
-        // that we can return a 32-bit unsigned value, and call
-        // toUint32 instead of toInt32.
-        if (type == Token.URSH) {
-            addScriptRuntimeInvoke("toUint32", LONG, OBJECT);
+        if (!unary) {
             generateExpression(child.getNext(), node);
-            addScriptRuntimeInvoke("toInt32", INTEGER, OBJECT);
-            // Looks like we need to explicitly mask the shift to 5 bits -
-            // LUSHR takes 6 bits.
-            cfw.addPush(31);
-            cfw.add(ByteCode.IAND);
-            cfw.add(ByteCode.LUSHR);
-            cfw.add(ByteCode.L2D);
-            addDoubleWrap();
-            return;
         }
-        if (childNumberFlag == -1) {
-            addScriptRuntimeInvoke("toInt32", INTEGER, OBJECT);
-            generateExpression(child.getNext(), node);
-            addScriptRuntimeInvoke("toInt32", INTEGER, OBJECT);
+
+        cfw.addPush(op);
+        cfw.addALoad(contextLocal);
+
+        if (unary) {
+            addScriptRuntimeInvoke("unaryOperator", OBJECT, OBJECT, INTEGER, CONTEXT);
         } else {
-            addScriptRuntimeInvoke("toInt32", INTEGER, DOUBLE);
-            generateExpression(child.getNext(), node);
-            addScriptRuntimeInvoke("toInt32", INTEGER, DOUBLE);
-        }
-        switch (type) {
-            case Token.BITOR:
-                cfw.add(ByteCode.IOR);
-                break;
-            case Token.BITXOR:
-                cfw.add(ByteCode.IXOR);
-                break;
-            case Token.BITAND:
-                cfw.add(ByteCode.IAND);
-                break;
-            case Token.RSH:
-                cfw.add(ByteCode.ISHR);
-                break;
-            case Token.LSH:
-                cfw.add(ByteCode.ISHL);
-                break;
-            default:
-                throw Codegen.badTree();
-        }
-        cfw.add(ByteCode.I2D);
-        if (childNumberFlag == -1) {
-            addDoubleWrap();
+            addScriptRuntimeInvoke("binaryOperator", OBJECT, OBJECT, OBJECT, INTEGER, CONTEXT);
         }
     }
 

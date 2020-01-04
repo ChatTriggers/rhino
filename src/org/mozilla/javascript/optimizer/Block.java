@@ -100,12 +100,11 @@ class Block {
             }
         }
 
-        for (int i = paramCount; i != varCount; i++) {
-            if (varTypes[i] == Optimizer.NumberType) {
-                fn.setIsNumberVar(i);
-            }
-        }
-
+        // for (int i = paramCount; i != varCount; i++) {
+        //     if (varTypes[i] == Optimizer.NumberType) {
+        //         fn.setIsNumberVar(i);
+        //     }
+        // }
     }
 
     private static Block[] buildBlocks(Node[] statementNodes) {

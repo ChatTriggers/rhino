@@ -48,10 +48,11 @@ class Optimizer {
              * Number typed vars is marked so that the codegen will
              * generate non-object code.
              */
-            parameterUsedInNumberContext = false;
-            for (Node theStatementNode : theStatementNodes) {
-                rewriteForNumberVariables(theStatementNode, NumberType);
-            }
+            parameterUsedInNumberContext = true;
+            // parameterUsedInNumberContext = false;
+            // for (Node theStatementNode : theStatementNodes) {
+            //     rewriteForNumberVariables(theStatementNode, NumberType);
+            // }
             theFunction.setParameterNumberContext(parameterUsedInNumberContext);
         }
 

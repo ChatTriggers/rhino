@@ -12,6 +12,7 @@ import org.mozilla.javascript.decorators.DecoratorType;
 import org.mozilla.javascript.generator.NativeGenerator;
 import org.mozilla.javascript.generator.NativeGeneratorIterator;
 import org.mozilla.javascript.optimizer.Codegen;
+import org.mozilla.javascript.optimizer.OptRuntime;
 import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.v8dtoa.DoubleConversion;
 import org.mozilla.javascript.v8dtoa.FastDtoa;
@@ -20,6 +21,8 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 /**
  * This is the class that implements the runtime.
@@ -2626,7 +2629,7 @@ public class ScriptRuntime {
                 enumType != ENUMERATE_VALUES_NO_ITERATOR &&
                 enumType != ENUMERATE_ARRAY_NO_ITERATOR) {
             x.iterator = toIterator(cx, x.obj.getParentScope(), x.obj,
-                    enumType == ScriptRuntime.ENUMERATE_KEYS);
+                                    enumType == ScriptRuntime.ENUMERATE_KEYS);
         }
         if (x.iterator == null) {
             // enumInit should read all initial ids before returning
@@ -3007,7 +3010,7 @@ public class ScriptRuntime {
         }
         // No runtime support for now
         String msg = getMessage1("msg.no.ref.from.function",
-                toString(function));
+                                 toString(function));
         throw constructError("ReferenceError", msg);
     }
 
@@ -3033,12 +3036,12 @@ public class ScriptRuntime {
         if (callType == Node.SPECIALCALL_EVAL) {
             if (thisObj.getParentScope() == null && NativeGlobal.isEvalFunction(fun)) {
                 return evalSpecial(cx, scope, callerThis, args,
-                        filename, lineNumber);
+                                   filename, lineNumber);
             }
         } else if (callType == Node.SPECIALCALL_WITH) {
             if (NativeWith.isWithFunction(fun)) {
                 throw Context.reportRuntimeError1("msg.only.from.new",
-                        "With");
+                                                  "With");
             }
         } else {
             throw Kit.codeBug();
@@ -3179,7 +3182,7 @@ public class ScriptRuntime {
         reporter = DefaultErrorReporter.forEval(cx.getErrorReporter());
 
         Script script = cx.compileString(x.toString(), new Codegen(),
-                reporter, sourceName, 1, null);
+                                         reporter, sourceName, 1, null);
         Callable c = (Callable) script;
         return c.call(cx, scope, (Scriptable) thisArg, ScriptRuntime.emptyArgs);
     }
@@ -3188,6 +3191,12 @@ public class ScriptRuntime {
      * The typeof operator
      */
     public static String typeof(Object value) {
+        Object opResult = applyUnaryOperator(value, "typeof", Context.getContext());
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return toString(opResult);
+        }
+
         if (value == null)
             return "object";
         if (value == Undefined.instance)
@@ -3233,22 +3242,16 @@ public class ScriptRuntime {
         return false;
     }
 
-    // neg:
-    // implement the '-' operator inline in the caller
-    // as "-toNumber(val)"
-
-    // not:
-    // implement the '!' operator inline in the caller
-    // as "!toBoolean(val)"
-
-    // bitnot:
-    // implement the '~' operator inline in the caller
-    // as "~toInt32(val)"
-
     public static Object add(Object val1, Object val2, Context cx) {
+        Object opResult = applyOperator(val1, val2, "+", cx);
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return opResult;
+        }
+
         if (val1 instanceof Number && val2 instanceof Number) {
             return wrapNumber(((Number) val1).doubleValue() +
-                    ((Number) val2).doubleValue());
+                                      ((Number) val2).doubleValue());
         }
         if ((val1 instanceof Symbol) || (val2 instanceof Symbol)) {
             throw typeError0("msg.not.a.number");
@@ -3274,19 +3277,125 @@ public class ScriptRuntime {
         return new ConsString(toCharSequence(val1), val2);
     }
 
+    public static Object binaryOperator(Object val1, Object val2, int op, Context cx) {
+        switch (op) {
+            case Token.SUB:
+                return doArithmetic(val1, val2, "-", () -> OptRuntime.wrapDouble(toNumber(val1) - toNumber(val2)), cx);
+            case Token.MUL:
+                return doArithmetic(val1, val2, "*", () -> OptRuntime.wrapDouble(toNumber(val1) * toNumber(val2)), cx);
+            case Token.DIV:
+                return doArithmetic(val1, val2, "/", () -> OptRuntime.wrapDouble(toNumber(val1) / toNumber(val2)), cx);
+            case Token.MOD:
+                return doArithmetic(val1, val2, "%", () -> OptRuntime.wrapDouble(toNumber(val1) % toNumber(val2)), cx);
+            case Token.EXP:
+                return doArithmetic(val1, val2, "**", () -> OptRuntime.wrapDouble(Math.pow(toNumber(val1), toNumber(val2))), cx);
+            case Token.LSH:
+                return doArithmetic(val1, val2, "<<", () -> OptRuntime.wrapDouble(toInt32(val1) << toInt32(val2)), cx);
+            case Token.RSH:
+                return doArithmetic(val1, val2, ">>", () -> OptRuntime.wrapDouble(toInt32(val1) >> toInt32(val2)), cx);
+            case Token.URSH:
+                return doArithmetic(val1, val2, ">>>", () -> OptRuntime.wrapDouble(toInt32(val1) >>> toInt32(val2)), cx);
+            case Token.BITAND:
+                return doArithmetic(val1, val2, "&", () -> OptRuntime.wrapDouble(toInt32(val1) & toInt32(val2)), cx);
+            case Token.BITOR:
+                return doArithmetic(val1, val2, "|", () -> OptRuntime.wrapDouble(toInt32(val1) | toInt32(val2)), cx);
+            case Token.BITXOR:
+                return doArithmetic(val1, val2, "^", () -> OptRuntime.wrapDouble((toInt32(val1) ^ toInt32(val2))), cx);
+            case Token.LT:
+                return doArithmetic(val1, val2, "<", () -> cmp_LT(val1, val2), cx);
+            case Token.LE:
+                return doArithmetic(val1, val2, "<=", () -> cmp_LE(val1, val2), cx);
+            case Token.GT:
+                return doArithmetic(val1, val2, ">", () -> !cmp_LE(val1, val2), cx);
+            case Token.GE:
+                return doArithmetic(val1, val2, ">=", () -> !cmp_LT(val1, val2), cx);
+            default:
+                throw Kit.codeBug("Unexpected binary operator token: " + op);
+        }
+    }
+
+    public static Object unaryOperator(Object val, int op, Context cx) {
+        switch (op) {
+            case Token.BITNOT:
+                return doArithmetic(val, "~", () -> OptRuntime.wrapDouble(~toInt32(val)), cx);
+            case Token.POS:
+                return doArithmetic(val, "+", () -> OptRuntime.wrapDouble(toNumber(val)), cx);
+            case Token.NEG:
+                return doArithmetic(val, "-", () -> OptRuntime.wrapDouble(-toNumber(val)), cx);
+            case Token.NOT:
+                return doArithmetic(val, "!", () -> !toBoolean(val), cx);
+            default:
+                throw Kit.codeBug("Unexpected unary operator token: " + op);
+        }
+    }
+
+    private static Object doArithmetic(Object val1, Object val2, String op, Supplier<Object> fn, Context cx) {
+        Object opResult = applyOperator(val1, val2, op, cx);
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return opResult;
+        }
+
+        return fn.get();
+    }
+
+    private static Object doArithmetic(Object val, String op, Supplier<Object> fn, Context cx) {
+        Object opResult = applyUnaryOperator(val, op, cx);
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return opResult;
+        }
+
+        return fn.get();
+    }
+
+    private static Object applyOperator(Object lho, Object rho, String operator, Context cx) {
+        if (cx.getLanguageVersion() >= Context.VERSION_ES6) {
+            NativeSymbol sym = NativeSymbol.operator(cx, operator);
+
+            if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
+                Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
+
+                if (!(fn instanceof Callable)) {
+                    throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
+                }
+
+                return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[]{ rho });
+            }
+        }
+
+        return UniqueTag.NOT_FOUND;
+    }
+
+    private static Object applyUnaryOperator(Object lho, String operator, Context cx) {
+        if (cx.getLanguageVersion() >= Context.VERSION_ES6) {
+            NativeSymbol sym = NativeSymbol.unaryOperator(cx, operator);
+
+            if (lho instanceof Scriptable && ScriptableObject.hasProperty((Scriptable) lho, sym)) {
+                Object fn = ScriptableObject.getProperty((Scriptable) lho, sym);
+
+                if (!(fn instanceof Callable)) {
+                    throw ScriptRuntime.typeError2("msg.invalid.operator", operator, toString(lho));
+                }
+
+                return ((Callable) fn).call(cx, cx.topCallScope, (Scriptable) lho, new Object[0]);
+            }
+        }
+
+        return UniqueTag.NOT_FOUND;
+    }
+
     /**
      * The method is only present for compatibility.
      *
      * @deprecated Use {@link #nameIncrDecr(Scriptable, String, Context, int)} instead
      */
     @Deprecated
-    public static Object nameIncrDecr(Scriptable scopeChain, String id,
-                                      int incrDecrMask) {
+    public static Object nameIncrDecr(Scriptable scopeChain, String id, int incrDecrMask) {
         return nameIncrDecr(scopeChain, id, Context.getContext(), incrDecrMask);
     }
 
-    public static Object nameIncrDecr(Scriptable scopeChain, String id,
-                                      Context cx, int incrDecrMask) {
+    public static Object nameIncrDecr(Scriptable scopeChain, String id, Context cx, int incrDecrMask) {
         Scriptable target;
         Object value;
         search:
@@ -3307,8 +3416,7 @@ public class ScriptRuntime {
             } while (scopeChain != null);
             throw notFoundError(scopeChain, id);
         }
-        return doScriptableIncrDecr(target, id, scopeChain, value,
-                incrDecrMask);
+        return doScriptableIncrDecr(target, id, scopeChain, value, incrDecrMask);
     }
 
     /**
@@ -3340,14 +3448,16 @@ public class ScriptRuntime {
             return NaNobj;
         }
         return doScriptableIncrDecr(target, id, start, value,
-                incrDecrMask);
+                                    incrDecrMask);
     }
 
-    private static Object doScriptableIncrDecr(Scriptable target,
-                                               String id,
-                                               Scriptable protoChainStart,
-                                               Object value,
-                                               int incrDecrMask) {
+    private static Object doScriptableIncrDecr(Scriptable target, String id, Scriptable protoChainStart, Object value, int incrDecrMask) {
+        Object opResult = applyUnaryOperator(value, (incrDecrMask & Node.DECR_FLAG) == 0 ? "++" : "--", Context.getContext());
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return opResult;
+        }
+
         boolean post = ((incrDecrMask & Node.POST_FLAG) != 0);
         double number;
         if (value instanceof Number) {
@@ -3463,6 +3573,12 @@ public class ScriptRuntime {
      * ==
      */
     public static boolean eq(Object x, Object y) {
+        Object opResult = applyOperator(x, y, "==", Context.getContext());
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return toBoolean(opResult);
+        }
+
         if (x == null || x == Undefined.instance) {
             if (y == null || y == Undefined.instance) {
                 return true;
@@ -3772,6 +3888,12 @@ public class ScriptRuntime {
             throw typeError0("msg.in.not.object");
         }
 
+        Object opResult = applyOperator(b, a, "in", cx);
+
+        if (opResult != UniqueTag.NOT_FOUND) {
+            return toBoolean(opResult);
+        }
+
         return hasObjectElem((Scriptable) b, a, cx);
     }
 
@@ -3946,7 +4068,7 @@ public class ScriptRuntime {
                         ScriptableObject.defineConstProperty(varScope, name);
                     } else if (!evalScript) {
                         if (!(funObj instanceof InterpretedFunction)
-                            || ((InterpretedFunction) funObj).hasFunctionNamed(name)) {
+                                || ((InterpretedFunction) funObj).hasFunctionNamed(name)) {
                             // Global var definitions are supposed to be DONTDELETE
                             ScriptableObject.defineProperty(varScope, name, Undefined.instance, ScriptableObject.NOT_CONFIGURABLE);
                         }
@@ -4089,7 +4211,7 @@ public class ScriptRuntime {
 
             if (javaException != null && isVisible(cx, javaException)) {
                 Object wrap = cx.getWrapFactory().wrap(cx, scope, javaException,
-                        null);
+                                                       null);
                 ScriptableObject.defineProperty(
                         errorObject, "javaException", wrap,
                         ScriptableObject.NOT_CONFIGURABLE | ScriptableObject.NOT_WRITABLE | ScriptableObject.NOT_ENUMERABLE);
@@ -4182,7 +4304,7 @@ public class ScriptRuntime {
 
         if (javaException != null && isVisible(cx, javaException)) {
             Object wrap = cx.getWrapFactory().wrap(cx, scope, javaException,
-                    null);
+                                                   null);
             ScriptableObject.defineProperty(
                     errorObject, "javaException", wrap,
                     ScriptableObject.NOT_CONFIGURABLE | ScriptableObject.NOT_WRITABLE | ScriptableObject.NOT_ENUMERABLE);
@@ -4527,7 +4649,7 @@ public class ScriptRuntime {
                                            String lineSource,
                                            int columnNumber) {
         return new EcmaError(error, message, sourceName,
-                lineNumber, lineSource, columnNumber);
+                             lineNumber, lineSource, columnNumber);
     }
 
     public static EcmaError rangeError(String message) {
@@ -4575,7 +4697,7 @@ public class ScriptRuntime {
                                                    Object id,
                                                    Object value) {
         return typeError3("msg.undef.prop.write", toString(object), toString(id),
-                toString(value));
+                          toString(value));
     }
 
     private static RuntimeException undefDeleteError(Object object, Object id) {
@@ -4618,10 +4740,10 @@ public class ScriptRuntime {
         }
         if (value == Scriptable.NOT_FOUND) {
             return typeError2("msg.function.not.found.in", propertyName,
-                    objString);
+                              objString);
         }
         return typeError3("msg.isnt.function.in", propertyName, objString,
-                typeof(value));
+                          typeof(value));
     }
 
     private static RuntimeException notXmlError(Object value) {
@@ -4770,7 +4892,7 @@ public class ScriptRuntime {
         int[] linep = {0};
         String filename = Context.getSourcePositionFromStack(linep);
         final Scriptable error = newBuiltinObject(cx, scope,
-                TopLevel.Builtins.Error, new Object[]{message, filename, Integer.valueOf(linep[0])});
+                                                  TopLevel.Builtins.Error, new Object[]{message, filename, Integer.valueOf(linep[0])});
         return new JavaScriptException(error, filename, linep[0]);
     }
 
@@ -4788,7 +4910,7 @@ public class ScriptRuntime {
         int[] linep = {0};
         String filename = Context.getSourcePositionFromStack(linep);
         final Scriptable error = cx.newObject(scope, constructorName,
-                new Object[]{message, filename, Integer.valueOf(linep[0])});
+                                              new Object[]{message, filename, Integer.valueOf(linep[0])});
         return new JavaScriptException(error, filename, linep[0]);
     }
 
