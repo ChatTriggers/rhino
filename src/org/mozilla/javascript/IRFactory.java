@@ -626,9 +626,21 @@ public final class IRFactory extends Parser {
             node.addChildToBack(cm);
         }
 
+        ScriptNode currentScriptTemp = null;
+
         for (ClassField cp : node.getFields()) {
+            if (!cp.isStatic()) {
+                currentScriptTemp = currentScriptOrFn;
+                currentScriptOrFn = fn;
+            }
+
             cp.setNameKey(getPropKey(cp.getName()));
             cp.addChildToBack(transform(cp.getDefaultValue()));
+
+            if (!cp.isStatic()) {
+                currentScriptOrFn = currentScriptTemp;
+                currentScriptTemp = null;
+            }
 
             decorators = new ArrayList<>();
 
