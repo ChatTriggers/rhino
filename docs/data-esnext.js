@@ -2171,102 +2171,16 @@ exports.tests = [
       }
     },
     {
-      name: 'partial application from left with rest',
-      exec: function(){/*
-        function f(a, b, c) {
-          return a + b + c;
-        };
-        var p = f('a', ...);
-        return p('b', 'c') === 'abc';
-      */},
-      res : {
-        ie11: false,
-        firefox10: false,
-        firefox52: false,
-        chrome77: false,
-        graalvm: false,
-      }
-    },
-    {
-      name: 'partial application from right with rest',
-      exec: function(){/*
-        function f(a, b, c) {
-          return a + b + c;
-        };
-        var p = f(..., 'c');
-        return p('a', 'b') === 'abc';
-      */},
-      res : {
-        ie11: false,
-        firefox10: false,
-        firefox52: false,
-        chrome77: false,
-        graalvm: false,
-      }
-    },
-    {
-      name: 'partial application for any arg with rest',
-      exec: function(){/*
-        function f(a, b, c, d, e) {
-          return a + b + c + d + e;
-        };
-        var p = f(..., 'c', ...);
-        return p('a', 'b') === 'abcab';
-      */},
-      res : {
-        ie11: false,
-        firefox10: false,
-        firefox52: false,
-        chrome77: false,
-        graalvm: false,
-      }
-    },
-    {
-      name: 'mixed partial application',
-      exec: function(){/*
-        function f(a, b, c, d) {
-          return a + b + c;
-        };
-        var p = f(?, 'b', ...);
-        return p('a', 'c', 'd') === 'abcd';
-      */},
-      res : {
-        ie11: false,
-        firefox10: false,
-        firefox52: false,
-        chrome77: false,
-        graalvm: false,
-      }
-    },
-    {
       name: 'runtime evaluation',
       exec: function(){/*
-        var f = function() {
-          throw new Error();
-        };
-        var p = f(?, 'b');
         f = function(a, b) {
           return a + b;
         };
+        var p = f(?, 'b');
+        var f = function() {
+          throw new Error();
+        };
         return p('a') === 'ab';
-      */},
-      res : {
-        ie11: false,
-        firefox10: false,
-        firefox52: false,
-        chrome77: false,
-        graalvm: false,
-      }
-    },
-    {
-      name: 'runtime evaluation of property access',
-      exec: function(){/*
-        var o = {};
-        var p = o.f(?, 'b');
-        o = { x: 'c', f: function(a, b) {
-          return a + b + this.x;
-        } };
-        return p('a') === 'abc';
       */},
       res : {
         ie11: false,
@@ -2284,39 +2198,6 @@ exports.tests = [
         }
         var o = { f: f(?, 'b') };
         return o.f('a') === 'abfalse';
-      */},
-      res : {
-        ie11: false,
-        firefox10: false,
-        firefox52: false,
-        chrome77: false,
-        graalvm: false,
-      }
-    },
-    {
-      name: 'constructor partial application',
-      exec: function(){/*
-        function F(a, b) {
-          this.x = a + b;
-        }
-        var p = new F(?, 'b');
-        return p('a').x === 'ab';
-      */},
-      res : {
-        ie11: false,
-        firefox10: false,
-        firefox52: false,
-        graalvm: false,
-      }
-    },
-    {
-      name: 'constructor partial application with rest',
-      exec: function(){/*
-        function F(a, b, c) {
-          this.x = a + b + c;
-        }
-        var p = new F('a', ...);
-        return p('b', 'c').x === 'abc';
       */},
       res : {
         ie11: false,

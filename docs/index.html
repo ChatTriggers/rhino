@@ -14860,7 +14860,7 @@ return this === undefined &amp;&amp; ({ a:1, a:1 }).a === 1;</div>}
           <td class="result"><div class="Error unflagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div><div class="Error flagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div><div class="Error flagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div><div class="Error flagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div><div class="Error flagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -14922,7 +14922,7 @@ try {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -17980,7 +17980,7 @@ return tag`\01\1\xg\xAg\u0\u0g\u00g\u000g\u{g\u{0\u{110000}${0}\0`;</div>}
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">41% complete</sub><sub class="unflagged">24% complete</sub>
+                </div><sub class="flagged">45% complete</sub><sub class="unflagged">27% complete</sub>
               </th>
             </tr>
           </table>
@@ -20951,7 +20951,7 @@ return p('b') === 'ab';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -20972,7 +20972,7 @@ return p('a') === 'ab';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -20993,103 +20993,19 @@ return p('a', 'c') === 'abc';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-        </tr>
-        <tr>
-          <td class="feature subsub">
-            <div class="hash" id="ESNEXT-proposal--stage-1--partial-application-syntax-partial-application-from-left-with-rest"></div><a href="#ESNEXT-proposal--stage-1--partial-application-syntax-partial-application-from-left-with-rest">partial application from left with rest</a>
-            <div class="info">?
-              <div class="fn">function(){
-                <div class="code">function f(a, b, c) {
-  return a + b + c;
-};
-var p = f('a', ...);
-return p('b', 'c') === 'abc';</div>}
-              </div>
-            </div>
-          </td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="a is not iterable">Error</div><div class="Error flagged " title="a is not iterable">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-        </tr>
-        <tr>
-          <td class="feature subsub">
-            <div class="hash" id="ESNEXT-proposal--stage-1--partial-application-syntax-partial-application-from-right-with-rest"></div><a href="#ESNEXT-proposal--stage-1--partial-application-syntax-partial-application-from-right-with-rest">partial application from right with rest</a>
-            <div class="info">?
-              <div class="fn">function(){
-                <div class="code">function f(a, b, c) {
-  return a + b + c;
-};
-var p = f(..., 'c');
-return p('a', 'b') === 'abc';</div>}
-              </div>
-            </div>
-          </td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="f is not iterable">Error</div><div class="Error flagged " title="f is not iterable">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-        </tr>
-        <tr>
-          <td class="feature subsub">
-            <div class="hash" id="ESNEXT-proposal--stage-1--partial-application-syntax-partial-application-for-any-arg-with-rest"></div><a href="#ESNEXT-proposal--stage-1--partial-application-syntax-partial-application-for-any-arg-with-rest">partial application for any arg with rest</a>
-            <div class="info">?
-              <div class="fn">function(){
-                <div class="code">function f(a, b, c, d, e) {
-  return a + b + c + d + e;
-};
-var p = f(..., 'c', ...);
-return p('a', 'b') === 'abcab';</div>}
-              </div>
-            </div>
-          </td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="f is not iterable">Error</div><div class="Error flagged " title="f is not iterable">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-        </tr>
-        <tr>
-          <td class="feature subsub">
-            <div class="hash" id="ESNEXT-proposal--stage-1--partial-application-syntax-mixed-partial-application"></div><a href="#ESNEXT-proposal--stage-1--partial-application-syntax-mixed-partial-application">mixed partial application</a>
-            <div class="info">?
-              <div class="fn">function(){
-                <div class="code">function f(a, b, c, d) {
-  return a + b + c;
-};
-var p = f(?, 'b', ...);
-return p('a', 'c', 'd') === 'abcd';</div>}
-              </div>
-            </div>
-          </td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
             <div class="hash" id="ESNEXT-proposal--stage-1--partial-application-syntax-runtime-evaluation"></div><a href="#ESNEXT-proposal--stage-1--partial-application-syntax-runtime-evaluation">runtime evaluation</a>
             <div class="info">?
               <div class="fn">function(){
-                <div class="code">var f = function() {
-  throw new Error();
+                <div class="code">f = function(a, b) {
+  return a + b;
 };
 var p = f(?, 'b');
-f = function(a, b) {
-  return a + b;
+var f = function() {
+  throw new Error();
 };
 return p('a') === 'ab';</div>}
               </div>
@@ -21101,29 +21017,7 @@ return p('a') === 'ab';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-        </tr>
-        <tr>
-          <td class="feature subsub">
-            <div class="hash" id="ESNEXT-proposal--stage-1--partial-application-syntax-runtime-evaluation-of-property-access"></div><a href="#ESNEXT-proposal--stage-1--partial-application-syntax-runtime-evaluation-of-property-access">runtime evaluation of property access</a>
-            <div class="info">?
-              <div class="fn">function(){
-                <div class="code">var o = {};
-var p = o.f(?, 'b');
-o = { x: 'c', f: function(a, b) {
-  return a + b + this.x;
-} };
-return p('a') === 'abc';</div>}
-              </div>
-            </div>
-          </td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature subsub">
@@ -21144,49 +21038,7 @@ return o.f('a') === 'abfalse';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-        </tr>
-        <tr>
-          <td class="feature subsub">
-            <div class="hash" id="ESNEXT-proposal--stage-1--partial-application-syntax-constructor-partial-application"></div><a href="#ESNEXT-proposal--stage-1--partial-application-syntax-constructor-partial-application">constructor partial application</a>
-            <div class="info">?
-              <div class="fn">function(){
-                <div class="code">function F(a, b) {
-  this.x = a + b;
-}
-var p = new F(?, 'b');
-return p('a').x === 'ab';</div>}
-              </div>
-            </div>
-          </td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-        </tr>
-        <tr>
-          <td class="feature subsub">
-            <div class="hash" id="ESNEXT-proposal--stage-1--partial-application-syntax-constructor-partial-application-with-rest"></div><a href="#ESNEXT-proposal--stage-1--partial-application-syntax-constructor-partial-application-with-rest">constructor partial application with rest</a>
-            <div class="info">?
-              <div class="fn">function(){
-                <div class="code">function F(a, b, c) {
-  this.x = a + b + c;
-}
-var p = new F('a', ...);
-return p('b', 'c').x === 'abc';</div>}
-              </div>
-            </div>
-          </td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="a is not iterable">Error</div><div class="Error flagged " title="a is not iterable">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="8">
