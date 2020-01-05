@@ -2519,8 +2519,7 @@ public class ScriptRuntime {
         throw constructError("ReferenceError", msg);
     }
 
-    public static Object setConst(Scriptable bound, Object value,
-                                  Context cx, String id) {
+    public static Object setConst(Scriptable bound, Object value, Context cx, String id) {
         ScriptableObject.putConstProperty(bound, id, value);
         return value;
     }
