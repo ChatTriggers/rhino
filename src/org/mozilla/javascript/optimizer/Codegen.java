@@ -1926,10 +1926,14 @@ class BodyCodegen {
                                     generateExpression(defaultParams.get(i), fnCurrent.fnode);
                                     cfw.markLabel(label);
                                 } else {
+                                    cfw.add(ByteCode.DUP);
+                                    int label = cfw.acquireLabel();
+                                    cfw.addInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/Undefined", "isUndefined", "(Ljava/lang/Object;)Z");
+                                    cfw.add(ByteCode.IFEQ, label);
+                                    cfw.add(ByteCode.POP);
                                     generateExpression(defaultParams.get(i), fnCurrent.fnode);
-                                    addScriptRuntimeInvoke("mixDefaultArgument", OBJECT, OBJECT, OBJECT);
+                                    cfw.markLabel(label);
                                 }
-
                             }
                         }
 
