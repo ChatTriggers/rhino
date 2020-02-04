@@ -157,27 +157,20 @@ public class Parser {
             errorCollector.warning(message, sourceURI, position, length);
         } else {
             errorReporter.warning(message, sourceURI, ts.getLineno(),
-                    ts.getLine(), ts.getOffset());
+                                  ts.getLine(), ts.getOffset()
+            );
         }
     }
 
     void addError(String messageId) {
-        addError(messageId, ts.tokenBeg, ts.tokenEnd - ts.tokenBeg);
-    }
-
-    void addError(String messageId, int position, int length) {
-        addError(messageId, null, position, length);
-    }
-
-    void addError(String messageId, String messageArg) {
-        addError(messageId, messageArg, ts.tokenBeg,
-                ts.tokenEnd - ts.tokenBeg);
+        addError(messageId, null, ts.tokenBeg, ts.tokenEnd - ts.tokenBeg);
     }
 
     void addError(String messageId, int c) {
         String messageArg = Character.toString((char) c);
         addError(messageId, messageArg, ts.tokenBeg,
-                ts.tokenEnd - ts.tokenBeg);
+                 ts.tokenEnd - ts.tokenBeg
+        );
     }
 
     void addError(String messageId, String messageArg, int position, int length) {
@@ -235,9 +228,10 @@ public class Parser {
     }
 
     String lookupMessage(String messageId, String messageArg) {
-        return messageArg == null
-                ? ScriptRuntime.getMessage0(messageId)
-                : ScriptRuntime.getMessage1(messageId, messageArg);
+        return messageArg == null ? ScriptRuntime.getMessage0(messageId) : ScriptRuntime.getMessage1(
+                messageId,
+                messageArg
+        );
     }
 
     void reportError(String messageId) {
@@ -246,24 +240,14 @@ public class Parser {
 
     void reportError(String messageId, String messageArg) {
         if (ts == null) {  // happens in some regression tests
-            reportError(messageId, messageArg, 1, 1);
+            addError(messageId, messageArg, 1, 1);
         } else {
-            reportError(messageId, messageArg, ts.tokenBeg,
-                    ts.tokenEnd - ts.tokenBeg);
+            addError(messageId, messageArg, ts.tokenBeg, ts.tokenEnd - ts.tokenBeg);
         }
     }
 
     void reportError(String messageId, int position, int length) {
-        reportError(messageId, null, position, length);
-    }
-
-    void reportError(String messageId, String messageArg, int position,
-                     int length) {
-        addError(messageId, messageArg, position, length);
-
-        if (!compilerEnv.recoverFromErrors()) {
-            throw new ParserException();
-        }
+        addError(messageId, null, position, length);
     }
 
     // Computes the absolute end offset of node N.
@@ -275,18 +259,12 @@ public class Parser {
 
     private void recordComment(int lineno, String comment) {
         if (scannedComments == null) {
-            scannedComments = new ArrayList<Comment>();
+            scannedComments = new ArrayList<>();
         }
-        Comment commentNode = new Comment(ts.tokenBeg,
-                ts.getTokenLength(),
-                ts.commentType,
-                comment);
+        Comment commentNode = new Comment(ts.tokenBeg, ts.getTokenLength(), ts.commentType, comment);
         if (ts.commentType == Token.CommentType.JSDOC &&
                 compilerEnv.isRecordingLocalJsDocComments()) {
-            currentJsDocComment = new Comment(ts.tokenBeg,
-                    ts.getTokenLength(),
-                    ts.commentType,
-                    comment);
+            currentJsDocComment = new Comment(ts.tokenBeg, ts.getTokenLength(), ts.commentType, comment);
             currentJsDocComment.setLineno(lineno);
         }
         commentNode.setLineno(lineno);
@@ -553,8 +531,8 @@ public class Parser {
                     consumeToken();
                     try {
                         n = function(calledByCompileFunction
-                                ? FunctionNode.FUNCTION_EXPRESSION
-                                : FunctionNode.FUNCTION_STATEMENT);
+                                             ? FunctionNode.FUNCTION_EXPRESSION
+                                             : FunctionNode.FUNCTION_STATEMENT);
                     } catch (ParserException e) {
                         break;
                     }
@@ -581,7 +559,8 @@ public class Parser {
             String msg = lookupMessage("msg.too.deep.parser.recursion");
             if (!compilerEnv.isIdeMode())
                 throw Context.reportRuntimeError(msg, sourceURI,
-                        ts.lineno, null, 0);
+                                                 ts.lineno, null, 0
+                );
         } finally {
             inUseStrictDirective = savedStrictMode;
         }
@@ -591,7 +570,8 @@ public class Parser {
             msg = lookupMessage("msg.got.syntax.errors", msg);
             if (!compilerEnv.isIdeMode())
                 throw errorReporter.runtimeError(msg, sourceURI, baseLineno,
-                        null, 0);
+                                                 null, 0
+                );
         }
 
         // add comments to root in lexical order
@@ -636,7 +616,11 @@ public class Parser {
         try {
             if (isExpressionClosure) {
                 AstNode returnValue = assignExpr();
-                ReturnStatement n = new ReturnStatement(returnValue.getPosition(), returnValue.getLength(), returnValue);
+                ReturnStatement n = new ReturnStatement(
+                        returnValue.getPosition(),
+                        returnValue.getLength(),
+                        returnValue
+                );
                 // expression closure flag is required on both nodes
                 n.putProp(Node.EXPRESSION_CLOSURE_PROP, Boolean.TRUE);
                 pn.putProp(Node.EXPRESSION_CLOSURE_PROP, Boolean.TRUE);
@@ -733,7 +717,7 @@ public class Parser {
 
         while (true) {
             // Eat all useless semicolons and line breaks
-            while (matchToken(Token.SEMI) || matchToken(Token.EOL));
+            while (matchToken(Token.SEMI) || matchToken(Token.EOL)) ;
 
             String propertyName = null;
             int entryKind = PROP_ENTRY;
@@ -1083,7 +1067,8 @@ public class Parser {
                 // Add assignment helper for each destructuring parameter
                 for (Map.Entry<String, Node> param : destructuring.entrySet()) {
                     Node assign = createDestructuringAssignment(Token.VAR,
-                            param.getValue(), createName(param.getKey()));
+                                                                param.getValue(), createName(param.getKey())
+                    );
                     destructuringNode.addChildToBack(assign);
 
                 }
@@ -1130,7 +1115,7 @@ public class Parser {
                     reportError("msg.bad.id.strict", paramName);
                 }
                 if (paramNames.contains(paramName))
-                    addError("msg.dup.param.strict", paramName);
+                    reportError("msg.dup.param.strict", paramName);
                 paramNames.add(paramName);
             }
         } else {
@@ -1174,8 +1159,9 @@ public class Parser {
         // warning if the condition is parenthesized, like "if ((a = 7)) ...".
         if (data.condition instanceof Assignment) {
             addStrictWarning("msg.equal.as.assign", "",
-                    data.condition.getPosition(),
-                    data.condition.getLength());
+                             data.condition.getPosition(),
+                             data.condition.getLength()
+            );
         }
         return data;
     }
@@ -1189,9 +1175,10 @@ public class Parser {
                     int beg = pn.getPosition();
                     beg = Math.max(beg, lineBeginningFor(beg));
                     addStrictWarning(pn instanceof EmptyStatement
-                                    ? "msg.extra.trailing.semi"
-                                    : "msg.no.side.effects",
-                            "", beg, nodeEnd(pn) - beg);
+                                             ? "msg.extra.trailing.semi"
+                                             : "msg.no.side.effects",
+                                     "", beg, nodeEnd(pn) - beg
+                    );
                 }
                 int ntt = peekToken();
                 if (ntt == Token.COMMENT && pn.getLineno() == scannedComments.get(scannedComments.size() - 1).getLineno()) {
@@ -1296,7 +1283,8 @@ public class Parser {
             case Token.DEBUGGER:
                 consumeToken();
                 pn = new KeywordLiteral(ts.tokenBeg,
-                        ts.tokenEnd - ts.tokenBeg, tt);
+                                        ts.tokenEnd - ts.tokenBeg, tt
+                );
                 pn.setLineno(ts.lineno);
                 break;
 
@@ -1404,7 +1392,7 @@ public class Parser {
                 if (defaultComma != hasNamedImports) {
                     reportError(defaultComma ? "msg.import.unexpected.comma" : "msg.import.missing.comma");
                 }
-            } else  {
+            } else {
                 mustMatchToken(Token.LC, "msg.import.unexpected.token");
                 hasNamedImports = true;
             }
@@ -1470,9 +1458,9 @@ public class Parser {
     private void validateDefaultExport(AstNode node) {
         if (!(
                 node instanceof FunctionNode ||
-                node instanceof ClassNode ||
-                node instanceof ConditionalExpression ||
-                node instanceof Assignment
+                        node instanceof ClassNode ||
+                        node instanceof ConditionalExpression ||
+                        node instanceof Assignment
         )) {
             reportError("msg.export.invalid.default.export");
         }
@@ -1481,15 +1469,15 @@ public class Parser {
     private void validateExport(AstNode node) {
         if (!(
                 node instanceof VariableDeclaration ||
-                node instanceof FunctionNode ||
-                node instanceof ClassNode
+                        node instanceof FunctionNode ||
+                        node instanceof ClassNode
         )) {
             reportError("msg.export.invalid.export");
         }
 
         if (
-            node instanceof FunctionNode && ((FunctionNode) node).getFunctionName() == null ||
-            node instanceof ClassNode && ((ClassNode) node).getClassName() == null
+                node instanceof FunctionNode && ((FunctionNode) node).getFunctionName() == null ||
+                        node instanceof ClassNode && ((ClassNode) node).getClassName() == null
         ) {
             reportError("msg.export.no.identifier");
         }
@@ -2187,7 +2175,8 @@ public class Parser {
 
             // see if we need a strict mode warning
             if (nowAllSet(before, endFlags,
-                    Node.END_RETURNS | Node.END_RETURNS_VALUE))
+                          Node.END_RETURNS | Node.END_RETURNS_VALUE
+            ))
                 addStrictWarning("msg.return.inconsistent", "", pos, end - pos);
         } else {
             if (!insideFunction())
@@ -2254,7 +2243,7 @@ public class Parser {
         }
 
         mustMatchToken(Token.RC, "msg.decorator.declaration.missing.rc");
-        
+
         return dn;
     }
 
@@ -2304,11 +2293,9 @@ public class Parser {
             if (ls != null) {
                 if (compilerEnv.isIdeMode()) {
                     Label dup = ls.getLabelByName(name);
-                    reportError("msg.dup.label",
-                            dup.getAbsolutePosition(), dup.getLength());
+                    reportError("msg.dup.label", dup.getAbsolutePosition(), dup.getLength());
                 }
-                reportError("msg.dup.label",
-                        label.getPosition(), label.getLength());
+                reportError("msg.dup.label", label.getPosition(), label.getLength());
             }
         }
         bundle.addLabel(label);
@@ -2372,9 +2359,7 @@ public class Parser {
 
         // If stmt has parent assigned its position already is relative
         // (See bug #710225)
-        bundle.setLength(stmt.getParent() == null
-                ? getNodeEnd(stmt) - pos
-                : getNodeEnd(stmt));
+        bundle.setLength(stmt.getParent() == null ? getNodeEnd(stmt) - pos : getNodeEnd(stmt));
         bundle.setStatement(stmt);
         return bundle;
     }
@@ -2437,7 +2422,11 @@ public class Parser {
                     name = createNameNode();
                 } else {
                     if (compilerEnv.isReservedKeywordAsIdentifier()) {
-                        boolean isKeyword = TokenStream.isKeyword(ts.getString(), compilerEnv.getLanguageVersion(), false);
+                        boolean isKeyword = TokenStream.isKeyword(
+                                ts.getString(),
+                                compilerEnv.getLanguageVersion(),
+                                false
+                        );
                         boolean isSafeKeyword = Token.keywordToName(tt) == null;
 
                         if (isKeyword && isSafeKeyword) {
@@ -2571,20 +2560,14 @@ public class Parser {
                 ? definingScope.getSymbol(name)
                 : null;
         int symDeclType = symbol != null ? symbol.getDeclType() : -1;
-        if (symbol != null
-                && (definingScope == currentScope
-                && (symDeclType == Token.CONST || symDeclType == Token.LET)
-        )
-        ) {
-            addError(symDeclType == Token.CONST ? "msg.const.redecl" : "msg.let.redecl", name);
+        if (symbol != null && (definingScope == currentScope && (symDeclType == Token.CONST || symDeclType == Token.LET))) {
+            reportError(symDeclType == Token.CONST ? "msg.const.redecl" : "msg.let.redecl", name);
             return;
         }
         switch (declType) {
             case Token.LET:
-                if (!ignoreNotInBlock &&
-                        ((currentScope.getType() == Token.IF) ||
-                                currentScope instanceof Loop)) {
-                    addError("msg.let.decl.not.in.block");
+                if (!ignoreNotInBlock && ((currentScope.getType() == Token.IF) || currentScope instanceof Loop)) {
+                    reportError("msg.let.decl.not.in.block");
                     return;
                 }
                 currentScope.putSymbol(new Symbol(declType, name));
@@ -2627,8 +2610,7 @@ public class Parser {
         while (matchToken(Token.COMMA)) {
             int opPos = ts.tokenBeg;
             if (compilerEnv.isStrictMode() && !pn.hasSideEffects())
-                addStrictWarning("msg.no.side.effects", "",
-                        pos, nodeEnd(pn) - pos);
+                addStrictWarning("msg.no.side.effects", "", pos, nodeEnd(pn) - pos);
             if (peekToken() == Token.YIELD)
                 reportError("msg.yield.parenthesized");
             pn = new InfixExpression(Token.COMMA, pn, assignExpr(), opPos);
@@ -3189,7 +3171,6 @@ public class Parser {
         lineno = ts.lineno;
 
 
-
         pn = propertyAccess(chaining ? Token.OPTIONAL_CHAINING : Token.DOT, pn);
         pn.setLineno(lineno);
 
@@ -3366,9 +3347,7 @@ public class Parser {
                 if (ts.isNumberHex()) {
                     s = "0x" + s;
                 }
-                pn = new NumberLiteral(ts.tokenBeg,
-                        s,
-                        ts.getNumber());
+                pn = new NumberLiteral(ts.tokenBeg, s, ts.getNumber());
                 break;
             }
 
@@ -3406,7 +3385,11 @@ public class Parser {
 
             case Token.RESERVED:
                 consumeToken();
-                if (compilerEnv.isReservedKeywordAsIdentifier() && TokenStream.isKeyword(ts.getString(), compilerEnv.getLanguageVersion(), inUseStrictDirective)) {
+                if (compilerEnv.isReservedKeywordAsIdentifier() && TokenStream.isKeyword(
+                        ts.getString(),
+                        compilerEnv.getLanguageVersion(),
+                        inUseStrictDirective
+                )) {
                     pn = name(ttFlagged, tt);
                 } else {
                     reportError("msg.reserved.id", ts.getString());
@@ -3842,8 +3825,11 @@ public class Parser {
                 break;
 
             default:
-                if (compilerEnv.isReservedKeywordAsIdentifier()
-                        && TokenStream.isKeyword(ts.getString(), compilerEnv.getLanguageVersion(), inUseStrictDirective)) {
+                if (compilerEnv.isReservedKeywordAsIdentifier() && TokenStream.isKeyword(
+                        ts.getString(),
+                        compilerEnv.getLanguageVersion(),
+                        inUseStrictDirective
+                )) {
                     // convert keyword to property name, e.g. ({if: 1})
                     pname = createNameNode();
                     consumeToken();
@@ -4047,9 +4033,7 @@ public class Parser {
                 || tt == Token.GETELEM
                 || tt == Token.GET_REF
                 || tt == Token.CALL))
-            reportError(expr.getType() == Token.INC
-                    ? "msg.bad.incr"
-                    : "msg.bad.decr");
+            reportError(expr.getType() == Token.INC ? "msg.bad.incr" : "msg.bad.decr");
     }
 
     private ErrorNode makeErrorNode() {
@@ -4115,8 +4099,7 @@ public class Parser {
                     ? Math.max(pos, end - linep[1])
                     : pos;
             if (line != null) {
-                addStrictWarning("msg.missing.semi", "", beg, end - beg,
-                        linep[0], line, linep[1]);
+                addStrictWarning("msg.missing.semi", "", beg, end - beg, linep[0], line, linep[1]);
             } else {
                 // no line information available, report warning at current line
                 addStrictWarning("msg.missing.semi", "", beg, end - beg);
@@ -4150,18 +4133,18 @@ public class Parser {
      */
     Node createDestructuringAssignment(int type, Node left, Node right) {
         String tempName = currentScriptOrFn.getNextTempName();
-        Node result = destructuringAssignmentHelper(type, left, right,
-                tempName);
+        Node result = destructuringAssignmentHelper(type, left, right, tempName);
         Node comma = result.getLastChild();
         comma.addChildToBack(createName(tempName));
         return result;
     }
 
-    Node destructuringAssignmentHelper(int variableType, Node left,
-                                       Node right, String tempName) {
+    Node destructuringAssignmentHelper(int variableType, Node left, Node right, String tempName) {
         Scope result = createScopeNode(Token.LETEXPR, left.getLineno());
-        result.addChildToFront(new Node(Token.LET,
-                createName(Token.NAME, tempName, right)));
+        result.addChildToFront(new Node(
+                Token.LET,
+                createName(Token.NAME, tempName, right)
+        ));
         try {
             pushScope(result);
             defineSymbol(Token.LET, tempName, true);
@@ -4174,12 +4157,17 @@ public class Parser {
         boolean empty = true;
         switch (left.getType()) {
             case Token.ARRAYLIT:
-                empty = destructuringArray((ArrayLiteral) left, right, variableType, tempName, comma, destructuringNames);
+                empty = destructuringArray(
+                        (ArrayLiteral) left,
+                        right,
+                        variableType,
+                        tempName,
+                        comma,
+                        destructuringNames
+                );
                 break;
             case Token.OBJECTLIT:
-                empty = destructuringObject((ObjectLiteral) left,
-                        variableType, tempName, comma,
-                        destructuringNames);
+                empty = destructuringObject((ObjectLiteral) left, variableType, tempName, comma, destructuringNames);
                 break;
             case Token.GETPROP:
             case Token.GETELEM:
@@ -4216,7 +4204,7 @@ public class Parser {
             }
             Node rightElem = new Node(Token.GETELEM, createName(tempName), createNumber(index));
             if (n.getProp(Node.SPREAD_PROP) != null) {
-                rightElem.putProp(Node.SPREAD_PROP, new Object[]{index, right});
+                rightElem.putProp(Node.SPREAD_PROP, new Object[]{ index, right });
             }
             if (n.getType() == Token.NAME) {
                 String name = n.getString();
@@ -4250,11 +4238,7 @@ public class Parser {
         return empty;
     }
 
-    boolean destructuringObject(ObjectLiteral node,
-                                int variableType,
-                                String tempName,
-                                Node parent,
-                                List<String> destructuringNames) {
+    boolean destructuringObject(ObjectLiteral node, int variableType, String tempName, Node parent, List<String> destructuringNames) {
         boolean empty = true;
         int setOp = variableType == Token.CONST
                 ? Token.SETCONST : Token.SETNAME;
@@ -4471,9 +4455,7 @@ public class Parser {
     // throw a failed-assertion with some helpful debugging info
     private RuntimeException codeBug()
             throws RuntimeException {
-        throw Kit.codeBug("ts.cursor=" + ts.cursor
-                + ", ts.tokenBeg=" + ts.tokenBeg
-                + ", currentToken=" + currentToken);
+        throw Kit.codeBug("ts.cursor=" + ts.cursor + ", ts.tokenBeg=" + ts.tokenBeg + ", currentToken=" + currentToken);
     }
 
     public void setDefaultUseStrictDirective(boolean useStrict) {
