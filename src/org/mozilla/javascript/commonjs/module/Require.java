@@ -10,6 +10,7 @@ import org.mozilla.javascript.tools.shell.Main;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -212,6 +213,22 @@ public class Require extends BaseFunction {
                 }
             }
         }
+
+        // If URI is a directory, attempt to grab an index.js file
+        if (uri != null) {
+            File file = new File(uri);
+
+            if (file.isDirectory()) {
+                File indexFile = new File(file, "index.js");
+
+                if (indexFile.exists()) {
+                    uri = indexFile.toURI();
+                } else {
+                    throw ScriptRuntime.typeError1("msg.import.directory.has.no.index.file", file.getAbsolutePath());
+                }
+            }
+        }
+
         return getExportedModuleInterface(cx, id, uri, base, false);
     }
 
