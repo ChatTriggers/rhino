@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassNode extends ScriptNode {
-    private Name className;
-    private AstNode extendsName;
+    private Name className = null;
+    private AstNode extendsName = null;
     private FunctionNode constructor = null;
     private List<ClassMethod> methods = new ArrayList<>();
     private List<ClassField> fields = new ArrayList<>();

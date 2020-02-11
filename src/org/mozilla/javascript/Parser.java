@@ -1495,72 +1495,111 @@ public class Parser {
         en.setType(Token.EXPORT);
 
         if (matchToken(Token.DEFAULT)) {
-            reportError("msg.export.inline.not.supported");
-            // AstNode node = expr();
-            // validateDefaultExport(node);
-            // en.setExportedValue(node);
-            // en.setDefaultExport();
-        } else {
-            boolean needsFrom = false;
+            AstNode exportTarget;
 
-            if (matchToken(Token.MUL)) {
-                en.setModuleMember(null);
-                needsFrom = true;
-            } else if (matchToken(Token.LC)) {
-                do {
-                    boolean decorator = matchToken(Token.AT);
-
-                    mustMatchToken(Token.NAME, "msg.export.missing.identifier");
-                    String target = createNameNode().getIdentifier();
-
-                    if (decorator) {
-                        target = "@" + target;
-                    }
-
-                    String scope = null;
-                    consumeToken();
-                    peekToken();
-
-                    if ("as".equals(ts.getString())) {
-                        consumeToken();
-                        decorator = matchToken(Token.AT);
-
-                        if (matchToken(Token.NAME)) {
-                            scope = createNameNode().getIdentifier();
-                            if (decorator) {
-                                scope = "@" + scope;
-                            }
-                        } else if (matchToken(Token.DEFAULT)) {
-                            if (decorator) reportError("msg.export.invalid.default");
-                            scope = "default";
-                        } else {
-                            reportError("msg.export.unexpected.token");
-                            consumeToken();
-                        }
-                    }
-
-                    en.addNamedMember(target, scope);
-                } while (matchToken(Token.COMMA));
-
-                mustMatchToken(Token.RC, "msg.export.missing.rc");
+            if (matchToken(Token.FUNCTION)) {
+                exportTarget = function(FunctionNode.FUNCTION_EXPRESSION_STATEMENT);
+            } else if (matchToken(Token.CLASS)) {
+                exportTarget = classExpr(Collections.emptyList());
             } else {
-                reportError("msg.export.inline.not.supported");
-                // AstNode node = statement();
-                // validateExport(node);
-                // en.setExportedValue(node);
+                // TODO: Support "export default from '...'"
+                exportTarget = assignExpr();
             }
 
-            if (matchToken(Token.NAME)) {
+            if (exportTarget == null) {
+                reportError("msg.export.invalid.default.export");
+            }
+
+            en.setExportedValue(exportTarget);
+        } else if (matchToken(Token.MUL)) {
+            mustMatchToken(Token.NAME, "msg.export.unexpected.char.after.wildcard");
+
+            if (!"from".equals(ts.getString())) {
+                reportError("msg.export.unexpected.char.after.wildcard");
+            }
+
+            mustMatchToken(Token.STRING, "msg.export.star.missing.file.path");
+            en.setFilePath(ts.getString());
+        } else if (matchToken(Token.LC)) {
+            do {
+                boolean decorator = matchToken(Token.AT);
+
+                mustMatchToken(Token.NAME, "msg.export.missing.identifier");
+                String target = createNameNode().getIdentifier();
+
+                if (decorator) {
+                    target = "@" + target;
+                }
+
+                String scope = null;
+                consumeToken();
                 peekToken();
 
+                if ("as".equals(ts.getString())) {
+                    consumeToken();
+                    decorator = matchToken(Token.AT);
+
+                    if (matchToken(Token.NAME)) {
+                        scope = createNameNode().getIdentifier();
+                        if (decorator) {
+                            scope = "@" + scope;
+                        }
+                    } else if (matchToken(Token.DEFAULT)) {
+                        if (decorator) reportError("msg.export.invalid.default");
+                        scope = "default";
+                    } else {
+                        reportError("msg.export.unexpected.token");
+                        consumeToken();
+                    }
+                }
+
+                en.addNamedMember(target, scope);
+            } while (matchToken(Token.COMMA));
+
+            mustMatchToken(Token.RC, "msg.export.missing.rc");
+
+            if (matchToken(Token.NAME)) {
                 if (!"from".equals(ts.getString())) {
                     reportError("msg.export.missing.from");
                 }
 
                 mustMatchToken(Token.STRING, "");
                 en.setFilePath(ts.getString());
-            } else if (needsFrom) {
-                reportError("msg.export.missing.from");
+            }
+        } else {
+            // Inline export statement
+            if (matchToken(Token.FUNCTION)) {
+                FunctionNode fn = function(FunctionNode.FUNCTION_EXPRESSION_STATEMENT);
+                if (fn.getName() == null) {
+                    reportError("msg.export.inline.requires.name");
+                    return makeErrorNode();
+                }
+                en.setExportedValue(fn, fn.getFunctionName().getIdentifier());
+            } else if (matchToken(Token.CLASS)) {
+                ClassNode cn = classExpr(Collections.emptyList());
+                if (cn.getClassName() == null) {
+                    reportError("msg.export.inline.requires.name");
+                    return makeErrorNode();
+                }
+                en.setExportedValue(cn, cn.getClassName().getIdentifier());
+            } else {
+                int token = -1;
+
+                if (matchToken(Token.VAR)) {
+                    token = Token.VAR;
+                } else if (matchToken(Token.LET)) {
+                    token = Token.LET;
+                } else if (matchToken(Token.CONST)) {
+                    token = Token.CONST;
+                }
+
+                if (token == -1) {
+                    reportError("msg.export.inline.requires.name");
+                    return makeErrorNode();
+                }
+
+                VariableDeclaration decl = variables(token, ts.tokenBeg, false);
+                en.setExportedValue(decl, null);
             }
         }
 

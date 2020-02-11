@@ -772,13 +772,24 @@ public class ScriptRuntime {
     }
 
     // Export all members from another file
-    public static void handleExport(Object fromRequire, ScriptableObject scope) {
+    public static void handleExport(Scriptable fromRequire, Scriptable scope) {
+        Object[] ids = ScriptableObject.getPropertyIds(fromRequire);
 
+        for (Object id : ids) {
+            if (!(id instanceof String)) continue;
+            handleExport((String) id, (String) id, fromRequire, scope);
+        }
     }
 
     // Export single member from another file
-    public static void handleExport(String targetName, String scopeName, Object fromRequire, Scriptable scope) {
+    public static void handleExport(String targetName, String scopeName, Scriptable fromRequire, Scriptable scope) {
+        Scriptable exports = getExports(scope);
 
+        if (ScriptableObject.hasProperty(exports, scopeName)) {
+            throw ScriptRuntime.typeError1("msg.export.duplicate.identifier", scopeName);
+        }
+
+        ScriptableObject.putProperty(exports, scopeName, ScriptableObject.getProperty(fromRequire, targetName));
     }
 
     // Export single member from current file
@@ -788,32 +799,34 @@ public class ScriptRuntime {
         }
 
         Object value = ScriptableObject.getProperty(scope, targetName);
-        Scriptable module = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(scope, "module"));
-        Scriptable exports = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(module, "exports"));
+        Scriptable exports = getExports(scope);
 
         if ("default".equals(scopeName)) {
+            if (ScriptableObject.hasProperty(exports, "default")) {
+                throw ScriptRuntime.typeError0("msg.export.inline.multiple.defaults");
+            }
             ScriptableObject.putProperty(exports, "default", value);
         } else {
+            if (ScriptableObject.hasProperty(exports, scopeName)) {
+                throw ScriptRuntime.typeError1("msg.export.duplicate.identifier", scopeName);
+            }
             ScriptableObject.putProperty(exports, scopeName, value);
         }
     }
 
-    // Inline export: export entire value from current file
-    public static void handleExport(Object value, boolean isDefault, Scriptable scope) {
-        if (isDefault) {
-            ScriptableObject.putConstProperty(scope, "default", value);
-        } else {
-            String name;
+    // Inline default export: export entire value from current file
+    public static void handleExport(Object value, Scriptable scope) {
+        Scriptable exports = getExports(scope);
 
-            if (value instanceof BaseFunction) {
-                name = ((BaseFunction) value).getFunctionName();
-            } else {
-                System.out.println("test");
-                return;
-            }
-
-            ScriptableObject.putConstProperty(scope, name, value);
+        if (ScriptableObject.hasProperty(exports, "default")) {
+            throw ScriptRuntime.typeError0("msg.export.inline.multiple.defaults");
         }
+        ScriptableObject.putConstProperty(exports, "default", value);
+    }
+
+    private static Scriptable getExports(Scriptable scope) {
+        Scriptable module = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(scope, "module"));
+        return ScriptableObject.ensureScriptable(ScriptableObject.getProperty(module, "exports"));
     }
 
     public static Object getRestParams(Object[] _args, int index, Context cx, Scriptable scope) {

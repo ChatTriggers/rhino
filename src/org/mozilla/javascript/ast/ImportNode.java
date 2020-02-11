@@ -12,11 +12,10 @@ import java.util.List;
 public class ImportNode extends AstNode {
     private List<ModuleMember> namedMembers = new ArrayList<>();
     private ModuleMember defaultMember = null;
+    private ModuleMember moduleMember = null;
 
     // ex: "import * as myModule from '...';"
     // or  "export * from '...';"
-    private ModuleMember moduleMember = null;
-
     private String filePath = null;
 
     {

@@ -2307,25 +2307,61 @@ class BodyCodegen {
             case Token.EXPORT: {
                 ExportNode en = (ExportNode) node;
 
-                // Inline export statement
-                if (en.getExportedValue() != null) {
-                    generateStatement(en.getFirstChild());
-                    // cfw.addALoad(popvLocal);
-                    cfw.addPush(en.isDefaultExport());
+                // Default inline export
+                if (en.isDefaultExport()) {
+                    generateExpression(en.getFirstChild(), en);
                     cfw.addALoad(variableObjectLocal);
-                    addScriptRuntimeInvoke("handleExport", VOID, OBJECT, BOOLEAN, SCRIPTABLE);
+                    addScriptRuntimeInvoke("handleExport", VOID, OBJECT, SCRIPTABLE);
                     break;
                 }
 
-                // Default export
-                ImportNode.ModuleMember defaultExport = en.getDefaultMember();
-                if (defaultExport != null) {
-                    cfw.addPush(defaultExport.getScopeName());
-                    cfw.addPush("default");
-                    cfw.addALoad(variableObjectLocal);
-                    addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
+                // Inline export
+                if (en.getExportedValue() != null) {
+                    AstNode ast = en.getExportedValue();
+                    String identifier = en.getIdentifier();
+                    Node value = en.getFirstChild();
+
+                    if (!(ast instanceof VariableDeclaration) && identifier == null) {
+                        throw Codegen.badTree();
+                    }
+
+                    generateStatement(value);
+
+                    if (ast instanceof VariableDeclaration) {
+                        List<VariableInitializer> variables = ((VariableDeclaration) ast).getVariables();
+                        variables.forEach(var -> {
+                            AstNode name = var.getTarget();
+                            if (!(name instanceof Name)) {
+                                throw Codegen.badTree();
+                            }
+
+                            cfw.addPush(((Name) name).getIdentifier());
+                            cfw.add(ByteCode.DUP);
+                            cfw.addALoad(variableObjectLocal);
+                            addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
+                        });
+                    } else {
+                        cfw.addPush(identifier);
+                        cfw.add(ByteCode.DUP);
+                        cfw.addALoad(variableObjectLocal);
+                        addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
+                    }
+
+                    break;
                 }
 
+                // Wildcard export
+                String filePath = en.getFilePath();
+                if (filePath != null && en.getNamedMembers().size() == 0) {
+                    generateRequireCall(filePath);
+                    cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/Scriptable");
+                    cfw.addALoad(variableObjectLocal);
+                    addScriptRuntimeInvoke("handleExport", VOID, SCRIPTABLE, SCRIPTABLE);
+
+                    break;
+                }
+
+                // Named members
                 for (ImportNode.ModuleMember namedImport : en.getNamedMembers()) {
                     String target = namedImport.getTargetName();
                     String scope = namedImport.getScopeName();
@@ -2335,41 +2371,27 @@ class BodyCodegen {
 
                     cfw.addPush(target);
                     cfw.addPush(scope);
+
+                    if (filePath != null) {
+                        generateRequireCall(filePath);
+                    }
+
                     cfw.addALoad(variableObjectLocal);
-                    addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
+
+                    if (filePath == null) {
+                        addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE);
+                    } else {
+                        addScriptRuntimeInvoke("handleExport", VOID, STRING, STRING, SCRIPTABLE, SCRIPTABLE);
+                    }
                 }
 
                 break;
             }
 
-            /*
-
-            const VarFactory = new SavedVariableFactory('MyModule');
-
-            const count = VarFactory.newVar(5);
-
-            count.get()
-            count.set('hello world');
-
-
-
-             */
-
             case Token.IMPORT: {
                 ImportNode in = (ImportNode) node;
 
-                cfw.addPush(1);
-                cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
-                cfw.add(ByteCode.DUP);
-                cfw.addPush(0);
-                cfw.addPush(in.getFilePath());
-                cfw.add(ByteCode.AASTORE);
-
-                // Result of require
-                cfw.addPush("require");
-                cfw.addALoad(contextLocal);
-                cfw.addALoad(variableObjectLocal);
-                addOptRuntimeInvoke("callName", OBJECT, OBJECT_ARRAY, STRING, CONTEXT, SCRIPTABLE);
+                generateRequireCall(in.getFilePath());
 
                 // Generate namedImports, which is an object array (each object being a string array of length 2)
                 int namedCount = in.getNamedMembers().size();
@@ -3814,6 +3836,21 @@ class BodyCodegen {
 
     private void generateDebugCall() {
         addScriptRuntimeInvoke("debug", VOID, OBJECT);
+    }
+
+    private void generateRequireCall(String filePath) {
+        cfw.addPush(1);
+        cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+        cfw.add(ByteCode.DUP);
+        cfw.addPush(0);
+        cfw.addPush(filePath);
+        cfw.add(ByteCode.AASTORE);
+
+        // Result of require
+        cfw.addPush("require");
+        cfw.addALoad(contextLocal);
+        cfw.addALoad(variableObjectLocal);
+        addOptRuntimeInvoke("callName", OBJECT, OBJECT_ARRAY, STRING, CONTEXT, SCRIPTABLE);
     }
 
     private void visitFunction(OptFunctionNode ofn, int functionType) {
