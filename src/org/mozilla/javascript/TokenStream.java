@@ -1102,6 +1102,9 @@ class TokenStream {
                     return Token.COMMA;
                 case '?':
                     if (matchChar('?')) {
+                        if (matchChar('=')) {
+                            return Token.ASSIGN_NULLISH;
+                        }
                         return Token.NULLISH_COALESCING;
                     } else if (matchChar('.')) {
                         return Token.OPTIONAL_CHAINING;
@@ -1123,6 +1126,9 @@ class TokenStream {
 
                 case '|':
                     if (matchChar('|')) {
+                        if (matchChar('=')) {
+                            return Token.ASSIGN_OR;
+                        }
                         return Token.OR;
                     } else if (matchChar('=')) {
                         return Token.ASSIGN_BITOR;
@@ -1140,6 +1146,9 @@ class TokenStream {
 
                 case '&':
                     if (matchChar('&')) {
+                        if (matchChar('=')) {
+                            return Token.ASSIGN_AND;
+                        }
                         return Token.AND;
                     } else if (matchChar('=')) {
                         return Token.ASSIGN_BITAND;

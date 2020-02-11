@@ -2199,6 +2199,15 @@ public final class IRFactory extends Parser {
             case Token.ASSIGN_MOD:
                 assignOp = Token.MOD;
                 break;
+            case Token.ASSIGN_AND:
+                assignOp = Token.AND;
+                break;
+            case Token.ASSIGN_OR:
+                assignOp = Token.OR;
+                break;
+            case Token.ASSIGN_NULLISH:
+                assignOp = Token.NULLISH_COALESCING;
+                break;
             default:
                 throw Kit.codeBug();
         }

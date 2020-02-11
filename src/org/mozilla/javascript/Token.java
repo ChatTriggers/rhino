@@ -146,88 +146,91 @@ public class Token {
             ASSIGN_DIV = 97,  // /=
             ASSIGN_MOD = 98,  // %=
             ASSIGN_EXP = 99,  // **=
+            ASSIGN_OR = 100,  // ||=
+            ASSIGN_AND = 101,  // &&=
+            ASSIGN_NULLISH = 102,  // ??=
 
             FIRST_ASSIGN = ASSIGN,
-            LAST_ASSIGN = ASSIGN_EXP,
+            LAST_ASSIGN = ASSIGN_NULLISH,
 
-            HOOK = 100, // conditional (?:)
-            COLON = 101,
-            OR = 102, // logical or (||)
-            AND = 103, // logical and (&&)
-            INC = 104, // increment/decrement (++ --)
-            DEC = 105,
-            DOT = 106, // member operator (.)
-            SPREAD = 107,
-            OPTIONAL_CHAINING = 108, // optional chaining member operator (?.) https://tc39.es/proposal-optional-chaining/
-            PIPELINE = 109, // pipeline operator (|>) https://tc39.es/proposal-pipeline-operator
-            NULLISH_COALESCING = 110, // pipeline operator (??) https://tc39.es/proposal-nullish-coalescing/
-            FUNCTION = 111, // function keyword
-            CLASS = 112,
-            EXTENDS = 113,
-            STATIC = 114,
-            SUPER = 115,
-            EXPORT = 116, // export keyword
-            IMPORT = 117, // import keyword
-            IF = 118, // if keyword
-            ELSE = 119, // else keyword
-            SWITCH = 120, // switch keyword
-            CASE = 121, // case keyword
-            DEFAULT = 122, // default keyword
-            WHILE = 123, // while keyword
-            DO = 124, // do keyword
-            FOR = 125, // for keyword
-            BREAK = 126, // break keyword
-            CONTINUE = 127, // continue keyword
-            VAR = 128, // var keyword
-            WITH = 129, // with keyword
-            CATCH = 130, // catch keyword
-            FINALLY = 131, // finally keyword
-            DECORATOR = 132,
-            VOID = 133, // void keyword
-            RESERVED = 134, // reserved keywords
+            HOOK = 103, // conditional (?:)
+            COLON = 104,
+            OR = 105, // logical or (||)
+            AND = 106, // logical and (&&)
+            INC = 107, // increment/decrement (++ --)
+            DEC = 108,
+            DOT = 109, // member operator (.)
+            SPREAD = 110,
+            OPTIONAL_CHAINING = 111, // optional chaining member operator (?.) https://tc39.es/proposal-optional-chaining/
+            PIPELINE = 112, // pipeline operator (|>) https://tc39.es/proposal-pipeline-operator
+            NULLISH_COALESCING = 113, // pipeline operator (??) https://tc39.es/proposal-nullish-coalescing/
+            FUNCTION = 114, // function keyword
+            CLASS = 115,
+            EXTENDS = 116,
+            STATIC = 117,
+            SUPER = 118,
+            EXPORT = 119, // export keyword
+            IMPORT = 120, // import keyword
+            IF = 121, // if keyword
+            ELSE = 122, // else keyword
+            SWITCH = 123, // switch keyword
+            CASE = 124, // case keyword
+            DEFAULT = 125, // default keyword
+            WHILE = 126, // while keyword
+            DO = 127, // do keyword
+            FOR = 128, // for keyword
+            BREAK = 129, // break keyword
+            CONTINUE = 130, // continue keyword
+            VAR = 131, // var keyword
+            WITH = 132, // with keyword
+            CATCH = 133, // catch keyword
+            FINALLY = 134, // finally keyword
+            DECORATOR = 135,
+            VOID = 136, // void keyword
+            RESERVED = 137, // reserved keywords
 
-            EMPTY = 135,
+            EMPTY = 138,
 
             /* types used for the parse tree - these never get returned
              * by the scanner.
              */
-            BLOCK = 136, // statement block
-            LABEL = 137, // label
-            TARGET = 138,
-            LOOP = 139,
-            EXPR_VOID = 140, // expression statement in functions
-            EXPR_RESULT = 141, // expression statement in scripts
-            JSR = 142,
-            SCRIPT = 143, // top-level node for entire script
-            TYPEOFNAME = 144, // for typeof(simple-name)
-            USE_STACK = 145,
-            SETPROP_OP = 146, // x.y op= something
-            SETELEM_OP = 147, // x[y] op= something
-            LOCAL_BLOCK = 148,
-            SET_REF_OP = 149, // *reference op= something
+            BLOCK = 139, // statement block
+            LABEL = 140, // label
+            TARGET = 141,
+            LOOP = 142,
+            EXPR_VOID = 143, // expression statement in functions
+            EXPR_RESULT = 144, // expression statement in scripts
+            JSR = 145,
+            SCRIPT = 146, // top-level node for entire script
+            TYPEOFNAME = 147, // for typeof(simple-name)
+            USE_STACK = 148,
+            SETPROP_OP = 149, // x.y op= something
+            SETELEM_OP = 150, // x[y] op= something
+            LOCAL_BLOCK = 151,
+            SET_REF_OP = 152, // *reference op= something
 
-            AT = 150,  // @
+            AT = 153,  // @
 
             // Optimizer-only-tokens
-            TO_OBJECT = 151,
-            TO_DOUBLE = 152,
+            TO_OBJECT = 154,
+            TO_DOUBLE = 155,
 
-            GET = 153,  // JS 1.5 get pseudo keyword
-            SET = 154,  // JS 1.5 set pseudo keyword
-            LET = 155,  // JS 1.7 let pseudo keyword
-            CONST = 156,
-            SETCONST = 157,
-            SETCONSTVAR = 158,
-            ARRAYCOMP = 159,  // array comprehension
-            LETEXPR = 160,
-            WITHEXPR = 161,
-            DEBUGGER = 162,
-            COMMENT = 163,
-            GENEXPR = 164,
-            METHOD = 165, // ES6 MethodDefinition
-            ARROW = 166,  // ES6 ArrowFunction
-            HASHTAG = 167,  // ES6 ArrowFunction
-            LAST_TOKEN = 168;
+            GET = 156,  // JS 1.5 get pseudo keyword
+            SET = 157,  // JS 1.5 set pseudo keyword
+            LET = 158,  // JS 1.7 let pseudo keyword
+            CONST = 159,
+            SETCONST = 160,
+            SETCONSTVAR = 161,
+            ARRAYCOMP = 162,  // array comprehension
+            LETEXPR = 163,
+            WITHEXPR = 164,
+            DEBUGGER = 165,
+            COMMENT = 166,
+            GENEXPR = 167,
+            METHOD = 168, // ES6 MethodDefinition
+            ARROW = 169,  // ES6 ArrowFunction
+            HASHTAG = 170,  // ES6 ArrowFunction
+            LAST_TOKEN = 170;
 
     /**
      * Returns a name for the token.  If Rhino is compiled with certain
@@ -452,6 +455,12 @@ public class Token {
                 return "ASSIGN_DIV";
             case ASSIGN_MOD:
                 return "ASSIGN_MOD";
+            case ASSIGN_AND:
+                return "ASSIGN_AND";
+            case ASSIGN_OR:
+                return "ASSIGN_OR";
+            case ASSIGN_NULLISH:
+                return "ASSIGN_NULLISH";
             case HOOK:
                 return "HOOK";
             case COLON:

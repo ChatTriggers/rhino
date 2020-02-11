@@ -652,6 +652,18 @@ public class Decompiler {
                     result.append(" >>>= ");
                     break;
 
+                case Token.ASSIGN_OR:
+                    result.append(" ||= ");
+                    break;
+
+                case Token.ASSIGN_AND:
+                    result.append(" &&=");
+                    break;
+
+                case Token.ASSIGN_NULLISH:
+                    result.append(" ??= ");
+                    break;
+
                 case Token.HOOK:
                     result.append(" ? ");
                     break;
