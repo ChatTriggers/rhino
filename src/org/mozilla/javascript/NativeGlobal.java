@@ -7,6 +7,9 @@
 package org.mozilla.javascript;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.mozilla.javascript.ScriptableObject.*;
 
@@ -21,6 +24,9 @@ import static org.mozilla.javascript.ScriptableObject.*;
 
 public class NativeGlobal implements Serializable, IdFunctionCall {
     static final long serialVersionUID = 6080442165748707530L;
+
+    private int nextIntervalId = 0;
+    private final Set<Integer> activeIntervals = Collections.synchronizedSet(new HashSet<>());
 
     public static void init(Context cx, Scriptable scope, boolean sealed) {
         NativeGlobal obj = new NativeGlobal();
@@ -65,6 +71,20 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
                     break;
                 case Id_uneval:
                     name = "uneval";
+                    break;
+                case Id_setTimeout:
+                    name = "setTimeout";
+                    break;
+                case Id_setInterval:
+                    name = "setInterval";
+                    break;
+                case Id_clearTimeout:
+                    name = "clearTimeout";
+                    arity = 1;
+                    break;
+                case Id_clearInterval:
+                    name = "clearInterval";
+                    arity = 1;
                     break;
                 default:
                     throw Kit.codeBug();
@@ -175,6 +195,18 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
                     return ScriptRuntime.uneval(cx, scope, value);
                 }
 
+                case Id_setTimeout:
+                    return js_setTimeout(cx, scope, thisObj, args);
+
+                case Id_setInterval:
+                    return js_setInterval(cx, scope, thisObj, args);
+
+                case Id_clearInterval:
+                case Id_clearTimeout:
+                    if (args.length > 0 && args[0] instanceof Number)
+                        activeIntervals.remove(ScriptRuntime.toInt32(args[0]));
+                    return Undefined.instance;
+
                 case Id_new_CommonError:
                     // The implementation of all the ECMA error constructors
                     // (SyntaxError, TypeError, etc.)
@@ -182,6 +214,89 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
             }
         }
         throw f.unknown();
+    }
+
+    private int js_setTimeout(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (args.length == 0) {
+            throw ScriptRuntime.typeError4("msg.reflect.bad.args", "0", "setInterval", "function", "undefined");
+        }
+
+        Object delay = args.length > 1 ? args[1] : null;
+        int millis = delay != null ? ScriptRuntime.toInt32(delay) : 0;
+        Object[] funcArgs;
+
+        if (args.length > 2) {
+            funcArgs = new Object[args.length - 2];
+            System.arraycopy(args, 2, funcArgs, 0, funcArgs.length);
+        } else {
+            funcArgs = new Object[0];
+        }
+
+        int finalId = nextIntervalId++;
+        activeIntervals.add(finalId);
+
+        new Thread(() -> {
+            if (millis > 0 && args[0] instanceof Callable) {
+                try {
+                    Context newCx = Context.enter();
+                    Thread.sleep(millis);
+                    if (activeIntervals.contains(finalId)) {
+                        ((Callable) args[0]).call(newCx, scope, thisObj, funcArgs);
+                    }
+                } catch (InterruptedException e) {
+                    throw Kit.codeBug();
+                } finally {
+                    Context.exit();
+                }
+            }
+
+            activeIntervals.remove(finalId);
+        }).start();
+
+        return finalId;
+    };
+
+    private int js_setInterval(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (args.length == 0) {
+            throw ScriptRuntime.typeError4("msg.reflect.bad.args", "0", "setInterval", "function", "undefined");
+        }
+
+        Object delay = args.length > 1 ? args[1] : null;
+        int millis = delay != null ? ScriptRuntime.toInt32(delay) : 0;
+        Object[] funcArgs;
+
+        if (args.length > 2) {
+            funcArgs = new Object[args.length - 2];
+            System.arraycopy(args, 2, funcArgs, 0, funcArgs.length);
+        } else {
+            funcArgs = new Object[0];
+        }
+
+        int finalId = nextIntervalId++;
+        activeIntervals.add(finalId);
+
+        new Thread(() -> {
+            if (millis > 0 && args[0] instanceof Callable) {
+                try {
+                    Context.enter();
+
+                    while (activeIntervals.contains(finalId)) {
+                        Thread.sleep(millis);
+                        if (activeIntervals.contains(finalId)) {
+                            ((Callable) args[0]).call(cx, scope, thisObj, funcArgs);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    throw Kit.codeBug();
+                } finally {
+                    Context.exit();
+                }
+            }
+
+            activeIntervals.remove(finalId);
+        }).start();
+
+        return finalId;
     }
 
     /**
@@ -754,8 +869,12 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
             Id_parseInt = 10,
             Id_unescape = 11,
             Id_uneval = 12,
+            Id_setTimeout = 13,
+            Id_setInterval = 14,
+            Id_clearTimeout = 15,
+            Id_clearInterval = 16,
 
-    LAST_SCOPE_FUNCTION_ID = 12,
+            LAST_SCOPE_FUNCTION_ID = 16,
 
-    Id_new_CommonError = 13;
+            Id_new_CommonError = 17;
 }

@@ -198,6 +198,7 @@ public class ScriptRuntime {
         NativeJSON.init(scope, sealed);
         NativeReflect.init(scope, sealed);
         NativeProxy.init(scope, sealed);
+        NativePromise.init(scope, sealed);
 
         // Decorators
         DecoratorType.init(scope);

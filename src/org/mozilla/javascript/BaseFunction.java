@@ -15,10 +15,23 @@ import org.mozilla.javascript.optimizer.Codegen;
  * @author Norris Boyd
  */
 public class BaseFunction extends IdScriptableObject implements Function {
-
     private static final long serialVersionUID = 5311394446546053859L;
 
     private static final Object FUNCTION_TAG = "Function";
+
+    @FunctionalInterface
+    interface BaseFunctionLambda {
+        Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args);
+    }
+
+    public static BaseFunction wrap(BaseFunctionLambda lambda) {
+        return new BaseFunction() {
+            @Override
+            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                return lambda.call(cx, scope, thisObj, args);
+            }
+        };
+    }
 
     static void init(Scriptable scope, boolean sealed) {
         BaseFunction obj = new BaseFunction();

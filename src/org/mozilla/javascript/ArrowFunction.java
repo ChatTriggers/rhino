@@ -36,7 +36,7 @@ public class ArrowFunction extends BaseFunction {
 
     @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        Scriptable callThis = boundThis != null ? boundThis : ScriptRuntime.getTopCallScope(cx);
+        Scriptable callThis = boundThis != null ? boundThis : cx.topCallScope;
         return targetFunction.call(cx, scope, callThis, args);
     }
 
