@@ -243,8 +243,8 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
                     if (activeIntervals.contains(finalId)) {
                         ((Callable) args[0]).call(newCx, scope, thisObj, funcArgs);
                     }
-                } catch (InterruptedException e) {
-                    throw Kit.codeBug();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     Context.exit();
                 }
@@ -278,16 +278,16 @@ public class NativeGlobal implements Serializable, IdFunctionCall {
         new Thread(() -> {
             if (millis > 0 && args[0] instanceof Callable) {
                 try {
-                    Context.enter();
+                    Context newCx = Context.enter();
 
                     while (activeIntervals.contains(finalId)) {
                         Thread.sleep(millis);
                         if (activeIntervals.contains(finalId)) {
-                            ((Callable) args[0]).call(cx, scope, thisObj, funcArgs);
+                            ((Callable) args[0]).call(newCx, scope, thisObj, funcArgs);
                         }
                     }
-                } catch (InterruptedException e) {
-                    throw Kit.codeBug();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     Context.exit();
                 }
