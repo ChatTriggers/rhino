@@ -103,13 +103,14 @@ public class NativePromise extends IdScriptableObject {
                 return js_then(cx, scope, thisObj, args);
             case Id_catch:
                 return js_catch(cx, scope, thisObj, args);
+            case Id_finally:
+                return js_finally(cx, scope, thisObj, args);
             case ConstructorId_all:
             case ConstructorId_allSettled:
             case ConstructorId_any:
             case ConstructorId_race:
             case ConstructorId_reject:
             case ConstructorId_resolve:
-            case Id_finally:
             default:
                 throw new IllegalArgumentException(String.valueOf(f.methodId()));
         }
@@ -174,26 +175,45 @@ public class NativePromise extends IdScriptableObject {
         return promise;
     }
 
-    private Object js_catch(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        if (args.length == 0) {
-            throw ScriptRuntime.typeError("Promise.catch requires a catch handler");
+    private Object js_finally(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (!(thisObj instanceof NativePromise)) {
+            throw Kit.codeBug("Expected Promise.then thisObj to be a NativePromise");
         }
-        return js_then(cx, scope, thisObj, new Object[]{ null, args[0] });
+
+        NativePromise thisPromise = (NativePromise) thisObj;
+
+        Object onFinally = args.length > 0 ? args[0] : null;
+
+        return constructPromise(cx, scope, thisObj, new Object[]{
+            thisPromise._future.handle((success, error) -> {
+                try {
+                    Context newCx = Context.enter();
+
+                    if (onFinally instanceof Callable) {
+                        ((Callable) onFinally).call(newCx, scope, thisObj, new Object[0]);
+                    }
+
+                    return Undefined.instance;
+                } finally {
+                    Context.exit();
+                }
+            })
+        });
+    }
+
+    private Object js_catch(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        return js_then(cx, scope, thisObj, new Object[]{ null, args.length > 0 ? args[0] : null });
     }
 
     private Object js_then(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         if (!(thisObj instanceof NativePromise)) {
-            throw Kit.codeBug("Expected Promise#then thisObj to be a NativePromise");
+            throw Kit.codeBug("Expected Promise.then thisObj to be a NativePromise");
         }
 
         NativePromise thisPromise = (NativePromise) thisObj;
 
         Object onFulfillment = args.length > 0 ? args[0] : null;
         Object onRejection = args.length > 1 ? args[1] : null;
-
-        if (onFulfillment == null && onRejection == null) {
-            throw ScriptRuntime.typeError("Promise.then requires at least a success handler or an error handler");
-        }
 
         return constructPromise(cx, scope, thisObj, new Object[]{
             thisPromise._future.handle((success, error) -> {
@@ -208,12 +228,10 @@ public class NativePromise extends IdScriptableObject {
                             thisPromise._futures.stream().map(
                                 future -> {
                                     try {
-                                        Object result = ScriptableObject.getProperty(
+                                        return ScriptableObject.getProperty(
                                             ScriptableObject.ensureScriptable(future.get()),
                                             "result"
                                         );
-
-                                        return result;
                                     } catch (InterruptedException | ExecutionException e) {
                                         throw new WrappedException(e);
                                     }
@@ -284,16 +302,13 @@ public class NativePromise extends IdScriptableObject {
                         return success;
                     } else if (error != null) {
                         try {
-                            Object result = reject.call(newCx, scope, thisObj, new Object[]{ error });
-                            return result;
+                            return reject.call(newCx, scope, thisObj, new Object[]{ error });
                         } catch (Exception e) {
                             throw new CompletionException(e);
                         }
                     }
 
                     throw Kit.codeBug("Unexpected end of Promise then handler");
-                } catch (Exception e) {
-                    throw e;
                 } finally {
                     Context.exit();
                 }
