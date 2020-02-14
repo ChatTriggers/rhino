@@ -227,7 +227,7 @@ public class NativeJavaObject
             } else if (hint == ScriptRuntime.NumberClass) {
                 converterName = "doubleValue";
             } else {
-                throw Context.reportRuntimeError0("msg.default.value");
+                throw Context.reportRuntimeError1("msg.default.value", this.toString());
             }
             Object converterObject = get(converterName, this);
             if (converterObject instanceof Function) {

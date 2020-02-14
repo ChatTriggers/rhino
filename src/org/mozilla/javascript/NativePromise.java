@@ -1,5 +1,6 @@
 package org.mozilla.javascript;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -13,8 +14,6 @@ public class NativePromise extends IdScriptableObject {
 
     private CompletableFuture<Object> _future;
     private List<CompletableFuture<Object>> _futures;
-
-    private PromiseState state = PromiseState.PENDING;
 
     enum PromiseState {
         PENDING,
@@ -105,17 +104,21 @@ public class NativePromise extends IdScriptableObject {
                 return js_catch(cx, scope, thisObj, args);
             case Id_finally:
                 return js_finally(cx, scope, thisObj, args);
+            case ConstructorId_resolve:
+                return js_resolve(cx, scope, args);
+            case ConstructorId_reject:
+                return js_reject(cx, scope, args);
             case ConstructorId_all:
+                // return js_all(cx, scope, args);
             case ConstructorId_allSettled:
             case ConstructorId_any:
             case ConstructorId_race:
-            case ConstructorId_reject:
-            case ConstructorId_resolve:
             default:
                 throw new IllegalArgumentException(String.valueOf(f.methodId()));
         }
     }
 
+    @SuppressWarnings("unchecked")
     private NativePromise js_construct(Scriptable scope, Object[] args) {
         NativePromise promise = new NativePromise();
 
@@ -156,7 +159,7 @@ public class NativePromise extends IdScriptableObject {
                             })
                         });
 
-                        while (state.get() == PromiseState.PENDING) ;
+                        while (state.get() == PromiseState.PENDING);
 
                         if (state.get() == PromiseState.REJECTED) {
                             throw new JavaScriptException(result.get());
@@ -173,38 +176,6 @@ public class NativePromise extends IdScriptableObject {
         }
 
         return promise;
-    }
-
-    private Object js_finally(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        if (!(thisObj instanceof NativePromise)) {
-            throw Kit.codeBug("Expected Promise.then thisObj to be a NativePromise");
-        }
-
-        NativePromise thisPromise = (NativePromise) thisObj;
-
-        Object onFinally = args.length > 0 ? args[0] : null;
-
-        return constructPromise(cx, scope, thisObj, new Object[]{
-            thisPromise._future.handle((success, error) -> {
-                synchronized (thisPromise) {
-                    try {
-                        Context newCx = Context.enter();
-
-                        if (onFinally instanceof Callable) {
-                            ((Callable) onFinally).call(newCx, scope, thisObj, new Object[0]);
-                        }
-
-                        return Undefined.instance;
-                    } finally {
-                        Context.exit();
-                    }
-                }
-            })
-        });
-    }
-
-    private Object js_catch(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        return js_then(cx, scope, thisObj, new Object[]{ null, args.length > 0 ? args[0] : null });
     }
 
     private Object js_then(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
@@ -248,15 +219,7 @@ public class NativePromise extends IdScriptableObject {
 
                             if (onRejection instanceof Function) {
                                 try {
-                                    while (reason instanceof Throwable) {
-                                        if (reason instanceof WrappedException) {
-                                            reason = ((WrappedException) reason).getWrappedException();
-                                        } else if (reason instanceof CompletionException) {
-                                            reason = ((CompletionException) reason).getCause();
-                                        } else if (reason instanceof JavaScriptException) {
-                                            reason = ((JavaScriptException) reason).getValue();
-                                        }
-                                    }
+                                    reason = unwrapException(reason);
 
                                     Scriptable obj = _cx.newObject(scope);
                                     ScriptableObject.putProperty(
@@ -285,8 +248,8 @@ public class NativePromise extends IdScriptableObject {
 
                                     Object arg = value instanceof NativePromise
                                         ? ScriptableObject.getProperty(ScriptableObject.ensureScriptable(
-                                        ((NativePromise) value)._future.get()
-                                    ), "result")
+                                                ((NativePromise) value)._future.get()
+                                            ), "result")
                                         : value;
 
                                     Object newVal = ((Function) onFulfillment).call(
@@ -320,6 +283,110 @@ public class NativePromise extends IdScriptableObject {
         });
     }
 
+    private Object js_catch(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        return js_then(cx, scope, thisObj, new Object[]{ null, args.length > 0 ? args[0] : null });
+    }
+
+    private Object js_finally(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (!(thisObj instanceof NativePromise)) {
+            throw Kit.codeBug("Expected Promise.then thisObj to be a NativePromise");
+        }
+
+        NativePromise thisPromise = (NativePromise) thisObj;
+
+        Object onFinally = args.length > 0 ? args[0] : null;
+
+        return constructPromise(cx, scope, thisObj, new Object[]{
+            thisPromise._future.handle((success, error) -> {
+                synchronized (thisPromise) {
+                    try {
+                        Context newCx = Context.enter();
+
+                        if (onFinally instanceof Callable) {
+                            ((Callable) onFinally).call(newCx, scope, thisObj, new Object[0]);
+                        }
+
+                        return Undefined.instance;
+                    } finally {
+                        Context.exit();
+                    }
+                }
+            })
+        });
+    }
+
+    private Object js_resolve(Context cx, Scriptable scope, Object[] args) {
+        Scriptable obj = cx.newObject(scope);
+        ScriptableObject.putProperty(obj, "result", args.length > 0 ? args[0] : Undefined.instance);
+
+        return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
+            CompletableFuture.completedFuture(obj)
+        });
+    }
+
+    private Object js_reject(Context cx, Scriptable scope, Object[] args) {
+        Scriptable obj = cx.newObject(scope);
+        ScriptableObject.putProperty(obj, "result", args.length > 0 ? args[0] : Undefined.instance);
+
+        return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
+            CompletableFuture.supplyAsync(() -> {
+                throw new JavaScriptException(obj);
+            })
+        });
+    }
+
+    /*
+    @SuppressWarnings("unchecked")
+    private Object js_all(Context cx, Scriptable scope, Object[] args) {
+        List<CompletableFuture<Object>> futures = new ArrayList<>();
+
+        for (Object obj : args) {
+            if (obj instanceof NativePromise) {
+                futures.add(((NativePromise) obj)._future);
+            }
+        }
+
+        // return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
+        //     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])),
+        //     futures
+        // });
+
+        return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
+            CompletableFuture
+                .allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(__ -> {
+                    Context newCx = Context.enter();
+
+                    synchronized (newCx) {
+                        try {
+                            NativeArray arr = (NativeArray) newCx.newArray(scope, futures.size());
+
+                            for (int i = 0, futuresSize = futures.size(); i < futuresSize; i++) {
+                                Object obj = futures.get(i).get();
+                                Object value = ScriptableObject.getProperty(
+                                    ScriptableObject.ensureScriptable(obj),
+                                    "result"
+                                );
+
+                                ScriptableObject.putProperty(arr, i, value);
+                            }
+
+                            Scriptable obj = newCx.newObject(scope);
+                            ScriptableObject.putProperty(obj, "result", arr);
+
+                            return obj;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return null;
+                        } finally {
+                            Context.exit();
+                        }
+                    }
+                })
+        });
+    }
+    */
+
     private Object constructPromise(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         BaseFunction species = getSpecies(thisObj);
 
@@ -328,6 +395,20 @@ public class NativePromise extends IdScriptableObject {
         }
 
         return species.construct(cx, scope, args);
+    }
+
+    private Object unwrapException(Object error) {
+        while (error instanceof Throwable) {
+            if (error instanceof WrappedException) {
+                error = ((WrappedException) error).getWrappedException();
+            } else if (error instanceof CompletionException) {
+                error = ((CompletionException) error).getCause();
+            } else if (error instanceof JavaScriptException) {
+                error = ((JavaScriptException) error).getValue();
+            }
+        }
+
+        return error;
     }
 
     @Override
@@ -344,31 +425,15 @@ public class NativePromise extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2020-02-11 08:35:44 CST
-        L0:
-        {
-            id = 0;
-            String X = null;
-            L:
-            switch (s.length()) {
-                case 4:
-                    X = "then";
-                    id = Id_then;
-                    break L;
-                case 5:
-                    X = "catch";
-                    id = Id_catch;
-                    break L;
-                case 7:
-                    X = "finally";
-                    id = Id_finally;
-                    break L;
-                case 11:
-                    X = "constructor";
-                    id = Id_constructor;
-                    break L;
+// #generated# Last update: 2020-02-13 20:15:13 CST
+        L0: { id = 0; String X = null;
+            L: switch (s.length()) {
+            case 4: X="then";id=Id_then; break L;
+            case 5: X="catch";id=Id_catch; break L;
+            case 7: X="finally";id=Id_finally; break L;
+            case 11: X="constructor";id=Id_constructor; break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -380,8 +445,8 @@ public class NativePromise extends IdScriptableObject {
         ConstructorId_allSettled = -2,
         ConstructorId_any = -3,
         ConstructorId_race = -4,
-        ConstructorId_reject = -5,
-        ConstructorId_resolve = -6,
+        ConstructorId_resolve = -5,
+        ConstructorId_reject = -6,
 
     Id_constructor = 1,
         Id_then = 2,

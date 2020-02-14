@@ -1152,8 +1152,7 @@ public abstract class ScriptableObject implements Scriptable,
             }
         }
         // fall through to error
-        String arg = (typeHint == null) ? "undefined" : typeHint.getName();
-        throw ScriptRuntime.typeError1("msg.default.value", arg);
+        throw ScriptRuntime.typeError1("msg.default.value", object.toString());
     }
 
     /**
