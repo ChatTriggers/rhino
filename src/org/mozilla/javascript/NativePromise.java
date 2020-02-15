@@ -131,7 +131,7 @@ public class NativePromise extends IdScriptableObject {
             promise._future = CompletableFuture.supplyAsync(() -> {
                 Context newCx = Context.enter();
 
-                synchronized (newCx) {
+                synchronized (promise) {
                     try {
                         AtomicReference<PromiseState> state = new AtomicReference<>(PromiseState.PENDING);
                         AtomicReference<Object> result = new AtomicReference<>(null);
@@ -149,15 +149,13 @@ public class NativePromise extends IdScriptableObject {
                             })
                         });
 
-                        while (state.get() == PromiseState.PENDING);
+                        while (state.get() == PromiseState.PENDING) ;
 
                         if (state.get() == PromiseState.REJECTED) {
                             throw new JavaScriptException(result.get());
                         }
 
-                        Scriptable obj = new NativeObject();
-                        ScriptableObject.putProperty(obj, "result", result.get());
-                        return obj;
+                        return result.get();
                     } finally {
                         Context.exit();
                     }
@@ -185,20 +183,15 @@ public class NativePromise extends IdScriptableObject {
                         Context newCx = Context.enter();
 
                         if (success == null && error == null && thisPromise._futures != null) {
-                            success = newCx.newObject(scope);
-                            ScriptableObject.putProperty(
-                                (Scriptable) success,
-                                "result",
-                                thisPromise._futures.stream().map(
-                                    future -> {
-                                        try {
-                                            return ScriptableObject.getProperty(future.get(), "result");
-                                        } catch (InterruptedException | ExecutionException e) {
-                                            throw new WrappedException(e);
-                                        }
+                            success = thisPromise._futures.stream().map(
+                                future -> {
+                                    try {
+                                        return future.get();
+                                    } catch (InterruptedException | ExecutionException e) {
+                                        throw new WrappedException(e);
                                     }
-                                ).collect(Collectors.toList())
-                            );
+                                }
+                            ).collect(Collectors.toList());
                         }
 
                         Function reject = BaseFunction.wrap((_cx, _scope, _thisObj, _args) -> {
@@ -206,23 +199,9 @@ public class NativePromise extends IdScriptableObject {
 
                             if (onRejection instanceof Function) {
                                 try {
-                                    reason = unwrapException(reason);
-
-                                    // TODO: Make more robust
-                                    // If the user throws an object, this will mess up the error reason.
-                                    // "result" should be a custom SymbolKey
-                                    reason = reason instanceof Scriptable
-                                        ? ScriptableObject.getProperty((Scriptable) reason, "result")
-                                        : reason;
-
-                                    Scriptable obj = _cx.newObject(scope);
-                                    ScriptableObject.putProperty(
-                                        obj,
-                                        "result",
-                                        ((Function) onRejection).call(_cx, _scope, _thisObj, new Object[]{ reason })
-                                    );
-
-                                    return obj;
+                                    return ((Function) onRejection).call(_cx, _scope, _thisObj, new Object[]{
+                                        unwrapException(reason)
+                                    });
                                 } catch (Exception e) {
                                     throw new CompletionException(e);
                                 }
@@ -234,23 +213,13 @@ public class NativePromise extends IdScriptableObject {
                         if (success != null) {
                             if (onFulfillment instanceof Function) {
                                 try {
-                                    Object value = success instanceof Scriptable
-                                        ? ScriptableObject.getProperty((Scriptable) success, "result")
-                                        : Undefined.instance;
+                                    Object arg = success instanceof NativePromise
+                                        ? ((NativePromise) success)._future.get()
+                                        : success;
 
-                                    Scriptable obj = newCx.newObject(scope);
-
-                                    Object arg = value instanceof NativePromise
-                                        ? ScriptableObject.getProperty(((NativePromise) value)._future.get(), "result")
-                                        : value;
-
-                                    Object newVal = ((Function) onFulfillment).call(
+                                    return ((Function) onFulfillment).call(
                                         newCx, scope, thisObj, new Object[]{ arg }
                                     );
-
-                                    ScriptableObject.putProperty(obj, "result", newVal);
-
-                                    return obj;
                                 } catch (Exception e) {
                                     // TODO: return this?
                                     reject.call(newCx, scope, thisObj, new Object[]{ e });
@@ -308,21 +277,15 @@ public class NativePromise extends IdScriptableObject {
     }
 
     private Object js_resolve(Context cx, Scriptable scope, Object[] args) {
-        Scriptable obj = cx.newObject(scope);
-        ScriptableObject.putProperty(obj, "result", args.length > 0 ? args[0] : Undefined.instance);
-
         return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
-            CompletableFuture.completedFuture(obj)
+            CompletableFuture.completedFuture(args.length > 0 ? args[0] : Undefined.instance)
         });
     }
 
     private Object js_reject(Context cx, Scriptable scope, Object[] args) {
-        Scriptable obj = cx.newObject(scope);
-        ScriptableObject.putProperty(obj, "result", args.length > 0 ? args[0] : Undefined.instance);
-
         return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
             CompletableFuture.supplyAsync(() -> {
-                throw new JavaScriptException(obj);
+                throw new JavaScriptException(args.length > 0 ? args[0] : Undefined.instance);
             })
         });
     }
