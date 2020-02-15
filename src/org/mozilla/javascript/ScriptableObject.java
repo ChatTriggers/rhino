@@ -1151,6 +1151,7 @@ public abstract class ScriptableObject implements Scriptable,
                 }
             }
         }
+
         // fall through to error
         throw ScriptRuntime.typeError1("msg.default.value", object.toString());
     }
@@ -2430,16 +2431,18 @@ public abstract class ScriptableObject implements Scriptable,
      * Generalized variant of getProperty that calls one of the other
      * three getProperty methods depending on the type of key
      */
-    public static Object getProperty(Scriptable obj, Object key) {
-        if (key instanceof String) {
-            return getProperty(obj, (String) key);
-        } else if (key instanceof Integer) {
-            return getProperty(obj, (int) key);
-        } else if (key instanceof Symbol) {
-            return getProperty(obj, (Symbol) key);
-        } else {
-            throw Kit.codeBug();
+    public static Object getProperty(Object obj, Object id) {
+        Scriptable sObj = ensureScriptable(obj);
+
+        if (id instanceof String) {
+            return getProperty(sObj, (String) id);
+        } else if (id instanceof Symbol) {
+            return getProperty(sObj, (Symbol) id);
+        } else if (id instanceof Integer) {
+            return getProperty(sObj, (int) id);
         }
+
+        throw new IllegalArgumentException();
     }
 
 
@@ -2513,6 +2516,43 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     /**
+     * Returns whether an indexed property is defined in an object or any object
+     * in its prototype chain.
+     * <p>
+     * Searches the prototype chain for a property with index <code>index</code>.
+     * <p>
+     *
+     * @param obj   a JavaScript object
+     * @param index a property index
+     * @return the true if property was found
+     * @since 1.5R2
+     */
+    public static boolean hasProperty(Scriptable obj, int index) {
+        return null != getBase(obj, index);
+    }
+
+    /**
+     * A version of hasProperty for properties with Symbol keys.
+     */
+    public static boolean hasProperty(Scriptable obj, Symbol key) {
+        return null != getBase(obj, key);
+    }
+
+    public static boolean hasProperty(Object obj, Object id) {
+        Scriptable sObj = ensureScriptable(obj);
+
+        if (id instanceof String) {
+            return hasProperty(sObj, (String) id);
+        } else if (id instanceof Symbol) {
+            return hasProperty(sObj, (Symbol) id);
+        } else if (id instanceof Integer) {
+            return hasProperty(sObj, (int) id);
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    /**
      * If hasProperty(obj, name) would return true, then if the property that
      * was found is compatible with the new property, this method just returns.
      * If the property is not compatible, then an exception is thrown.
@@ -2534,29 +2574,6 @@ public abstract class ScriptableObject implements Scriptable,
         }
         if (isConst)
             throw ScriptRuntime.typeError1("msg.var.redecl", name);
-    }
-
-    /**
-     * Returns whether an indexed property is defined in an object or any object
-     * in its prototype chain.
-     * <p>
-     * Searches the prototype chain for a property with index <code>index</code>.
-     * <p>
-     *
-     * @param obj   a JavaScript object
-     * @param index a property index
-     * @return the true if property was found
-     * @since 1.5R2
-     */
-    public static boolean hasProperty(Scriptable obj, int index) {
-        return null != getBase(obj, index);
-    }
-
-    /**
-     * A version of hasProperty for properties with Symbol keys.
-     */
-    public static boolean hasProperty(Scriptable obj, Symbol key) {
-        return null != getBase(obj, key);
     }
 
     /**
@@ -2593,30 +2610,6 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     /**
-     * Puts a named property in an object or in an object in its prototype chain.
-     * <p>
-     * Searches for the named property in the prototype chain. If it is found,
-     * the value of the property in <code>obj</code> is changed through a call
-     * to {@link Scriptable#put(String, Scriptable, Object)} on the
-     * prototype passing <code>obj</code> as the <code>start</code> argument.
-     * This allows the prototype to veto the property setting in case the
-     * prototype defines the property with [[ReadOnly]] attribute. If the
-     * property is not found, it is added in <code>obj</code>.
-     *
-     * @param obj   a JavaScript object
-     * @param name  a property name
-     * @param value any JavaScript value accepted by Scriptable.put
-     * @since 1.5R2
-     */
-    public static void putConstProperty(Scriptable obj, String name, Object value) {
-        Scriptable base = getBase(obj, name);
-        if (base == null)
-            base = obj;
-        if (base instanceof ConstProperties)
-            ((ConstProperties) base).putConst(name, obj, value);
-    }
-
-    /**
      * Puts an indexed property in an object or in an object in its prototype chain.
      * <p>
      * Searches for the indexed property in the prototype chain. If it is found,
@@ -2639,16 +2632,41 @@ public abstract class ScriptableObject implements Scriptable,
         base.put(index, obj, value);
     }
 
-    public static void putProperty(Scriptable obj, Object key, Object value) {
+    public static void putProperty(Object obj, Object key, Object value) {
+        Scriptable sObj = ensureScriptable(obj);
         if (key instanceof String) {
-            putProperty(obj, (String) key, value);
+            putProperty(sObj, (String) key, value);
         } else if (key instanceof Integer) {
-            putProperty(obj, (int) key, value);
+            putProperty(sObj, (int) key, value);
         } else if (key instanceof Symbol) {
-            putProperty(obj, (Symbol) key, value);
+            putProperty(sObj, (Symbol) key, value);
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    /**
+     * Puts a named property in an object or in an object in its prototype chain.
+     * <p>
+     * Searches for the named property in the prototype chain. If it is found,
+     * the value of the property in <code>obj</code> is changed through a call
+     * to {@link Scriptable#put(String, Scriptable, Object)} on the
+     * prototype passing <code>obj</code> as the <code>start</code> argument.
+     * This allows the prototype to veto the property setting in case the
+     * prototype defines the property with [[ReadOnly]] attribute. If the
+     * property is not found, it is added in <code>obj</code>.
+     *
+     * @param obj   a JavaScript object
+     * @param name  a property name
+     * @param value any JavaScript value accepted by Scriptable.put
+     * @since 1.5R2
+     */
+    public static void putConstProperty(Scriptable obj, String name, Object value) {
+        Scriptable base = getBase(obj, name);
+        if (base == null)
+            base = obj;
+        if (base instanceof ConstProperties)
+            ((ConstProperties) base).putConst(name, obj, value);
     }
 
     /**

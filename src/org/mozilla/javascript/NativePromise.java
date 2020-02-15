@@ -1,6 +1,5 @@
 package org.mozilla.javascript;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -36,10 +35,6 @@ public class NativePromise extends IdScriptableObject {
 
     @Override
     protected void fillConstructorProperties(IdFunctionObject ctor) {
-        addIdFunctionProperty(ctor, PROMISE_TAG, ConstructorId_all, "all", 1);
-        addIdFunctionProperty(ctor, PROMISE_TAG, ConstructorId_allSettled, "allSettled", 1);
-        addIdFunctionProperty(ctor, PROMISE_TAG, ConstructorId_any, "any", 1);
-        addIdFunctionProperty(ctor, PROMISE_TAG, ConstructorId_race, "race", 1);
         addIdFunctionProperty(ctor, PROMISE_TAG, ConstructorId_resolve, "resolve", 1);
         addIdFunctionProperty(ctor, PROMISE_TAG, ConstructorId_reject, "reject", 1);
 
@@ -108,11 +103,6 @@ public class NativePromise extends IdScriptableObject {
                 return js_resolve(cx, scope, args);
             case ConstructorId_reject:
                 return js_reject(cx, scope, args);
-            case ConstructorId_all:
-                // return js_all(cx, scope, args);
-            case ConstructorId_allSettled:
-            case ConstructorId_any:
-            case ConstructorId_race:
             default:
                 throw new IllegalArgumentException(String.valueOf(f.methodId()));
         }
@@ -139,10 +129,10 @@ public class NativePromise extends IdScriptableObject {
 
 
             promise._future = CompletableFuture.supplyAsync(() -> {
-                synchronized (promise) {
-                    try {
-                        Context newCx = Context.enter();
+                Context newCx = Context.enter();
 
+                synchronized (newCx) {
+                    try {
                         AtomicReference<PromiseState> state = new AtomicReference<>(PromiseState.PENDING);
                         AtomicReference<Object> result = new AtomicReference<>(null);
 
@@ -202,10 +192,7 @@ public class NativePromise extends IdScriptableObject {
                                 thisPromise._futures.stream().map(
                                     future -> {
                                         try {
-                                            return ScriptableObject.getProperty(
-                                                ScriptableObject.ensureScriptable(future.get()),
-                                                "result"
-                                            );
+                                            return ScriptableObject.getProperty(future.get(), "result");
                                         } catch (InterruptedException | ExecutionException e) {
                                             throw new WrappedException(e);
                                         }
@@ -220,6 +207,13 @@ public class NativePromise extends IdScriptableObject {
                             if (onRejection instanceof Function) {
                                 try {
                                     reason = unwrapException(reason);
+
+                                    // TODO: Make more robust
+                                    // If the user throws an object, this will mess up the error reason.
+                                    // "result" should be a custom SymbolKey
+                                    reason = reason instanceof Scriptable
+                                        ? ScriptableObject.getProperty((Scriptable) reason, "result")
+                                        : reason;
 
                                     Scriptable obj = _cx.newObject(scope);
                                     ScriptableObject.putProperty(
@@ -247,9 +241,7 @@ public class NativePromise extends IdScriptableObject {
                                     Scriptable obj = newCx.newObject(scope);
 
                                     Object arg = value instanceof NativePromise
-                                        ? ScriptableObject.getProperty(ScriptableObject.ensureScriptable(
-                                                ((NativePromise) value)._future.get()
-                                            ), "result")
+                                        ? ScriptableObject.getProperty(((NativePromise) value)._future.get(), "result")
                                         : value;
 
                                     Object newVal = ((Function) onFulfillment).call(
@@ -335,58 +327,6 @@ public class NativePromise extends IdScriptableObject {
         });
     }
 
-    /*
-    @SuppressWarnings("unchecked")
-    private Object js_all(Context cx, Scriptable scope, Object[] args) {
-        List<CompletableFuture<Object>> futures = new ArrayList<>();
-
-        for (Object obj : args) {
-            if (obj instanceof NativePromise) {
-                futures.add(((NativePromise) obj)._future);
-            }
-        }
-
-        // return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
-        //     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])),
-        //     futures
-        // });
-
-        return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
-            CompletableFuture
-                .allOf(futures.toArray(new CompletableFuture[0]))
-                .thenApply(__ -> {
-                    Context newCx = Context.enter();
-
-                    synchronized (newCx) {
-                        try {
-                            NativeArray arr = (NativeArray) newCx.newArray(scope, futures.size());
-
-                            for (int i = 0, futuresSize = futures.size(); i < futuresSize; i++) {
-                                Object obj = futures.get(i).get();
-                                Object value = ScriptableObject.getProperty(
-                                    ScriptableObject.ensureScriptable(obj),
-                                    "result"
-                                );
-
-                                ScriptableObject.putProperty(arr, i, value);
-                            }
-
-                            Scriptable obj = newCx.newObject(scope);
-                            ScriptableObject.putProperty(obj, "result", arr);
-
-                            return obj;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return null;
-                        } finally {
-                            Context.exit();
-                        }
-                    }
-                })
-        });
-    }
-    */
-
     private Object constructPromise(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         BaseFunction species = getSpecies(thisObj);
 
@@ -425,15 +365,31 @@ public class NativePromise extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2020-02-13 20:15:13 CST
-        L0: { id = 0; String X = null;
-            L: switch (s.length()) {
-            case 4: X="then";id=Id_then; break L;
-            case 5: X="catch";id=Id_catch; break L;
-            case 7: X="finally";id=Id_finally; break L;
-            case 11: X="constructor";id=Id_constructor; break L;
+// #generated# Last update: 2020-02-15 14:10:12 CST
+        L0:
+        {
+            id = 0;
+            String X = null;
+            L:
+            switch (s.length()) {
+                case 4:
+                    X = "then";
+                    id = Id_then;
+                    break L;
+                case 5:
+                    X = "catch";
+                    id = Id_catch;
+                    break L;
+                case 7:
+                    X = "finally";
+                    id = Id_finally;
+                    break L;
+                case 11:
+                    X = "constructor";
+                    id = Id_constructor;
+                    break L;
             }
-            if (X!=null && X!=s && !X.equals(s)) id = 0;
+            if (X != null && X != s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -441,12 +397,8 @@ public class NativePromise extends IdScriptableObject {
     }
 
     private static final int
-        ConstructorId_all = -1,
-        ConstructorId_allSettled = -2,
-        ConstructorId_any = -3,
-        ConstructorId_race = -4,
-        ConstructorId_resolve = -5,
-        ConstructorId_reject = -6,
+        ConstructorId_resolve = -1,
+        ConstructorId_reject = -2,
 
     Id_constructor = 1,
         Id_then = 2,

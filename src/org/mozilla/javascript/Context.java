@@ -1616,7 +1616,7 @@ public class Context {
      *               additional properties added dynamically).
      * @return the new array object
      */
-    public Scriptable newArray(Scriptable scope, int length) {
+    public NativeArray newArray(Scriptable scope, int length) {
         NativeArray result = new NativeArray(length);
         ScriptRuntime.setBuiltinProtoAndParent(result, scope,
                 TopLevel.Builtins.Array);
