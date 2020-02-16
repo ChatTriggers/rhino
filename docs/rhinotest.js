@@ -6,12 +6,12 @@ var global = {};
 // This function is needed to run the tests and was extracted from:
 // https://github.com/kangax/compat-table/blob/gh-pages/node.js
 global.__createIterableObject = function (arr, methods) {
-  methods = methods || {}
+  methods = methods || {};
   if (typeof Symbol !== 'function' || !Symbol.iterator) {
-    return {}
+    return {};
   }
 
-  arr.length++
+  arr.length++;
   var iterator = {
     next: function () {
       return {
@@ -21,91 +21,120 @@ global.__createIterableObject = function (arr, methods) {
     },
     'return': methods['return'],
     'throw': methods['throw']
-  }
-  var iterable = {}
-  iterable[Symbol.iterator] = function () { return iterator }
+  };
+  var iterable = {};
+  iterable[Symbol.iterator] = function () {
+    return iterator
+  };
 
   return iterable
-}
+};
 
 var output = {
   _version: 'UNKNOWN',
   _engine: 'Rhino',
-}
+};
 
-var versions = Object.keys(testers)
-function next (ver) {
-  if (!ver) return write()
+let activeAsyncTests = 0;
+var shouldWrite = false;
 
-  var completed = 0
+var interval = setInterval(function () {
+  if (shouldWrite && activeAsyncTests === 0) {
+    write();
+    clearInterval(interval);
+  }
+}, 100);
+
+var versions = Object.keys(testers);
+
+function next(ver) {
+  if (!ver) {
+    shouldWrite = true;
+    return;
+  }
+
+  var completed = 0;
   var results = output[ver] = {
     _successful: 0,
     _count: Object.keys(testers[ver]).length,
     _percent: 0
-  }
+  };
   Object.keys(testers[ver]).forEach(function (name) {
-    var script = testers[ver][name]
-    results[name] = false // make SURE it makes it to the output
+    var script = testers[ver][name];
+    results[name] = false; // make SURE it makes it to the output
 
     run(name, script, function (result) {
-      // expected results: `e.message` or true/false
-      results[name] = typeof result === 'string' ? result : !!result
-      if (results[name] === true) results._successful++
+      if (/asyncTestPassed/.test(script)) {
+      }
+      // expected results: `e.message` or true/false;
+      results[name] = typeof result === 'string' ? result : !!result;
+      if (results[name] === true) results._successful++;
 
       if (++completed === results._count) {
-        results._percent = results._successful / results._count
-		// In the future this needs to become setTimeout
-		// so that we can support Promises
-		next(versions.pop());
+        results._percent = results._successful / results._count;
+        // In the future this needs to become setTimeout
+        // so that we can support Promises
+        next(versions.pop());
       }
     })
   })
 }
+
 next(versions.pop());
 
-function run (name, script, cb) {
+function run(name, script, cb) {
   // Work around a regexp bug in older Rhinos
   if (/incomplete patterns and quantifiers/.test(name)) {
-	return cb(false);
+    return cb(false);
   }
 
   // kangax's Promise tests reply on a asyncTestPassed function.
-  var async = /asyncTestPassed/.test(script)
+  var async = /asyncTestPassed/.test(script);
   if (async) {
-    runAsync(script, function (result) {
-      return cb(result)
-    })
+    runAsync(script, cb);
   } else {
-    var result = runSync(script)
-    return cb(result)
+    cb(runSync(script));
   }
 }
 
-function runAsync (script, cb) {
-
+function runAsync(script, cb) {
+  activeAsyncTests += 1;
+  let caught = false;
+  let passed = false;
   try {
-    var fn = new Function('asyncTestPassed', script)
+    script += ';setTimeout(() => asyncTestFailed(), 5000);';
+    // print('======== async ========');
+    // print(script);
+    var fn = new Function('asyncTestPassed', 'asyncTestFailed', script);
 
     fn(function () {
-	  // TODO eventually do this async
-	  cb(true);
-    })
+      passed = true;
+      activeAsyncTests -= 1;
+      cb(true);
+    }, function () {
+      if (!caught && !passed) {
+        activeAsyncTests -= 1;
+        cb(false);
+      }
+    });
   } catch (e) {
+    caught = true;
+    activeAsyncTests -= 1;
     cb(e.message)
   }
 }
 
-function runSync (script) {
+function runSync(script) {
   try {
     // print('==================');
     // print(script);
-    var fn = new Function(script)
+    var fn = new Function(script);
     return fn() || false
   } catch (e) {
-    return e.message
+    return e !== undefined && e !== null ? e.message : "Empty error"
   }
 }
 
-function write () {
+function write() {
   print(JSON.stringify(output, null, 2));
 }

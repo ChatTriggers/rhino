@@ -9,6 +9,7 @@
 
 rhinoJar=../buildGradle/libs/rhino-1.7.17-SNAPSHOT.jar
 rhinoVersion=master
+debug=false
 
 # curl https://raw.githubusercontent.com/kangax/compat-table/gh-pages/data-es6.js > data-es6.js
 # curl https://raw.githubusercontent.com/kangax/compat-table/gh-pages/data-es2016plus.js > data-es2016plus.js
@@ -22,8 +23,16 @@ node extract.js ./data-esnext.js > ./testers-esnext.json
 node testers.js > testers.json
 
 echo 'Running test...'
-java -jar ${rhinoJar} rhinotest.js > rhino-results/${rhinoVersion}.json
-java -jar ${rhinoJar} -version 200 rhinotest.js > rhino-results/${rhinoVersion}-es6.json
+if [ "$debug" = true ]; then
+  echo 'Waiting for remote debugger'
+  java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 -jar ${rhinoJar} rhinotest.js > rhino-results/${rhinoVersion}.json
+  java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 -jar ${rhinoJar} -version 200 rhinotest.js > rhino-results/${rhinoVersion}-es6.json
+else
+  java -jar ${rhinoJar} rhinotest.js > rhino-results/${rhinoVersion}.json
+  java -jar ${rhinoJar} -version 200 rhinotest.js > rhino-results/${rhinoVersion}-es6.json
+fi
+
+# -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
 
 echo 'Building...'
 node buildrhino.js
