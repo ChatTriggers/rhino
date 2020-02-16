@@ -173,10 +173,14 @@ public class NativePromise extends IdScriptableObject {
 
         NativePromise thisPromise = (NativePromise) thisObj;
 
+        if (thisPromise._future == null) {
+            throw ScriptRuntime.typeError1("msg.incompat.call", "then");
+        }
+
         Object onFulfillment = args.length > 0 ? args[0] : null;
         Object onRejection = args.length > 1 ? args[1] : null;
 
-        return constructPromise(cx, scope, thisObj, new Object[]{
+        return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
             thisPromise._future.handle((success, error) -> {
                 synchronized (thisPromise) {
                     try {
@@ -244,6 +248,16 @@ public class NativePromise extends IdScriptableObject {
     }
 
     private Object js_catch(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (!(thisObj instanceof NativePromise)) {
+            throw Kit.codeBug("Expected Promise.catch to be a NativePromise");
+        }
+
+        NativePromise thisPromise = (NativePromise) thisObj;
+
+        if (thisPromise._future == null) {
+            throw ScriptRuntime.typeError1("msg.incompat.call", "catch");
+        }
+
         return js_then(cx, scope, thisObj, new Object[]{ null, args.length > 0 ? args[0] : null });
     }
 
@@ -254,9 +268,13 @@ public class NativePromise extends IdScriptableObject {
 
         NativePromise thisPromise = (NativePromise) thisObj;
 
+        if (thisPromise._future == null) {
+            throw ScriptRuntime.typeError1("msg.incompat.call", "then");
+        }
+
         Object onFinally = args.length > 0 ? args[0] : null;
 
-        return constructPromise(cx, scope, thisObj, new Object[]{
+        return ScriptRuntime.newObject(cx, scope, "Promise", new Object[]{
             thisPromise._future.handle((success, error) -> {
                 synchronized (thisPromise) {
                     try {
@@ -293,16 +311,6 @@ public class NativePromise extends IdScriptableObject {
                 throw new JavaScriptException(args.length > 0 ? args[0] : Undefined.instance);
             })
         });
-    }
-
-    private Object constructPromise(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        BaseFunction species = getSpecies(thisObj);
-
-        if (species == null) {
-            throw Kit.codeBug();
-        }
-
-        return species.construct(cx, scope, args);
     }
 
     private Object unwrapException(Object error) {
