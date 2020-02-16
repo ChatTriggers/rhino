@@ -221,7 +221,6 @@ public class NativePromise extends IdScriptableObject {
                                         newCx, scope, thisObj, new Object[]{ arg }
                                     );
                                 } catch (Exception e) {
-                                    // TODO: return this?
                                     reject.call(newCx, scope, thisObj, new Object[]{ e });
                                 }
                             }
@@ -264,10 +263,16 @@ public class NativePromise extends IdScriptableObject {
                         Context newCx = Context.enter();
 
                         if (onFinally instanceof Callable) {
-                            ((Callable) onFinally).call(newCx, scope, thisObj, new Object[0]);
+                            Object obj = ((Callable) onFinally).call(newCx, scope, thisObj, new Object[0]);
+
+                            if (obj instanceof NativePromise) {
+                                ((NativePromise) obj)._future.get();
+                            }
                         }
 
-                        return Undefined.instance;
+                        return success;
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
                     } finally {
                         Context.exit();
                     }
@@ -304,10 +309,10 @@ public class NativePromise extends IdScriptableObject {
         while (error instanceof Throwable) {
             if (error instanceof WrappedException) {
                 error = ((WrappedException) error).getWrappedException();
-            } else if (error instanceof CompletionException) {
-                error = ((CompletionException) error).getCause();
             } else if (error instanceof JavaScriptException) {
                 error = ((JavaScriptException) error).getValue();
+            } else {
+                error = ((Throwable) error).getCause();
             }
         }
 
