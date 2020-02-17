@@ -6,6 +6,9 @@ package org.mozilla.javascript.commonjs.module.provider;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
 
@@ -113,13 +116,24 @@ public class UrlModuleSourceProvider extends ModuleSourceProviderBase {
         ModuleSource source = loadFromActualUri(fullUri, base, validator);
         // ... but for compatibility we support modules without extension,
         // or ids with explicit extension.
-        return source != null ?
-                source : loadFromActualUri(uri, base, validator);
+        if (source != null) {
+            return source;
+        }
+
+        try {
+            Path path = Paths.get(uri);
+            if (Files.isDirectory(path)) {
+                uri = new URI(uri.toString() + File.separatorChar + "index" + (uri.toString().endsWith(".js") ? "" : ".js"));
+            }
+        } catch (Exception ignored) { }
+
+        return loadFromActualUri(uri, base, validator);
     }
 
     protected ModuleSource loadFromActualUri(URI uri, URI base, Object validator)
             throws IOException {
         final URL url = new URL(base == null ? null : base.toURL(), uri.toString());
+
         final long request_time = System.currentTimeMillis();
         final URLConnection urlConnection = openUrlConnection(url);
         final URLValidator applicableValidator;
