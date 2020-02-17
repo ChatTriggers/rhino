@@ -2984,6 +2984,10 @@ public abstract class ScriptableObject implements Scriptable,
                 if (constFlag != UNINITIALIZED_CONST) {
                     slot.setAttributes(attr & ~UNINITIALIZED_CONST | INITIALIZED_CONST);
                 }
+            } else if ((attr & (UNINITIALIZED_CONST | INITIALIZED_CONST)) == 0) {
+                // We are initializing a const slot in a ScriptRuntime.enterWith call
+                slot.value = value;
+                slot.setAttributes(attr | INITIALIZED_CONST);
             }
             return true;
         }
