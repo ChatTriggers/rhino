@@ -202,9 +202,7 @@ public abstract class ScriptableObject implements Scriptable,
 
     }
 
-    protected static ScriptableObject buildDataDescriptor(Scriptable scope,
-                                                          Object value,
-                                                          int attributes) {
+    protected static ScriptableObject buildDataDescriptor(Scriptable scope, Object value, int attributes) {
         ScriptableObject desc = new NativeObject();
         ScriptRuntime.setBuiltinProtoAndParent(desc, scope, TopLevel.Builtins.Object);
         desc.defineProperty("value", value, EMPTY);
@@ -674,8 +672,7 @@ public abstract class ScriptableObject implements Scriptable,
      * The engine always ignored the start argument.
      */
     @Deprecated
-    public void setAttributes(int index, Scriptable start,
-                              int attributes) {
+    public void setAttributes(int index, Scriptable start, int attributes) {
         setAttributes(index, attributes);
     }
 
@@ -953,8 +950,7 @@ public abstract class ScriptableObject implements Scriptable,
         return false;
     }
 
-    void addLazilyInitializedValue(String name, int index,
-                                   LazilyLoadedCtor init, int attributes) {
+    void addLazilyInitializedValue(String name, int index, LazilyLoadedCtor init, int attributes) {
         if (name != null && index != 0)
             throw new IllegalArgumentException(name);
         checkNotSealed(name, index);
@@ -1301,9 +1297,8 @@ public abstract class ScriptableObject implements Scriptable,
      * #defineProperty(String, Class, int)
      */
     public static <T extends Scriptable> void defineClass(
-            Scriptable scope, Class<T> clazz)
-            throws IllegalAccessException, InstantiationException,
-            InvocationTargetException {
+            Scriptable scope, Class<T> clazz
+    ) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         defineClass(scope, clazz, false, false);
     }
 
@@ -1331,9 +1326,8 @@ public abstract class ScriptableObject implements Scriptable,
      * @since 1.4R3
      */
     public static <T extends Scriptable> void defineClass(
-            Scriptable scope, Class<T> clazz, boolean sealed)
-            throws IllegalAccessException, InstantiationException,
-            InvocationTargetException {
+            Scriptable scope, Class<T> clazz, boolean sealed
+    ) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         defineClass(scope, clazz, sealed, false);
     }
 
@@ -1365,10 +1359,8 @@ public abstract class ScriptableObject implements Scriptable,
      * @since 1.6R2
      */
     public static <T extends Scriptable> String defineClass(
-            Scriptable scope, Class<T> clazz, boolean sealed,
-            boolean mapInheritance)
-            throws IllegalAccessException, InstantiationException,
-            InvocationTargetException {
+            Scriptable scope, Class<T> clazz, boolean sealed, boolean mapInheritance
+    ) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         BaseFunction ctor = buildClassCtor(scope, clazz, sealed,
                 mapInheritance);
         if (ctor == null)
@@ -1379,11 +1371,8 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     static <T extends Scriptable> BaseFunction buildClassCtor(
-            Scriptable scope, Class<T> clazz,
-            boolean sealed,
-            boolean mapInheritance)
-            throws IllegalAccessException, InstantiationException,
-            InvocationTargetException {
+            Scriptable scope, Class<T> clazz, boolean sealed, boolean mapInheritance
+    ) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Method[] methods = FunctionObject.getMethodList(clazz);
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
@@ -1609,8 +1598,7 @@ public abstract class ScriptableObject implements Scriptable,
         return ctor;
     }
 
-    private static Member findAnnotatedMember(AccessibleObject[] members,
-                                              Class<? extends Annotation> annotation) {
+    private static Member findAnnotatedMember(AccessibleObject[] members, Class<? extends Annotation> annotation) {
         for (AccessibleObject member : members) {
             if (member.isAnnotationPresent(annotation)) {
                 return (Member) member;
@@ -1619,9 +1607,7 @@ public abstract class ScriptableObject implements Scriptable,
         return null;
     }
 
-    private static Method findSetterMethod(Method[] methods,
-                                           String name,
-                                           String prefix) {
+    private static Method findSetterMethod(Method[] methods, String name, String prefix) {
         String newStyleName = "set"
                 + Character.toUpperCase(name.charAt(0))
                 + name.substring(1);
@@ -1643,9 +1629,7 @@ public abstract class ScriptableObject implements Scriptable,
         return null;
     }
 
-    private static String getPropertyName(String methodName,
-                                          String prefix,
-                                          Annotation annotation) {
+    private static String getPropertyName(String methodName, String prefix, Annotation annotation) {
         if (prefix != null) {
             return methodName.substring(prefix.length());
         }
@@ -1693,8 +1677,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param attributes   the attributes of the JavaScript property
      * @see org.mozilla.javascript.Scriptable#put(String, Scriptable, Object)
      */
-    public void defineProperty(String propertyName, Object value,
-                               int attributes) {
+    public void defineProperty(String propertyName, Object value, int attributes) {
         checkNotSealed(propertyName, 0);
         put(propertyName, this, value);
         setAttributes(propertyName, attributes);
@@ -1707,8 +1690,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param value      the initial value of the property
      * @param attributes the attributes of the JavaScript property
      */
-    public void defineProperty(Symbol key, Object value,
-                               int attributes) {
+    public void defineProperty(Symbol key, Object value, int attributes) {
         checkNotSealed(key, 0);
         put(key, this, value);
         setAttributes(key, attributes);
@@ -1725,9 +1707,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param value        the initial value of the property
      * @param attributes   the attributes of the JavaScript property
      */
-    public static void defineProperty(Scriptable destination,
-                                      String propertyName, Object value,
-                                      int attributes) {
+    public static void defineProperty(Scriptable destination, String propertyName, Object value, int attributes) {
         if (!(destination instanceof ScriptableObject)) {
             destination.put(propertyName, destination, value);
             return;
@@ -1745,8 +1725,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param destination  ScriptableObject to define the property on
      * @param propertyName the name of the property to define.
      */
-    public static void defineConstProperty(Scriptable destination,
-                                           String propertyName) {
+    public static void defineConstProperty(Scriptable destination, String propertyName) {
         if (destination instanceof ConstProperties) {
             ConstProperties cp = (ConstProperties) destination;
             cp.defineConst(propertyName, destination);
@@ -1772,8 +1751,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param attributes   the attributes of the JavaScript property
      * @see org.mozilla.javascript.Scriptable#put(String, Scriptable, Object)
      */
-    public void defineProperty(String propertyName, Class<?> clazz,
-                               int attributes) {
+    public void defineProperty(String propertyName, Class<?> clazz, int attributes) {
         int length = propertyName.length();
         if (length == 0) throw new IllegalArgumentException();
         char[] buf = new char[3 + length];
@@ -1836,8 +1814,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param setter       the method to invoke to set the value of the property
      * @param attributes   the attributes of the JavaScript property
      */
-    public void defineProperty(String propertyName, Object delegateTo,
-                               Method getter, Method setter, int attributes) {
+    public void defineProperty(String propertyName, Object delegateTo, Method getter, Method setter, int attributes) {
         MemberBox getterBox = null;
         if (getter != null) {
             getterBox = new MemberBox(getter);
@@ -2041,8 +2018,7 @@ public abstract class ScriptableObject implements Scriptable,
     protected void checkObjectPropertyRestrictions(Object id, ScriptableObject desc) {
     }
 
-    protected void checkPropertyChange(Object id, ScriptableObject current,
-                                       ScriptableObject desc) {
+    protected void checkPropertyChange(Object id, ScriptableObject current, ScriptableObject desc) {
         if (current == null) { // new property
             if (!isExtensible()) throw ScriptRuntime.typeError0("msg.not.extensible");
         } else {
@@ -2207,8 +2183,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param attributes the attributes of the new properties
      * @see org.mozilla.javascript.FunctionObject
      */
-    public void defineFunctionProperties(String[] names, Class<?> clazz,
-                                         int attributes) {
+    public void defineFunctionProperties(String[] names, Class<?> clazz, int attributes) {
         Method[] methods = FunctionObject.getMethodList(clazz);
         for (int i = 0; i < names.length; i++) {
             String name = names[i];
@@ -2360,6 +2335,22 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     /**
+     * Generalized variant of getProperty that calls one of the other
+     * three getProperty methods depending on the type of key
+     */
+    public static Object getProperty(Object obj, Object key) {
+        if (key instanceof String) {
+            return getProperty(obj, (String) key);
+        } else if (key instanceof Integer) {
+            return getProperty(obj, (int) key);
+        } else if (key instanceof Symbol) {
+            return getProperty(obj, (Symbol) key);
+        } else {
+            throw Kit.codeBug();
+        }
+    }
+
+    /**
      * Gets a named property from an object or any object in its prototype chain.
      * <p>
      * Searches the prototype chain for a property named <code>name</code>.
@@ -2426,23 +2417,6 @@ public abstract class ScriptableObject implements Scriptable,
         } while (obj != null);
         return result;
     }
-
-    /**
-     * Generalized variant of getProperty that calls one of the other
-     * three getProperty methods depending on the type of key
-     */
-    public static Object getProperty(Scriptable obj, Object key) {
-        if (key instanceof String) {
-            return getProperty(obj, (String) key);
-        } else if (key instanceof Integer) {
-            return getProperty(obj, (int) key);
-        } else if (key instanceof Symbol) {
-            return getProperty(obj, (Symbol) key);
-        } else {
-            throw Kit.codeBug();
-        }
-    }
-
 
     /**
      * Gets an indexed property from an object or any object in its prototype
@@ -2514,30 +2488,6 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     /**
-     * If hasProperty(obj, name) would return true, then if the property that
-     * was found is compatible with the new property, this method just returns.
-     * If the property is not compatible, then an exception is thrown.
-     * <p>
-     * A property redefinition is incompatible if the first definition was a
-     * const declaration or if this one is.  They are compatible only if neither
-     * was const.
-     */
-    public static void redefineProperty(Scriptable obj, String name,
-                                        boolean isConst) {
-        Scriptable base = getBase(obj, name);
-        if (base == null)
-            return;
-        if (base instanceof ConstProperties) {
-            ConstProperties cp = (ConstProperties) base;
-
-            if (cp.isConst(name))
-                throw ScriptRuntime.typeError1("msg.const.redecl", name);
-        }
-        if (isConst)
-            throw ScriptRuntime.typeError1("msg.var.redecl", name);
-    }
-
-    /**
      * Returns whether an indexed property is defined in an object or any object
      * in its prototype chain.
      * <p>
@@ -2558,6 +2508,47 @@ public abstract class ScriptableObject implements Scriptable,
      */
     public static boolean hasProperty(Scriptable obj, Symbol key) {
         return null != getBase(obj, key);
+    }
+
+    /**
+     * Generalized variant of hasProperty that calls one of the other
+     * three hasProperty methods depending on the type of key
+     */
+    public static boolean hasProperty(Object obj, Object key) {
+        Scriptable scriptable = ensureScriptable(obj);
+
+        if (key instanceof String) {
+            return hasProperty(scriptable, (String) key);
+        } else if (key instanceof Symbol) {
+            return hasProperty(scriptable, (Symbol) key);
+        } else if (key instanceof Integer) {
+            return hasProperty(scriptable, (int) key);
+        } else {
+            throw Kit.codeBug();
+        }
+    }
+
+    /**
+     * If hasProperty(obj, name) would return true, then if the property that
+     * was found is compatible with the new property, this method just returns.
+     * If the property is not compatible, then an exception is thrown.
+     * <p>
+     * A property redefinition is incompatible if the first definition was a
+     * const declaration or if this one is.  They are compatible only if neither
+     * was const.
+     */
+    public static void redefineProperty(Scriptable obj, String name, boolean isConst) {
+        Scriptable base = getBase(obj, name);
+        if (base == null)
+            return;
+        if (base instanceof ConstProperties) {
+            ConstProperties cp = (ConstProperties) base;
+
+            if (cp.isConst(name))
+                throw ScriptRuntime.typeError1("msg.const.redecl", name);
+        }
+        if (isConst)
+            throw ScriptRuntime.typeError1("msg.var.redecl", name);
     }
 
     /**
@@ -2594,30 +2585,6 @@ public abstract class ScriptableObject implements Scriptable,
     }
 
     /**
-     * Puts a named property in an object or in an object in its prototype chain.
-     * <p>
-     * Searches for the named property in the prototype chain. If it is found,
-     * the value of the property in <code>obj</code> is changed through a call
-     * to {@link Scriptable#put(String, Scriptable, Object)} on the
-     * prototype passing <code>obj</code> as the <code>start</code> argument.
-     * This allows the prototype to veto the property setting in case the
-     * prototype defines the property with [[ReadOnly]] attribute. If the
-     * property is not found, it is added in <code>obj</code>.
-     *
-     * @param obj   a JavaScript object
-     * @param name  a property name
-     * @param value any JavaScript value accepted by Scriptable.put
-     * @since 1.5R2
-     */
-    public static void putConstProperty(Scriptable obj, String name, Object value) {
-        Scriptable base = getBase(obj, name);
-        if (base == null)
-            base = obj;
-        if (base instanceof ConstProperties)
-            ((ConstProperties) base).putConst(name, obj, value);
-    }
-
-    /**
      * Puts an indexed property in an object or in an object in its prototype chain.
      * <p>
      * Searches for the indexed property in the prototype chain. If it is found,
@@ -2640,16 +2607,48 @@ public abstract class ScriptableObject implements Scriptable,
         base.put(index, obj, value);
     }
 
-    public static void putProperty(Scriptable obj, Object key, Object value) {
+    /**
+     * Generalized variant of putProperty that calls one of the other
+     * three putProperty methods depending on the type of key
+     */
+    public static void putProperty(Object obj, Object key, Object value) {
+        Scriptable scriptable = ensureScriptable(obj);
+
         if (key instanceof String) {
-            putProperty(obj, (String) key, value);
+            putProperty(scriptable, (String) key, value);
         } else if (key instanceof Integer) {
-            putProperty(obj, (int) key, value);
+            putProperty(scriptable, (int) key, value);
         } else if (key instanceof Symbol) {
-            putProperty(obj, (Symbol) key, value);
+            putProperty(scriptable, (Symbol) key, value);
         } else {
-            throw new IllegalArgumentException();
+            throw Kit.codeBug();
         }
+    }
+
+    /**
+     * Puts a named property in an object or in an object in its prototype chain.
+     * <p>
+     * Searches for the named property in the prototype chain. If it is found,
+     * the value of the property in <code>obj</code> is changed through a call
+     * to {@link Scriptable#put(String, Scriptable, Object)} on the
+     * prototype passing <code>obj</code> as the <code>start</code> argument.
+     * This allows the prototype to veto the property setting in case the
+     * prototype defines the property with [[ReadOnly]] attribute. If the
+     * property is not found, it is added in <code>obj</code>.
+     *
+     * @param obj   a JavaScript object
+     * @param name  a property name
+     * @param value any JavaScript value accepted by Scriptable.put
+     * @since 1.5R2
+     */
+    public static void putConstProperty(Object obj, String name, Object value) {
+        Scriptable scriptable = ensureScriptable(obj);
+
+        Scriptable base = getBase(scriptable, name);
+        if (base == null)
+            base = scriptable;
+        if (base instanceof ConstProperties)
+            ((ConstProperties) base).putConst(name, scriptable, value);
     }
 
     /**
@@ -2759,9 +2758,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @param methodName the name of the function property
      * @param args       the arguments for the call
      */
-    public static Object callMethod(Context cx, Scriptable obj,
-                                    String methodName,
-                                    Object[] args) {
+    public static Object callMethod(Context cx, Scriptable obj, String methodName, Object[] args) {
         Object funObj = getProperty(obj, methodName);
         if (!(funObj instanceof Function)) {
             throw ScriptRuntime.notFunctionError(obj, methodName);
@@ -2877,7 +2874,6 @@ public abstract class ScriptableObject implements Scriptable,
         return associateValue(key, value, false);
     }
 
-
     /**
      * Associate arbitrary application-specific value with this object.
      * If override is set to false, the method will ignore any attempts
@@ -2907,8 +2903,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @return false if this != start and no slot was found.  true if this == start
      * or this != start and a READONLY slot was found.
      */
-    private boolean putImpl(Object key, int index, Scriptable start,
-                            Object value) {
+    private boolean putImpl(Object key, int index, Scriptable start, Object value) {
         // This method is very hot (basically called on each assignment)
         // so we inline the extensible/sealed checks below.
         Slot slot;
@@ -2953,8 +2948,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @return false if this != start and no slot was found.  true if this == start
      * or this != start and a READONLY slot was found.
      */
-    private boolean putConstImpl(String name, int index, Scriptable start,
-                                 Object value, int constFlag) {
+    private boolean putConstImpl(String name, int index, Scriptable start, Object value, int constFlag) {
         assert (constFlag != EMPTY);
         if (!isExtensible) {
             Context cx = Context.getContext();
@@ -3067,8 +3061,7 @@ public abstract class ScriptableObject implements Scriptable,
         return result;
     }
 
-    private void writeObject(ObjectOutputStream out)
-            throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
         final long stamp = slotMap.readLock();
         try {
@@ -3086,8 +3079,7 @@ public abstract class ScriptableObject implements Scriptable,
         }
     }
 
-    private void readObject(ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
         int tableSize = in.readInt();

@@ -783,7 +783,7 @@ public class ScriptRuntime {
 
     // Export single member from another file
     public static void handleExport(String targetName, String scopeName, Scriptable fromRequire, Scriptable scope) {
-        Scriptable exports = getExports(scope);
+        Object exports = getExports(scope);
 
         if (ScriptableObject.hasProperty(exports, scopeName)) {
             throw ScriptRuntime.typeError1("msg.export.duplicate.identifier", scopeName);
@@ -799,7 +799,7 @@ public class ScriptRuntime {
         }
 
         Object value = ScriptableObject.getProperty(scope, targetName);
-        Scriptable exports = getExports(scope);
+        Object exports = getExports(scope);
 
         if ("default".equals(scopeName)) {
             if (ScriptableObject.hasProperty(exports, "default")) {
@@ -816,17 +816,16 @@ public class ScriptRuntime {
 
     // Inline default export: export entire value from current file
     public static void handleExport(Object value, Scriptable scope) {
-        Scriptable exports = getExports(scope);
+        Object exports = getExports(scope);
 
-        if (ScriptableObject.hasProperty(exports, "default")) {
+        if (ScriptableObject.hasProperty(exports, "default"))
             throw ScriptRuntime.typeError0("msg.export.inline.multiple.defaults");
-        }
+
         ScriptableObject.putConstProperty(exports, "default", value);
     }
 
-    private static Scriptable getExports(Scriptable scope) {
-        Scriptable module = ScriptableObject.ensureScriptable(ScriptableObject.getProperty(scope, "module"));
-        return ScriptableObject.ensureScriptable(ScriptableObject.getProperty(module, "exports"));
+    private static Object getExports(Scriptable scope) {
+        return ScriptableObject.getProperty(ScriptableObject.getProperty(scope, "module"), "exports");
     }
 
     public static Object getRestParams(Object[] _args, int index, Context cx, Scriptable scope) {
@@ -1022,14 +1021,12 @@ public class ScriptRuntime {
             throw typeError0("msg.class.no.super");
         }
 
-        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
-
         if (prop instanceof String) {
-            ScriptableObject.putProperty(superProto, (String) prop, value);
+            ScriptableObject.putProperty(superObj, (String) prop, value);
         } else if (prop instanceof Integer) {
-            ScriptableObject.putProperty(superProto, (Integer) prop, value);
+            ScriptableObject.putProperty(superObj, (Integer) prop, value);
         } else if (isSymbol(prop)) {
-            ScriptableObject.putProperty(superProto, (Symbol) prop, value);
+            ScriptableObject.putProperty(superObj, (Symbol) prop, value);
         }
 
         return value;
@@ -1042,9 +1039,7 @@ public class ScriptRuntime {
             throw typeError0("msg.class.no.super");
         }
 
-        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
-
-        ScriptableObject.putProperty(superProto, prop, value);
+        ScriptableObject.putProperty(superObj, prop, value);
 
         return value;
     }
@@ -1056,9 +1051,7 @@ public class ScriptRuntime {
             throw typeError0("msg.class.no.super");
         }
 
-        ScriptableObject superProto = ScriptableObject.ensureScriptableObject(superObj);
-
-        Object result = ScriptableObject.getProperty(superProto, prop);
+        Object result = ScriptableObject.getProperty(superObj, prop);
 
         if (result == Scriptable.NOT_FOUND) {
             result = Undefined.instance;
@@ -1068,7 +1061,7 @@ public class ScriptRuntime {
     }
 
     public static Object callSuperProp(Object prop, Object[] args, Scriptable scope, Scriptable thisObj, NativeFunction nativeFunction, Context cx) {
-        Scriptable method = ScriptableObject.ensureScriptable(accessSuper(prop, thisObj, nativeFunction));
+        Object method = accessSuper(prop, thisObj, nativeFunction);
 
         if (!(method instanceof Callable)) {
             // TODO: Error
@@ -1103,18 +1096,12 @@ public class ScriptRuntime {
         ScriptableObject.putProperty(clazz, "prototype", newObject);
 
         clazz.associateValue(SUPER_KEY, extendedProto);
-
         clazz.setPrototype(extended);
 
         NativeObject desc = new NativeObject();
         ScriptableObject.defineProperty(desc, "configurable", true, 0);
         ScriptableObject.defineProperty(desc, "enumerable", false, 0);
-        ScriptableObject.defineProperty(desc, "get", new BaseFunction() {
-            @Override
-            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-                return clazz;
-            }
-        }, 0);
+        ScriptableObject.defineProperty(desc, "get", BaseFunction.wrap(() -> clazz), 0);
 
         clazz.defineOwnProperty(Context.getContext(), SymbolKey.SPECIES, desc, true);
 
@@ -2023,7 +2010,7 @@ public class ScriptRuntime {
         } else if (obj instanceof NativeGenerator) {
             NativeGenerator gen = (NativeGenerator) obj;
             Object o = ScriptableObject.callMethod(gen, "next", new Object[]{});
-            return ScriptableObject.getProperty(ScriptableObject.ensureScriptable(o), "value");
+            return ScriptableObject.getProperty(o, "value");
         } else {
             String s = toStringIdOrIndex(cx, elem);
             if (s == null) {

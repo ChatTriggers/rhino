@@ -20,6 +20,33 @@ public class BaseFunction extends IdScriptableObject implements Function {
 
     private static final Object FUNCTION_TAG = "Function";
 
+    @FunctionalInterface
+    interface BaseFunctionLambda {
+        Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args);
+    }
+
+    public static BaseFunction wrap(BaseFunctionLambda lambda) {
+        return new BaseFunction() {
+            @Override
+            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                return lambda.call(cx, scope, thisObj, args);
+            }
+        };
+    }
+
+    public static BaseFunction wrap(java.util.concurrent.Callable<Object> lambda) {
+        return new BaseFunction() {
+            @Override
+            public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                try {
+                    return lambda.call();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+    }
+
     static void init(Scriptable scope, boolean sealed) {
         BaseFunction obj = new BaseFunction();
         // Function.prototype attributes: see ECMA 15.3.3.1

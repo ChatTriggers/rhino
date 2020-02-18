@@ -1504,7 +1504,7 @@ public class NativeArray extends IdScriptableObject implements List {
                     } else {
                         result = species.construct(cx, scope, new Object[]{});
                         for (int i = 0; i < copy.length; i++) {
-                            ScriptableObject.putProperty(ScriptableObject.ensureScriptable(result), i, copy[i]);
+                            ScriptableObject.putProperty(result, i, copy[i]);
                         }
                     }
                 } else {
