@@ -238,7 +238,7 @@ public class Require extends BaseFunction {
                 "require() can not be invoked as a constructor");
     }
 
-    private Scriptable getExportedModuleInterface(Context cx, String id,
+    public Scriptable getExportedModuleInterface(Context cx, String id,
                                                   URI uri, URI base, boolean isMain) {
         // Check if the requested module is already completely loaded
         Scriptable exports = exportedModuleInterfaces.get(id);
