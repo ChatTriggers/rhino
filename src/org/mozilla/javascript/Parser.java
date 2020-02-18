@@ -1502,15 +1502,23 @@ public class Parser {
             } else if (matchToken(Token.CLASS)) {
                 exportTarget = classExpr(Collections.emptyList());
             } else {
-                // TODO: Support "export default from '...'"
                 exportTarget = assignExpr();
+
+                if (exportTarget instanceof Name && "from".equals(((Name) exportTarget).getIdentifier())) {
+                    if (matchToken(Token.STRING)) {
+                        // export default from '...';
+                        en.addNamedMember("default", "default");
+                        en.setFilePath(ts.getString());
+                        exportTarget = null;
+                    }
+                } else if (exportTarget == null) {
+                    reportError("msg.export.invalid.default.export");
+                }
             }
 
-            if (exportTarget == null) {
-                reportError("msg.export.invalid.default.export");
+            if (exportTarget != null) {
+                en.setExportedValue(exportTarget);
             }
-
-            en.setExportedValue(exportTarget);
         } else if (matchToken(Token.MUL)) {
             mustMatchToken(Token.NAME, "msg.export.unexpected.char.after.wildcard");
 
