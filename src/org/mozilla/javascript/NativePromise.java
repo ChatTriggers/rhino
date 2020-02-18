@@ -12,7 +12,6 @@ public class NativePromise extends IdScriptableObject {
     private static final String PROMISE_TAG = "Promise";
 
     private CompletableFuture<Object> _future;
-    private List<CompletableFuture<Object>> _futures;
 
     enum PromiseState {
         PENDING,
@@ -114,12 +113,6 @@ public class NativePromise extends IdScriptableObject {
 
         if (args.length > 0 && args[0] instanceof CompletableFuture) {
             promise._future = (CompletableFuture<Object>) args[0];
-
-            if (args.length > 1) {
-                promise._futures = (List<CompletableFuture<Object>>) args[1];
-            } else {
-                promise._futures = Collections.emptyList();
-            }
         } else {
             if (args.length == 0 || !(args[0] instanceof Function)) {
                 throw ScriptRuntime.typeError0("msg.promise.missing.resolver");
@@ -185,18 +178,6 @@ public class NativePromise extends IdScriptableObject {
                 synchronized (thisPromise) {
                     try {
                         Context newCx = Context.enter();
-
-                        if (success == null && error == null && thisPromise._futures != null) {
-                            success = thisPromise._futures.stream().map(
-                                future -> {
-                                    try {
-                                        return future.get();
-                                    } catch (InterruptedException | ExecutionException e) {
-                                        throw new WrappedException(e);
-                                    }
-                                }
-                            ).collect(Collectors.toList());
-                        }
 
                         Function reject = BaseFunction.wrap((_cx, _scope, _thisObj, _args) -> {
                             Object reason = _args[0];
