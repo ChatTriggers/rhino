@@ -2339,12 +2339,14 @@ public abstract class ScriptableObject implements Scriptable,
      * three getProperty methods depending on the type of key
      */
     public static Object getProperty(Object obj, Object key) {
+        Scriptable scriptable = ensureScriptable(obj);
+
         if (key instanceof String) {
-            return getProperty(obj, (String) key);
+            return getProperty(scriptable, (String) key);
         } else if (key instanceof Integer) {
-            return getProperty(obj, (int) key);
+            return getProperty(scriptable, (int) key);
         } else if (key instanceof Symbol) {
-            return getProperty(obj, (Symbol) key);
+            return getProperty(scriptable, (Symbol) key);
         } else {
             throw Kit.codeBug();
         }
