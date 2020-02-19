@@ -310,9 +310,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": true
   },
   "ES2015": {
-    "_successful": 530,
+    "_successful": 531,
     "_count": 689,
-    "_percent": 0.7692307692307693,
+    "_percent": 0.7706821480406386,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -708,7 +708,7 @@
     "built-ins›Reflect›Reflect.ownKeys, symbol keys": true,
     "built-ins›Reflect›Reflect.apply": true,
     "built-ins›Reflect›Reflect.construct": true,
-    "built-ins›Reflect›Reflect.construct sets new.target meta-property": false,
+    "built-ins›Reflect›Reflect.construct sets new.target meta-property": true,
     "built-ins›Reflect›Reflect.construct creates instances from third argument": true,
     "built-ins›Reflect›Reflect.construct, Array subclassing": true,
     "built-ins›Reflect›Reflect.construct, RegExp subclassing": true,
