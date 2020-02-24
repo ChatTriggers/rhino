@@ -724,6 +724,20 @@ public class ScriptRuntime {
         }
     }
 
+    public static Object[] lengthenObjArray(Object[] arr, int minLength) {
+        if (arr.length >= minLength) {
+            return arr;
+        }
+
+        Object[] newArr = new Object[minLength];
+
+        for (int i = 0; i < newArr.length; i++) {
+            newArr[i] = i < arr.length ? arr[i] : Undefined.instance;
+        }
+
+        return newArr;
+    }
+
     public static Object mixDefaultArgument(Object arg, Object defaultArg) {
         if (arg == Undefined.instance) {
             return defaultArg;
@@ -4085,28 +4099,35 @@ public class ScriptRuntime {
      * @deprecated Use {@link #createFunctionActivation(NativeFunction, Scriptable, Object[], boolean)} instead
      */
     @Deprecated
-    public static Scriptable createFunctionActivation(NativeFunction funObj,
-                                                      Scriptable scope,
-                                                      Object[] args) {
+    public static Scriptable createFunctionActivation(NativeFunction funObj, Scriptable scope, Object[] args) {
         return createFunctionActivation(funObj, scope, args, false);
     }
 
-    public static Scriptable createFunctionActivation(NativeFunction funObj,
-                                                      Scriptable scope,
-                                                      Object[] args,
-                                                      boolean isStrict) {
+    public static Scriptable createFunctionActivation(
+        NativeFunction funObj, Scriptable scope, Object[] args, boolean isStrict
+    ) {
         return new NativeCall(funObj, scope, args, false, isStrict);
     }
 
-    public static Scriptable createArrowFunctionActivation(NativeFunction funObj,
-                                                           Scriptable scope,
-                                                           Object[] args,
-                                                           boolean isStrict) {
+    public static Scriptable createFunctionActivation(
+        NativeFunction funObj, Scriptable scope, Object[] callArgs, Object[] effectiveArgs, boolean isStrict
+    ) {
+        return new NativeCall(funObj, scope, callArgs, effectiveArgs, false, isStrict);
+    }
+
+    public static Scriptable createArrowFunctionActivation(
+        NativeFunction funObj, Scriptable scope, Object[] args, boolean isStrict
+    ) {
         return new NativeCall(funObj, scope, args, true, isStrict);
     }
 
-    public static void enterActivationFunction(Context cx,
-                                               Scriptable scope) {
+    public static Scriptable createArrowFunctionActivation(
+        NativeFunction funObj, Scriptable scope, Object[] callArgs, Object[] effectiveArgs, boolean isStrict
+    ) {
+        return new NativeCall(funObj, scope, callArgs, effectiveArgs, true, isStrict);
+    }
+
+    public static void enterActivationFunction(Context cx, Scriptable scope) {
         if (cx.topCallScope == null)
             throw new IllegalStateException();
         NativeCall call = (NativeCall) scope;

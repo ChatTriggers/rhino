@@ -28,7 +28,7 @@ final class Arguments extends IdScriptableObject {
         setParentScope(parent);
         setPrototype(ScriptableObject.getObjectPrototype(parent));
 
-        Object[] origArgs = activation.originalArgs;
+        Object[] origArgs = activation.callArgs;
 
         if (activation.function.hasRest() && activation.function.getParamCount() <= origArgs.length) {
             Object restObj = origArgs[origArgs.length - 1];
@@ -88,7 +88,7 @@ final class Arguments extends IdScriptableObject {
             putIntoActivation(index, value);
         }
         synchronized (this) {
-            if (args == activation.originalArgs) {
+            if (args == activation.callArgs) {
                 args = args.clone();
             }
             args[index] = value;
@@ -98,7 +98,7 @@ final class Arguments extends IdScriptableObject {
     private void removeArg(int index) {
         synchronized (this) {
             if (args[index] != NOT_FOUND) {
-                if (args == activation.originalArgs) {
+                if (args == activation.callArgs) {
                     args = args.clone();
                 }
                 args[index] = NOT_FOUND;

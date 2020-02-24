@@ -51,7 +51,7 @@ public abstract class NativeFunction extends BaseFunction {
         if (activation == null) {
             return paramCount;
         }
-        return activation.originalArgs.length;
+        return activation.effectiveArgs.length;
     }
 
     @Override

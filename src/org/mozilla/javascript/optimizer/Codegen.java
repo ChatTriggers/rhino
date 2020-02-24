@@ -1991,6 +1991,8 @@ class BodyCodegen {
             isArrow = ((FunctionNode) scriptOrFn).getFunctionType() == FunctionNode.ARROW_FUNCTION;
         }
         if (fnCurrent != null) {
+            String methodName = isArrow ? "createArrowFunctionActivation" : "createFunctionActivation";
+
             debugVariableName = "activation";
             cfw.addALoad(funObjLocal);
             cfw.addALoad(variableObjectLocal);
@@ -2014,9 +2016,56 @@ class BodyCodegen {
                 addScriptRuntimeInvoke("paramsToRestParams", OBJECT_ARRAY, OBJECT_ARRAY, INTEGER, CONTEXT, SCRIPTABLE);
             }
 
-            String methodName = isArrow ? "createArrowFunctionActivation" : "createFunctionActivation";
-            cfw.addPush(scriptOrFn.isInStrictMode());
-            addScriptRuntimeInvoke(methodName, SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE, OBJECT_ARRAY, BOOLEAN);
+            int paramCount = fnCurrent.fnode.getParamCount();
+            Map<Integer, Node> defaultParams = fnCurrent.fnode.getDefaultParams();
+
+            if (!defaultParams.isEmpty()) {
+                int max = -1;
+
+                for (int key : defaultParams.keySet()) {
+                    if (key > max) max = key;
+                }
+
+                cfw.add(ByteCode.DUP);
+                cfw.addPush(max + 1);
+                addScriptRuntimeInvoke("lengthenObjArray", OBJECT_ARRAY, OBJECT_ARRAY, INTEGER);
+
+                int array = getNewWordLocal();
+                cfw.addAStore(array);
+
+                for (int i = 0; i < paramCount; i++) {
+                    if (defaultParams.containsKey(i)) {
+                        int label = cfw.acquireLabel();
+
+                        cfw.addALoad(array);
+                        cfw.addPush(i);
+                        cfw.add(ByteCode.AALOAD);
+                        cfw.addInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/Undefined", "isUndefined", "(Ljava/lang/Object;)Z");
+
+                        cfw.add(ByteCode.IFEQ, label);
+
+                        if (defaultParams.get(i).getType() == Token.THROW) {
+                            generateExpression(defaultParams.get(i), fnCurrent.fnode);
+                        } else {
+                            cfw.addALoad(array);
+                            cfw.addPush(i);
+                            generateExpression(defaultParams.get(i), fnCurrent.fnode);
+                            cfw.add(ByteCode.AASTORE);
+                        }
+
+                        cfw.markLabel(label);
+                    }
+                }
+
+                cfw.addALoad(array);
+
+                cfw.addPush(scriptOrFn.isInStrictMode());
+                addScriptRuntimeInvoke(methodName, SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE, OBJECT_ARRAY, OBJECT_ARRAY, BOOLEAN);
+            } else {
+                cfw.addPush(scriptOrFn.isInStrictMode());
+                addScriptRuntimeInvoke(methodName, SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE, OBJECT_ARRAY, BOOLEAN);
+            }
+
             cfw.addAStore(variableObjectLocal);
             cfw.addALoad(contextLocal);
             cfw.addALoad(variableObjectLocal);

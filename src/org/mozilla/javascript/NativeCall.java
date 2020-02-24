@@ -28,12 +28,17 @@ public final class NativeCall extends IdScriptableObject {
     }
 
     NativeCall(NativeFunction function, Scriptable scope, Object[] args, boolean isArrow, boolean isStrict) {
+        this(function, scope, args, args, isArrow, isStrict);
+    }
+
+    NativeCall(NativeFunction function, Scriptable scope, Object[] callArgs, Object[] effectiveArgs, boolean isArrow, boolean isStrict) {
         this.function = function;
 
         setParentScope(scope);
         // leave prototype null
 
-        this.originalArgs = (args == null) ? ScriptRuntime.emptyArgs : args;
+        this.callArgs = (callArgs == null) ? ScriptRuntime.emptyArgs : callArgs;
+        this.effectiveArgs = (effectiveArgs == null) ? ScriptRuntime.emptyArgs : effectiveArgs;
         this.isStrict = isStrict;
 
         // initialize values of arguments
@@ -42,7 +47,7 @@ public final class NativeCall extends IdScriptableObject {
         if (paramAndVarCount != 0) {
             for (int i = 0; i < paramCount; ++i) {
                 String name = function.getParamOrVarName(i);
-                Object val = i < args.length ? args[i] : Undefined.instance;
+                Object val = i < effectiveArgs.length ? effectiveArgs[i] : Undefined.instance;
                 defineProperty(name, val, NOT_CONFIGURABLE);
             }
         }
@@ -61,7 +66,7 @@ public final class NativeCall extends IdScriptableObject {
                     if (function.getParamOrVarConst(i)) {
                         defineProperty(name, Undefined.instance, CONST);
                     } else if (!(function instanceof InterpretedFunction)
-                                || ((InterpretedFunction) function).hasFunctionNamed(name)) {
+                        || ((InterpretedFunction) function).hasFunctionNamed(name)) {
                         defineProperty(name, Undefined.instance, NOT_CONFIGURABLE);
                     }
                 }
@@ -122,7 +127,8 @@ public final class NativeCall extends IdScriptableObject {
             MAX_PROTOTYPE_ID = 1;
 
     NativeFunction function;
-    Object[] originalArgs;
+    Object[] callArgs;
+    Object[] effectiveArgs;
     boolean isStrict;
     private Arguments arguments;
 
