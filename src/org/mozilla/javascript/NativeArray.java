@@ -813,7 +813,7 @@ public class NativeArray extends IdScriptableObject implements List {
                         if (mapping) {
                             temp = mapFn.call(cx, scope, thisArg, new Object[]{temp, k});
                         }
-                        defineElem(result, k, temp);
+                        defineElem(cx, result, k, temp);
                         k++;
                     }
                 }
@@ -830,7 +830,7 @@ public class NativeArray extends IdScriptableObject implements List {
                 if (mapping) {
                     temp = mapFn.call(cx, scope, thisArg, new Object[]{temp, k});
                 }
-                defineElem(result, k, temp);
+                defineElem(cx, result, k, temp);
             }
         }
 
@@ -843,7 +843,7 @@ public class NativeArray extends IdScriptableObject implements List {
                 callConstructorOrCreateArray(cx, scope, thisObj, args.length, true);
 
         for (int i = 0; i < args.length; i++) {
-            defineElem(result, i, args[i]);
+            defineElem(cx, result, i, args[i]);
         }
         setLengthProperty(result, args.length);
 
@@ -1017,14 +1017,19 @@ public class NativeArray extends IdScriptableObject implements List {
         return ScriptableObject.getProperty(target, (int) index);
     }
 
-    private static void defineElem(Scriptable target, long index,
-                                   Object value) {
-        if (index > Integer.MAX_VALUE) {
-            String id = Long.toString(index);
-            target.put(id, target, value);
-        } else {
-            target.put((int) index, target, value);
-        }
+    private static void defineElem(Context cx, Scriptable target, long index, Object value) {
+        ScriptableObject so = ScriptableObject.ensureScriptableObject(target);
+
+        NativeObject obj = cx.newObject(cx.topCallScope);
+
+        ScriptableObject.putProperty(obj, "writable", true);
+        ScriptableObject.putProperty(obj, "enumerable", true);
+        ScriptableObject.putProperty(obj, "configurable", true);
+        ScriptableObject.putProperty(obj, "value", value);
+
+        Object id = index > Integer.MAX_VALUE ? Long.toString(index) : (int) index;
+
+        so.defineOwnProperty(cx, id, obj);
     }
 
     private static void setElem(Scriptable target, long index,
@@ -1631,7 +1636,7 @@ public class NativeArray extends IdScriptableObject implements List {
         for (long srcpos = 0; srcpos < srclen; srcpos++, dstpos++) {
             final Object temp = getRawElem(arg, srcpos);
             if (temp != Scriptable.NOT_FOUND) {
-                defineElem(result, dstpos, temp);
+                defineElem(cx, result, dstpos, temp);
             }
         }
         return newlen;
@@ -1642,7 +1647,7 @@ public class NativeArray extends IdScriptableObject implements List {
         if (isConcatSpreadable(cx, scope, arg)) {
             return concatSpreadArg(cx, result, (Scriptable) arg, offset);
         }
-        defineElem(result, offset, arg);
+        defineElem(cx, result, offset, arg);
         return offset + 1;
     }
 
@@ -1707,7 +1712,7 @@ public class NativeArray extends IdScriptableObject implements List {
         for (long slot = begin; slot < end; slot++) {
             Object temp = getRawElem(thisObj, slot);
             if (temp != NOT_FOUND) {
-                defineElem(result, slot - begin, temp);
+                defineElem(cx, result, slot - begin, temp);
             }
         }
         setLengthProperty(result, Math.max(0, end - begin));
@@ -2057,7 +2062,7 @@ public class NativeArray extends IdScriptableObject implements List {
             Object elem = getRawElem(o, i);
             if (elem == Scriptable.NOT_FOUND) {
                 if (id == Id_map) {
-                    defineElem(array, i, Undefined.instance);
+                    defineElem(cx, array, i, Undefined.instance);
                     continue;
                 } else if (id == Id_find || id == Id_findIndex) {
                     elem = Undefined.instance;
@@ -2076,12 +2081,12 @@ public class NativeArray extends IdScriptableObject implements List {
                     break;
                 case Id_filter:
                     if (ScriptRuntime.toBoolean(result))
-                        defineElem(array, j++, innerArgs[0]);
+                        defineElem(cx, array, j++, innerArgs[0]);
                     break;
                 case Id_forEach:
                     break;
                 case Id_map:
-                    defineElem(array, i, result);
+                    defineElem(cx, array, i, result);
                     break;
                 case Id_some:
                     if (ScriptRuntime.toBoolean(result))

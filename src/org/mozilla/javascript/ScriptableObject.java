@@ -1683,6 +1683,12 @@ public abstract class ScriptableObject implements Scriptable,
         setAttributes(propertyName, attributes);
     }
 
+    public void defineProperty(int propertyIndex, Object value, int attributes) {
+        checkNotSealed(propertyIndex, 0);
+        put(propertyIndex, this, value);
+        setAttributes(propertyIndex, attributes);
+    }
+
     /**
      * A version of defineProperty that uses a Symbol key.
      *
@@ -1714,6 +1720,15 @@ public abstract class ScriptableObject implements Scriptable,
         }
         ScriptableObject so = (ScriptableObject) destination;
         so.defineProperty(propertyName, value, attributes);
+    }
+
+    public static void defineProperty(Scriptable destination, int propertyIndex, Object value, int attributes) {
+        if (!(destination instanceof ScriptableObject)) {
+            destination.put(propertyIndex, destination, value);
+            return;
+        }
+        ScriptableObject so = (ScriptableObject) destination;
+        so.defineProperty(propertyIndex, value, attributes);
     }
 
     /**

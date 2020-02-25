@@ -310,9 +310,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": true
   },
   "ES2015": {
-    "_successful": 388,
+    "_successful": 390,
     "_count": 689,
-    "_percent": 0.5631349782293179,
+    "_percent": 0.5660377358490566,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -920,8 +920,8 @@
     "misc›Proxy, internal 'get' calls›String.prototype.split": "\"Symbol\" is not defined.",
     "misc›Proxy, internal 'get' calls›Date.prototype.toJSON": "Property valueOf not found.",
     "misc›Proxy, internal 'set' calls›Object.assign": true,
-    "misc›Proxy, internal 'set' calls›Array.from": false,
-    "misc›Proxy, internal 'set' calls›Array.of": false,
+    "misc›Proxy, internal 'set' calls›Array.from": true,
+    "misc›Proxy, internal 'set' calls›Array.of": true,
     "misc›Proxy, internal 'set' calls›Array.prototype.copyWithin": true,
     "misc›Proxy, internal 'set' calls›Array.prototype.fill": true,
     "misc›Proxy, internal 'set' calls›Array.prototype.pop": true,
