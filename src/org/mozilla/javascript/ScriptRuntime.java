@@ -3326,12 +3326,16 @@ public class ScriptRuntime {
             case Token.BITXOR:
                 return doArithmetic(val1, val2, "^", () -> OptRuntime.wrapDouble((toInt32(val1) ^ toInt32(val2))), cx);
             case Token.LT:
+                if (isNaN(val1) || isNaN(val2)) return false;
                 return doArithmetic(val1, val2, "<", () -> cmp_LT(val1, val2), cx);
             case Token.LE:
+                if (isNaN(val1) || isNaN(val2)) return false;
                 return doArithmetic(val1, val2, "<=", () -> cmp_LE(val1, val2), cx);
             case Token.GT:
+                if (isNaN(val1) || isNaN(val2)) return false;
                 return doArithmetic(val1, val2, ">", () -> !cmp_LE(val1, val2), cx);
             case Token.GE:
+                if (isNaN(val1) || isNaN(val2)) return false;
                 return doArithmetic(val1, val2, ">=", () -> !cmp_LT(val1, val2), cx);
             default:
                 throw Kit.codeBug("Unexpected binary operator token: " + op);
