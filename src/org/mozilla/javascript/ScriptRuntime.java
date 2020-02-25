@@ -3799,7 +3799,13 @@ public class ScriptRuntime {
 
     // ===
     public static boolean shallowEq(Object x, Object y) {
-        if (x == y) {
+        if (x instanceof Symbol && y instanceof Symbol) {
+            if (x == y) return true;
+            if (x instanceof SymbolKey && y instanceof SymbolKey) return false;
+            if (x instanceof NativeSymbol && y instanceof NativeSymbol) return false;
+            if (x instanceof SymbolKey) return x == ((NativeSymbol) y).getKey();
+            if (y instanceof SymbolKey) return y == ((NativeSymbol) x).getKey();
+        } else if (x == y) {
             if (!(x instanceof Number)) {
                 return true;
             }
@@ -3828,7 +3834,6 @@ public class ScriptRuntime {
             }
         } else {
             warnAboutNonJSObject(x);
-            return x == y;
         }
         return false;
     }
