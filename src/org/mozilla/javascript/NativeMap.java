@@ -23,7 +23,7 @@ public class NativeMap extends IdScriptableObject {
         NativeMap obj = new NativeMap();
         obj.exportAsJSClass(MAX_PROTOTYPE_ID, scope, false);
 
-        ScriptableObject desc = (ScriptableObject) cx.newObject(scope);
+        ScriptableObject desc = cx.newObject(scope);
         desc.put("enumerable", desc, false);
         desc.put("configurable", desc, true);
         desc.put("get", desc, obj.get(NativeSet.GETSIZE, obj));

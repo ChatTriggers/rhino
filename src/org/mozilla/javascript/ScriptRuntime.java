@@ -2583,7 +2583,12 @@ public class ScriptRuntime {
             }
             Callable f = (Callable) v;
             Object[] args = new Object[]{keyOnly ? Boolean.TRUE : Boolean.FALSE};
-            Object result = f.call(cx, scope, obj, args);
+            Object result;
+            try {
+                result = f.call(cx, scope, obj, args);
+            } catch (Exception e) {
+                return null;
+            }
             if (result instanceof ES6Iterator) {
                 return (ES6Iterator) result;
             } else if (result instanceof NativeObject) {
