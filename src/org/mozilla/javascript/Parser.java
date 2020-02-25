@@ -1166,7 +1166,7 @@ public class Parser {
         return data;
     }
 
-    private AstNode statement() throws IOException {
+    private AstNode  statement() throws IOException {
         int pos = ts.tokenBeg;
         try {
             AstNode pn = statementHelper();
@@ -1649,7 +1649,7 @@ public class Parser {
         int pos = ts.tokenBeg, lineno = ts.lineno, elsePos = -1;
         IfStatement pn = new IfStatement(pos);
         ConditionData data = condition();
-        AstNode ifTrue = getNextStatementAfterInlineComments(pn), ifFalse = null;
+        AstNode ifTrue = getNextStatementAfterInlineComments(pn, true), ifFalse = null;
         if (matchToken(Token.ELSE)) {
             int tt = peekToken();
             if (tt == Token.COMMENT) {
@@ -1658,6 +1658,7 @@ public class Parser {
             }
             elsePos = ts.tokenBeg - pos;
             ifFalse = statement();
+            validateSingleStatementContext(ifFalse);
         }
         int end = getNodeEnd(ifFalse != null ? ifFalse : ifTrue);
         pn.setLength(end - pos);
@@ -1765,7 +1766,7 @@ public class Parser {
             ConditionData data = condition();
             pn.setCondition(data.condition);
             pn.setParens(data.lp - pos, data.rp - pos);
-            AstNode body = getNextStatementAfterInlineComments(pn);
+            AstNode body = getNextStatementAfterInlineComments(pn, true);
             pn.setLength(getNodeEnd(body) - pos);
             pn.setBody(body);
         } finally {
@@ -1782,7 +1783,7 @@ public class Parser {
         pn.setLineno(ts.lineno);
         enterLoop(pn);
         try {
-            AstNode body = getNextStatementAfterInlineComments(pn);
+            AstNode body = getNextStatementAfterInlineComments(pn, true);
             mustMatchToken(Token.WHILE, "msg.no.while.do");
             pn.setWhilePosition(ts.tokenBeg - pos);
             ConditionData data = condition();
@@ -1811,7 +1812,7 @@ public class Parser {
         return tt;
     }
 
-    private AstNode getNextStatementAfterInlineComments(AstNode pn) throws IOException {
+    private AstNode getNextStatementAfterInlineComments(AstNode pn, boolean checkSingleStatementContext) throws IOException {
         AstNode body = statement();
         if (Token.COMMENT == body.getType()) {
             AstNode commentNode = body;
@@ -1822,7 +1823,30 @@ public class Parser {
                 body.setInlineComment(commentNode);
             }
         }
+
+        if (checkSingleStatementContext) {
+            validateSingleStatementContext(body);
+        }
+
         return body;
+    }
+
+    private void validateSingleStatementContext(AstNode node) {
+        if (node instanceof Scope) return;
+
+        if (node instanceof ExpressionStatement && node.getType() == Token.EXPR_RESULT) {
+            AstNode expr = ((ExpressionStatement) node).getExpression();
+
+            if (expr instanceof ClassNode) {
+                reportError("msg.single.statement.context", "classes");
+            }
+        } else if (node instanceof VariableDeclaration) {
+            int type = node.getType();
+
+            if (type == Token.LET || type == Token.CONST) {
+                reportError("msg.single.statement.context", "lexical declaration");
+            }
+        }
     }
 
     private Loop forLoop() throws IOException {
@@ -1907,7 +1931,7 @@ public class Parser {
             // break/continue statements to find the enclosing loop.
             enterLoop(pn);
             try {
-                AstNode body = getNextStatementAfterInlineComments(pn);
+                AstNode body = getNextStatementAfterInlineComments(pn, true);
                 pn.setLength(getNodeEnd(body) - forPos);
                 pn.setBody(body);
             } finally {
@@ -1974,7 +1998,7 @@ public class Parser {
         if (lctt != Token.LC) {
             reportError("msg.no.brace.try");
         }
-        AstNode tryBlock = getNextStatementAfterInlineComments(pn);
+        AstNode tryBlock = getNextStatementAfterInlineComments(pn, false);
         int tryEnd = getNodeEnd(tryBlock);
 
         List<CatchClause> clauses = null;
@@ -2165,7 +2189,7 @@ public class Parser {
             rp = ts.tokenBeg;
 
         WithStatement pn = new WithStatement(pos);
-        AstNode body = getNextStatementAfterInlineComments(pn);
+        AstNode body = getNextStatementAfterInlineComments(pn, true);
         pn.setLength(getNodeEnd(body) - pos);
         pn.setJsDocNode(withComment);
         pn.setExpression(obj);
@@ -2662,6 +2686,7 @@ public class Parser {
                 reportError("msg.yield.parenthesized");
             pn = new InfixExpression(Token.COMMA, pn, assignExpr(), opPos);
         }
+
         return pn;
     }
 
