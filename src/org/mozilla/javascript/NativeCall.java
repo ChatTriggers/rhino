@@ -47,7 +47,7 @@ public final class NativeCall extends IdScriptableObject {
         if (paramAndVarCount != 0) {
             for (int i = 0; i < paramCount; ++i) {
                 String name = function.getParamOrVarName(i);
-                Object val = i < effectiveArgs.length ? effectiveArgs[i] : Undefined.instance;
+                Object val = i < this.effectiveArgs.length ? this.effectiveArgs[i] : Undefined.instance;
                 defineProperty(name, val, NOT_CONFIGURABLE);
             }
         }
@@ -98,8 +98,7 @@ public final class NativeCall extends IdScriptableObject {
     }
 
     @Override
-    public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope,
-                             Scriptable thisObj, Object[] args) {
+    public Object execIdCall(IdFunctionObject f, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         if (!f.hasTag(CALL_TAG)) {
             return super.execIdCall(f, cx, scope, thisObj, args);
         }

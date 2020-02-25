@@ -894,7 +894,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
                     checkPropertyChange(name, current, desc);
                     int attr = (info >>> 16);
                     Object value = getProperty(desc, "value");
-                    if (value != NOT_FOUND && (attr & NOT_CONFIGURABLE) == 0) {
+                    if (value != NOT_FOUND && ((attr & NOT_CONFIGURABLE) == 0 || (attr & NOT_WRITABLE) == 0)) {
                         Object currentValue = getInstanceIdValue(id);
                         if (!sameValue(value, currentValue)) {
                             setInstanceIdValue(id, value);
