@@ -1090,17 +1090,17 @@ public abstract class ScriptableObject implements Scriptable,
         if (ScriptableObject.hasProperty(object, SymbolKey.TO_PRIMITIVE)) {
             Object toPrimitive = ScriptableObject.getProperty(object, SymbolKey.TO_PRIMITIVE);
 
-            if (!(toPrimitive instanceof Callable)) {
-                // TODO: Error
-                throw Kit.codeBug();
-            }
-
             String hint = "default";
 
             if (typeHint == String.class) {
                 hint = "string";
             } else if (typeHint == Number.class) {
                 hint = "number";
+            }
+
+            if (!(toPrimitive instanceof Callable)) {
+                throw ScriptRuntime.typeError("Cannot convert object to " + hint +
+                    ": it's [Symbol.toPrimitive] property is not a function");
             }
 
             Context _cx = Context.getContext();
