@@ -3200,19 +3200,25 @@ public class ScriptRuntime {
         return c.call(cx, scope, (Scriptable) thisArg, ScriptRuntime.emptyArgs);
     }
 
+    public static String typeof(Object value) {
+        return typeof(value, true);
+    }
+
     /**
      * The typeof operator
      */
-    public static String typeof(Object value) {
-        Object opResult = applyUnaryOperator(value, "typeof", Context.getContext());
+    public static String typeof(Object value, boolean checkForOperator) {
+        if (checkForOperator) {
+            Object opResult = applyUnaryOperator(value, "typeof", Context.getContext());
 
-        if (opResult != UniqueTag.NOT_FOUND) {
-            return toString(opResult);
+            if (opResult != UniqueTag.NOT_FOUND) {
+                return toString(opResult);
+            }
         }
 
         if (value == null)
             return "object";
-        if (value == Undefined.instance)
+        if (value == Undefined.instance || value == Undefined.SCRIPTABLE_UNDEFINED)
             return "undefined";
         if (value instanceof ScriptableObject)
             return ((ScriptableObject) value).getTypeOf();

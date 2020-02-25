@@ -2175,7 +2175,7 @@ public abstract class ScriptableObject implements Scriptable,
 
     protected static SymbolScriptable ensureSymbolScriptable(Object arg) {
         if (!(arg instanceof SymbolScriptable))
-            throw ScriptRuntime.typeError1("msg.object.not.symbolscriptable", ScriptRuntime.typeof(arg));
+            throw ScriptRuntime.typeError1("msg.object.not.symbolscriptable", ScriptRuntime.typeof(arg, false));
         return (SymbolScriptable) arg;
     }
 
@@ -2815,6 +2815,7 @@ public abstract class ScriptableObject implements Scriptable,
 
     private static Scriptable getBase(Scriptable obj, Symbol key) {
         do {
+            if (Undefined.isUndefined(obj) || obj == null) return null;
             if (ensureSymbolScriptable(obj).has(key, obj))
                 break;
             obj = obj.getPrototype();
