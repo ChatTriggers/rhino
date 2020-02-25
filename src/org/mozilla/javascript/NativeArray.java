@@ -6,6 +6,7 @@
 
 package org.mozilla.javascript;
 
+import org.mozilla.javascript.proxy.NativeProxy;
 import org.mozilla.javascript.regexp.NativeRegExp;
 
 import java.util.*;
@@ -2153,8 +2154,11 @@ public class NativeArray extends IdScriptableObject implements List {
     private static boolean js_isArray(Object o) {
         if (!(o instanceof Scriptable)) {
             return false;
+        } else if (o instanceof NativeProxy && ((NativeProxy) o).isRevoked()) {
+            throw ScriptRuntime.typeError0("msg.proxy.revocable.illegal.operation");
+        } else {
+            return "Array".equals(((Scriptable) o).getClassName());
         }
-        return "Array".equals(((Scriptable) o).getClassName());
     }
 
     // methods to implement java.util.List

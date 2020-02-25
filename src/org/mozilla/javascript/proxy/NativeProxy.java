@@ -39,8 +39,16 @@ public class NativeProxy extends IdScriptableObject implements Function {
         return target;
     }
 
+    public ScriptableObject getHandler() {
+        return handler;
+    }
+
     void revoke() {
         this.revoked = true;
+    }
+
+    public boolean isRevoked() {
+        return this.revoked;
     }
 
     private void ensureNotRevoked() {
