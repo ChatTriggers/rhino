@@ -116,6 +116,25 @@ public final class NativeCall extends IdScriptableObject {
         throw new IllegalArgumentException(String.valueOf(id));
     }
 
+    @Override
+    public void put(String name, Scriptable start, Object value) {
+        if (arguments != null) {
+            int index = -1;
+
+            for (int i = 0; i < function.getParamCount() && index == -1; i++) {
+                if (function.getParamOrVarName(i).equals(name)) {
+                    index = i;
+                }
+            }
+
+            if (index != -1) {
+                ScriptableObject.putProperty(arguments, index, value);
+            }
+        }
+
+        super.put(name, start, value);
+    }
+
     public void defineAttributesForArguments() {
         if (arguments != null) {
             arguments.defineAttributesForStrictMode();
