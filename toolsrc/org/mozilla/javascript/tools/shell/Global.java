@@ -32,21 +32,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextAction;
-import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.ErrorReporter;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.ImporterTopLevel;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.RhinoException;
-import org.mozilla.javascript.Script;
-import org.mozilla.javascript.ScriptRuntime;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.Synchronizer;
-import org.mozilla.javascript.Undefined;
-import org.mozilla.javascript.Wrapper;
+import org.mozilla.javascript.*;
 import org.mozilla.javascript.commonjs.module.Require;
 import org.mozilla.javascript.commonjs.module.RequireBuilder;
 import org.mozilla.javascript.commonjs.module.provider.SoftCachingModuleScriptProvider;
@@ -237,7 +223,8 @@ public class Global extends ImporterTopLevel
                 out.print(" ");
 
             // Convert the arbitrary JavaScript value into a string form.
-            String s = Context.toString(args[i]);
+            Object arg = args[i];
+            String s = arg instanceof Symbol ? arg.toString() : Context.toString(arg);
 
             out.print(s);
         }

@@ -1609,8 +1609,7 @@ public class NativeArray extends IdScriptableObject implements List {
 
     // Concat elements of "arg" into the destination, with optimizations for native,
     // dense arrays.
-    private static long concatSpreadArg(Context cx,
-                                        Scriptable result, Scriptable arg, long offset) {
+    private static long concatSpreadArg(Context cx, Scriptable result, Scriptable arg, long offset) {
         long srclen = getLengthProperty(arg, false);
         long newlen = srclen + offset;
 
