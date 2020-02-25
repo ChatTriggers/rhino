@@ -51,7 +51,8 @@ public class Symbol {
                 || declType == Token.LP
                 || declType == Token.VAR
                 || declType == Token.LET
-                || declType == Token.CONST))
+                || declType == Token.CONST
+                || declType == Token.CLASS))
             throw new IllegalArgumentException("Invalid declType: " + declType);
         this.declType = declType;
     }

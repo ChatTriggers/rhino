@@ -700,7 +700,9 @@ public class Parser {
         cls.setDecorators(classDecorators);
 
         if (matchToken(Token.NAME)) {
-            cls.setClassName(createNameNode());
+            Name name = createNameNode();
+            defineSymbol(Token.CLASS, name.getIdentifier());
+            cls.setClassName(name);
         }
 
         if (matchToken(Token.EXTENDS)) {
@@ -2631,8 +2633,14 @@ public class Parser {
                 ? definingScope.getSymbol(name)
                 : null;
         int symDeclType = symbol != null ? symbol.getDeclType() : -1;
-        if (symbol != null && (definingScope == currentScope && (symDeclType == Token.CONST || symDeclType == Token.LET))) {
-            reportError(symDeclType == Token.CONST ? "msg.const.redecl" : "msg.let.redecl", name);
+        if (symbol != null && (definingScope == currentScope && (symDeclType == Token.CONST || symDeclType == Token.LET || symDeclType == Token.CLASS))) {
+            if (symDeclType == Token.CONST) {
+                reportError("msg.const.redecl", name);
+            } else if (symDeclType == Token.LET) {
+                reportError("msg.let.redecl", name);
+            } else {
+                reportError("msg.class.redecl", name);
+            }
             return;
         }
         switch (declType) {
@@ -2644,6 +2652,7 @@ public class Parser {
                 currentScope.putSymbol(new Symbol(declType, name));
                 return;
 
+            case Token.CLASS:
             case Token.CONST:
                 currentScope.putSymbol(new Symbol(declType, name));
                 return;
