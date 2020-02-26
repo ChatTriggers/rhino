@@ -636,7 +636,7 @@ final class NativeString extends IdScriptableObject {
                 }
 
                 case SymbolId_iterator:
-                    return new NativeStringIterator(scope, thisObj);
+                    return new NativeStringIterator(scope, thisObj, args.length > 0 && ScriptRuntime.toBoolean(args[0]));
 
             }
             throw new IllegalArgumentException("String.prototype has no method: " + f.getFunctionName());

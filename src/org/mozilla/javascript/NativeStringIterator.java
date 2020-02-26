@@ -21,10 +21,11 @@ public final class NativeStringIterator extends ES6Iterator {
         super();
     }
 
-    NativeStringIterator(Scriptable scope, Scriptable stringLike) {
+    NativeStringIterator(Scriptable scope, Scriptable stringLike, boolean keyOnly) {
         super(scope, ITERATOR_TAG);
         this.index = 0;
         this.string = ScriptRuntime.toString(stringLike);
+        this.keyOnly = keyOnly;
     }
 
     @Override
@@ -39,10 +40,14 @@ public final class NativeStringIterator extends ES6Iterator {
 
     @Override
     public Object nextValue(Context cx, Scriptable scope) {
-        int newIndex = string.offsetByCodePoints(index, 1);
-        Object value = string.substring(index, newIndex);
-        index = newIndex;
-        return value;
+        if (keyOnly) {
+            return index++;
+        } else {
+            int newIndex = string.offsetByCodePoints(index, 1);
+            Object value = string.substring(index, newIndex);
+            index = newIndex;
+            return value;
+        }
     }
 
     @Override
@@ -52,4 +57,5 @@ public final class NativeStringIterator extends ES6Iterator {
 
     private String string;
     private int index;
+    private boolean keyOnly;
 }
