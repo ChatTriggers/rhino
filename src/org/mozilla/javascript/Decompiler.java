@@ -830,10 +830,12 @@ public class Decompiler {
                     result.append(" => ");
                     break;
 
+                // TODO?
+                case Token.SETNAME: break;
+
                 default:
                     // If we don't know how to decompile it, raise an exception.
-                    throw new RuntimeException("Token: " +
-                            Token.name(source.charAt(i)));
+                    throw new RuntimeException("Token: " + Token.name(source.charAt(i)));
             }
             ++i;
         }
