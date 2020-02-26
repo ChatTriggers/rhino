@@ -1232,6 +1232,10 @@ class TokenStream {
                     }
                     return Token.MUL;
 
+                case '\u2029': {
+                    return Token.EOL;
+                }
+
                 case '/':
                     markCommentStart();
                     // is it a // comment?
