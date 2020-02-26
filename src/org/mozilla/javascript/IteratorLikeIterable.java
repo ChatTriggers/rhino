@@ -53,18 +53,17 @@ public class IteratorLikeIterable implements Iterable<Object>, Closeable {
         return new Itr();
     }
 
-    public final class Itr
-            implements Iterator<Object> {
+    public final class Itr implements Iterator<Object> {
         private Object nextVal;
 
         @Override
         public boolean hasNext() {
             final Object val = next.call(cx, scope, iterator, ScriptRuntime.emptyArgs);
-            final Object doneval = ScriptRuntime.getObjectProp(val, "done", cx, scope);
+            Object doneval = ScriptRuntime.getObjectProp(val, "done", cx, scope);
             if (Undefined.instance.equals(doneval)) {
-                throw ScriptRuntime.undefReadError(val, "done");
+                doneval = false;
             }
-            if (Boolean.TRUE.equals(doneval)) {
+            if (ScriptRuntime.toBoolean(doneval)) {
                 return false;
             }
             nextVal = ScriptRuntime.getObjectProp(val, "value", cx, scope);

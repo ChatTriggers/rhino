@@ -720,7 +720,17 @@ public class ScriptRuntime {
             System.arraycopy(((NativeArray) right).toArray(), startIndex, target, 0, target.length);
             return cx.newArray(scope, target);
         } else {
-            throw Kit.codeBug("TODO Handle rest destructure with non-arrays");
+            ES6Iterator it = toIterator(cx, scope, ScriptableObject.ensureScriptable(right), false);
+            if (it == null)
+                return cx.newArray(scope, 0);
+
+            List<Object> objects = new ArrayList<>();
+
+            while (!it.isDone(cx, scope)) {
+                objects.add(it.nextValue(cx, scope));
+            }
+
+            return cx.newArray(scope, objects.toArray());
         }
     }
 

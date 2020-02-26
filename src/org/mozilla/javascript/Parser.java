@@ -2646,7 +2646,7 @@ public class Parser {
                     reportError("msg.class.redecl", name);
                     return;
                 }
-            } else if (symDeclType == Token.FUNCTION && declType == Token.CLASS) {
+            } else if (symDeclType == Token.FUNCTION && (declType == Token.CLASS || declType == Token.CONST || declType == Token.LET)) {
                 reportError("msg.func.redecl", name);
                 return;
             }
