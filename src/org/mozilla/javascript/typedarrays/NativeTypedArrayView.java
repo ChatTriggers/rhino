@@ -593,9 +593,13 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
     private NativeTypedArrayView<T> js_slice(Context cx, Scriptable scope, Object _start, Object _end) {
         if (!(_start instanceof Number)) {
             _start = (int) ScriptRuntime.toNumber(_start);
+        } else if (_start instanceof Double) {
+            _start = ((Double) _start).intValue();
         }
         if (!(_end instanceof Number)) {
             _end = (int) ScriptRuntime.toNumber(_end);
+        } else if (_end instanceof Double) {
+            _end = ((Double) _end).intValue();
         }
 
         int start = (int) _start;
