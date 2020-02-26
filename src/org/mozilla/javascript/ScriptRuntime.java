@@ -4115,36 +4115,30 @@ public class ScriptRuntime {
         }
     }
 
-    /**
-     * @deprecated Use {@link #createFunctionActivation(NativeFunction, Scriptable, Object[], boolean)} instead
-     */
-    @Deprecated
-    public static Scriptable createFunctionActivation(NativeFunction funObj, Scriptable scope, Object[] args) {
-        return createFunctionActivation(funObj, scope, args, false);
+    public static Scriptable createFunctionActivation(
+        NativeFunction funObj, Scriptable scope, Object[] args, boolean isStrict, boolean syncArgumentsObj
+    ) {
+        return new NativeCall(funObj, scope, args, args, false, isStrict, syncArgumentsObj);
     }
 
     public static Scriptable createFunctionActivation(
-        NativeFunction funObj, Scriptable scope, Object[] args, boolean isStrict
+        NativeFunction funObj, Scriptable scope, Object[] callArgs,
+        Object[] effectiveArgs, boolean isStrict, boolean syncArgumentsObj
     ) {
-        return new NativeCall(funObj, scope, args, false, isStrict);
-    }
-
-    public static Scriptable createFunctionActivation(
-        NativeFunction funObj, Scriptable scope, Object[] callArgs, Object[] effectiveArgs, boolean isStrict
-    ) {
-        return new NativeCall(funObj, scope, callArgs, effectiveArgs, false, isStrict);
+        return new NativeCall(funObj, scope, callArgs, effectiveArgs, false, isStrict, syncArgumentsObj);
     }
 
     public static Scriptable createArrowFunctionActivation(
-        NativeFunction funObj, Scriptable scope, Object[] args, boolean isStrict
+        NativeFunction funObj, Scriptable scope, Object[] args, boolean isStrict, boolean syncArgumentsObj
     ) {
-        return new NativeCall(funObj, scope, args, true, isStrict);
+        return new NativeCall(funObj, scope, args, args, true, isStrict, syncArgumentsObj);
     }
 
     public static Scriptable createArrowFunctionActivation(
-        NativeFunction funObj, Scriptable scope, Object[] callArgs, Object[] effectiveArgs, boolean isStrict
+        NativeFunction funObj, Scriptable scope, Object[] callArgs,
+        Object[] effectiveArgs, boolean isStrict, boolean syncArgumentsObj
     ) {
-        return new NativeCall(funObj, scope, callArgs, effectiveArgs, true, isStrict);
+        return new NativeCall(funObj, scope, callArgs, effectiveArgs, true, isStrict, syncArgumentsObj);
     }
 
     public static void enterActivationFunction(Context cx, Scriptable scope) {

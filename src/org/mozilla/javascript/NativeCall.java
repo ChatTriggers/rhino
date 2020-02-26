@@ -27,16 +27,14 @@ public final class NativeCall extends IdScriptableObject {
     NativeCall() {
     }
 
-    NativeCall(NativeFunction function, Scriptable scope, Object[] args, boolean isArrow, boolean isStrict) {
-        this(function, scope, args, args, isArrow, isStrict);
-    }
-
-    NativeCall(NativeFunction function, Scriptable scope, Object[] callArgs, Object[] effectiveArgs, boolean isArrow, boolean isStrict) {
+    NativeCall(NativeFunction function, Scriptable scope, Object[] callArgs,
+               Object[] effectiveArgs, boolean isArrow, boolean isStrict, boolean syncArgumentsObj) {
         this.function = function;
 
         setParentScope(scope);
         // leave prototype null
 
+        this.syncArgumentsObj = !isStrict && syncArgumentsObj;
         this.callArgs = (callArgs == null) ? ScriptRuntime.emptyArgs : callArgs;
         this.effectiveArgs = (effectiveArgs == null) ? ScriptRuntime.emptyArgs : effectiveArgs;
         this.isStrict = isStrict;
@@ -115,9 +113,18 @@ public final class NativeCall extends IdScriptableObject {
         throw new IllegalArgumentException(String.valueOf(id));
     }
 
+    /**
+     * Bypasses the arguments object synchronization. This is called
+     * from the activation to achieve two-way synchronization. If the
+     * other method was called, it would cause a stack overflow.
+     */
+    public void putRaw(String name, Scriptable start, Object value) {
+        super.put(name, start, value);
+    }
+
     @Override
     public void put(String name, Scriptable start, Object value) {
-        if (arguments != null) {
+        if (this.syncArgumentsObj && arguments != null) {
             int index = -1;
 
             for (int i = 0; i < function.getParamCount() && index == -1; i++) {
@@ -148,6 +155,7 @@ public final class NativeCall extends IdScriptableObject {
     Object[] callArgs;
     Object[] effectiveArgs;
     boolean isStrict;
+    boolean syncArgumentsObj;
     private Arguments arguments;
 
     transient NativeCall parentActivationCall;

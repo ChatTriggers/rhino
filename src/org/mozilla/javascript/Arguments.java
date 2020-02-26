@@ -84,9 +84,10 @@ final class Arguments extends IdScriptableObject {
     }
 
     private void replaceArg(int index, Object value) {
-        if (sharedWithActivation(index)) {
-            putIntoActivation(index, value);
+        if (activation.syncArgumentsObj) {
+            activation.putRaw(activation.function.getParamOrVarName(index), activation, value);
         }
+
         synchronized (this) {
             if (args == activation.callArgs) {
                 args = args.clone();
@@ -478,7 +479,7 @@ final class Arguments extends IdScriptableObject {
     private NativeCall activation;
 
     // Initially args holds activation.getOriginalArgs(), but any modification
-// of its elements triggers creation of a copy. If its element holds NOT_FOUND,
-// it indicates deleted index, in which case super class is queried.
+    // of its elements triggers creation of a copy. If its element holds NOT_FOUND,
+    // it indicates deleted index, in which case super class is queried.
     private Object[] args;
 }

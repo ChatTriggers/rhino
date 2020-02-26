@@ -1015,8 +1015,7 @@ public class Codegen implements Evaluator {
                                 if (j == 0) {
                                     cfw.markTableSwitchDefault(paramSwitchStart);
                                 } else {
-                                    cfw.markTableSwitchCase(paramSwitchStart, j - 1,
-                                            0);
+                                    cfw.markTableSwitchCase(paramSwitchStart, j - 1, 0);
                                 }
                                 cfw.addPush(s);
                                 cfw.add(ByteCode.ARETURN);
@@ -1508,7 +1507,11 @@ class BodyCodegen {
         cfw.addALoad(variableObjectLocal);
         cfw.addALoad(argsLocal);
         cfw.addPush(scriptOrFn.isInStrictMode());
-        addScriptRuntimeInvoke("createFunctionActivation", SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE, OBJECT_ARRAY, BOOLEAN);
+        // TODO: Sync arguments object?
+        cfw.addPush(false);
+
+        addScriptRuntimeInvoke("createFunctionActivation", SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE,
+            OBJECT_ARRAY, BOOLEAN, BOOLEAN);
         cfw.addAStore(variableObjectLocal);
 
         // create a function object
@@ -2060,11 +2063,19 @@ class BodyCodegen {
                 cfw.addALoad(array);
 
                 cfw.addPush(scriptOrFn.isInStrictMode());
-                addScriptRuntimeInvoke(methodName, SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE, OBJECT_ARRAY, OBJECT_ARRAY, BOOLEAN);
+                // The function has defaults, which automatically means the arguments object should not be synced
+                cfw.addPush(false);
+
+                addScriptRuntimeInvoke(methodName, SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE,
+                    OBJECT_ARRAY, OBJECT_ARRAY, BOOLEAN, BOOLEAN);
             } else {
+                boolean hasDefaults = fnCurrent.fnode.getParams().stream().anyMatch(ast -> ast.getType() == Token.ARRAYLIT);
                 cfw.addPush(scriptOrFn.isInStrictMode());
-                addScriptRuntimeInvoke(methodName, SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE, OBJECT_ARRAY, BOOLEAN);
+                cfw.addPush(!hasDefaults && !scriptOrFn.hasRest());
+                addScriptRuntimeInvoke(methodName, SCRIPTABLE, NATIVE_FUNCTION, SCRIPTABLE,
+                    OBJECT_ARRAY, BOOLEAN, BOOLEAN);
             }
+
 
             cfw.addAStore(variableObjectLocal);
             cfw.addALoad(contextLocal);
