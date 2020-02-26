@@ -2633,16 +2633,24 @@ public class Parser {
                 ? definingScope.getSymbol(name)
                 : null;
         int symDeclType = symbol != null ? symbol.getDeclType() : -1;
-        if (symbol != null && (definingScope == currentScope && (symDeclType == Token.CONST || symDeclType == Token.LET || symDeclType == Token.CLASS))) {
-            if (symDeclType == Token.CONST) {
-                reportError("msg.const.redecl", name);
-            } else if (symDeclType == Token.LET) {
-                reportError("msg.let.redecl", name);
-            } else {
-                reportError("msg.class.redecl", name);
+        if (symbol != null) {
+            if (definingScope == currentScope) {
+                if (symDeclType == Token.CONST) {
+                    reportError("msg.const.redecl", name);
+                    return;
+                } else if (symDeclType == Token.LET) {
+                    reportError("msg.let.redecl", name);
+                    return;
+                } else if (symDeclType == Token.CLASS) {
+                    reportError("msg.class.redecl", name);
+                    return;
+                }
+            } else if (symDeclType == Token.FUNCTION && declType == Token.CLASS) {
+                reportError("msg.func.redecl", name);
+                return;
             }
-            return;
         }
+
         switch (declType) {
             case Token.LET:
                 if (!ignoreNotInBlock && ((currentScope.getType() == Token.IF) || currentScope instanceof Loop)) {
