@@ -1869,7 +1869,7 @@ public class Parser {
                 lp = ts.tokenBeg - forPos;
             int tt = peekToken();
 
-            init = forLoopInit(tt, isForIn || isForOf);
+            init = forLoopInit(tt);
             if (matchToken(Token.IN)) {
                 isForIn = true;
                 inPos = ts.tokenBeg - forPos;
@@ -1904,12 +1904,6 @@ public class Parser {
 
             if (isForIn || isForOf) {
                 ForInLoop fis = new ForInLoop(forPos);
-                if (init instanceof VariableDeclaration) {
-                    // check that there was only one variable given
-                    if (((VariableDeclaration) init).getVariables().size() > 1) {
-                        reportError("msg.mult.index");
-                    }
-                }
                 fis.setIterator(init);
                 fis.setIteratedObject(cond);
                 fis.setInPosition(inPos);
@@ -1956,19 +1950,26 @@ public class Parser {
     // the peeked token was not a name.  Side effect:  sets scanner token
     // information for the label identifier (tokenBeg, tokenEnd, etc.)
 
-    private AstNode forLoopInit(int tt, boolean noAssignment) throws IOException {
+    private AstNode forLoopInit(int tt) throws IOException {
         try {
             inForInit = true;  // checked by variables() and relExpr()
             AstNode init;
             if (tt == Token.SEMI) {
                 init = new EmptyExpression(ts.tokenBeg, 1);
                 init.setLineno(ts.lineno);
-            } else if (tt == Token.VAR || tt == Token.LET) {
-                if (noAssignment && inUseStrictDirective) {
+            } else if (tt == Token.VAR || tt == Token.LET || tt == Token.CONST) {
+                consumeToken();
+                VariableDeclaration decl = variables(tt, ts.tokenBeg, false);
+
+                if (decl.getVariables().size() != 1) {
+                    reportError("msg.for.in.multiple.decl");
+                }
+
+                if (inUseStrictDirective && decl.getVariables().get(0).getInitializer() != null) {
                     reportError("msg.for.in.assignment.in.strict.mode");
                 }
-                consumeToken();
-                init = variables(tt, ts.tokenBeg, false);
+
+                init = decl;
             } else {
                 init = expr();
                 markDestructuring(init);

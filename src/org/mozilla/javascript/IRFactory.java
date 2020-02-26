@@ -1558,7 +1558,7 @@ public final class IRFactory extends Parser {
             if (loopType == LOOP_FOR) {
                 int initType = init.getType();
                 if (initType != Token.EMPTY) {
-                    if (initType != Token.VAR && initType != Token.LET) {
+                    if (initType != Token.VAR && initType != Token.LET && initType != Token.CONST) {
                         init = new Node(Token.EXPR_VOID, init);
                     }
                     loop.addChildToFront(init);
@@ -1585,7 +1585,7 @@ public final class IRFactory extends Parser {
         int destructuringLen = 0;
         Node lvalue;
         int type = lhs.getType();
-        if (type == Token.VAR || type == Token.LET) {
+        if (type == Token.VAR || type == Token.LET || type == Token.CONST) {
             Node kid = lhs.getLastChild();
             int kidType = kid.getType();
             if (kidType == Token.ARRAYLIT || kidType == Token.OBJECTLIT) {
@@ -1643,7 +1643,7 @@ public final class IRFactory extends Parser {
 
         loop = createLoop((Jump) loop, LOOP_WHILE, newBody, cond, null, null);
         loop.addChildToFront(init);
-        if (type == Token.VAR || type == Token.LET)
+        if (type == Token.VAR || type == Token.LET || type == Token.CONST)
             loop.addChildToFront(lhs);
         localBlock.addChildToBack(loop);
 
