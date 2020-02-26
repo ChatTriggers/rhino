@@ -1014,7 +1014,7 @@ public class NativeArray extends IdScriptableObject implements List {
         if (index > Integer.MAX_VALUE) {
             return ScriptableObject.getProperty(target, Long.toString(index));
         }
-        return ScriptableObject.getProperty(target, (int) index);
+        return ScriptableObject.getProperty(target, ScriptRuntime.toString((int) index));
     }
 
     private static void defineElem(Context cx, Scriptable target, long index, Object value) {
