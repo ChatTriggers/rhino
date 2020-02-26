@@ -1904,6 +1904,19 @@ public class Parser {
 
             if (isForIn || isForOf) {
                 ForInLoop fis = new ForInLoop(forPos);
+
+                if (init instanceof VariableDeclaration) {
+                    VariableDeclaration decl = (VariableDeclaration) init;
+                    // check that there was only one variable given
+                    if (decl.getVariables().size() > 1) {
+                        reportError("msg.mult.index");
+                    }
+
+                    if (inUseStrictDirective && decl.getVariables().get(0).getInitializer() != null) {
+                        reportError("msg.for.in.assignment.in.strict.mode");
+                    }
+                }
+
                 fis.setIterator(init);
                 fis.setIteratedObject(cond);
                 fis.setInPosition(inPos);
@@ -1963,10 +1976,6 @@ public class Parser {
 
                 if (decl.getVariables().size() != 1) {
                     reportError("msg.for.in.multiple.decl");
-                }
-
-                if (inUseStrictDirective && decl.getVariables().get(0).getInitializer() != null) {
-                    reportError("msg.for.in.assignment.in.strict.mode");
                 }
 
                 init = decl;
