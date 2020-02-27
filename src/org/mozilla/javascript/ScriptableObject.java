@@ -1098,13 +1098,10 @@ public abstract class ScriptableObject implements Scriptable,
                 hint = "number";
             }
 
-            if (!(toPrimitive instanceof Callable)) {
-                throw ScriptRuntime.typeError("Cannot convert object to " + hint +
-                    ": it's [Symbol.toPrimitive] property is not a function");
+            if ((toPrimitive instanceof Callable)) {
+                Context _cx = Context.getContext();
+                return ((Callable) toPrimitive).call(_cx, _cx.topCallScope, object, new Object[]{hint});
             }
-
-            Context _cx = Context.getContext();
-            return ((Callable) toPrimitive).call(_cx, _cx.topCallScope, object, new Object[]{hint});
         }
 
         for (int i = 0; i < 2; i++) {
