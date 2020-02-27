@@ -802,8 +802,7 @@ public class NativeArray extends IdScriptableObject implements List {
         }
 
         Object iteratorProp = ScriptableObject.getProperty(items, SymbolKey.ITERATOR);
-        if (!(items instanceof NativeArray) && (iteratorProp != Scriptable.NOT_FOUND) &&
-                !Undefined.isUndefined(iteratorProp)) {
+        if (!(items instanceof NativeArray) && (iteratorProp != Scriptable.NOT_FOUND) && !Undefined.isUndefined(iteratorProp)) {
             final Object iterator = ScriptRuntime.callIterator(items, cx, scope);
             if (!Undefined.isUndefined(iterator)) {
                 final Scriptable result = callConstructorOrCreateArray(cx, scope, thisObj, 0, false);

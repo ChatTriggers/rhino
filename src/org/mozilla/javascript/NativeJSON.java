@@ -131,16 +131,14 @@ public final class NativeJSON extends IdScriptableObject {
         }
     }
 
-    public static Object parse(Context cx, Scriptable scope, String jtext,
-                               Callable reviver) {
+    public static Object parse(Context cx, Scriptable scope, String jtext, Callable reviver) {
         Object unfiltered = parse(cx, scope, jtext);
         Scriptable root = cx.newObject(scope);
         root.put("", root, unfiltered);
         return walk(cx, scope, reviver, root, "");
     }
 
-    private static Object walk(Context cx, Scriptable scope, Callable reviver,
-                               Scriptable holder, Object name) {
+    private static Object walk(Context cx, Scriptable scope, Callable reviver, Scriptable holder, Object name) {
         final Object property;
         if (name instanceof Number) {
             property = holder.get(((Number) name).intValue(), holder);
@@ -150,8 +148,8 @@ public final class NativeJSON extends IdScriptableObject {
 
         if (property instanceof Scriptable) {
             Scriptable val = ((Scriptable) property);
-            if (val instanceof NativeArray) {
-                long len = ((NativeArray) val).getLength();
+            if (ScriptRuntime.isArray(val)) {
+                long len = ScriptRuntime.getArray(val).getLength();
                 for (long i = 0; i < len; i++) {
                     // indices greater than MAX_INT are represented as strings
                     if (i > Integer.MAX_VALUE) {

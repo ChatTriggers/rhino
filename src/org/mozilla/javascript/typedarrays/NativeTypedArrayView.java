@@ -477,7 +477,7 @@ public abstract class NativeTypedArrayView<T extends Comparable<T>> extends Nati
             return v;
         }
 
-        if (ScriptRuntime.isArrayObject(arg0)) {
+        if (ScriptRuntime.isArray(arg0)) {
             // Copy elements of the array and convert them to the correct type
             Object[] arrayElements = ScriptRuntime.getArrayElements((Scriptable) arg0);
 

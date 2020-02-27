@@ -7,7 +7,6 @@
 package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.FunctionNode;
-import org.mozilla.javascript.decorators.Decorator;
 import org.mozilla.javascript.decorators.DecoratorType;
 import org.mozilla.javascript.generator.NativeGenerator;
 import org.mozilla.javascript.generator.NativeGeneratorIterator;
@@ -21,7 +20,6 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
@@ -4553,8 +4551,30 @@ public class ScriptRuntime {
         }
     }
 
-    public static boolean isArrayObject(Object obj) {
-        return obj instanceof NativeArray || obj instanceof Arguments;
+    /**
+     * Determines if the Object is an array. Implements the
+     * ECMAScript IsArray() abstract operation
+     *
+     * @return true if the passed in Scriptable is an Array
+     */
+    public static boolean isArray(Object obj) {
+        if (obj instanceof NativeProxy) {
+            return isArray(((NativeProxy) obj).getTarget());
+        }
+
+        return obj instanceof NativeArray;
+    }
+
+    public static NativeArray getArray(Object obj) {
+        if (!isArray(obj)) {
+            throw Kit.codeBug();
+        }
+
+        if (obj instanceof NativeProxy) {
+            return getArray(((NativeProxy) obj).getTarget());
+        }
+
+        return (NativeArray) obj;
     }
 
     public static Object[] getArrayElements(Scriptable object) {
