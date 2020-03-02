@@ -1637,8 +1637,7 @@ public class Context {
         if (elements.getClass().getComponentType() != ScriptRuntime.ObjectClass)
             throw new IllegalArgumentException();
         NativeArray result = new NativeArray(elements);
-        ScriptRuntime.setBuiltinProtoAndParent(result, scope,
-                TopLevel.Builtins.Array);
+        ScriptRuntime.setBuiltinProtoAndParent(result, scope, TopLevel.Builtins.Array);
         return result;
     }
 
@@ -2401,24 +2400,11 @@ public class Context {
         ScriptNode tree = parse(sourceString, sourceName, lineno,
                 compilerEnv, compilationErrorReporter, returnFunction);
 
-        Object bytecode;
-        try {
-            if (compiler == null) {
-                compiler = createCompiler();
-            }
-
-            bytecode = compiler.compile(compilerEnv, tree, tree.getEncodedSource(), returnFunction);
-        } catch (ClassFileFormatException e) {
-            throw Kit.codeBug();
-
-            // // we hit some class file limit, fall back to interpreter or report
-            //
-            // // we have to recreate the tree because the compile call might have changed the tree already
-            // tree = parse(sourceString, sourceName, lineno, compilerEnv, compilationErrorReporter, returnFunction);
-            //
-            // compiler = createInterpreter();
-            // bytecode = compiler.compile(compilerEnv, tree, tree.getEncodedSource(), returnFunction);
+        if (compiler == null) {
+            compiler = createCompiler();
         }
+
+        Object bytecode = compiler.compile(compilerEnv, tree, tree.getEncodedSource(), returnFunction);
 
         if (debugger != null) {
             if (sourceString == null) Kit.codeBug();

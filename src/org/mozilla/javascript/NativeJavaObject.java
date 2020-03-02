@@ -27,8 +27,7 @@ import java.util.Map;
  * @see NativeJavaClass
  */
 
-public class NativeJavaObject
-        implements Scriptable, SymbolScriptable, Wrapper, Serializable {
+public class NativeJavaObject implements Scriptable, SymbolScriptable, Wrapper, Serializable {
     private static final long serialVersionUID = -6948590651130498591L;
 
     public NativeJavaObject() {
@@ -133,6 +132,14 @@ public class NativeJavaObject
     public boolean hasInstance(Scriptable value) {
         // This is an instance of a Java class, so always return false
         return false;
+    }
+
+    @Override
+    public void declare(String name, Scriptable start) {
+    }
+
+    @Override
+    public void declareConst(String name, Scriptable start) {
     }
 
     @Override

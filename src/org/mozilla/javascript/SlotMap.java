@@ -17,9 +17,7 @@ package org.mozilla.javascript;
  * resulted in substantial performance regressions so we are doing the best that we can.
  */
 
-public interface SlotMap
-        extends Iterable<ScriptableObject.Slot> {
-
+public interface SlotMap extends Iterable<ScriptableObject.Slot> {
     /**
      * Return the size of the map.
      */
@@ -48,6 +46,8 @@ public interface SlotMap
      * Note that ScriptableObject generally adds slots via the "get" method.
      */
     void addSlot(ScriptableObject.Slot newSlot);
+
+    void createSlot(String key, ScriptableObject.Slot slot);
 
     /**
      * Remove the slot at either "key" or "index".

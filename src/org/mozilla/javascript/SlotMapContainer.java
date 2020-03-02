@@ -16,7 +16,6 @@ import java.util.Iterator;
  * switch between them when we need to so that we use the right data structure at the right time.
  */
 class SlotMapContainer implements SlotMap {
-
     /**
      * Once the object has this many properties in it, we will replace the EmbeddedSlotMap
      * with HashSlotMap. We can adjust this parameter to balance
@@ -65,6 +64,11 @@ class SlotMapContainer implements SlotMap {
     public void addSlot(Slot newSlot) {
         checkMapSize();
         map.addSlot(newSlot);
+    }
+
+    @Override
+    public void createSlot(String key, Slot slot) {
+        map.createSlot(key, slot);
     }
 
     @Override

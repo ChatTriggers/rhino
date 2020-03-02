@@ -167,6 +167,14 @@ public class Matrix implements Scriptable {
     public void put(int index, Scriptable start, Object value) {
     }
 
+    @Override
+    public void declare(String name, Scriptable start) {
+    }
+
+    @Override
+    public void declareConst(String name, Scriptable start) {
+    }
+
     /**
      * Remove a named property.
      *

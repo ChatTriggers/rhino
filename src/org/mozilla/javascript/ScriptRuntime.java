@@ -4083,9 +4083,9 @@ public class ScriptRuntime {
         }
     }
 
-    public static void initScript(NativeFunction funObj, Scriptable thisObj,
-                                  Context cx, Scriptable scope,
-                                  boolean evalScript) {
+    public static void initScript(
+        NativeFunction funObj, Scriptable thisObj, Context cx, Scriptable scope
+    ) {
         if (cx.topCallScope == null)
             throw new IllegalStateException();
 
@@ -4102,17 +4102,14 @@ public class ScriptRuntime {
             for (int i = varCount; i-- != 0; ) {
                 String name = funObj.getParamOrVarName(i);
                 boolean isConst = funObj.getParamOrVarConst(i);
+                boolean isLexical = funObj.isVarLexical(i);
                 // Don't overwrite existing def if already defined in object
                 // or prototypes of object.
                 if (!ScriptableObject.hasProperty(scope, name)) {
                     if (isConst) {
-                        ScriptableObject.defineConstProperty(varScope, name);
-                    } else if (!evalScript) {
-                        if (!(funObj instanceof InterpretedFunction)
-                                || ((InterpretedFunction) funObj).hasFunctionNamed(name)) {
-                            // Global var definitions are supposed to be DONTDELETE
-                            ScriptableObject.defineProperty(varScope, name, Undefined.instance, ScriptableObject.NOT_CONFIGURABLE);
-                        }
+                        varScope.declareConst(name, varScope);
+                    } else if (isLexical) {
+                        varScope.declare(name, varScope);
                     } else {
                         varScope.put(name, varScope, Undefined.instance);
                     }
@@ -4768,8 +4765,7 @@ public class ScriptRuntime {
         throw typeError2("msg.undef.prop.delete", toString(object), toString(id));
     }
 
-    public static RuntimeException notFoundError(Scriptable object,
-                                                 String property) {
+    public static RuntimeException notFoundError(Scriptable object, String property) {
         // XXX: use object to improve the error message
         String msg = getMessage1("msg.is.not.defined", property);
         throw constructError("ReferenceError", msg);

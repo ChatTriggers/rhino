@@ -136,18 +136,13 @@ public class AstRoot extends ScriptNode {
      * @throws IllegalStateException if a parent link is missing
      */
     public void checkParentLinks() {
-        this.visit(new NodeVisitor() {
-            @Override
-            public boolean visit(AstNode node) {
-                int type = node.getType();
-                if (type == Token.SCRIPT)
-                    return true;
-                if (node.getParent() == null)
-                    throw new IllegalStateException
-                            ("No parent for node: " + node
-                                    + "\n" + node.toSource(0));
+        this.visit(node -> {
+            int type = node.getType();
+            if (type == Token.SCRIPT)
                 return true;
-            }
+            if (node.getParent() == null)
+                throw new IllegalStateException("No parent for node: " + node + "\n" + node.toSource(0));
+            return true;
         });
     }
 }

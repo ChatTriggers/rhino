@@ -188,7 +188,6 @@ public class IterableTest extends TestCase {
 
     //Explicitly not a ScriptableObject
     public static class FooBoilerplate implements Scriptable {
-
         protected final Scriptable scope;
 
         public FooBoilerplate(final Scriptable scope) {
@@ -245,6 +244,16 @@ public class IterableTest extends TestCase {
 
         @Override
         public void put(int index, Scriptable start, Object value) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void declare(String name, Scriptable start) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void declareConst(String name, Scriptable start) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 

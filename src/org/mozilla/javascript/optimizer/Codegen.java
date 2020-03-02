@@ -876,7 +876,8 @@ public class Codegen implements Evaluator {
         final int Do_construct = 6;
         final int Do_hasRest = 7;
         final int Do_isCallable = 8;
-        final int SWITCH_COUNT = 9;
+        final int Do_isVarLexical = 9;
+        final int SWITCH_COUNT = 10;
 
         for (int methodIndex = 0; methodIndex != SWITCH_COUNT; ++methodIndex) {
             if (methodIndex == Do_getEncodedSource && encodedSource == null) {
@@ -930,6 +931,10 @@ public class Codegen implements Evaluator {
                 case Do_isCallable:
                     methodLocals = 1;
                     cfw.startMethod("isCallable", "()Z", ACC_PUBLIC);
+                    break;
+                case Do_isVarLexical:
+                    methodLocals = 2;
+                    cfw.startMethod("isVarLexical", "(I)Z", ACC_PUBLIC);
                     break;
                 default:
                     throw Kit.codeBug();
@@ -1007,8 +1012,7 @@ public class Codegen implements Evaluator {
                             cfw.addILoad(1); // param or var index
                             // do switch from 1 .. paramAndVarCount - 1 mapping 0
                             // to the default case
-                            int paramSwitchStart = cfw.addTableSwitch(
-                                    1, paramAndVarCount - 1);
+                            int paramSwitchStart = cfw.addTableSwitch(1, paramAndVarCount - 1);
                             for (int j = 0; j != paramAndVarCount; ++j) {
                                 if (cfw.getStackTop() != 0) Kit.codeBug();
                                 String s = n.getParamOrVarName(j);
@@ -1051,8 +1055,7 @@ public class Codegen implements Evaluator {
                                 if (j == 0) {
                                     cfw.markTableSwitchDefault(paramSwitchStart);
                                 } else {
-                                    cfw.markTableSwitchCase(paramSwitchStart, j - 1,
-                                            0);
+                                    cfw.markTableSwitchCase(paramSwitchStart, j - 1, 0);
                                 }
                                 cfw.addPush(constness[j]);
                                 cfw.add(ByteCode.IRETURN);
@@ -1115,6 +1118,35 @@ public class Codegen implements Evaluator {
                             cfw.addInvoke(ByteCode.INVOKESPECIAL, "org/mozilla/javascript/BaseFunction", "isCallable", "()Z");
                         }
                         cfw.add(ByteCode.IRETURN);
+                        break;
+
+                    case Do_isVarLexical:
+                        int switchMax = n.getParamAndVarCount();
+                        boolean[] lexicals = n.getParamAndVarLexical();
+
+                        if (switchMax == 0) {
+                            cfw.addPush(false);
+                            cfw.add(ByteCode.IRETURN);
+                            break;
+                        } else if (switchMax == 1) {
+                            cfw.addPush(lexicals[0]);
+                            cfw.add(ByteCode.IRETURN);
+                            break;
+                        }
+
+                        cfw.addILoad(1);
+                        int varSwitchStart = cfw.addTableSwitch(1, switchMax - 1);
+
+                        for (int varIndex = 0; varIndex < switchMax; varIndex++) {
+                            if (varIndex == 0) {
+                                cfw.markTableSwitchDefault(varSwitchStart);
+                            } else {
+                                cfw.markTableSwitchCase(varSwitchStart, varIndex - 1);
+                            }
+                            cfw.addPush(lexicals[varIndex]);
+                            cfw.add(ByteCode.IRETURN);
+                        }
+
                         break;
 
                     default:
@@ -2087,8 +2119,7 @@ class BodyCodegen {
             cfw.addALoad(thisObjLocal);
             cfw.addALoad(contextLocal);
             cfw.addALoad(variableObjectLocal);
-            cfw.addPush(0); // false to indicate it is not eval script
-            addScriptRuntimeInvoke("initScript", VOID, NATIVE_FUNCTION, SCRIPTABLE, CONTEXT, SCRIPTABLE, BOOLEAN);
+            addScriptRuntimeInvoke("initScript", VOID, NATIVE_FUNCTION, SCRIPTABLE, CONTEXT, SCRIPTABLE);
         }
 
         enterAreaStartLabel = cfw.acquireLabel();

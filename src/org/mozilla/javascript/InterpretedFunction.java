@@ -162,6 +162,11 @@ final class InterpretedFunction extends NativeFunction implements Script {
         return idata.argIsConst[index];
     }
 
+    @Override
+    protected boolean isVarLexical(int index) {
+        return false;
+    }
+
     boolean hasFunctionNamed(String name) {
         for (int f = 0; f < idata.getFunctionCount(); f++) {
             InterpreterData functionData = (InterpreterData) idata.getFunction(f);
