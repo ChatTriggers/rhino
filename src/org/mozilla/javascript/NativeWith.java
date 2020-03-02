@@ -138,6 +138,20 @@ public class NativeWith implements Scriptable, SymbolScriptable, IdFunctionCall,
     }
 
     @Override
+    public void declare(String name, Scriptable start) {
+        if (start == this)
+            start = prototype;
+        prototype.declare(name, start);
+    }
+
+    @Override
+    public void declareConst(String name, Scriptable start) {
+        if (start == this)
+            start = prototype;
+        prototype.declare(name, start);
+    }
+
+    @Override
     public void delete(String id) {
         prototype.delete(id);
     }

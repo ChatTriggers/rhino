@@ -134,8 +134,7 @@ public final class Interpreter extends Icode implements Evaluator {
                 }
             } else {
                 scope = callerScope;
-                ScriptRuntime.initScript(fnOrScript, thisObj, cx, scope,
-                        fnOrScript.idata.evalScriptFlag);
+                ScriptRuntime.initScript(fnOrScript, thisObj, cx, scope);
             }
 
             if (idata.itsNestedFunctions != null) {

@@ -66,8 +66,12 @@ public class HashSlotMap
         return createSlot(key, index, name, accessType);
     }
 
-    private ScriptableObject.Slot createSlot(Object key, int index,
-                                             Object name, ScriptableObject.SlotAccess accessType) {
+    @Override
+    public void createSlot(String key, ScriptableObject.Slot slot) {
+        createSlot(key, key.hashCode(), key, SlotAccess.MODIFY);
+    }
+
+    private ScriptableObject.Slot createSlot(Object key, int index, Object name, ScriptableObject.SlotAccess accessType) {
         ScriptableObject.Slot slot = map.get(name);
         if (slot != null) {
             ScriptableObject.Slot newSlot;
@@ -83,7 +87,7 @@ public class HashSlotMap
             } else {
                 return slot;
             }
-            newSlot.value = slot.value;
+            newSlot.setValue(slot.value);
             map.put(name, newSlot);
             return newSlot;
         }

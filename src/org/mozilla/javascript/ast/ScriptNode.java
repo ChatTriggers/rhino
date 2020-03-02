@@ -34,6 +34,7 @@ public class ScriptNode extends Scope {
     private boolean hasRest = false;
     private String[] variableNames;
     private boolean[] isConsts;
+    private boolean[] isLexical;
 
     private Object compilerData;
     private int tempNumber = 0;
@@ -246,6 +247,11 @@ public class ScriptNode extends Scope {
         return isConsts;
     }
 
+    public boolean[] getParamAndVarLexical() {
+        if (variableNames == null) codeBug();
+        return isLexical;
+    }
+
     void addSymbol(Symbol symbol) {
         if (variableNames != null) codeBug();
         if (symbol.getDeclType() == Token.LP) {
@@ -296,10 +302,13 @@ public class ScriptNode extends Scope {
         }
         variableNames = new String[symbols.size()];
         isConsts = new boolean[symbols.size()];
+        isLexical = new boolean[symbols.size()];
         for (int i = 0; i < symbols.size(); i++) {
             Symbol symbol = symbols.get(i);
             variableNames[i] = symbol.getName();
-            isConsts[i] = symbol.getDeclType() == Token.CONST;
+            int declType = symbol.getDeclType();
+            isConsts[i] = declType == Token.CONST;
+            isLexical[i] = declType == Token.CONST || declType == Token.LET || declType == Token.CLASS;
             symbol.setIndex(i);
         }
     }

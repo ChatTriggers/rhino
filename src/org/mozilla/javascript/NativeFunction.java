@@ -128,5 +128,7 @@ public abstract class NativeFunction extends BaseFunction {
         // from earlier Rhino versions. See Bugzilla #396117.
         return false;
     }
+
+    protected abstract boolean isVarLexical(int index);
 }
 

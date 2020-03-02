@@ -199,6 +199,43 @@ public interface Scriptable {
     void put(int index, Scriptable start, Object value);
 
     /**
+     * Declares a lexical variable in this object.
+     *
+     * Defines an uninitialized Slot given the name of this
+     * lexical variable. Lexical variables are: let declarations,
+     * const declarations, and classes (but note that const
+     * variables are declaring using declareConst below)
+     *
+     * This method is used to insert a Slot into an object's
+     * SlotMap without associating a value with that slot.
+     * If a get operation is executed on a slot which is
+     * lexical and uninitialized, a ReferenceError is thrown.
+     *
+     * @param name  the name of the property
+     * @param start the object whose property is being set (ignored)
+     * @see org.mozilla.javascript.Scriptable#declareConst(String, Scriptable)
+     */
+    void declare(String name, Scriptable start);
+
+
+    /**
+     * Declares a const variable in this object.
+     *
+     * Defines an uninitialized Slot given the name of this
+     * const variable.
+     *
+     * This method is used to insert a const Slot into an object's
+     * SlotMap without associating a value with that slot.
+     * If a get operation is executed on a slot which is
+     * lexical and uninitialized, a ReferenceError is thrown.
+     *
+     * @param name  the name of the property
+     * @param start the object whose property is being set (ignored)
+     * @see org.mozilla.javascript.Scriptable#declare(String, Scriptable)
+     */
+    void declareConst(String name, Scriptable start);
+
+    /**
      * Removes a property from this object.
      * This operation corresponds to the ECMA [[Delete]] except that
      * the no result is returned. The runtime will guarantee that this

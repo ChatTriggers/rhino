@@ -147,9 +147,10 @@ public abstract class ScriptableObject implements Scriptable,
         Object name; // This can change due to caching
         int indexOrHash;
         private short attributes;
-        Object value;
+        protected Object value;
         transient Slot next; // next in hash table bucket
         transient Slot orderedNext; // next in linked list
+        private boolean initialized = false;
 
         Slot(Object name, int indexOrHash, int attributes) {
             this.name = name;
@@ -157,12 +158,16 @@ public abstract class ScriptableObject implements Scriptable,
             this.attributes = (short) attributes;
         }
 
-        private void readObject(ObjectInputStream in)
-                throws IOException, ClassNotFoundException {
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
             in.defaultReadObject();
             if (name != null) {
                 indexOrHash = name.hashCode();
             }
+        }
+
+        void setValue(Object value) {
+            this.initialized = true;
+            this.value = value;
         }
 
         boolean setValue(Object value, Scriptable owner, Scriptable start) {
@@ -174,16 +179,24 @@ public abstract class ScriptableObject implements Scriptable,
                     throw ScriptRuntime.typeError1("msg.modify.readonly", name);
                 }
 
+                this.initialized = true;
+
                 return true;
             }
             if (owner == start) {
-                this.value = value;
+                this.setValue(value);
+
                 return true;
             }
+
             return false;
         }
 
         Object getValue(Scriptable start) {
+            if (!this.initialized) {
+                throw ScriptRuntime.throwCustomError(Context.getContext(), Context.getScope(), "ReferenceError",
+                    "can't access lexical declaration '" + name + "' before initialization");
+            }
             return value;
         }
 
@@ -338,7 +351,8 @@ public abstract class ScriptableObject implements Scriptable,
                 try {
                     initializer.init();
                 } finally {
-                    this.value = val = initializer.getValue();
+                    val = initializer.getValue();
+                    setValue(val);
                 }
             }
             return val;
@@ -545,6 +559,16 @@ public abstract class ScriptableObject implements Scriptable,
 
         if (start == this) throw Kit.codeBug();
         ensureSymbolScriptable(start).put(key, start, value);
+    }
+
+    @Override
+    public void declare(String name, Scriptable start) {
+        slotMap.createSlot(name, new Slot(name, 0, 0));
+    }
+
+    @Override
+    public void declareConst(String name, Scriptable start) {
+        slotMap.createSlot(name, new Slot(name, 0, UNINITIALIZED_CONST));
     }
 
     /**
@@ -801,7 +825,7 @@ public abstract class ScriptableObject implements Scriptable,
         } else {
             gslot.getter = getterOrSetter;
         }
-        gslot.value = Undefined.instance;
+        gslot.setValue(Undefined.instance);
     }
 
     public void setGetterOrSetter(Symbol name, int index, Callable getterOrSetter, boolean isSetter) {
@@ -837,7 +861,7 @@ public abstract class ScriptableObject implements Scriptable,
         } else {
             gslot.getter = getterOrSetter;
         }
-        gslot.value = Undefined.instance;
+        gslot.setValue(Undefined.instance);
     }
 
     /**
@@ -876,7 +900,7 @@ public abstract class ScriptableObject implements Scriptable,
         } else {
             gslot.getter = getterOrSetter;
         }
-        gslot.value = Undefined.instance;
+        gslot.setValue(Undefined.instance);
     }
 
     /**
@@ -959,7 +983,7 @@ public abstract class ScriptableObject implements Scriptable,
         gslot.setAttributes(attributes);
         gslot.getter = null;
         gslot.setter = null;
-        gslot.value = init;
+        gslot.setValue(init);
     }
 
     /**
@@ -1994,7 +2018,7 @@ public abstract class ScriptableObject implements Scriptable,
                 gslot.setter = setter;
             }
 
-            gslot.value = Undefined.instance;
+            gslot.setValue(Undefined.instance);
             gslot.setAttributes(attributes);
         } else {
             if (slot instanceof GetterSlot && isDataDescriptor(desc)) {
@@ -2003,9 +2027,9 @@ public abstract class ScriptableObject implements Scriptable,
 
             Object value = getProperty(desc, "value");
             if (value != NOT_FOUND) {
-                slot.value = value;
+                slot.setValue(value);
             } else if (isNew) {
-                slot.value = Undefined.instance;
+                slot.setValue(Undefined.instance);
             }
             slot.setAttributes(attributes);
         }
@@ -2316,7 +2340,7 @@ public abstract class ScriptableObject implements Scriptable,
                         try {
                             initializer.init();
                         } finally {
-                            slot.value = initializer.getValue();
+                            slot.setValue(initializer.getValue());
                         }
                     }
                 }
@@ -2988,14 +3012,14 @@ public abstract class ScriptableObject implements Scriptable,
             slot = slotMap.get(name, index, SlotAccess.MODIFY_CONST);
             int attr = slot.getAttributes();
             if ((attr & UNINITIALIZED_CONST) != 0) {
-                slot.value = value;
+                slot.setValue(value);
                 // clear the bit on const initialization
                 if (constFlag != UNINITIALIZED_CONST) {
                     slot.setAttributes(attr & ~UNINITIALIZED_CONST | INITIALIZED_CONST);
                 }
             } else if ((attr & (UNINITIALIZED_CONST | INITIALIZED_CONST)) == 0) {
                 // We are initializing a const slot in a ScriptRuntime.enterWith call
-                slot.value = value;
+                slot.setValue(value);
                 slot.setAttributes(attr | INITIALIZED_CONST);
             }
             return true;

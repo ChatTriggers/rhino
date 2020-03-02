@@ -23,9 +23,7 @@ package org.mozilla.javascript;
  * @see Scriptable
  */
 
-public class Delegator
-        implements Function, SymbolScriptable {
-
+public class Delegator implements Function, SymbolScriptable {
     protected Scriptable obj = null;
 
     /**
@@ -298,5 +296,15 @@ public class Delegator
             return n;
         }
         return ((Function) myDelegee).construct(cx, scope, args);
+    }
+
+    @Override
+    public void declare(String name, Scriptable start) {
+        getDelegee().declare(name, start);
+    }
+
+    @Override
+    public void declareConst(String name, Scriptable start) {
+        getDelegee().declare(name, start);
     }
 }
