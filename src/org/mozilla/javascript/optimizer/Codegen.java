@@ -4438,18 +4438,28 @@ class BodyCodegen {
                 return;
             }
 
-            generateFunctionAndThisObj(child, node, isPrivate);
             // stack: ... functionObj thisObj
-            if (argCount == 1) {
+            if (child.getProp(Node.CHAINING_PROP) != null) {
+                Node prop = child.getFirstChild();
+                generateExpression(prop, child);
+                String property = prop.getNext().getString();
+                cfw.addPush(property);
+                generateCallArgArray(node, firstArgChild, false);
+                methodName = "optionalAccessCallN";
+                signature = new String[]{ OBJECT, STRING, OBJECT_ARRAY, CONTEXT, SCRIPTABLE };
+            } else if (argCount == 1) {
+                generateFunctionAndThisObj(child, node, isPrivate);
                 generateExpression(firstArgChild, node);
                 methodName = "call1";
                 signature = new String[]{ CALLABLE, SCRIPTABLE, OBJECT, CONTEXT, SCRIPTABLE };
             } else if (argCount == 2) {
+                generateFunctionAndThisObj(child, node, isPrivate);
                 generateExpression(firstArgChild, node);
                 generateExpression(firstArgChild.getNext(), node);
                 methodName = "call2";
                 signature = new String[]{ CALLABLE, SCRIPTABLE, OBJECT, OBJECT, CONTEXT, SCRIPTABLE };
             } else {
+                generateFunctionAndThisObj(child, node, isPrivate);
                 generateCallArgArray(node, firstArgChild, false);
                 methodName = "callN";
                 signature = new String[]{ CALLABLE, SCRIPTABLE, OBJECT_ARRAY, CONTEXT, SCRIPTABLE };
