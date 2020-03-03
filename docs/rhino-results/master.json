@@ -310,9 +310,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": true
   },
   "ES2015": {
-    "_successful": 400,
+    "_successful": 401,
     "_count": 689,
-    "_percent": 0.5805515239477503,
+    "_percent": 0.5820029027576198,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -320,7 +320,7 @@
     "syntax›default function parameters›defaults can refer to previous params": true,
     "syntax›default function parameters›arguments object interaction": true,
     "syntax›default function parameters›temporal dead zone": true,
-    "syntax›default function parameters›separate scope": "Test remove - crashes Rhino",
+    "syntax›default function parameters›separate scope": true,
     "syntax›default function parameters›new Function() support": true,
     "syntax›rest parameters›basic functionality": true,
     "syntax›rest parameters›function 'length' property": true,

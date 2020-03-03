@@ -1757,13 +1757,12 @@ exports.tests = [
     {
       name: 'separate scope',
       exec: function(){/*
-        throw new Error('Test remove - crashes Rhino');
-        // return (function(a=function(){
-        //   return typeof b === 'undefined';
-        // }){
-        //   var b = 1;
-        //   return a();
-        // }());
+        return (function(a=function(){
+          return typeof b === 'undefined';
+        }){
+          var b = 1;
+          return a();
+        }());
       */},
       res: {
         babel6corejs2: false,
