@@ -286,7 +286,7 @@ public class ScriptNode extends Scope {
      */
     public void flattenSymbolTable(boolean flattenAllTables) {
         if (!flattenAllTables) {
-            List<Symbol> newSymbols = new ArrayList<Symbol>();
+            List<Symbol> newSymbols = new ArrayList<>();
             if (this.symbolTable != null) {
                 // Just replace "symbols" with the symbols in this object's
                 // symbol table. Can't just work from symbolTable map since
@@ -308,7 +308,7 @@ public class ScriptNode extends Scope {
             variableNames[i] = symbol.getName();
             int declType = symbol.getDeclType();
             isConsts[i] = declType == Token.CONST;
-            isLexical[i] = declType == Token.CONST || declType == Token.LET || declType == Token.CLASS;
+            isLexical[i] = declType == Token.CONST || declType == Token.LET || declType == Token.CLASS || declType == Token.LP;
             symbol.setIndex(i);
         }
     }

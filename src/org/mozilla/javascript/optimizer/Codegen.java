@@ -1919,6 +1919,13 @@ class BodyCodegen {
             List<AstNode> params = fnCurrent.fnode.getParams();
             Map<Integer, Node> defaultParams = fnCurrent.fnode.getDefaultParams();
 
+            // Checks for the following function parameter TDZs:
+            //   - function(a = a) {}
+            //   - function(a = b, b) {}
+            // In both of the above cases, a ReferenceError is thrown to indicate accessing an uninitialized
+            // lexical variable (as function parameters are lexical)
+            generateParameterTDZChecks(params, defaultParams);
+
             // REMIND - only need to initialize the vars that don't get a value
             // before the next call and are used in the function
             short firstUndefVar = -1;
@@ -1940,35 +1947,24 @@ class BodyCodegen {
                             cfw.add(ByteCode.AALOAD);
 
                             if (defaultParams.containsKey(i)) {
-                                // TODO Default parameters can refer to themselves, resulting
-                                //  in some quite excellent class output:
-                                // private static Object _c_test2_1(_stdin__1 var0, Context var1, Scriptable var2, Scriptable var3, Object[] var4) {
-                                //     var2 = var0.getParentScope();
-                                //     if (var4.length < 1) {
-                                //         var4 = ScriptRuntime.padArguments(var4, 1);
-                                //     }
-                                //
-                                //     Object a = ScriptRuntime.mixDefaultArgument(var4[0], var0);
-                                //     return a;
-                                // }
-                                if (defaultParams.get(i).getType() == Token.THROW) {
-                                    int label = cfw.acquireLabel();
+                                int label = cfw.acquireLabel();
+                                Node defaultParam = defaultParams.get(i);
+
+                                if (defaultParam.getType() == Token.THROW) {
                                     cfw.addALoad(argsLocal);
                                     cfw.addPush(i);
                                     cfw.add(ByteCode.AALOAD);
                                     cfw.addInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/Undefined", "isUndefined", "(Ljava/lang/Object;)Z");
                                     cfw.add(ByteCode.IFEQ, label);
-                                    generateExpression(defaultParams.get(i), fnCurrent.fnode);
-                                    cfw.markLabel(label);
                                 } else {
                                     cfw.add(ByteCode.DUP);
-                                    int label = cfw.acquireLabel();
                                     cfw.addInvoke(ByteCode.INVOKESTATIC, "org/mozilla/javascript/Undefined", "isUndefined", "(Ljava/lang/Object;)Z");
                                     cfw.add(ByteCode.IFEQ, label);
                                     cfw.add(ByteCode.POP);
-                                    generateExpression(defaultParams.get(i), fnCurrent.fnode);
-                                    cfw.markLabel(label);
                                 }
+
+                                generateExpression(defaultParam, fnCurrent.fnode);
+                                cfw.markLabel(label);
                             }
                         }
 
@@ -2803,6 +2799,30 @@ class BodyCodegen {
                 "<init>",
                 "(Ljava/lang/Object;Ljava/lang/String;I)V");
         cfw.add(ByteCode.ATHROW);
+    }
+
+    private void generateParameterTDZChecks(List<AstNode> params, Map<Integer, Node> defaultParams) {
+        int paramsSize = params.size();
+
+        for (Map.Entry<Integer, Node> en : defaultParams.entrySet()) {
+            int paramIndex = en.getKey();
+            Node defaultParam = en.getValue();
+
+            for (int i = paramIndex; i < paramsSize; i++) {
+                AstNode param = params.get(i);
+
+                if (Name.sameIdentifier(param, defaultParam)) {
+                    cfw.addALoad(contextLocal);
+                    cfw.addALoad(variableObjectLocal);
+                    cfw.addPush("ReferenceError");
+                    cfw.addPush("can't access lexical declaration '" + ((Name) defaultParam).getIdentifier() +
+                        "' before initialization");
+                    addScriptRuntimeInvoke("throwCustomError", "Lorg/mozilla/javascript/JavaScriptException;",
+                        CONTEXT, SCRIPTABLE, STRING, STRING);
+                    cfw.add(ByteCode.ATHROW);
+                }
+            }
+        }
     }
 
     private int getNextGeneratorState(Node node) {

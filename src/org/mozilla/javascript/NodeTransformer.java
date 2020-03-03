@@ -6,10 +6,7 @@
 
 package org.mozilla.javascript;
 
-import org.mozilla.javascript.ast.FunctionNode;
-import org.mozilla.javascript.ast.Jump;
-import org.mozilla.javascript.ast.Scope;
-import org.mozilla.javascript.ast.ScriptNode;
+import org.mozilla.javascript.ast.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +60,9 @@ public class NodeTransformer {
                 inStrictMode);
     }
 
-    private void transformCompilationUnit_r(final ScriptNode tree,
-                                            final Node parent,
-                                            Scope scope,
-                                            boolean createScopeObjects,
-                                            boolean inStrictMode) {
+    private void transformCompilationUnit_r(
+        final ScriptNode tree, final Node parent, Scope scope, boolean createScopeObjects, boolean inStrictMode
+    ) {
         Node node = null;
         siblingLoop:
         for (; ; ) {
@@ -408,8 +403,7 @@ public class NodeTransformer {
                         nameSource.setScope(defining);
                         if (type == Token.NAME) {
                             node.setType(Token.GETVAR);
-                        } else if (type == Token.SETNAME ||
-                                type == Token.STRICT_SETNAME) {
+                        } else if (type == Token.SETNAME || type == Token.STRICT_SETNAME) {
                             node.setType(Token.SETVAR);
                             nameSource.setType(Token.STRING);
                         } else if (type == Token.SETCONST) {

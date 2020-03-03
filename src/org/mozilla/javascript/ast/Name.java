@@ -6,6 +6,7 @@
 
 package org.mozilla.javascript.ast;
 
+import org.mozilla.javascript.Node;
 import org.mozilla.javascript.Token;
 
 /**
@@ -17,7 +18,6 @@ import org.mozilla.javascript.Token;
  * pseudo-keywords for object-initializer getter/setter properties.
  */
 public class Name extends AstNode {
-
     private String identifier;
     private Scope scope;
 
@@ -52,6 +52,11 @@ public class Name extends AstNode {
         super(pos);
         setIdentifier(name);
         setLength(name.length());
+    }
+
+    public static boolean sameIdentifier(Node name1, Node name2) {
+        return name1 instanceof Name && name2 instanceof Name &&
+            ((Name) name1).getIdentifier().equals(((Name) name2).getIdentifier());
     }
 
     /**

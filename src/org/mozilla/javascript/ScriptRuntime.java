@@ -4965,17 +4965,15 @@ public class ScriptRuntime {
      * @param message the message
      * @return a JavaScriptException you should throw
      */
-    public static JavaScriptException throwCustomError(Context cx, Scriptable scope, String constructorName,
-                                                       String message) {
+    public static JavaScriptException throwCustomError(
+        Context cx, Scriptable scope, String constructorName, String message
+    ) {
         int[] linep = {0};
         String filename = Context.getSourcePositionFromStack(linep);
-        final Scriptable error = cx.newObject(scope, constructorName,
-                                              new Object[]{message, filename, Integer.valueOf(linep[0])});
+        final Scriptable error = cx.newObject(scope, constructorName, new Object[]{message, filename, linep[0]});
         return new JavaScriptException(error, filename, linep[0]);
     }
 
     public static final Object[] emptyArgs = new Object[0];
     public static final String[] emptyStrings = new String[0];
-
-
 }
