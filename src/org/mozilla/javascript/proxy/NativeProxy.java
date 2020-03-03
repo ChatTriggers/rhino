@@ -118,7 +118,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
 
         Function fn = (Function) get;
-        Object result = fn.call(Context.getContext(), this, start, new Object[]{target, index, start});
+        Object result = fn.call(Context.getContext(), this, start, new Object[]{target, ScriptRuntime.toString(index), start});
 
         if (hasProperty(target, index)) {
             int attributes = target.getAttributes(index);
