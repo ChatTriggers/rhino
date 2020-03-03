@@ -19,7 +19,7 @@ public class PartialFunction extends ArrowFunction {
     public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] oldArgs) {
         Scriptable callThis = boundThis != null ? boundThis : ScriptRuntime.getTopCallScope(cx);
 
-        Object[] newArgs = new Object[oldArgs.length + appliedObjects.length];
+        Object[] newArgs = new Object[partialIndices.size() + appliedObjects.length];
 
         int appliedIndex = 0;
         int oldArgsIndex = 0;
