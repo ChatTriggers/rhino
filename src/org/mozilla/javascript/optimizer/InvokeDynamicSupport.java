@@ -33,11 +33,16 @@ public class InvokeDynamicSupport {
         return callSite;
     }
 
-    public static Object callWithTemplateLiteral(MutableCallSite callSite, Object[] args, int boundary, Object target, Context cx, Scriptable scope, Scriptable thisObj) {
-        Object value = ScriptRuntime.callWithTemplateLiteral(args, boundary, target, cx, scope, thisObj);
+    public static Object callWithTemplateLiteral(
+        MutableCallSite callSite, Object[] args, int boundary, Object[] rawStrings,
+        Object target, Context cx, Scriptable scope, Scriptable thisObj
+    ) {
+        Object value = ScriptRuntime.callWithTemplateLiteral(args, boundary, rawStrings, target, cx, scope, thisObj);
 
         MethodHandle constant = MethodHandles.constant(Object.class, value);
-        constant = MethodHandles.dropArguments(constant, 0, Object[].class, int.class, Object.class, Context.class, Scriptable.class, Scriptable.class);
+        constant = MethodHandles.dropArguments(
+            constant, 0, Object[].class, int.class, Object[].class, Object.class, Context.class, Scriptable.class, Scriptable.class
+        );
 
         MethodHandle guarded = MethodHandles.guardWithTest(
                 MethodHandles.insertArguments(ARRAY_EQUALS, 0, new Object[] { args }),
@@ -76,13 +81,13 @@ public class InvokeDynamicSupport {
             REAL_CALL_WITH_TEMPLATE = lookup.findStatic(
                     ScriptRuntime.class,
                     "callWithTemplateLiteral",
-                    MethodType.methodType(Object.class, Object[].class, int.class, Object.class, Context.class, Scriptable.class, Scriptable.class)
+                    MethodType.methodType(Object.class, Object[].class, int.class, Object[].class, Object.class, Context.class, Scriptable.class, Scriptable.class)
             );
 
             INIT_CALL_WITH_TEMPLATE = lookup.findStatic(
                     InvokeDynamicSupport.class,
                     "callWithTemplateLiteral",
-                    MethodType.methodType(Object.class, MutableCallSite.class, Object[].class, int.class, Object.class, Context.class, Scriptable.class, Scriptable.class)
+                    MethodType.methodType(Object.class, MutableCallSite.class, Object[].class, int.class, Object[].class, Object.class, Context.class, Scriptable.class, Scriptable.class)
             );
 
             // ====== UTILS ======

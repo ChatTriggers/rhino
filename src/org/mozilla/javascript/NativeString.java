@@ -10,6 +10,9 @@ import org.mozilla.javascript.regexp.NativeRegExp;
 
 import java.text.Collator;
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.mozilla.javascript.ScriptRuntime.rangeError;
 import static org.mozilla.javascript.ScriptRuntimeES6.requireObjectCoercible;
@@ -81,44 +84,26 @@ final class NativeString extends IdScriptableObject {
 
     @Override
     protected void fillConstructorProperties(IdFunctionObject ctor) {
-        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_fromCharCode,
-                "fromCharCode", 1);
-        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_fromCodePoint,
-                "fromCodePoint", 1);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_charAt, "charAt", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_charCodeAt, "charCodeAt", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_indexOf, "indexOf", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_lastIndexOf, "lastIndexOf", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_split, "split", 3);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_substring, "substring", 3);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_toLowerCase, "toLowerCase", 1);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_toUpperCase, "toUpperCase", 1);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_substr, "substr", 3);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_concat, "concat", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_slice, "slice", 3);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_equalsIgnoreCase, "equalsIgnoreCase", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_match, "match", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_search, "search", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_replace, "replace", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_localeCompare, "localeCompare", 2);
-        addIdFunctionProperty(ctor, STRING_TAG,
-                ConstructorId_toLocaleLowerCase, "toLocaleLowerCase", 1);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_raw, "raw", 1);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_fromCharCode, "fromCharCode", 1);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_fromCodePoint, "fromCodePoint", 1);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_charAt, "charAt", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_charCodeAt, "charCodeAt", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_indexOf, "indexOf", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_lastIndexOf, "lastIndexOf", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_split, "split", 3);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_substring, "substring", 3);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_toLowerCase, "toLowerCase", 1);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_toUpperCase, "toUpperCase", 1);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_substr, "substr", 3);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_concat, "concat", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_slice, "slice", 3);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_equalsIgnoreCase, "equalsIgnoreCase", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_match, "match", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_search, "search", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_replace, "replace", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_localeCompare, "localeCompare", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_toLocaleLowerCase, "toLocaleLowerCase", 1);
         super.fillConstructorProperties(ctor);
     }
 
@@ -383,6 +368,9 @@ final class NativeString extends IdScriptableObject {
                     return js_fromCodePoint(args);
                 }
 
+                case ConstructorId_raw:
+                    return js_raw(cx, scope, thisObj, args);
+
                 case Id_constructor: {
                     CharSequence s;
                     if (args.length == 0) {
@@ -447,10 +435,7 @@ final class NativeString extends IdScriptableObject {
                     if (id == Id_startsWith) {
                         return idx == 0;
                     }
-                    if (id == Id_endsWith) {
-                        return idx != -1;
-                    }
-                    // fallthrough
+                    return idx != -1;
 
                 case Id_padStart:
                 case Id_padEnd:
@@ -985,6 +970,39 @@ final class NativeString extends IdScriptableObject {
         return concat.insert(0, pad).toString();
     }
 
+    private static String js_raw(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+        if (args.length == 0 || !(args[0] instanceof Scriptable)) {
+            throw ScriptRuntime.typeError0("msg.undef.to.object");
+        }
+
+        Object[] substitutions = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new Object[0];
+
+        Object cooked = ScriptRuntime.toObject(cx, scope, args[0]);
+        Object rawObj = ScriptRuntime.toObject(cx, scope, ScriptableObject.getProperty(cooked, "raw"));
+        Scriptable raw = ScriptableObject.ensureScriptable(rawObj);
+
+        long literalSegments = NativeArray.getLengthProperty(raw, false);
+        if (literalSegments <= 0) {
+            return "";
+        }
+
+        StringBuilder stringElements = new StringBuilder();
+
+        int nextIndex = 0;
+        while (true) {
+            stringElements.append(ScriptRuntime.toString(ScriptableObject.getProperty(raw, nextIndex)));
+
+            if (nextIndex + 1 == literalSegments) {
+                return stringElements.toString();
+            }
+
+            Object next = nextIndex < substitutions.length ? substitutions[nextIndex] : "";
+            stringElements.append(ScriptRuntime.toString(next));
+
+            nextIndex++;
+        }
+    }
+
     private String js_fromCodePoint(Object[] args) {
         // Adapted from
         // https://github.com/mathiasbynens/String.fromCodePoint/blob/master/fromcodepoint.js
@@ -1024,242 +1042,80 @@ final class NativeString extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2019-11-25 21:30:43 CST
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            L:
-            switch (s.length()) {
-                case 3:
-                    c = s.charAt(2);
-                    if (c == 'b') {
-                        if (s.charAt(0) == 's' && s.charAt(1) == 'u') {
-                            id = Id_sub;
-                            break L0;
-                        }
-                    } else if (c == 'g') {
-                        if (s.charAt(0) == 'b' && s.charAt(1) == 'i') {
-                            id = Id_big;
-                            break L0;
-                        }
-                    } else if (c == 'p') {
-                        if (s.charAt(0) == 's' && s.charAt(1) == 'u') {
-                            id = Id_sup;
-                            break L0;
-                        }
-                    }
+// #generated# Last update: 2020-03-02 23:40:46 CST
+        L0: { id = 0; String X = null; int c;
+            L: switch (s.length()) {
+            case 3: c=s.charAt(2);
+                if (c=='b') { if (s.charAt(0)=='s' && s.charAt(1)=='u') {id=Id_sub; break L0;} }
+                else if (c=='g') { if (s.charAt(0)=='b' && s.charAt(1)=='i') {id=Id_big; break L0;} }
+                else if (c=='p') { if (s.charAt(0)=='s' && s.charAt(1)=='u') {id=Id_sup; break L0;} }
+                break L;
+            case 4: c=s.charAt(0);
+                if (c=='b') { X="bold";id=Id_bold; }
+                else if (c=='l') { X="link";id=Id_link; }
+                else if (c=='t') { X="trim";id=Id_trim; }
+                break L;
+            case 5: switch (s.charAt(4)) {
+                case 'd': X="fixed";id=Id_fixed; break L;
+                case 'e': X="slice";id=Id_slice; break L;
+                case 'h': X="match";id=Id_match; break L;
+                case 'k': X="blink";id=Id_blink; break L;
+                case 'l': X="small";id=Id_small; break L;
+                case 't': X="split";id=Id_split; break L;
+                } break L;
+            case 6: switch (s.charAt(1)) {
+                case 'a': X="padEnd";id=Id_padEnd; break L;
+                case 'e': c=s.charAt(0);
+                    if (c=='r') { X="repeat";id=Id_repeat; }
+                    else if (c=='s') { X="search";id=Id_search; }
                     break L;
-                case 4:
-                    c = s.charAt(0);
-                    if (c == 'b') {
-                        X = "bold";
-                        id = Id_bold;
-                    } else if (c == 'l') {
-                        X = "link";
-                        id = Id_link;
-                    } else if (c == 't') {
-                        X = "trim";
-                        id = Id_trim;
-                    }
-                    break L;
-                case 5:
-                    switch (s.charAt(4)) {
-                        case 'd':
-                            X = "fixed";
-                            id = Id_fixed;
-                            break L;
-                        case 'e':
-                            X = "slice";
-                            id = Id_slice;
-                            break L;
-                        case 'h':
-                            X = "match";
-                            id = Id_match;
-                            break L;
-                        case 'k':
-                            X = "blink";
-                            id = Id_blink;
-                            break L;
-                        case 'l':
-                            X = "small";
-                            id = Id_small;
-                            break L;
-                        case 't':
-                            X = "split";
-                            id = Id_split;
-                            break L;
-                    }
-                    break L;
-                case 6:
-                    switch (s.charAt(1)) {
-                        case 'a':
-                            X = "padEnd";
-                            id = Id_padEnd;
-                            break L;
-                        case 'e':
-                            c = s.charAt(0);
-                            if (c == 'r') {
-                                X = "repeat";
-                                id = Id_repeat;
-                            } else if (c == 's') {
-                                X = "search";
-                                id = Id_search;
-                            }
-                            break L;
-                        case 'h':
-                            X = "charAt";
-                            id = Id_charAt;
-                            break L;
-                        case 'n':
-                            X = "anchor";
-                            id = Id_anchor;
-                            break L;
-                        case 'o':
-                            X = "concat";
-                            id = Id_concat;
-                            break L;
-                        case 'q':
-                            X = "equals";
-                            id = Id_equals;
-                            break L;
-                        case 't':
-                            X = "strike";
-                            id = Id_strike;
-                            break L;
-                        case 'u':
-                            X = "substr";
-                            id = Id_substr;
-                            break L;
-                    }
-                    break L;
-                case 7:
-                    switch (s.charAt(1)) {
-                        case 'a':
-                            X = "valueOf";
-                            id = Id_valueOf;
-                            break L;
-                        case 'e':
-                            X = "replace";
-                            id = Id_replace;
-                            break L;
-                        case 'n':
-                            X = "indexOf";
-                            id = Id_indexOf;
-                            break L;
-                        case 't':
-                            X = "italics";
-                            id = Id_italics;
-                            break L;
-                    }
-                    break L;
-                case 8:
-                    switch (s.charAt(6)) {
-                        case 'c':
-                            X = "toSource";
-                            id = Id_toSource;
-                            break L;
-                        case 'e':
-                            X = "includes";
-                            id = Id_includes;
-                            break L;
-                        case 'f':
-                            X = "trimLeft";
-                            id = Id_trimLeft;
-                            break L;
-                        case 'n':
-                            X = "toString";
-                            id = Id_toString;
-                            break L;
-                        case 'r':
-                            X = "padStart";
-                            id = Id_padStart;
-                            break L;
-                        case 't':
-                            X = "endsWith";
-                            id = Id_endsWith;
-                            break L;
-                        case 'z':
-                            X = "fontsize";
-                            id = Id_fontsize;
-                            break L;
-                    }
-                    break L;
-                case 9:
-                    switch (s.charAt(0)) {
-                        case 'f':
-                            X = "fontcolor";
-                            id = Id_fontcolor;
-                            break L;
-                        case 'n':
-                            X = "normalize";
-                            id = Id_normalize;
-                            break L;
-                        case 's':
-                            X = "substring";
-                            id = Id_substring;
-                            break L;
-                        case 't':
-                            X = "trimRight";
-                            id = Id_trimRight;
-                            break L;
-                    }
-                    break L;
-                case 10:
-                    c = s.charAt(0);
-                    if (c == 'c') {
-                        X = "charCodeAt";
-                        id = Id_charCodeAt;
-                    } else if (c == 's') {
-                        X = "startsWith";
-                        id = Id_startsWith;
-                    }
-                    break L;
-                case 11:
-                    switch (s.charAt(2)) {
-                        case 'L':
-                            X = "toLowerCase";
-                            id = Id_toLowerCase;
-                            break L;
-                        case 'U':
-                            X = "toUpperCase";
-                            id = Id_toUpperCase;
-                            break L;
-                        case 'd':
-                            X = "codePointAt";
-                            id = Id_codePointAt;
-                            break L;
-                        case 'n':
-                            X = "constructor";
-                            id = Id_constructor;
-                            break L;
-                        case 's':
-                            X = "lastIndexOf";
-                            id = Id_lastIndexOf;
-                            break L;
-                    }
-                    break L;
-                case 13:
-                    X = "localeCompare";
-                    id = Id_localeCompare;
-                    break L;
-                case 16:
-                    X = "equalsIgnoreCase";
-                    id = Id_equalsIgnoreCase;
-                    break L;
-                case 17:
-                    c = s.charAt(8);
-                    if (c == 'L') {
-                        X = "toLocaleLowerCase";
-                        id = Id_toLocaleLowerCase;
-                    } else if (c == 'U') {
-                        X = "toLocaleUpperCase";
-                        id = Id_toLocaleUpperCase;
-                    }
-                    break L;
+                case 'h': X="charAt";id=Id_charAt; break L;
+                case 'n': X="anchor";id=Id_anchor; break L;
+                case 'o': X="concat";id=Id_concat; break L;
+                case 'q': X="equals";id=Id_equals; break L;
+                case 't': X="strike";id=Id_strike; break L;
+                case 'u': X="substr";id=Id_substr; break L;
+                } break L;
+            case 7: switch (s.charAt(1)) {
+                case 'a': X="valueOf";id=Id_valueOf; break L;
+                case 'e': X="replace";id=Id_replace; break L;
+                case 'n': X="indexOf";id=Id_indexOf; break L;
+                case 't': X="italics";id=Id_italics; break L;
+                } break L;
+            case 8: switch (s.charAt(6)) {
+                case 'c': X="toSource";id=Id_toSource; break L;
+                case 'e': X="includes";id=Id_includes; break L;
+                case 'f': X="trimLeft";id=Id_trimLeft; break L;
+                case 'n': X="toString";id=Id_toString; break L;
+                case 'r': X="padStart";id=Id_padStart; break L;
+                case 't': X="endsWith";id=Id_endsWith; break L;
+                case 'z': X="fontsize";id=Id_fontsize; break L;
+                } break L;
+            case 9: switch (s.charAt(0)) {
+                case 'f': X="fontcolor";id=Id_fontcolor; break L;
+                case 'n': X="normalize";id=Id_normalize; break L;
+                case 's': X="substring";id=Id_substring; break L;
+                case 't': X="trimRight";id=Id_trimRight; break L;
+                } break L;
+            case 10: c=s.charAt(0);
+                if (c=='c') { X="charCodeAt";id=Id_charCodeAt; }
+                else if (c=='s') { X="startsWith";id=Id_startsWith; }
+                break L;
+            case 11: switch (s.charAt(2)) {
+                case 'L': X="toLowerCase";id=Id_toLowerCase; break L;
+                case 'U': X="toUpperCase";id=Id_toUpperCase; break L;
+                case 'd': X="codePointAt";id=Id_codePointAt; break L;
+                case 'n': X="constructor";id=Id_constructor; break L;
+                case 's': X="lastIndexOf";id=Id_lastIndexOf; break L;
+                } break L;
+            case 13: X="localeCompare";id=Id_localeCompare; break L;
+            case 16: X="equalsIgnoreCase";id=Id_equalsIgnoreCase; break L;
+            case 17: c=s.charAt(8);
+                if (c=='L') { X="toLocaleLowerCase";id=Id_toLocaleLowerCase; }
+                else if (c=='U') { X="toLocaleUpperCase";id=Id_toLocaleUpperCase; }
+                break L;
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
@@ -1269,6 +1125,7 @@ final class NativeString extends IdScriptableObject {
     private static final int
             ConstructorId_fromCharCode = -1,
             ConstructorId_fromCodePoint = -2,
+            ConstructorId_raw = -3,
 
     Id_constructor = 1,
             Id_toString = 2,

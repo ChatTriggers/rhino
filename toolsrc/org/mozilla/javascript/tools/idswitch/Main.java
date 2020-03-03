@@ -23,7 +23,6 @@ import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.tools.ToolErrorReporter;
 
 public class Main {
-
     private static final String SWITCH_TAG_STR = "string_id_map";
     private static final String GENERATED_TAG_STR = "generated";
     private static final String STRING_TAG_STR = "string";

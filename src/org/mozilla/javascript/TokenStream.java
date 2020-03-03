@@ -8,6 +8,8 @@ package org.mozilla.javascript;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class implements the JavaScript scanner.
@@ -465,6 +467,8 @@ class TokenStream {
                 stringBufferTop = 0;
 
                 while (character != '`') {
+                    currRawLiteral.append((char) character);
+
                     if (character == -1) {
                         throw new EvaluatorException("Unfinished template literal");
                     }
@@ -474,6 +478,7 @@ class TokenStream {
                         int escapeVal;
 
                         character = getChar();
+                        currRawLiteral.append((char) character);
                         switch (character) {
                             case 'b':
                                 character = '\b';
@@ -595,6 +600,9 @@ class TokenStream {
                         if (aChar == '{') {
                             justBeganTemplateExpr = true;
                             inTemplateExpr = true;
+                            currRawLiteral.deleteCharAt(currRawLiteral.length() - 1);
+                            rawLiterals.add(currRawLiteral.toString());
+                            currRawLiteral.setLength(0);
                             ungetChar(aChar);
                             ungetChar(character);
                             break;
@@ -931,6 +939,12 @@ class TokenStream {
 
             if (c == '`') {
                 inTemplateLiteral = !inTemplateLiteral;
+                if (inTemplateLiteral) {
+                    currRawLiteral.setLength(0);
+                    rawLiterals.clear();
+                } else {
+                    rawLiterals.add(currRawLiteral.toString());
+                }
                 endOfTemplate = false;
                 return Token.TEMPLATE;
             }
@@ -1808,6 +1822,10 @@ class TokenStream {
         return buf.toString();
     }
 
+    public String[] getRawLiterals() {
+        return rawLiterals.toArray(new String[0]);
+    }
+
     // stuff other than whitespace since start of line
     private boolean dirtyLine;
 
@@ -1828,6 +1846,8 @@ class TokenStream {
     private boolean inTemplateExpr = false;
     private boolean endOfTemplate = false;
     private boolean justBeganTemplateExpr = false;
+    private final StringBuilder currRawLiteral = new StringBuilder();
+    private final List<String> rawLiterals = new ArrayList<>();
 
     // delimiter for last string literal scanned
     private int quoteChar;

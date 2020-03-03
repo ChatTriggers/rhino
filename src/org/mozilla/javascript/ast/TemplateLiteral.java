@@ -10,6 +10,7 @@ import java.util.Set;
 
 public class TemplateLiteral extends AstNode {
     private List<AstNode> elements = new ArrayList<>();
+    private String[] rawElements= null;
     private Set<Integer> isExpr = new HashSet<>();
     private AstNode target = null;
     private Node transformedTarget = null;
@@ -27,6 +28,14 @@ public class TemplateLiteral extends AstNode {
     public void addExpr(AstNode expr) {
         isExpr.add(elements.size());
         elements.add(expr);
+    }
+
+    public void setRawElements(String[] rawElements) {
+        this.rawElements = rawElements;
+    }
+
+    public String[] getRawElements() {
+        return this.rawElements;
     }
 
     public List<AstNode> getElements() {

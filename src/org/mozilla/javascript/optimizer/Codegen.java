@@ -2972,6 +2972,19 @@ class BodyCodegen {
                     }
 
                     cfw.addPush(boundary);
+
+                    String[] rawStrings = lit.getRawElements();
+                    cfw.addPush(rawStrings.length);
+                    cfw.add(ByteCode.ANEWARRAY, "java/lang/Object");
+
+                    for (int i1 = 0, rawStringsLength = rawStrings.length; i1 < rawStringsLength; i1++) {
+                        String rawString = rawStrings[i1];
+                        cfw.add(ByteCode.DUP);
+                        cfw.addPush(i1);
+                        cfw.addPush(rawString);
+                        cfw.add(ByteCode.AASTORE);
+                    }
+
                     generateExpression(target, node);
                     cfw.addALoad(contextLocal);
                     cfw.addALoad(variableObjectLocal);
@@ -2986,10 +2999,9 @@ class BodyCodegen {
                     );
                     cfw.addInvokeDynamic(
                             "callWithTemplateLiteral",
-                            "(" + OBJECT_ARRAY + INTEGER + OBJECT + CONTEXT + SCRIPTABLE + SCRIPTABLE + ")" + OBJECT,
+                            "(" + OBJECT_ARRAY + INTEGER + OBJECT_ARRAY + OBJECT + CONTEXT + SCRIPTABLE + SCRIPTABLE + ")" + OBJECT,
                             bootstrap
                     );
-//                    addScriptRuntimeInvoke("callWithTemplateLiteral", OBJECT, OBJECT_ARRAY, INTEGER, OBJECT, CONTEXT, SCRIPTABLE, SCRIPTABLE);
                 }
 
                 break;

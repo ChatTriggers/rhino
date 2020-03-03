@@ -3546,7 +3546,9 @@ public class Parser {
 
         consumeToken(); // Consume trailing '`'
 
+        lit.setRawElements(ts.getRawLiterals());
         lit.setTarget(target);
+
         return lit;
     }
 

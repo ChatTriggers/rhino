@@ -1200,26 +1200,20 @@ public class ScriptRuntime {
         return str;
     }
 
-    public static Object callWithTemplateLiteral(Object[] args, int boundary, Object target, Context cx, Scriptable scope, Scriptable thisObj) {
+    public static Object callWithTemplateLiteral(
+        Object[] args, int boundary, Object[] rawStrings, Object target, Context cx, Scriptable scope, Scriptable thisObj
+    ) {
         if (!(target instanceof Callable)) {
             // TODO: Error
-            throw Kit.codeBug();
+            throw ScriptRuntime.typeError1("msg.isnt.function", ScriptRuntime.toString(target));
         }
 
         Callable fn = (Callable) target;
 
         NativeArray parts = cx.newArray(scope, Arrays.copyOfRange(args, 0, boundary));
         parts.setTemplateObj();
-        Object[] rawArgs = new Object[boundary];
-
-        for (int i = 0; i < boundary; i++) {
-
-            rawArgs[i] = ScriptRuntime.escapeString((String) args[i]);
-        }
-
-        ScriptableObject raw = ScriptableObject.ensureScriptableObject(cx.newArray(scope, rawArgs));
+        ScriptableObject raw = ScriptableObject.ensureScriptableObject(cx.newArray(scope, rawStrings));
         freeze(raw, cx);
-
         ScriptableObject.putProperty(parts, "raw", raw);
 
         freeze(parts, cx);
