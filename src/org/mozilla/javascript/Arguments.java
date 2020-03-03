@@ -51,12 +51,6 @@ final class Arguments extends IdScriptableObject {
         calleeObj = f;
 
         int version = f.getLanguageVersion();
-        if (version <= Context.VERSION_1_3
-                && version != Context.VERSION_DEFAULT) {
-            callerObj = null;
-        } else {
-            callerObj = NOT_FOUND;
-        }
 
         defineProperty(SymbolKey.ITERATOR, iteratorMethod, ScriptableObject.NOT_ENUMERABLE);
     }
@@ -183,9 +177,7 @@ final class Arguments extends IdScriptableObject {
     private static final int
             Id_callee = 1,
             Id_length = 2,
-            Id_caller = 3,
-
-    MAX_INSTANCE_ID = Id_caller;
+            MAX_INSTANCE_ID = Id_length;
 
     @Override
     protected int getMaxInstanceId() {
@@ -195,33 +187,20 @@ final class Arguments extends IdScriptableObject {
     @Override
     protected int findInstanceIdInfo(String s) {
         int id;
-// #generated# Last update: 2010-01-06 05:48:21 ARST
-        L0:
-        {
-            id = 0;
-            String X = null;
-            int c;
-            int s_length = s.length();
-            if (s_length == 6) {
-                c = s.charAt(5);
-                if (c == 'e') {
-                    X = "callee";
-                    id = Id_callee;
-                } else if (c == 'h') {
-                    X = "length";
-                    id = Id_length;
-                } else if (c == 'r') {
-                    X = "caller";
-                    id = Id_caller;
-                }
+// #generated# Last update: 2020-03-03 10:45:13 CST
+        L0: { id = 0; String X = null; int c;
+            if (s.length()==6) {
+                c=s.charAt(0);
+                if (c=='c') { X="callee";id=Id_callee; }
+                else if (c=='l') { X="length";id=Id_length; }
             }
-            if (X != null && X != s && !X.equals(s)) id = 0;
+            if (X!=null && X!=s && !X.equals(s)) id = 0;
             break L0;
         }
 // #/generated#
         Context cx = Context.getContext();
         if (cx.isStrictMode()) {
-            if (id == Id_callee || id == Id_caller) {
+            if (id == Id_callee) {
                 return super.findInstanceIdInfo(s);
             }
         }
@@ -233,9 +212,6 @@ final class Arguments extends IdScriptableObject {
         switch (id) {
             case Id_callee:
                 attr = calleeAttr;
-                break;
-            case Id_caller:
-                attr = callerAttr;
                 break;
             case Id_length:
                 attr = lengthAttr;
@@ -255,8 +231,6 @@ final class Arguments extends IdScriptableObject {
                 return "callee";
             case Id_length:
                 return "length";
-            case Id_caller:
-                return "caller";
         }
         return null;
     }
@@ -268,18 +242,6 @@ final class Arguments extends IdScriptableObject {
                 return calleeObj;
             case Id_length:
                 return lengthObj;
-            case Id_caller: {
-                Object value = callerObj;
-                if (value == UniqueTag.NULL_VALUE) {
-                    value = null;
-                } else if (value == null) {
-                    NativeCall caller = activation.parentActivationCall;
-                    if (caller != null) {
-                        value = caller.get("arguments", caller);
-                    }
-                }
-                return value;
-            }
         }
         return super.getInstanceIdValue(id);
     }
@@ -293,9 +255,6 @@ final class Arguments extends IdScriptableObject {
             case Id_length:
                 lengthObj = value;
                 return;
-            case Id_caller:
-                callerObj = (value != null) ? value : UniqueTag.NULL_VALUE;
-                return;
         }
         super.setInstanceIdValue(id, value);
     }
@@ -308,9 +267,6 @@ final class Arguments extends IdScriptableObject {
                 return;
             case Id_length:
                 lengthAttr = attr;
-                return;
-            case Id_caller:
-                callerAttr = attr;
                 return;
         }
         super.setInstanceIdAttributes(id, attr);
@@ -416,8 +372,6 @@ final class Arguments extends IdScriptableObject {
 
     // ECMAScript2015
     // 9.4.4.6 CreateUnmappedArgumentsObject(argumentsList)
-    //   8. Perform DefinePropertyOrThrow(obj, "caller", PropertyDescriptor {[[Get]]: %ThrowTypeError%,
-    //      [[Set]]: %ThrowTypeError%, [[Enumerable]]: false, [[Configurable]]: false}).
     //   9. Perform DefinePropertyOrThrow(obj, "callee", PropertyDescriptor {[[Get]]: %ThrowTypeError%,
     //      [[Set]]: %ThrowTypeError%, [[Enumerable]]: false, [[Configurable]]: false}).
     void defineAttributesForStrictMode() {
@@ -425,13 +379,8 @@ final class Arguments extends IdScriptableObject {
         if (!cx.isStrictMode()) {
             return;
         }
-        setGetterOrSetter("caller", 0, new ThrowTypeError("caller"), true);
-        setGetterOrSetter("caller", 0, new ThrowTypeError("caller"), false);
         setGetterOrSetter("callee", 0, new ThrowTypeError("callee"), true);
         setGetterOrSetter("callee", 0, new ThrowTypeError("callee"), false);
-        setAttributes("caller", NOT_ENUMERABLE | NOT_CONFIGURABLE);
-        setAttributes("callee", NOT_ENUMERABLE | NOT_CONFIGURABLE);
-        callerObj = null;
         calleeObj = null;
     }
 
@@ -463,16 +412,11 @@ final class Arguments extends IdScriptableObject {
         }
     }
 
-    // Fields to hold caller, callee and length properties,
-// where NOT_FOUND value tags deleted properties.
-// In addition if callerObj == NULL_VALUE, it tags null for scripts, as
-// initial callerObj == null means access to caller arguments available
-// only in JS <= 1.3 scripts
-    private Object callerObj;
+    // Fields to hold the callee and length properties,
+    // where NOT_FOUND value tags deleted properties.
     private Object calleeObj;
     private Object lengthObj;
 
-    private int callerAttr = NOT_ENUMERABLE;
     private int calleeAttr = NOT_ENUMERABLE;
     private int lengthAttr = NOT_ENUMERABLE;
 
