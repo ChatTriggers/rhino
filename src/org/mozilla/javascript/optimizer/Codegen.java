@@ -4437,6 +4437,7 @@ class BodyCodegen {
 
             if (isPartial) {
                 cfw.addInvoke(ByteCode.INVOKESPECIAL, "org/mozilla/javascript/PartialFunction", "<init>", "(" + CONTEXT + SCRIPTABLE + CALLABLE + SCRIPTABLE + "[I" + OBJECT_ARRAY + ")V");
+                cfw.add(ByteCode.CHECKCAST, "java/lang/Object");
                 return;
             }
 
@@ -4466,6 +4467,7 @@ class BodyCodegen {
                 generateFunctionAndThisObj(child, node, isPrivate);
                 generateCallArgArray(node, firstArgChild, false);
                 cfw.addInvoke(ByteCode.INVOKESPECIAL, "org/mozilla/javascript/PartialFunction", "<init>", "(" + CONTEXT + SCRIPTABLE + CALLABLE + SCRIPTABLE + "[I" + OBJECT_ARRAY + ")V");
+                cfw.add(ByteCode.CHECKCAST, "java/lang/Object");
                 return;
             }
 
