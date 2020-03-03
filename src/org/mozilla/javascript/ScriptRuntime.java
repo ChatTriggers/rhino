@@ -4900,7 +4900,7 @@ public class ScriptRuntime {
     }
 
     public static boolean isNullOrUndefined(Object prop) {
-        return prop == null || prop == Undefined.instance;
+        return prop == null || prop == Undefined.instance || prop == UniqueTag.NOT_FOUND;
     }
 
     public static Object optionalGetObjectProp(Object obj, String property, Context cx, Scriptable scope) {

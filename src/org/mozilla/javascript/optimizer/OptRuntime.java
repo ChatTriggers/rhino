@@ -84,11 +84,7 @@ public final class OptRuntime extends ScriptRuntime {
     }
 
     public static Object optionalAccessCallProp0(Object value, String property, Context cx, Scriptable scope) {
-        if (ScriptRuntime.isNullOrUndefined(value)) return Undefined.instance;
-
-        Callable f = getPropFunctionAndThis(value, property, cx, scope);
-        Scriptable thisObj = lastStoredScriptable(cx);
-        return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
+        return optionalAccessCallN(value, property, ScriptRuntime.emptyArgs, cx, scope);
     }
 
     public static Object optionalCallProp0(Object value, String property, Context cx, Scriptable scope) {
@@ -103,6 +99,14 @@ public final class OptRuntime extends ScriptRuntime {
         Callable f = getPropFunctionAndThis(value, property, cx, scope);
         thisObj = lastStoredScriptable(cx);
         return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
+    }
+
+    public static Object optionalAccessCallN(Object value, String property, Object[] args, Context cx, Scriptable scope) {
+        if (ScriptRuntime.isNullOrUndefined(value)) return Undefined.instance;
+
+        Callable f = getPropFunctionAndThis(value, property, cx, scope);
+        Scriptable thisObj = lastStoredScriptable(cx);
+        return f.call(cx, scope, thisObj, args);
     }
 
     public static void optionalPrivateToggle(Object value) {
