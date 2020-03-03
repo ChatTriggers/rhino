@@ -455,11 +455,12 @@ public final class IRFactory extends Parser {
     private Node transformFunction(FunctionNode fn) {
         int functionType = fn.getFunctionType();
         int start = decompiler.markFunctionStart(functionType);
-        decompileFunctionHeader(fn);
         int index = currentScriptOrFn.addFunction(fn);
 
         PerFunctionVariables savedVars = new PerFunctionVariables(fn);
+
         try {
+            decompileFunctionHeader(fn);
             // If we start needing to record much more codegen metadata during
             // function parsing, we should lump it all into a helper class.
             Node destructuring = (Node) fn.getProp(Node.DESTRUCTURING_PARAMS);
