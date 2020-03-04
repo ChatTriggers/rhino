@@ -33,8 +33,6 @@ import static org.mozilla.classfile.ClassFileWriter.*;
  */
 
 public class Codegen implements Evaluator {
-    public static boolean DEBUG_CODEGEN = false;
-
     @Override
     public void captureStackInfo(RhinoException ex) {
         throw new UnsupportedOperationException();
@@ -81,21 +79,30 @@ public class Codegen implements Evaluator {
                 tree, encodedSource,
                 returnFunction);
 
-        if (DEBUG_CODEGEN) {
-            new File("./out/class").mkdirs();
-            new File("./out/js").mkdirs();
-            new File("./out/tokens").mkdirs();
-            File output = new File("./out/class/" + baseName + "_" + serial + ".class");
-            File outputDecomp = new File("./out/js/" + baseName + "_" + serial + ".js");
-            File outputTokens = new File("./out/tokens/" + baseName + "_" + serial + ".tokens");
+        File debugOutputPath = Context.getContext().getDebugOutputPath();
 
-            try (FileOutputStream fos = new FileOutputStream(output)) {
+        if (debugOutputPath != null) {
+            File classDir = new File(debugOutputPath, "class");
+            File jsDir = new File(debugOutputPath, "js");
+            File tokenDir = new File(debugOutputPath, "token");
+            File nodeDir = new File(debugOutputPath, "nodes");
+
+            classDir.mkdir();
+            jsDir.mkdir();
+            tokenDir.mkdir();
+            nodeDir.mkdir();
+
+            File classOutput = new File(classDir, baseName + "_" + serial + ".class");
+            File jsOutput = new File(jsDir, baseName + "_" + serial + ".txt");
+            File tokenOutput = new File(tokenDir, baseName + "_" + serial + ".txt");
+
+            try (FileOutputStream fos = new FileOutputStream(classOutput)) {
                 fos.write(mainClassBytes);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            try (FileOutputStream fos = new FileOutputStream(outputDecomp)) {
+            try (FileOutputStream fos = new FileOutputStream(jsOutput)) {
                 UintMap properties = new UintMap(1);
                 properties.put(Decompiler.INITIAL_INDENT_PROP, 4);
                 String source = Decompiler.decompile(encodedSource, Decompiler.TO_SOURCE_FLAG, properties);
@@ -104,7 +111,7 @@ public class Codegen implements Evaluator {
                 e.printStackTrace();
             }
 
-            try (FileOutputStream fos = new FileOutputStream(outputTokens)) {
+            try (FileOutputStream fos = new FileOutputStream(tokenOutput)) {
                 StringBuilder sb = new StringBuilder();
 
                 try {
@@ -127,10 +134,8 @@ public class Codegen implements Evaluator {
                 e.printStackTrace();
             }
 
-            new File("./out/nodes").mkdirs();
-
             for (int i = 0; i < scriptOrFnNodes.length; i++) {
-                File outputNodes = new File("./out/nodes/" + baseName + "_" + serial + "_" + i + ".nodes");
+                File outputNodes = new File(nodeDir, baseName + "_" + serial + "_" + i + ".txt");
 
                 try (FileOutputStream fos = new FileOutputStream(outputNodes)) {
                     StringBuilder sb = new StringBuilder();
@@ -231,17 +236,6 @@ public class Codegen implements Evaluator {
 
         if (Token.printTrees) {
             System.out.println(scriptOrFn.toStringTree(scriptOrFn));
-        }
-
-        if (DEBUG_CODEGEN) {
-            new File("./out/ir").mkdirs();
-            File outputIR = new File("./out/ir/" + mainClassName + ".ir");
-
-            try (FileOutputStream fos = new FileOutputStream(outputIR)) {
-                fos.write(scriptOrFn.toStringTree(scriptOrFn).getBytes());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
         if (returnFunction) {

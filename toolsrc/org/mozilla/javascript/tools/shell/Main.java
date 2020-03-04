@@ -126,35 +126,6 @@ public class Main
             ex.printStackTrace(System.err);
         }
 
-        for (int i = 0; i < args.length; i++) {
-            if ("-debug".equals(args[i])) {
-                Codegen.DEBUG_CODEGEN = true;
-            }
-        }
-
-        if (Codegen.DEBUG_CODEGEN) {
-            File root = new File("./out");
-
-            if (root.exists()) {
-                File[] files = root.listFiles();
-
-                if (files != null) {
-                    for (File child : files) {
-                        if (child.getName().contains("scripts")) continue;
-
-                        File[] childFiles = child.listFiles();
-
-                        if (childFiles != null) {
-                            for (File child2 : childFiles) {
-                                child2.delete();
-                            }
-                            child.delete();
-                        }
-                    }
-                }
-            }
-        }
-
         int result = exec(args);
         if (result != 0) {
             System.exit(result);

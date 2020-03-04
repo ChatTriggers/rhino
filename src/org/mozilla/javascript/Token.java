@@ -238,7 +238,7 @@ public class Token {
      * otherwise it returns a string whose value is the token number.
      */
     public static String name(int token) {
-        if (!printNames && !Codegen.DEBUG_CODEGEN) {
+        if (!printNames && !Context.getContext().hasFeature(Context.EMIT_DEBUG_OUTPUT)) {
             return String.valueOf(token);
         }
         return typeToName(token);

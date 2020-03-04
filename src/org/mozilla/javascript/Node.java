@@ -404,8 +404,8 @@ public class Node implements Iterable<Node> {
         return new NodeIterator();
     }
 
-    private static final String propToString(int propType) {
-        if (Token.printTrees || Codegen.DEBUG_CODEGEN) {
+    private static String propToString(int propType) {
+        if (Token.printTrees || Context.getContext().hasFeature(Context.EMIT_DEBUG_OUTPUT)) {
             // If Context.printTrees is false, the compiler
             // can remove all these strings.
             switch (propType) {
@@ -1104,7 +1104,7 @@ public class Node implements Iterable<Node> {
 
     @Override
     public String toString() {
-        if (Token.printTrees || Codegen.DEBUG_CODEGEN) {
+        if (Token.printTrees || Context.getContext().hasFeature(Context.EMIT_DEBUG_OUTPUT)) {
             StringBuilder sb = new StringBuilder();
             toString(new ObjToIntMap(), sb);
             return sb.toString();

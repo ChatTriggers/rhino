@@ -80,9 +80,12 @@ public final class IRFactory extends Parser {
 
         String mainClassName = "org.mozilla.javascript.gen." + baseName + "_" + (Codegen.globalSerialClassCounter + 1);
 
-        if (Codegen.DEBUG_CODEGEN) {
-            new File("./out/ir").mkdirs();
-            File outputIR = new File("./out/ir/" + mainClassName + ".ir");
+        File debugOutputPath = Context.getContext().getDebugOutputPath();
+
+        if (debugOutputPath != null) {
+            File irDir = new File(debugOutputPath, "ir");
+            irDir.mkdirs();
+            File outputIR = new File(irDir, mainClassName + ".txt");
 
             try (FileOutputStream fos = new FileOutputStream(outputIR)) {
                 fos.write(script.toStringTree(script).getBytes());

@@ -256,6 +256,7 @@ public class ContextFactory {
             case Context.FEATURE_THREAD_SAFE_OBJECTS:
             case Context.FEATURE_INTEGER_WITHOUT_DECIMAL_PLACE:
             case Context.FEATURE_LITTLE_ENDIAN:
+            case Context.EMIT_DEBUG_OUTPUT:
                 return false;
 
             case Context.FEATURE_OLD_UNDEF_NULL_THIS:
