@@ -1500,7 +1500,7 @@ public class Parser {
             AstNode exportTarget;
 
             if (matchToken(Token.FUNCTION)) {
-                exportTarget = function(FunctionNode.FUNCTION_EXPRESSION_STATEMENT);
+                exportTarget = function(FunctionNode.FUNCTION_EXPRESSION);
             } else if (matchToken(Token.CLASS)) {
                 exportTarget = classExpr(Collections.emptyList());
             } else {

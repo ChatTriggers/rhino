@@ -2844,8 +2844,7 @@ class BodyCodegen {
                     int fnIndex = node.getExistingIntProp(Node.FUNCTION_PROP);
                     OptFunctionNode ofn = OptFunctionNode.get(scriptOrFn, fnIndex);
                     int t = ofn.fnode.getFunctionType();
-                    if (t != FunctionNode.FUNCTION_EXPRESSION &&
-                            t != FunctionNode.ARROW_FUNCTION) {
+                    if (t != FunctionNode.FUNCTION_EXPRESSION && t != FunctionNode.ARROW_FUNCTION) {
                         throw Codegen.badTree();
                     }
                     visitFunction(ofn, t);
