@@ -1009,7 +1009,7 @@ public class Parser {
 
         PerFunctionVariables savedVars = new PerFunctionVariables(fnNode);
         try {
-            parseFunctionParams(fnNode, objEntryKind != 0);
+            parseFunctionParams(fnNode, objEntryKind == SET_ENTRY);
             fnNode.setBody(parseFunctionBody(type, fnNode));
             fnNode.setEncodedSourceBounds(functionSourceStart, ts.tokenEnd);
             fnNode.setLength(ts.tokenEnd - functionSourceStart);
