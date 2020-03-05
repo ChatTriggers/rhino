@@ -1104,7 +1104,7 @@ public class Node implements Iterable<Node> {
 
     @Override
     public String toString() {
-        if (Token.printTrees || Context.getContext().hasFeature(Context.EMIT_DEBUG_OUTPUT)) {
+        if (Token.printTrees || (Context.getCurrentContext() != null && Context.getContext().hasFeature(Context.EMIT_DEBUG_OUTPUT))) {
             StringBuilder sb = new StringBuilder();
             toString(new ObjToIntMap(), sb);
             return sb.toString();
