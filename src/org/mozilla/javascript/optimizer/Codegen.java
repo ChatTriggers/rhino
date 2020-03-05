@@ -626,13 +626,7 @@ public class Codegen implements Evaluator {
                     cfw.markLabel(callableLabel);
                 }
 
-                if (fnode.isStatic()) {
-                    // Set thisObj to undefined
-                    cfw.add(ByteCode.SWAP);
-                    cfw.add(ByteCode.POP);
-                    Codegen.pushUndefined(cfw);
-                    cfw.add(ByteCode.SWAP);
-                } else if (fnode.isInStrictMode()) {
+                if (fnode.isInStrictMode()) {
                     // If this is a non-new call, and the function is
                     // in strict mode, 'this' needs to be set to
                     // undefined

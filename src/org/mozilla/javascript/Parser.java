@@ -3198,7 +3198,7 @@ public class Parser {
             pn = nx;
         }
         pn.setLineno(lineno);
-        AstNode tail = memberExprTail(allowCallSyntax, pn);
+        AstNode tail = pn instanceof ClassNode ? pn : memberExprTail(allowCallSyntax, pn);
 
         if (spread) {
             if (tail == null) throw Kit.codeBug();
