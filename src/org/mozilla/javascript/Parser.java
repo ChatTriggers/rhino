@@ -2564,7 +2564,16 @@ public class Parser {
             } else {
                 vi.setTarget(name);
             }
-            vi.setInitializer(init);
+
+            if (declType == Token.LET && init == null) {
+                // To allow for the following:
+                //   let x;
+                //   print(x === undefined); // should print "true"
+                vi.setInitializer(new Name(ts.tokenBeg, "undefined"));
+            } else {
+                vi.setInitializer(init);
+            }
+
             vi.setType(declType);
             vi.setJsDocNode(jsdocNode);
             vi.setLineno(lineno);
