@@ -948,6 +948,7 @@ public class NativeArray extends IdScriptableObject implements List {
             return ((NativeArray) obj).getLength();
         }
 
+
         Object len = ScriptableObject.getProperty(obj, "length");
         if (len == Scriptable.NOT_FOUND) {
             // toUint32(undefined) == 0

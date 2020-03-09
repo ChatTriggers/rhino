@@ -223,17 +223,12 @@ public final class NativeJSON extends IdScriptableObject {
         Scriptable scope;
     }
 
-    public static Object stringify(Context cx, Scriptable scope, Object value,
-                                   Object replacer, Object space) {
+    public static Object stringify(Context cx, Scriptable scope, Object value, Object replacer, Object space) {
         String indent = "";
         String gap = "";
 
         List<Object> propertyList = null;
         Callable replacerFunction = null;
-
-        if (value instanceof NativeProxy) {
-            return stringify(cx, scope, ((NativeProxy) value).getTarget(), replacer, space);
-        }
 
         if (replacer instanceof Callable) {
             replacerFunction = (Callable) replacer;
@@ -335,9 +330,9 @@ public final class NativeJSON extends IdScriptableObject {
             return "null";
         }
 
-        if (value instanceof Scriptable && !(value instanceof Callable)) {
-            if (value instanceof NativeArray) {
-                return ja((NativeArray) value, state);
+        if (value instanceof Scriptable && (!(value instanceof Callable) || value instanceof NativeProxy)) {
+            if (ScriptRuntime.isArray(value)) {
+                return ja((Scriptable) value, state);
             }
             return jo((Scriptable) value, state);
         }
@@ -407,7 +402,7 @@ public final class NativeJSON extends IdScriptableObject {
         return finalValue;
     }
 
-    private static String ja(NativeArray value, StringifyState state) {
+    private static String ja(Scriptable value, StringifyState state) {
         if (state.stack.search(value) != -1) {
             throw ScriptRuntime.typeError0("msg.cyclic.value");
         }
@@ -415,9 +410,9 @@ public final class NativeJSON extends IdScriptableObject {
 
         String stepback = state.indent;
         state.indent = state.indent + state.gap;
-        List<Object> partial = new LinkedList<Object>();
+        List<Object> partial = new LinkedList<>();
 
-        long len = value.getLength();
+        long len = NativeArray.getLengthProperty(value, true);
         for (long index = 0; index < len; index++) {
             Object strP;
             if (index > Integer.MAX_VALUE) {
