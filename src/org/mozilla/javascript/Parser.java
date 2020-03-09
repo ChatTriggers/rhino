@@ -1113,12 +1113,39 @@ public class Parser {
 
             if (this.inUseStrictDirective) {
                 if ("eval".equals(paramName) ||
-                        "arguments".equals(paramName)) {
+                    "arguments".equals(paramName)) {
                     reportError("msg.bad.id.strict", paramName);
                 }
                 if (paramNames.contains(paramName))
                     reportError("msg.dup.param.strict", paramName);
                 paramNames.add(paramName);
+            }
+        } else if (params instanceof Assignment) {
+            int index = fnNode.getParams().size();
+            AstNode target = ((Assignment) params).getLeft();
+            fnNode.addParam(target);
+
+            if (target instanceof Name) {
+                fnNode.addDefaultParam(index, ((Assignment) params).getRight());
+                defineSymbol(Token.LP, ((Name) target).getIdentifier());
+                fnNode.setHasComplexParameters();
+            } else if (target instanceof ArrayLiteral || target instanceof ObjectLiteral) {
+                reportError("msg.arrowfn.destructuring.unsupported");
+                // String tempName = currentScriptOrFn.getNextTempName();
+                // defineSymbol(Token.LP, tempName, false);
+                // fnNode.setHasComplexParameters();
+                // Node assign = createDestructuringAssignment(
+                //     Token.LET,
+                //     target,
+                //     ((Assignment) params).getRight()
+                // );
+                //
+                // Node destructuringNode = (Node) fnNode.getProp(Node.DESTRUCTURING_PARAMS);
+                // if (destructuringNode == null) {
+                //     destructuringNode = new Node(Token.COMMA);
+                //     fnNode.putProp(Node.DESTRUCTURING_PARAMS, destructuringNode);
+                // }
+                // destructuringNode.addChildToBack(assign);
             }
         } else {
             reportError("msg.no.parm", params.getPosition(), params.getLength());
@@ -3198,7 +3225,7 @@ public class Parser {
             pn = nx;
         }
         pn.setLineno(lineno);
-        AstNode tail = memberExprTail(allowCallSyntax, pn);
+        AstNode tail = pn instanceof ClassNode ? pn : memberExprTail(allowCallSyntax, pn);
 
         if (spread) {
             if (tail == null) throw Kit.codeBug();

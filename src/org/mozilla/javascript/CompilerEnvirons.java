@@ -205,6 +205,11 @@ public class CompilerEnvirons {
         return allowSharpComments;
     }
 
+    public void setXmlAvailable(boolean available) {
+        // No-op
+        // Exists for compat reasons
+    }
+
     /**
      * Returns a {@code CompilerEnvirons} suitable for using Rhino
      * in an IDE environment.  Most features are enabled by default.
