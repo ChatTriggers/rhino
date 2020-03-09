@@ -12,9 +12,9 @@ import org.mozilla.javascript.Token;
  * AST node for a Number literal. Node type is {@link Token#NUMBER}.
  */
 public class NumberLiteral extends AstNode {
-
     private String value;
     private double number;
+    private DecoratorNode decoratorNode = null;
 
     {
         type = Token.NUMBER;
@@ -95,5 +95,13 @@ public class NumberLiteral extends AstNode {
     @Override
     public void visit(NodeVisitor v) {
         v.visit(this);
+    }
+
+    public DecoratorNode getDecoratorNode() {
+        return decoratorNode;
+    }
+
+    public void setDecoratorNode(DecoratorNode decoratorNode) {
+        this.decoratorNode = decoratorNode;
     }
 }

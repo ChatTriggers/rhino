@@ -75,20 +75,16 @@ final class SuperBlock {
         return copy;
     }
 
-    boolean merge(int[] locals, int localsTop, int[] stack, int stackTop,
-                  ConstantPool pool) {
+    boolean merge(int[] locals, int localsTop, int[] stack, int stackTop, ConstantPool pool) {
         if (!isInitialized) {
             System.arraycopy(locals, 0, this.locals, 0, localsTop);
             this.stack = new int[stackTop];
             System.arraycopy(stack, 0, this.stack, 0, stackTop);
             isInitialized = true;
             return true;
-        } else if (this.locals.length == localsTop &&
-                this.stack.length == stackTop) {
-            boolean localsChanged = mergeState(this.locals, locals, localsTop,
-                    pool);
-            boolean stackChanged = mergeState(this.stack, stack, stackTop,
-                    pool);
+        } else if (this.locals.length == localsTop && this.stack.length == stackTop) {
+            boolean localsChanged = mergeState(this.locals, locals, localsTop, pool);
+            boolean stackChanged = mergeState(this.stack, stack, stackTop, pool);
             return localsChanged || stackChanged;
         } else {
             if (ClassFileWriter.StackMapTable.DEBUGSTACKMAP) {

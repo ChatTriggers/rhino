@@ -10,6 +10,7 @@ public enum DecoratorType {
     WRAP(WrapDecorator.class),
     REGISTER(RegisterDecorator.class),
     INITIALIZE(InitializeDecorator.class),
+    NUMERICTEMPLATE(NumericTemplateDecorator.class),
     USER_DEFINED(null);
 
     private Class<? extends Decorator> decoratorClass;
@@ -30,7 +31,7 @@ public enum DecoratorType {
         decorator = decorator.replaceAll("@", "");
 
         for (DecoratorType type : values()) {
-            if (type.name().toLowerCase().equals(decorator)) {
+            if (type.name().toLowerCase().equals(decorator.toLowerCase())) {
                 return type;
             }
         }

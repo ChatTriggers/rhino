@@ -2358,6 +2358,10 @@ public class Parser {
     }
 
     private DecoratorNode decorator(boolean declaration) throws IOException {
+        return decorator(declaration, true);
+    }
+
+    private DecoratorNode decorator(boolean declaration, boolean classDecorator) throws IOException {
         consumeToken();
         peekToken();
         Name name = createNameNode();
@@ -2384,7 +2388,7 @@ public class Parser {
             peekToken();
         }
 
-        if (!declaration && !insideClass && peeked != Token.CLASS && peeked != Token.AT) {
+        if (classDecorator && !declaration && !insideClass && peeked != Token.CLASS && peeked != Token.AT) {
             reportError("msg.decorator.invalid.usage");
         }
 
@@ -3483,6 +3487,13 @@ public class Parser {
                     s = "0x" + s;
                 }
                 pn = new NumberLiteral(ts.tokenBeg, s, ts.getNumber());
+
+                // Check for decorator
+                if (matchToken(Token.AT)) {
+                    DecoratorNode dn = decorator(false, false);
+                    ((NumberLiteral) pn).setDecoratorNode(dn);
+                }
+
                 break;
             }
 

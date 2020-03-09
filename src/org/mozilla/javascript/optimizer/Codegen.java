@@ -2904,6 +2904,13 @@ class BodyCodegen {
                     codegen.pushNumberAsObject(cfw, num);
                 }
 
+                DecoratorNode dn = ((NumberLiteral) node).getDecoratorNode();
+                if (dn != null) {
+                    List<DecoratorNode> dnList = new ArrayList<>();
+                    dnList.add(dn);
+                    generateApplyDecorator(node, dnList, DecoratorType.NUMERICTEMPLATE);
+                }
+
                 break;
             }
 
@@ -3675,9 +3682,18 @@ class BodyCodegen {
             cfw.add(ByteCode.AASTORE);
         }
 
+        // Associate whether or not the decorator contains an @initialize decorator.
+        // However, the returned value may not be a ScriptableObject, so we need
+        // to do a instanceof check
+        int skipAssociate = cfw.acquireLabel();
+
         cfw.addALoad(argsLocal);
         cfw.addPush(0);
         cfw.add(ByteCode.AALOAD);
+        cfw.add(ByteCode.DUP);
+        cfw.add(ByteCode.INSTANCEOF, "org/mozilla/javascript/ScriptableObject");
+        cfw.add(ByteCode.IFEQ, skipAssociate);
+
         cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
         cfw.add(ByteCode.DUP);
         cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "HAS_INITIALIZE", OBJECT);
@@ -3687,9 +3703,7 @@ class BodyCodegen {
         cfw.addInvoke(ByteCode.INVOKEVIRTUAL, "org/mozilla/javascript/ScriptableObject", "associateValue", "(" + OBJECT + OBJECT + BOOLEAN + ")" + OBJECT);
         cfw.add(ByteCode.POP);
 
-        cfw.addALoad(argsLocal);
-        cfw.addPush(0);
-        cfw.add(ByteCode.AALOAD);
+        cfw.markLabel(skipAssociate);
     }
 
     private void visitClass(ClassNode cls) {

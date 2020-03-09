@@ -545,6 +545,13 @@ public final class IRFactory extends Parser {
         node.setBody(new Block());
         node.setFunctionType(FunctionNode.FUNCTION_STATEMENT);
 
+        List<DecoratorNode> dns = node.getDecoratorNodes();
+
+        if (dns.stream().anyMatch(it -> it.getDecoratorType() == DecoratorType.NUMERICTEMPLATE) && dns.size() != 1) {
+            throw ScriptRuntime.typeError("User-defined decorator cannot contain @numericTemplate with any other decorator");
+        }
+
+
         transformFunction(node);
 
         return node;
@@ -955,6 +962,10 @@ public final class IRFactory extends Parser {
 
     private Node transformNumber(NumberLiteral node) {
         decompiler.addNumber(node.getNumber());
+        DecoratorNode dn = node.getDecoratorNode();
+        if (dn != null) {
+            transformDecoratorNode(dn);
+        }
         return node;
     }
 

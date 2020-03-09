@@ -25,6 +25,7 @@ public abstract class Decorator extends BaseFunction {
     public static void init(Scriptable scope) {
         WrapDecorator.init(scope);
         RegisterDecorator.init(scope);
+        NumericTemplateDecorator.init(scope);
     }
 
     @Override
