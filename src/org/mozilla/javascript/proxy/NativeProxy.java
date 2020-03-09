@@ -679,11 +679,11 @@ public class NativeProxy extends IdScriptableObject implements Function {
     }
 
     @Override
-    public Object[] getIds() {
+    public Object[] getIds(boolean getNonEnumerable, boolean getSymbols) {
         ensureNotRevoked();
 
         if (!handlerIds.contains("ownKeys")) {
-            return target.getIds();
+            return target.getIds(getNonEnumerable, getSymbols);
         }
 
         Object ownKeys = handler.get("ownKeys");

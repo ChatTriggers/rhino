@@ -600,7 +600,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
     }
 
     @Override
-    Object[] getIds(boolean getNonEnumerable, boolean getSymbols) {
+    public Object[] getIds(boolean getNonEnumerable, boolean getSymbols) {
         Object[] result = super.getIds(getNonEnumerable, getSymbols);
 
         if (prototypeValues != null) {

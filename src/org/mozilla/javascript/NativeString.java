@@ -706,7 +706,7 @@ final class NativeString extends IdScriptableObject {
     }
 
     @Override
-    protected Object[] getIds(boolean nonEnumerable, boolean getSymbols) {
+    public Object[] getIds(boolean nonEnumerable, boolean getSymbols) {
         // In ES6, Strings have entries in the property map for each character.
         Context cx = Context.getCurrentContext();
         if ((cx != null) && (cx.getLanguageVersion() >= Context.VERSION_ES6)) {

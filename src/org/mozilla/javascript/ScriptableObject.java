@@ -3044,7 +3044,7 @@ public abstract class ScriptableObject implements Scriptable,
         return slot;
     }
 
-    Object[] getIds(boolean getNonEnumerable, boolean getSymbols) {
+    public Object[] getIds(boolean getNonEnumerable, boolean getSymbols) {
         Object[] a;
         int externalLen = (externalData == null ? 0 : externalData.getArrayLength());
 
@@ -3053,7 +3053,7 @@ public abstract class ScriptableObject implements Scriptable,
         } else {
             a = new Object[externalLen];
             for (int i = 0; i < externalLen; i++) {
-                a[i] = Integer.valueOf(i);
+                a[i] = i;
             }
         }
         if (slotMap.isEmpty()) {

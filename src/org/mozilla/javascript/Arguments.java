@@ -273,7 +273,7 @@ final class Arguments extends IdScriptableObject {
     }
 
     @Override
-    Object[] getIds(boolean getNonEnumerable, boolean getSymbols) {
+    public Object[] getIds(boolean getNonEnumerable, boolean getSymbols) {
         Object[] ids = super.getIds(getNonEnumerable, getSymbols);
         if (args.length != 0) {
             boolean[] present = new boolean[args.length];
@@ -281,7 +281,7 @@ final class Arguments extends IdScriptableObject {
             for (int i = 0; i != ids.length; ++i) {
                 Object id = ids[i];
                 if (id instanceof Integer) {
-                    int index = ((Integer) id).intValue();
+                    int index = (Integer) id;
                     if (0 <= index && index < args.length) {
                         if (!present[index]) {
                             present[index] = true;
