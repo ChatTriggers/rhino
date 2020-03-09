@@ -123,7 +123,7 @@ public class UrlModuleSourceProvider extends ModuleSourceProviderBase {
         try {
             Path path = Paths.get(uri);
             if (Files.isDirectory(path)) {
-                uri = new URI(uri.toString() + File.separatorChar + "index" + (uri.toString().endsWith(".js") ? "" : ".js"));
+                uri = new File(new File(uri), "index.js").toURI();
             }
         } catch (Exception ignored) { }
 
