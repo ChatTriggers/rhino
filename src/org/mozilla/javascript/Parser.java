@@ -1619,6 +1619,9 @@ public class Parser {
                     return makeErrorNode();
                 }
                 en.setExportedValue(cn, cn.getClassName().getIdentifier());
+            } else if (matchToken(Token.DECORATOR)) {
+                DecoratorDeclarationNode ddn = decoratorDeclaration();
+                en.setExportedValue(ddn, ddn.getName());
             } else {
                 int token = -1;
 

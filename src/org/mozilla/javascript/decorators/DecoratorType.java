@@ -40,16 +40,9 @@ public enum DecoratorType {
     }
 
     public static void init(Scriptable scope) {
-        try {
-            for (DecoratorType type : values()) {
-                Class<? extends Decorator> decoratorClass = type.getDecoratorClass();
-                if (decoratorClass == null) continue;
-
-                Method init = decoratorClass.getMethod("init", Scriptable.class);
-                init.invoke(null, scope);
-            }
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw Kit.codeBug();
-        }
+        WrapDecorator.init(scope);
+        RegisterDecorator.init(scope);
+        InitializeDecorator.init(scope);
+        NumericTemplateDecorator.init(scope);
     }
 }
