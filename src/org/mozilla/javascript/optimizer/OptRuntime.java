@@ -88,25 +88,44 @@ public final class OptRuntime extends ScriptRuntime {
     }
 
     public static Object optionalCallProp0(Object value, String property, Context cx, Scriptable scope) {
+        return optionalCallPropN(value, property, ScriptRuntime.emptyArgs, cx, scope);
+    }
+
+    /**
+     * For optional CALL, i.e, obj.func?.()
+     */
+    public static Object optionalCallPropN(Object value, String property, Object[] args, Context cx, Scriptable scope) {
         Scriptable thisObj = toObjectOrNull(cx, value, scope);
         if (thisObj == null) {
-            throw undefCallError(thisObj, property);
+            throw undefCallError(value, property);
         }
-        if (isNullOrUndefined(ScriptableObject.getProperty(thisObj, property))) {
+
+        Object prop = ScriptableObject.getProperty(thisObj, property);
+
+        if (isNullOrUndefined(prop)) {
             return Undefined.instance;
         }
 
-        Callable f = getPropFunctionAndThis(value, property, cx, scope);
-        thisObj = lastStoredScriptable(cx);
-        return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
+        if (!(prop instanceof Callable)) {
+            Object noSuchMethod = ScriptableObject.getProperty(thisObj, "__noSuchMethod__");
+            if (noSuchMethod instanceof Callable)
+                prop = new NoSuchMethodShim((Callable) noSuchMethod, property);
+        }
+
+        if (!(prop instanceof Callable)) {
+            throw notFunctionError(thisObj, prop, property);
+        }
+
+        return ((Callable) prop).call(cx, scope, thisObj, args);
     }
 
+    /**
+     * For optional access and optional call, i.e, obj?.func?.()
+     */
     public static Object optionalAccessCallN(Object value, String property, Object[] args, Context cx, Scriptable scope) {
         if (ScriptRuntime.isNullOrUndefined(value)) return Undefined.instance;
 
-        Callable f = getPropFunctionAndThis(value, property, cx, scope);
-        Scriptable thisObj = lastStoredScriptable(cx);
-        return f.call(cx, scope, thisObj, args);
+        return optionalCallPropN(value, property, args, cx, scope);
     }
 
     public static void optionalPrivateToggle(Object value) {

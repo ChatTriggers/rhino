@@ -4417,10 +4417,10 @@ class BodyCodegen {
                 String property = id.getString();
                 cfw.addPush(property);
 
-                if (node.getProp(Node.CHAINING_PROP) != null) {
-                    methodName = "optionalCallProp0";
-                } else if (child.getProp(Node.CHAINING_PROP) != null) {
+                if (child.getProp(Node.CHAINING_PROP) != null) {
                     methodName = "optionalAccessCallProp0";
+                } else if (node.getProp(Node.CHAINING_PROP) != null) {
+                    methodName = "optionalCallProp0";
                 } else if (isPrivate) {
                     methodName = "privateCallProp0";
                 } else {
@@ -4506,12 +4506,22 @@ class BodyCodegen {
 
             // stack: ... functionObj thisObj
             if (child.getProp(Node.CHAINING_PROP) != null) {
+                // If the access and call are optional: obj?.func?.()
                 Node prop = child.getFirstChild();
                 generateExpression(prop, child);
                 String property = prop.getNext().getString();
                 cfw.addPush(property);
                 generateCallArgArray(node, firstArgChild, false);
                 methodName = "optionalAccessCallN";
+                signature = new String[]{ OBJECT, STRING, OBJECT_ARRAY, CONTEXT, SCRIPTABLE };
+            } else if (node.getProp(Node.CHAINING_PROP) != null) {
+                // If the call itself is optional: obj.func?.()
+                Node prop = child.getFirstChild();
+                generateExpression(prop, child);
+                String property = prop.getNext().getString();
+                cfw.addPush(property);
+                generateCallArgArray(node, firstArgChild, false);
+                methodName = "optionalCallPropN";
                 signature = new String[]{ OBJECT, STRING, OBJECT_ARRAY, CONTEXT, SCRIPTABLE };
             } else if (argCount == 1) {
                 generateFunctionAndThisObj(child, node, isPrivate);
