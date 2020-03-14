@@ -784,6 +784,10 @@ public class Parser {
                     propertyName = ts.getString();
 
                     if (entryKind == FIELD_ENTRY) {
+                        if ("constructor".equals(propertyName)) {
+                            reportError("msg.class.ctor.as.field");
+                        }
+
                         if (decorators.stream().anyMatch(it -> DecoratorType.WRAP == it.getDecoratorType())) {
                             reportError("msg.decorator.wrap.on.field");
                         }
@@ -859,10 +863,6 @@ public class Parser {
                         cm.setLength(end - pos);
 
                         if ("constructor".equals(propertyName)) {
-                            if (entryKind != METHOD_ENTRY) {
-                                // TODO: Error
-                                reportError("msg.class.bad.method.definition");
-                            }
                             cls.setConstructor(fn);
                         } else {
                             classMethods.add(cm);
