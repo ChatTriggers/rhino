@@ -1561,8 +1561,14 @@ public class Parser {
             do {
                 boolean decorator = matchToken(Token.AT);
 
-                mustMatchToken(Token.NAME, "msg.export.missing.identifier");
-                String target = createNameNode().getIdentifier();
+                String target;
+
+                if (matchToken(Token.DEFAULT)) {
+                    target = "default";
+                } else {
+                    mustMatchToken(Token.NAME, "msg.export.missing.identifier");
+                    target = createNameNode().getIdentifier();
+                }
 
                 if (decorator) {
                     target = "@" + target;
