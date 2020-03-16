@@ -310,9 +310,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": true
   },
   "ES2015": {
-    "_successful": 404,
+    "_successful": 405,
     "_count": 689,
-    "_percent": 0.5863570391872278,
+    "_percent": 0.5878084179970973,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -944,7 +944,7 @@
     "misc›Proxy, internal 'getOwnPropertyDescriptor' calls›Function.prototype.bind": false,
     "misc›Proxy, internal 'ownKeys' calls›SetIntegrityLevel": true,
     "misc›Proxy, internal 'ownKeys' calls›TestIntegrityLevel": true,
-    "misc›Proxy, internal 'ownKeys' calls›SerializeJSONObject": false,
+    "misc›Proxy, internal 'ownKeys' calls›SerializeJSONObject": true,
     "misc›Object static methods accept primitives›Object.getPrototypeOf": "Expected argument of type object, but instead had type string",
     "misc›Object static methods accept primitives›Object.getOwnPropertyDescriptor": "Expected argument of type object, but instead had type string",
     "misc›Object static methods accept primitives›Object.getOwnPropertyNames": "Expected argument of type object, but instead had type string",

@@ -43,11 +43,11 @@
               </th>
               <th class="version v1">1.7.16
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">70% complete</sub><sub class="unflagged">51% complete</sub>
+                </div><sub class="flagged">71% complete</sub><sub class="unflagged">52% complete</sub>
               </th>
               <th class="version v1">1.7.17
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">79% complete</sub><sub class="unflagged">58% complete</sub>
+                </div><sub class="flagged">71% complete</sub><sub class="unflagged">52% complete</sub>
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
@@ -244,7 +244,7 @@
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -267,7 +267,7 @@
           <td class="result"><div class="Error unflagged " title="Test remove - crashes Rhino">Error</div><div class="Error flagged " title="Test remove - crashes Rhino">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Test remove - crashes Rhino">Error</div><div class="Error flagged " title="Test remove - crashes Rhino">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Test remove - crashes Rhino">Error</div><div class="Error flagged " title="Test remove - crashes Rhino">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Test remove - crashes Rhino">Error</div><div class="Error flagged " title="Test remove - crashes Rhino">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -649,7 +649,7 @@ return Math.max(...Object.create(iterable)) === 3;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
@@ -668,7 +668,7 @@ return [&quot;a&quot;, ...Object.create(iterable), &quot;e&quot;][3] === &quot;d
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="Invalid iterator value">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
@@ -1253,7 +1253,7 @@ return original === getStrings() &amp;&amp; original !== other;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -1279,7 +1279,7 @@ return original === getStrings() &amp;&amp; original === newed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -1798,7 +1798,7 @@ return e === 9 &amp;&amp; f === 10 &amp;&amp; g === undefined
           <td class="result"><div class="Error unflagged " title="invalid catch block condition">Error</div><div class="Error flagged " title="invalid catch block condition">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid catch block condition">Error</div><div class="Error flagged " title="invalid catch block condition">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid catch block condition">Error</div><div class="Error flagged " title="invalid catch block condition">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ) after catch">Error</div><div class="Error flagged " title="missing ) after catch">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="invalid catch block condition">Error</div><div class="Error flagged " title="invalid catch block condition">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) after catch">Error</div><div class="Error flagged " title="missing ) after catch">Error</div></td>
         </tr>
         <tr>
@@ -1867,7 +1867,7 @@ return a === 1 &amp;&amp; b === 2;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -2382,7 +2382,7 @@ return a === 1 &amp;&amp; b === 2 &amp;&amp; c === 3
           <td class="result"><div class="Error unflagged " title="SyntaxError: unexpected object initializer">Error</div><div class="Error flagged " title="SyntaxError: unexpected object initializer">Error</div></td>
           <td class="result"><div class="Error unflagged " title="SyntaxError: unexpected object initializer">Error</div><div class="Error flagged " title="SyntaxError: unexpected object initializer">Error</div></td>
           <td class="result"><div class="Error unflagged " title="SyntaxError: unexpected object initializer">Error</div><div class="Error flagged " title="SyntaxError: unexpected object initializer">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="SyntaxError: unexpected object initializer">Error</div><div class="Error flagged " title="SyntaxError: unexpected object initializer">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -3067,7 +3067,7 @@ return bar === 123;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -3090,7 +3090,7 @@ try {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -3133,7 +3133,7 @@ return baz === 1;</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -3155,7 +3155,7 @@ return (scopes[0]() === &quot;a&quot; &amp;&amp; scopes[1]() === &quot;b&quot;);
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
@@ -3177,7 +3177,7 @@ return (scopes[0]() === &quot;a&quot; &amp;&amp; scopes[1]() === &quot;b&quot;);
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
@@ -3265,7 +3265,7 @@ try {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -3289,7 +3289,7 @@ try {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -3334,7 +3334,7 @@ return baz === 1;</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -3357,7 +3357,7 @@ return (scopes[0]() === &quot;a&quot; &amp;&amp; scopes[1]() === &quot;b&quot;);
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
@@ -3380,7 +3380,7 @@ return (scopes[0]() === &quot;a&quot; &amp;&amp; scopes[1]() === &quot;b&quot;);
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; after for-loop initializer">Error</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
@@ -3496,7 +3496,7 @@ try {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -3657,7 +3657,7 @@ try {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -4033,7 +4033,7 @@ return arrow() === &quot;quux&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type object">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type object">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="Cannot use super in class without super class">Error</div><div class="Error flagged " title="Cannot use super in class without super class">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type object">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type object">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot use super in class without super class">Error</div><div class="Error flagged " title="Cannot use super in class without super class">Error</div></td>
         </tr>
         <tr>
@@ -4104,7 +4104,7 @@ return C === c1;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -5984,7 +5984,7 @@ return view.getFloat64(0) === 0.1;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -6023,7 +6023,7 @@ return constructors.every(function (constructor) {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -6747,7 +6747,7 @@ typeof Float64Array[Symbol.species] === &quot;function&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -7160,7 +7160,7 @@ return 'get' in prop &amp;&amp; Map[Symbol.species] === Map;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -7578,7 +7578,7 @@ return 'get' in prop &amp;&amp; Set[Symbol.species] === Set;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -9509,7 +9509,7 @@ return keys.indexOf(s2) &gt;-1 &amp;&amp; keys.indexOf(s3) &gt;-1 &amp;&amp; key
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -10459,7 +10459,7 @@ return ''.replace(O) === 42;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -10481,7 +10481,7 @@ return ''.search(O) === 42;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -10503,7 +10503,7 @@ return ''.split(O) === 42;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -10525,7 +10525,7 @@ return ''.match(O) === 42;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -10974,7 +10974,7 @@ return foo.bind({}).name === &quot;bound foo&quot; &amp;&amp;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
@@ -10995,7 +10995,7 @@ return foo.name === &quot;foo&quot; &amp;&amp; bar.name === &quot;baz&quot;;</di
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11017,7 +11017,7 @@ return o.foo.name === &quot;foo&quot; &amp;&amp;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11038,7 +11038,7 @@ return descriptor.get.name === &quot;get foo&quot; &amp;&amp;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11057,7 +11057,7 @@ return o.foo.name === &quot;foo&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11102,7 +11102,7 @@ return o[sym1].name === &quot;[foo]&quot; &amp;&amp;
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -11123,7 +11123,7 @@ return foo.name === &quot;foo&quot; &amp;&amp;
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11142,7 +11142,7 @@ return foo.name === &quot;foo&quot; &amp;&amp;
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="missing ; before statement">Error</div></td>
         </tr>
         <tr>
@@ -11165,7 +11165,7 @@ return foo.name === &quot;foo&quot; &amp;&amp;
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11187,7 +11187,7 @@ return o.foo.name === &quot;foo&quot; &amp;&amp;
           <td class="result"><div class="Error unflagged " title="missing } after property list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing } after property list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11206,7 +11206,7 @@ return (new C).foo.name === &quot;foo&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11225,7 +11225,7 @@ return C.foo.name === &quot;foo&quot;;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11246,7 +11246,7 @@ return descriptor.enumerable   === false &amp;&amp;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -11844,7 +11844,7 @@ return 'get' in prop &amp;&amp; Array[Symbol.species] === Array;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="Can&#x27;t use &#x27;in&#x27; on a non-object.">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -13516,7 +13516,7 @@ return get + '' === &quot;length,0,1&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -13564,7 +13564,7 @@ return get[0] === Symbol.unscopables &amp;&amp; get.slice(1) + '' === &quot;foo&
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -14008,7 +14008,7 @@ return get[0] === Symbol.iterator &amp;&amp; get.slice(1) + '' === &quot;length,
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -14037,7 +14037,7 @@ return get[0] === &quot;constructor&quot;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type undefined">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type undefined">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type undefined">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type undefined">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="Expected argument of type object, but instead had type undefined">Error</div><div class="Error flagged " title="Expected argument of type object, but instead had type undefined">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -14072,7 +14072,7 @@ return true;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Error unflagged " title="Property constructor not found.">Error</div><div class="Error flagged " title="Property constructor not found.">Error</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Error unflagged " title="Property constructor not found.">Error</div><div class="Error flagged " title="Property constructor not found.">Error</div></td>
         </tr>
         <tr>
@@ -14094,7 +14094,7 @@ return get + '' === &quot;length,3&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14138,7 +14138,7 @@ return get + '' === &quot;length,0,1,2,3&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14441,7 +14441,7 @@ return set + '' === &quot;0,1,2&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14463,7 +14463,7 @@ return set + '' === &quot;3,4,5&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14507,7 +14507,7 @@ return set + '' === &quot;0,1,2,length&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14529,7 +14529,7 @@ return set + '' === &quot;3,1,2&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14551,7 +14551,7 @@ return set + '' === &quot;0,2,length&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14573,7 +14573,7 @@ return set + '' === &quot;3,2,1,length&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14595,7 +14595,7 @@ return set + '' === &quot;5,3,2,0,1,length&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -14958,7 +14958,7 @@ return ownKeysCalled === 2;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
+          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
           <td class="feature sub" colspan="9">
@@ -15285,7 +15285,7 @@ return result === &quot;012349 DB-1ACEFGHIJKLMNOPQRST&quot;;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result flag"><div class="No unflagged " title="Test failed">No</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
-          <td class="result flag"><div class="Error unflagged " title="Constructor for &quot;Array&quot; not found.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result flag"><div class="No unflagged " title="Test failed">No</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
           <td class="result flag"><div class="Error unflagged " title="Constructor for &quot;Array&quot; not found.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -15518,7 +15518,7 @@ return this === undefined &amp;&amp; ({ a:1, a:1 }).a === 1;</div>}
           <td class="result"><div class="Error unflagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div><div class="Error flagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div><div class="Error flagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div><div class="Error flagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div><div class="Error flagged " title="Property &quot;a&quot; already defined in this object literal.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -15560,7 +15560,7 @@ catch(e) {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -15583,7 +15583,7 @@ try {
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -16342,7 +16342,7 @@ return a === 3;</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
       </table>
@@ -16378,7 +16378,7 @@ return a === 3;</div>}
               </th>
               <th class="version v1">1.7.17
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">92% complete</sub><sub class="unflagged">92% complete</sub>
+                </div><sub class="flagged">61% complete</sub><sub class="unflagged">61% complete</sub>
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
@@ -16525,7 +16525,7 @@ return 24;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -16548,7 +16548,7 @@ return new TypedArray([1, 2, 3]).includes(1)
           <td class="result"><div class="Error unflagged " title="Cannot find function includes in object 1,2,3.">Error</div><div class="Error flagged " title="Cannot find function includes in object 1,2,3.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function includes in object 1,2,3.">Error</div><div class="Error flagged " title="Cannot find function includes in object 1,2,3.">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function includes in object 1,2,3.">Error</div><div class="Error flagged " title="Cannot find function includes in object 1,2,3.">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot find function includes in object 1,2,3.">Error</div><div class="Error flagged " title="Cannot find function includes in object 1,2,3.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
       </table>
@@ -16641,7 +16641,7 @@ return true;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -16732,7 +16732,7 @@ return (get + '' === &quot;length,1,2&quot;);</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
       </table>
@@ -16768,7 +16768,7 @@ return (get + '' === &quot;length,1,2&quot;);</div>}
               </th>
               <th class="version v1">1.7.17
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">39% complete</sub><sub class="unflagged">32% complete</sub>
+                </div><sub class="flagged">23% complete</sub><sub class="unflagged">23% complete</sub>
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
@@ -16879,7 +16879,9 @@ return D.a.value === 1 &amp;&amp; D.a.enumerable === true &amp;&amp; D.a.configu
           <td class="result"><div class="Error unflagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
 .">Error</div><div class="Error flagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
 .">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
+.">Error</div><div class="Error flagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
+.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -16906,7 +16908,9 @@ return !Object.getOwnPropertyDescriptors(P).hasOwnProperty('a');</div>}
           <td class="result"><div class="Error unflagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
 .">Error</div><div class="Error flagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
 .">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
+.">Error</div><div class="Error flagged " title="Cannot find function getOwnPropertyDescriptors in object function Object() { [native code for Object.Object, arity=1] }
+.">Error</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
         </tr>
         <tr>
@@ -17248,7 +17252,7 @@ p.then(function(result) {
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: await">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: await">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: await">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="missing ; before statement">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: await">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="missing ; before statement">Error</div></td>
         </tr>
         <tr>
@@ -17277,7 +17281,7 @@ p.then(function(result) {
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: await">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="missing ; before statement">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: await">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="missing ; before statement">Error</div></td>
         </tr>
         <tr>
@@ -17828,7 +17832,7 @@ return prop.get === bar &amp;&amp; !prop.writable &amp;&amp; prop.configurable
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -17852,7 +17856,7 @@ return true;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -17899,7 +17903,7 @@ return prop.set === bar &amp;&amp; !prop.writable &amp;&amp; prop.configurable
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -17923,7 +17927,7 @@ return true;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -17999,7 +18003,7 @@ return foo() === &quot;bar&quot;
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -18022,7 +18026,7 @@ return true;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18120,7 +18124,7 @@ return foo() === &quot;bar&quot;
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Error flagged " title="The object is not a string">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Symbol&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -18143,7 +18147,7 @@ return true;
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18332,7 +18336,7 @@ return i === 0;</div>}
               </th>
               <th class="version v1">1.7.17
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">23% complete</sub><sub class="unflagged">23% complete</sub>
+                </div><sub class="flagged">0% complete</sub><sub class="unflagged">0% complete</sub>
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
@@ -18370,7 +18374,7 @@ return a === 1 &amp;&amp; rest.a === undefined &amp;&amp; rest.b === 2 &amp;&amp
           <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18390,7 +18394,7 @@ return O !== spread &amp;&amp; (O.a + O.b + O.c) === 6;</div>}
           <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18541,7 +18545,7 @@ return regex.test('foo\nbar');</div>}
           <td class="result"><div class="Error unflagged " title="invalid flag after regular expression">Error</div><div class="Error flagged " title="invalid flag after regular expression">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid flag after regular expression">Error</div><div class="Error flagged " title="invalid flag after regular expression">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid flag after regular expression">Error</div><div class="Error flagged " title="invalid flag after regular expression">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="invalid flag after regular expression">Error</div><div class="Error flagged " title="invalid flag after regular expression">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18777,7 +18781,7 @@ return tag`\01\1\xg\xAg\u0\u0g\u00g\u000g\u{g\u{0\u{110000}${0}\0`;</div>}
               </th>
               <th class="version v1">1.7.17
                 <div class="details"><small>(these versions have identical results)</small>
-                </div><sub class="flagged">45% complete</sub><sub class="unflagged">27% complete</sub>
+                </div><sub class="flagged">10% complete</sub><sub class="unflagged">9% complete</sub>
               </th>
               <th class="version vmaster">master
                 <div class="details"><small>(these versions have identical results)</small>
@@ -18863,7 +18867,7 @@ return new C().x === 'x';</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18890,7 +18894,7 @@ return new C(42).x() === 42;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18914,7 +18918,7 @@ return new C().x() === 42;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18935,7 +18939,7 @@ return new C().x === 42;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18963,7 +18967,7 @@ return C.x === 'x';</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -18987,7 +18991,7 @@ return new C().x() === 42;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19008,7 +19012,7 @@ return C.x === 42;</div>}
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ( before function parameters.">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19318,7 +19322,9 @@ return result === 'tromple';</div>}
           <td class="result"><div class="Error unflagged " title="Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }
 .">Error</div><div class="Error flagged " title="Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }
 .">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }
+.">Error</div><div class="Error flagged " title="Cannot find function isTemplateObject in object function Array() { [native code for Array.Array, arity=1] }
+.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19347,7 +19353,7 @@ return true;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19374,7 +19380,7 @@ return A.staticField === 1 &amp;&amp; A.staticMethod() === 2;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19403,7 +19409,7 @@ return a.instanceField === 3 &amp;&amp; a.instanceMethod() === 4;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19468,7 +19474,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19535,7 +19541,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19564,7 +19570,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19593,7 +19599,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19628,7 +19634,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19659,7 +19665,7 @@ return true;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19689,7 +19695,7 @@ return a.method() === 6;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19719,7 +19725,7 @@ return a.method === undefined;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19742,7 +19748,7 @@ return true;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19771,7 +19777,7 @@ return A.method() === 6;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19800,7 +19806,7 @@ return A.method === undefined;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19831,7 +19837,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19862,7 +19868,7 @@ return passed;</div>}
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="No unflagged " title="Test failed">No</div><div class="No flagged " title="Test failed">No</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19893,7 +19899,7 @@ try {
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19921,7 +19927,7 @@ try {
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19944,7 +19950,7 @@ try {
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19967,7 +19973,7 @@ try {
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -19995,7 +20001,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function intersection in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function intersection in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function intersection in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function intersection in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -20017,7 +20023,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function union in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function union in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function union in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function union in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -20038,7 +20044,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function difference in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function difference in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function difference in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function difference in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -20059,7 +20065,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function symmetricDifference in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function symmetricDifference in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function symmetricDifference in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function symmetricDifference in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -20077,7 +20083,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isDisjointFrom in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isDisjointFrom in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isDisjointFrom in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isDisjointFrom in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -20095,7 +20101,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSubsetOf in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSubsetOf in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSubsetOf in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSubsetOf in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -20113,7 +20119,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSupersetOf in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSupersetOf in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSupersetOf in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function isSupersetOf in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -20141,7 +20147,7 @@ return buffer1.byteLength === 0
           <td class="result"><div class="Error unflagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div><div class="Error flagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div><div class="Error flagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div><div class="Error flagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div><div class="Error flagged " title="Cannot find function transfer in object [object ArrayBuffer].">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -20190,7 +20196,7 @@ return Array.from(map).join() === 'a,2,b,3';</div>}
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -20212,7 +20218,7 @@ return map.get(a) === 2 &amp;&amp; map.get(b) === 3;</div>}
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object WeakMap].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object WeakMap].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object WeakMap].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function upsert in object [object WeakMap].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -21889,7 +21895,7 @@ return p('b') === 'ab';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -21911,7 +21917,7 @@ return p('a') === 'ab';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -21933,7 +21939,7 @@ return p('a', 'c') === 'abc';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -21958,7 +21964,7 @@ return p('a') === 'ab';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -21980,7 +21986,7 @@ return o.f('a') === 'abfalse';</div>}
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -22005,7 +22011,7 @@ return o.f('a') === 'abfalse';</div>}
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
         </tr>
         <tr>
@@ -22023,7 +22029,7 @@ return o.f('a') === 'abfalse';</div>}
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="syntax error">Error</div><div class="Error flagged " title="syntax error">Error</div></td>
         </tr>
         <tr>
@@ -22112,7 +22118,7 @@ try {
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="invalid property id">Error</div><div class="Error flagged " title="invalid property id">Error</div></td>
         </tr>
         <tr>
@@ -22165,7 +22171,7 @@ try {
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing variable name">Error</div><div class="Error flagged " title="missing variable name">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="illegal character: #">Error</div><div class="Error flagged " title="illegal character: #">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing variable name">Error</div><div class="Error flagged " title="missing variable name">Error</div></td>
         </tr>
         <tr>
@@ -22244,7 +22250,8 @@ return map.size === 2
 .">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function groupBy in object function Map() { [native code for Map.Map, arity=0] }
 .">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function groupBy in object function Map() { [native code for Map.Map, arity=0] }
+.">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22271,7 +22278,8 @@ return map.size === 2
 .">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyBy in object function Map() { [native code for Map.Map, arity=0] }
 .">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyBy in object function Map() { [native code for Map.Map, arity=0] }
+.">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22293,7 +22301,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22311,7 +22319,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22332,7 +22340,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22350,7 +22358,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22368,7 +22376,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function findKey in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function findKey in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function findKey in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function findKey in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22387,7 +22395,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function includes in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function includes in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function includes in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function includes in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22406,7 +22414,7 @@ return map.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyOf in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyOf in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyOf in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function keyOf in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22428,7 +22436,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapKeys in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapKeys in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapKeys in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapKeys in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22450,7 +22458,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapValues in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapValues in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapValues in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function mapValues in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22472,7 +22480,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function merge in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function merge in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function merge in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function merge in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22490,7 +22498,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22508,7 +22516,7 @@ return map.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Map].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Map].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Map].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Map&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22530,7 +22538,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22552,7 +22560,7 @@ return set.deleteAll(2, 3) === true
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22570,7 +22578,7 @@ return set.deleteAll(2, 3) === true
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function every in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22591,7 +22599,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function filter in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22609,7 +22617,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function find in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22627,7 +22635,7 @@ return set.size === 2
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function join in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function join in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function join in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function join in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22649,7 +22657,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function map in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function map in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function map in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function map in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22667,7 +22675,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function reduce in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22685,7 +22693,7 @@ return set.size === 3
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Set].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Set].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function some in object [object Set].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;Set&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22712,7 +22720,7 @@ return !map.has(a)
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakMap].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakMap].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakMap].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakMap].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;WeakMap&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22739,7 +22747,7 @@ return set.has(a)
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object WeakSet].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object WeakSet].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object WeakSet].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function addAll in object [object WeakSet].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22766,7 +22774,7 @@ return !set.has(a)
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakSet].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakSet].">Error</div></td>
           <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakSet].">Error</div></td>
-          <td class="result flag"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
+          <td class="result"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Error flagged " title="Cannot find function deleteAll in object [object WeakSet].">Error</div></td>
           <td class="result flag"><div class="Error unflagged " title="&quot;WeakSet&quot; is not defined.">Error</div><div class="Yes flagged required" title="Yes, but requires VERSION_ES6 flag">Flag</div></td>
         </tr>
         <tr>
@@ -22803,7 +22811,9 @@ return !set.has(a)
           <td class="result"><div class="Error unflagged " title="Cannot find function fromString in object function Number() { [native code for Number.Number, arity=1] }
 .">Error</div><div class="Error flagged " title="Cannot find function fromString in object function Number() { [native code for Number.Number, arity=1] }
 .">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot find function fromString in object function Number() { [native code for Number.Number, arity=1] }
+.">Error</div><div class="Error flagged " title="Cannot find function fromString in object function Number() { [native code for Number.Number, arity=1] }
+.">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -22855,7 +22865,7 @@ return typeof obj::foo === &quot;function&quot; &amp;&amp; obj::foo().garply ===
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="missing ; before statement">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div><div class="Error flagged " title="Cannot read property &quot;&quot;[object Object]&quot;:foo&quot; from undefined">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="missing ; before statement">Error</div></td>
         </tr>
         <tr>
@@ -22928,7 +22938,7 @@ return target === C.prototype
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ; before statement">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing variable name">Error</div><div class="Error flagged " title="missing variable name">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="missing variable name">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="missing variable name">Error</div><div class="Error flagged " title="missing variable name">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing variable name">Error</div><div class="Error flagged " title="missing ( before function parameters.">Error</div></td>
         </tr>
         <tr>
@@ -22953,7 +22963,7 @@ return (@inverse function(it){
           <td class="result"><div class="Error unflagged " title="missing ) in parenthetical">Error</div><div class="Error flagged " title="missing ) in parenthetical">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) in parenthetical">Error</div><div class="Error flagged " title="missing ) in parenthetical">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) in parenthetical">Error</div><div class="Error flagged " title="missing ) in parenthetical">Error</div></td>
-          <td class="result"><div class="Error unflagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div><div class="Error flagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div></td>
+          <td class="result"><div class="Error unflagged " title="missing ) in parenthetical">Error</div><div class="Error flagged " title="missing ) in parenthetical">Error</div></td>
           <td class="result"><div class="Error unflagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div><div class="Error flagged " title="SyntaxError: Decorators can only be used on or inside classes">Error</div></td>
         </tr>
         <tr>
@@ -23047,7 +23057,7 @@ return Array.isArray(arr)
           <td class="result"><div class="Error unflagged " title="missing ) after argument list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) after argument list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function isCallable in object [object Reflect].">Error</div><div class="Error flagged " title="Cannot find function isCallable in object [object Reflect].">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot find function isCallable in object [object Reflect].">Error</div><div class="Error flagged " title="Cannot find function isCallable in object [object Reflect].">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>
@@ -23067,7 +23077,7 @@ return Array.isArray(arr)
           <td class="result"><div class="Error unflagged " title="missing ) after argument list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="missing ) after argument list">Error</div><div class="Error flagged " title="identifier is a reserved word: class">Error</div></td>
           <td class="result"><div class="Error unflagged " title="Cannot find function isConstructor in object [object Reflect].">Error</div><div class="Error flagged " title="Cannot find function isConstructor in object [object Reflect].">Error</div></td>
-          <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
+          <td class="result"><div class="Error unflagged " title="Cannot find function isConstructor in object [object Reflect].">Error</div><div class="Error flagged " title="Cannot find function isConstructor in object [object Reflect].">Error</div></td>
           <td class="result"><div class="Yes unflagged " title="Test passed">Yes</div><div class="Yes flagged " title="Test passed">Yes</div></td>
         </tr>
         <tr>

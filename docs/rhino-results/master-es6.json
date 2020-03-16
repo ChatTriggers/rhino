@@ -310,9 +310,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": true
   },
   "ES2015": {
-    "_successful": 550,
+    "_successful": 551,
     "_count": 689,
-    "_percent": 0.7982583454281568,
+    "_percent": 0.7997097242380261,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -944,7 +944,7 @@
     "misc›Proxy, internal 'getOwnPropertyDescriptor' calls›Function.prototype.bind": false,
     "misc›Proxy, internal 'ownKeys' calls›SetIntegrityLevel": true,
     "misc›Proxy, internal 'ownKeys' calls›TestIntegrityLevel": true,
-    "misc›Proxy, internal 'ownKeys' calls›SerializeJSONObject": false,
+    "misc›Proxy, internal 'ownKeys' calls›SerializeJSONObject": true,
     "misc›Object static methods accept primitives›Object.getPrototypeOf": true,
     "misc›Object static methods accept primitives›Object.getOwnPropertyDescriptor": true,
     "misc›Object static methods accept primitives›Object.getOwnPropertyNames": true,
