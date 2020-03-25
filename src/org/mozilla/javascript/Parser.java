@@ -1416,14 +1416,12 @@ public class Parser {
                 defaultComma = matchToken(Token.COMMA);
             }
 
+            hasNamedImports = matchToken(Token.LC);
+
             if (hasDefault) {
-                hasNamedImports = matchToken(Token.LC);
                 if (defaultComma != hasNamedImports) {
                     reportError(defaultComma ? "msg.import.unexpected.comma" : "msg.import.missing.comma");
                 }
-            } else {
-                mustMatchToken(Token.LC, "msg.import.unexpected.token");
-                hasNamedImports = true;
             }
 
             if (hasNamedImports) {
@@ -1469,14 +1467,17 @@ public class Parser {
                 }
             }
 
-            hasTargets = hasNamedImports;
+            hasTargets = hasNamedImports || hasDefault;
         }
 
         peekToken();
-        if (hasTargets && !"from".equals(ts.getString())) {
-            reportError("msg.import.missing.file.path");
+        if (hasTargets) {
+            if (!"from".equals(ts.getString())) {
+                reportError("msg.import.missing.file.path");
+            }
+
+            consumeToken();
         }
-        consumeToken();
 
         mustMatchToken(Token.STRING, "msg.import.missing.file.path");
         in.setFilePath(ts.getString());
