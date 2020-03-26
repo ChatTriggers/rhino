@@ -32,6 +32,7 @@ import org.mozilla.javascript.Token;
  */
 public class ObjectProperty extends InfixExpression {
     private AstNode defaultValue;
+    private AstNode spread = null;
 
     {
         type = Token.COLON;
@@ -43,6 +44,14 @@ public class ObjectProperty extends InfixExpression {
 
     public AstNode getDefaultValue() {
         return defaultValue;
+    }
+
+    public void setSpread(AstNode node) {
+        spread = node;
+    }
+
+    public AstNode getSpread() {
+        return spread;
     }
 
     /**

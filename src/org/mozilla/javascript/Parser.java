@@ -3975,9 +3975,7 @@ public class Parser {
 
             case Token.SPREAD:
                 consumeToken();
-                mustMatchToken(Token.NAME, "msg.obj.spread.bad.ident");
-                pname = createNameNode();
-                consumeToken();
+                pname = memberExpr(true);
                 pname.putProp(Node.SPREAD_PROP, true);
                 break;
 
@@ -4008,10 +4006,9 @@ public class Parser {
                 reportError("msg.obj.spread.extra");
             }
 
-            AstNode nn = new Name(property.getPosition(), property.getString());
             ObjectProperty pn = new ObjectProperty();
+            pn.setSpread(property);
 
-            pn.setLeftAndRight(property, nn);
             return pn;
         }
 
