@@ -528,10 +528,12 @@ public class Node implements Iterable<Node> {
 
     public Object getProp(int propType) {
         PropListItem item = lookupProperty(propType);
-        if (item == null) {
-            return null;
-        }
-        return item.objectValue;
+        return item == null ? null : item.objectValue;
+    }
+
+    public Object getProp(int propType, Object defaultValue) {
+        PropListItem item = lookupProperty(propType);
+        return item == null ? defaultValue : item.objectValue;
     }
 
     public int getIntProp(int propType, int defaultValue) {
@@ -1205,24 +1207,24 @@ public class Node implements Iterable<Node> {
             sb.append(" [");
             sb.append(propToString(type));
             sb.append(": ");
-            String value;
+            StringBuilder value;
             switch (type) {
                 case TARGETBLOCK_PROP: // can't add this as it recurses
-                    value = "target block property";
+                    value = new StringBuilder("target block property");
                     break;
                 case LOCAL_BLOCK_PROP:     // can't add this as it is dull
-                    value = "last local block";
+                    value = new StringBuilder("last local block");
                     break;
                 case ISNUMBER_PROP:
                     switch (x.intValue) {
                         case BOTH:
-                            value = "both";
+                            value = new StringBuilder("both");
                             break;
                         case RIGHT:
-                            value = "right";
+                            value = new StringBuilder("right");
                             break;
                         case LEFT:
-                            value = "left";
+                            value = new StringBuilder("left");
                             break;
                         default:
                             throw Kit.codeBug();
@@ -1231,10 +1233,10 @@ public class Node implements Iterable<Node> {
                 case SPECIALCALL_PROP:
                     switch (x.intValue) {
                         case SPECIALCALL_EVAL:
-                            value = "eval";
+                            value = new StringBuilder("eval");
                             break;
                         case SPECIALCALL_WITH:
-                            value = "with";
+                            value = new StringBuilder("with");
                             break;
                         default:
                             // NON_SPECIALCALL should not be stored
@@ -1243,21 +1245,21 @@ public class Node implements Iterable<Node> {
                     break;
                 case OBJECT_IDS_PROP: {
                     Object[] a = (Object[]) x.objectValue;
-                    value = "[";
+                    value = new StringBuilder("[");
                     for (int i = 0; i < a.length; i++) {
-                        value += a[i].toString();
+                        value.append(a[i].toString());
                         if (i + 1 < a.length)
-                            value += ", ";
+                            value.append(", ");
                     }
-                    value += "]";
+                    value.append("]");
                     break;
                 }
                 default:
                     Object obj = x.objectValue;
                     if (obj != null) {
-                        value = obj.toString();
+                        value = new StringBuilder(obj.toString());
                     } else {
-                        value = String.valueOf(x.intValue);
+                        value = new StringBuilder(String.valueOf(x.intValue));
                     }
                     break;
             }

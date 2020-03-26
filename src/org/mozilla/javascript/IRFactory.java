@@ -234,7 +234,10 @@ public final class IRFactory extends Parser {
         for (int i = 0; i < elems.size(); ++i) {
             AstNode elem = elems.get(i);
             if (elem.getType() != Token.EMPTY) {
-                array.addChildToBack(transform(elem));
+                Node transformed = transform(elem);
+                if (elem.getProp(Node.SPREAD_PROP) != null)
+                    transformed.putProp(Node.SPREAD_PROP, true);
+                array.addChildToBack(transformed);
             } else {
                 if (spreading) {
                     array.addChildToBack(elem);
@@ -977,15 +980,17 @@ public final class IRFactory extends Parser {
         // creation plus object property entries, so later compiler
         // stages don't need to know about object literals.
         decompiler.addToken(Token.LC);
-        List<ObjectProperty> elems = node.getElements().stream().filter((it) -> it.getLeft().getProp(Node.SPREAD_PROP) == null).collect(Collectors.toList());;
-        List<ObjectProperty> spread = node.getElements().stream().filter((it) -> it.getLeft().getProp(Node.SPREAD_PROP) != null).collect(Collectors.toList());
+        List<ObjectProperty> elems = node.getElements();
         Node object = new Node(Token.OBJECTLIT);
         Object[] properties;
+        int[] spreadIndices;
         if (elems.isEmpty()) {
             properties = ScriptRuntime.emptyArgs;
+            spreadIndices = new int[0];
         } else {
-            int size = elems.size(), i = 0;
-            properties = new Object[size];
+            int size = elems.size(), i = 0, sI = 0;
+            properties = new Object[(int) elems.stream().filter(it -> it.getSpread() == null).count()];
+            spreadIndices = new int[elems.size() - properties.length];
             for (ObjectProperty prop : elems) {
                 if (prop.isGetterMethod()) {
                     decompiler.addToken(Token.GET);
@@ -995,41 +1000,41 @@ public final class IRFactory extends Parser {
                     decompiler.addToken(Token.METHOD);
                 }
 
-                properties[i++] = getPropKey(prop.getLeft());
+                AstNode spread = prop.getSpread();
 
-                // OBJECTLIT is used as ':' in object literal for
-                // decompilation to solve spacing ambiguity.
-                if (!(prop.isMethod())) {
-                    decompiler.addToken(Token.OBJECTLIT);
-                }
+                if (spread == null) {
+                    properties[i++] = getPropKey(prop.getLeft());
 
-                Node right = transform(prop.getRight());
-                if (prop.isGetterMethod()) {
-                    right = createUnary(Token.GET, right);
-                } else if (prop.isSetterMethod()) {
-                    right = createUnary(Token.SET, right);
-                } else if (prop.isNormalMethod()) {
-                    right = createUnary(Token.METHOD, right);
-                }
-                object.addChildToBack(right);
+                    // OBJECTLIT is used as ':' in object literal for
+                    // decompilation to solve spacing ambiguity.
+                    if (!(prop.isMethod())) {
+                        decompiler.addToken(Token.OBJECTLIT);
+                    }
 
-                if (i < size) {
-                    decompiler.addToken(Token.COMMA);
+                    Node right = transform(prop.getRight());
+                    if (prop.isGetterMethod()) {
+                        right = createUnary(Token.GET, right);
+                    } else if (prop.isSetterMethod()) {
+                        right = createUnary(Token.SET, right);
+                    } else if (prop.isNormalMethod()) {
+                        right = createUnary(Token.METHOD, right);
+                    }
+                    object.addChildToBack(right);
+
+                    if (i < size) {
+                        decompiler.addToken(Token.COMMA);
+                    }
+                } else {
+                    spreadIndices[sI++] = i;
+                    Node transformed = transform(spread);
+                    object.addChildToBack(transformed);
                 }
             }
-        }
-
-        if (spread.size() > 0) {
-            Object[] spreadProps = new Object[spread.size()];
-            int i = 0;
-            for (ObjectProperty prop : spread) {
-                spreadProps[i++] = getPropKey(prop.getLeft());
-            }
-            object.putProp(Node.SPREAD_IDS_PROP, spreadProps);
         }
 
         decompiler.addToken(Token.RC);
         object.putProp(Node.OBJECT_IDS_PROP, properties);
+        object.putProp(Node.SPREAD_IDS_PROP, spreadIndices);
         return object;
     }
 
@@ -2416,12 +2421,18 @@ public final class IRFactory extends Parser {
         int size = props.size();
         for (int i = 0; i < size; i++) {
             ObjectProperty prop = props.get(i);
-            boolean destructuringShorthand =
-                    Boolean.TRUE.equals(prop.getProp(Node.DESTRUCTURING_SHORTHAND));
-            decompile(prop.getLeft());
-            if (!destructuringShorthand) {
-                decompiler.addToken(Token.COLON);
-                decompile(prop.getRight());
+            boolean destructuringShorthand = Boolean.TRUE.equals(prop.getProp(Node.DESTRUCTURING_SHORTHAND));
+            AstNode spread = prop.getSpread();
+            if (spread != null) {
+                decompiler.addToken(Token.SPREAD);
+                decompile(spread);
+            } else {
+                decompile(prop.getLeft());
+
+                if (!destructuringShorthand) {
+                    decompiler.addToken(Token.COLON);
+                    decompile(prop.getRight());
+                }
             }
             if (i < size - 1) {
                 decompiler.addToken(Token.COMMA);

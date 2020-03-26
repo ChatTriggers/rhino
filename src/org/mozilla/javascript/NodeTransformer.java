@@ -155,23 +155,6 @@ public class NodeTransformer {
                         props[i] = parentNode.first;
                     }
 
-                    props = (Object[]) node.getProp(Node.SPREAD_IDS_PROP);
-
-                    if (props == null) {
-                        break;
-                    }
-
-                    for (int i = 0, propsLength = props.length; i < propsLength; i++) {
-                        Object prop = props[i];
-
-                        if (!(prop instanceof Node)) continue;
-
-                        Node parentNode = new Node(Token.EMPTY, (Node) prop);
-
-                        transformCompilationUnit_r(tree, parentNode, scope, createScopeObjects, inStrictMode);
-                        props[i] = parentNode.first;
-                    }
-
                     break;
 
                 case Token.YIELD:

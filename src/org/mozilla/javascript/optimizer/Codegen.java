@@ -1694,7 +1694,7 @@ class BodyCodegen {
                         }
 
                         // Associate the value, only if this is a field
-                        if (child instanceof ClassField) {
+                        if (child instanceof ClassField && !((ClassField) child).isStatic()) {
                             cfw.addALoad(thisObjLocal);
                             cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
                             cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "VALUE_KEY", OBJECT);
@@ -4163,12 +4163,27 @@ class BodyCodegen {
     /**
      * load array with property ids
      */
-    private void addLoadPropertyIds(Object[] properties, int count, Node parent) {
+    private void addLoadPropertyIds(Object[] properties, int[] spreadIndices, Node parent) {
+        int count = properties.length + spreadIndices.length;
         addNewObjectArray(count);
+
+        int propIndex = 0;
+
+        propLoop:
         for (int i = 0; i != count; ++i) {
             cfw.add(ByteCode.DUP);
             cfw.addPush(i);
-            Object id = properties[i];
+
+            // If this is a spread index, push null
+            for (int j : spreadIndices) {
+                if (i == j) {
+                    cfw.add(ByteCode.ACONST_NULL);
+                    cfw.add(ByteCode.AASTORE);
+                    continue propLoop;
+                }
+            }
+
+            Object id = properties[propIndex++];
             if (id instanceof String) {
                 cfw.addPush((String) id);
             } else if (id instanceof Node) {
@@ -4211,8 +4226,10 @@ class BodyCodegen {
             for (int i = 0; i != count; ++i) {
                 cfw.add(ByteCode.DUP);
                 cfw.addPush(i);
+                boolean spread = child2.getProp(Node.SPREAD_PROP) != null;
                 int childType = child2.getType();
                 if (childType == Token.GET || childType == Token.SET || childType == Token.METHOD) {
+                    if (spread) throw Kit.codeBug("Unexpected spread on an object method");
                     generateExpression(child2.getFirstChild(), node);
                 } else {
                     generateExpression(child2, node);
@@ -4225,6 +4242,7 @@ class BodyCodegen {
 
     private void visitObjectLiteral(Node node, Node child, boolean topLevel) {
         Object[] properties = (Object[]) node.getProp(Node.OBJECT_IDS_PROP);
+        int[] spreadIndices = (int[]) node.getProp(Node.SPREAD_IDS_PROP, new int[0]);
         int count = properties.length;
 
         // If code budget is tight swap out literals into separate method
@@ -4252,13 +4270,13 @@ class BodyCodegen {
         if (isGenerator) {
             // TODO: this is actually only necessary if the yield operation is
             // a child of this object or its children (bug 757410)
-            addLoadPropertyValues(node, child, count);
-            addLoadPropertyIds(properties, count, node);
+            addLoadPropertyValues(node, child, count + spreadIndices.length);
+            addLoadPropertyIds(properties, spreadIndices, node);
             // swap property-values and property-ids arrays
             cfw.add(ByteCode.SWAP);
         } else {
-            addLoadPropertyIds(properties, count, node);
-            addLoadPropertyValues(node, child, count);
+            addLoadPropertyIds(properties, spreadIndices, node);
+            addLoadPropertyValues(node, child, count + spreadIndices.length);
         }
 
         // check if object literal actually has any getters or setters
@@ -4298,17 +4316,6 @@ class BodyCodegen {
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
         addScriptRuntimeInvoke("newObjectLiteral", SCRIPTABLE, OBJECT_ARRAY, OBJECT_ARRAY, "[" + INTEGER, CONTEXT, SCRIPTABLE);
-
-        Object spreadProp = node.getProp(Node.SPREAD_IDS_PROP);
-        if (spreadProp != null) {
-            Object[] spread = (Object[]) spreadProp;
-
-            for (Object obj : spread) {
-                cfw.add(ByteCode.DUP);
-                generateExpression((Node) obj, node);
-                addScriptRuntimeInvoke("addSpreadObject", VOID, SCRIPTABLE, SCRIPTABLE);
-            }
-        }
     }
 
     private void visitSpecialCall(Node node, int type, int specialType, Node child) {

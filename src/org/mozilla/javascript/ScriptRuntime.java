@@ -1139,10 +1139,10 @@ public class ScriptRuntime {
                     obj.put((String) key, obj, val);
                 }
             } else if (key instanceof Number) {
-                int ii = ScriptRuntime.toInt32(key);
-                Object val = spread.get(ii, obj);
+                int i = ScriptRuntime.toInt32(key);
+                Object val = spread.get(i, obj);
                 if ((val != Scriptable.NOT_FOUND) && (val != Undefined.instance)) {
-                    obj.put(ii, obj, val);
+                    obj.put(i, obj, val);
                 }
             }
         }
@@ -4477,11 +4477,19 @@ public class ScriptRuntime {
         return newObjectLiteral(propertyIds, propertyValues, null, cx, scope);
     }
 
-    public static Scriptable newObjectLiteral(Object[] propertyIds, Object[] propertyValues, int[] getterSetters, Context cx, Scriptable scope) {
+    public static Scriptable newObjectLiteral(
+        Object[] propertyIds, Object[] propertyValues, int[] getterSetters, Context cx, Scriptable scope
+    ) {
         Scriptable object = cx.newObject(scope);
 
         for (int i = 0, end = propertyIds.length; i != end; ++i) {
             Object id = propertyIds[i];
+
+            if (id == null) {
+                addSpreadObject(object, ScriptableObject.ensureScriptable(propertyValues[i]));
+                continue;
+            }
+
             int getterSetter = getterSetters == null ? 0 : getterSetters[i];
             Object value = propertyValues[i];
             if (id instanceof String) {
