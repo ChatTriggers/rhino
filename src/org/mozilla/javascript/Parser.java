@@ -2008,13 +2008,8 @@ public class Parser {
                 init.setLineno(ts.lineno);
             } else if (tt == Token.VAR || tt == Token.LET || tt == Token.CONST) {
                 consumeToken();
-                VariableDeclaration decl = variables(tt, ts.tokenBeg, false);
 
-                if (decl.getVariables().size() != 1) {
-                    reportError("msg.for.in.multiple.decl");
-                }
-
-                init = decl;
+                init = variables(tt, ts.tokenBeg, false);
             } else {
                 init = expr();
                 markDestructuring(init);
