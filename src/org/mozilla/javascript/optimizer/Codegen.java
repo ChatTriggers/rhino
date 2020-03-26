@@ -1694,7 +1694,7 @@ class BodyCodegen {
                         }
 
                         // Associate the value, only if this is a field
-                        if (child instanceof ClassField) {
+                        if (child instanceof ClassField && !((ClassField) child).isStatic()) {
                             cfw.addALoad(thisObjLocal);
                             cfw.add(ByteCode.CHECKCAST, "org/mozilla/javascript/ScriptableObject");
                             cfw.add(ByteCode.GETSTATIC, "org/mozilla/javascript/decorators/Decorator", "VALUE_KEY", OBJECT);
