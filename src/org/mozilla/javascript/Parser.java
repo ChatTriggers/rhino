@@ -2345,6 +2345,7 @@ public class Parser {
             if (peekToken() == Token.LP) {
                 consumeToken();
                 parseFunctionParams(dn, false);
+                dn.setSourceName(sourceURI);
             }
 
             mustMatchToken(Token.LC, "msg.decorator.declaration.missing.lc");
