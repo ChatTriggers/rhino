@@ -4389,9 +4389,7 @@ public class Parser {
 
     boolean destructuringObject(ObjectLiteral node, int variableType, String tempName, Node parent, List<String> destructuringNames) {
         boolean empty = true;
-        int setOp = variableType == Token.CONST
-                ? Token.SETCONST : Token.SETNAME;
-
+        int setOp = variableType == Token.CONST ? Token.SETCONST : Token.SETNAME;
         List<Object> alreadyTaken = new ArrayList<>();
 
         for (ObjectProperty prop : node.getElements()) {
@@ -4402,41 +4400,51 @@ public class Parser {
             if (ts != null) {
                 lineno = ts.lineno;
             }
-            AstNode id = prop.getLeft();
-            Node rightElem;
-            if (id.getProp(Node.COMPUTED_PROP) != null) {
-                if (this instanceof IRFactory) {
-                    // If we're already undergoing IR, do the computed property transformation
-                    // right away.
 
-                    Node s = ((IRFactory) this).transform(id);
-                    rightElem = new Node(Token.GETELEM, createName(tempName), s);
-                } else {
-                    // Otherwise, we're probably a function parameter.
-                    // We're going to need to store ourselves and wait for IR.
-                    rightElem = new Node(Token.GETELEM, createName(tempName), id);
-                }
-            } else if (id.getProp(Node.SPREAD_PROP) != null) {
-                Node s = Node.newString(((Name) id).getIdentifier());
+            Node rightElem;
+
+            AstNode spread = prop.getSpread();
+            if (spread != null) {
+                Node s = Node.newString(((Name) spread).getIdentifier());
                 rightElem = new Node(Token.SPREAD, createName(tempName), s);
                 rightElem.putProp(Node.SPREAD_IDS_PROP, alreadyTaken.toArray());
-            } else if (id instanceof Name) {
-                Node s = Node.newString(((Name) id).getIdentifier());
-                alreadyTaken.add(((Name) id).getIdentifier());
-                rightElem = new Node(Token.GETPROP, createName(tempName), s);
-            } else if (id instanceof StringLiteral) {
-                Node s = Node.newString(((StringLiteral) id).getValue());
-                alreadyTaken.add(((StringLiteral) id).getValue());
-                rightElem = new Node(Token.GETPROP, createName(tempName), s);
-            } else if (id instanceof NumberLiteral) {
-                Node s = createNumber((int) ((NumberLiteral) id).getNumber());
-                alreadyTaken.add((int) ((NumberLiteral) id).getNumber());
-                rightElem = new Node(Token.GETELEM, createName(tempName), s);
             } else {
-                throw codeBug();
+                AstNode id = prop.getLeft();
+                if (id.getProp(Node.COMPUTED_PROP) != null) {
+                    if (this instanceof IRFactory) {
+                        // If we're already undergoing IR, do the computed property transformation
+                        // right away.
+
+                        Node s = ((IRFactory) this).transform(id);
+                        rightElem = new Node(Token.GETELEM, createName(tempName), s);
+                    } else {
+                        // Otherwise, we're probably a function parameter.
+                        // We're going to need to store ourselves and wait for IR.
+                        rightElem = new Node(Token.GETELEM, createName(tempName), id);
+                    }
+                } else if (id.getProp(Node.SPREAD_PROP) != null) {
+                    Node s = Node.newString(((Name) id).getIdentifier());
+                    rightElem = new Node(Token.SPREAD, createName(tempName), s);
+                    rightElem.putProp(Node.SPREAD_IDS_PROP, alreadyTaken.toArray());
+                } else if (id instanceof Name) {
+                    Node s = Node.newString(((Name) id).getIdentifier());
+                    alreadyTaken.add(((Name) id).getIdentifier());
+                    rightElem = new Node(Token.GETPROP, createName(tempName), s);
+                } else if (id instanceof StringLiteral) {
+                    Node s = Node.newString(((StringLiteral) id).getValue());
+                    alreadyTaken.add(((StringLiteral) id).getValue());
+                    rightElem = new Node(Token.GETPROP, createName(tempName), s);
+                } else if (id instanceof NumberLiteral) {
+                    Node s = createNumber((int) ((NumberLiteral) id).getNumber());
+                    alreadyTaken.add((int) ((NumberLiteral) id).getNumber());
+                    rightElem = new Node(Token.GETELEM, createName(tempName), s);
+                } else {
+                    throw codeBug();
+                }
             }
+
             rightElem.setLineno(lineno);
-            AstNode value = prop.getRight();
+            AstNode value = spread != null ? spread : prop.getRight();
             AstNode defaultValue = prop.getDefaultValue();
 
             if (defaultValue != null) {

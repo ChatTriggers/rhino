@@ -2421,12 +2421,18 @@ public final class IRFactory extends Parser {
         int size = props.size();
         for (int i = 0; i < size; i++) {
             ObjectProperty prop = props.get(i);
-            boolean destructuringShorthand =
-                    Boolean.TRUE.equals(prop.getProp(Node.DESTRUCTURING_SHORTHAND));
-            decompile(prop.getLeft());
-            if (!destructuringShorthand) {
-                decompiler.addToken(Token.COLON);
-                decompile(prop.getRight());
+            boolean destructuringShorthand = Boolean.TRUE.equals(prop.getProp(Node.DESTRUCTURING_SHORTHAND));
+            AstNode spread = prop.getSpread();
+            if (spread != null) {
+                decompiler.addToken(Token.SPREAD);
+                decompile(spread);
+            } else {
+                decompile(prop.getLeft());
+
+                if (!destructuringShorthand) {
+                    decompiler.addToken(Token.COLON);
+                    decompile(prop.getRight());
+                }
             }
             if (i < size - 1) {
                 decompiler.addToken(Token.COMMA);
