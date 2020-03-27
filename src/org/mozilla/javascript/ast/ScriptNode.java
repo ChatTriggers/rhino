@@ -6,6 +6,7 @@
 
 package org.mozilla.javascript.ast;
 
+import org.mozilla.javascript.Kit;
 import org.mozilla.javascript.Node;
 import org.mozilla.javascript.Token;
 
@@ -170,6 +171,9 @@ public class ScriptNode extends Scope {
     }
 
     public FunctionNode getFunctionNode(int i) {
+        if (functions == null) {
+            throw Kit.codeBug("FunctionNode requested from Node that has no attached functions");
+        }
         return functions.get(i);
     }
 

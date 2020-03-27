@@ -3719,6 +3719,9 @@ class BodyCodegen {
             addScriptRuntimeInvoke("setClassExtends", OBJECT, OBJECT, OBJECT, CONTEXT, SCRIPTABLE);
         }
 
+        ScriptNode temp = scriptOrFn;
+        scriptOrFn = cls.getTransformedFn();
+
         while (child != null) {
             if (child instanceof ClassMethod) {
                 ClassMethod cm = (ClassMethod) child;
@@ -3833,6 +3836,8 @@ class BodyCodegen {
         }
 
         generateApplyDecorator(cls.getFirstChild(), (List<DecoratorNode>) cls.getProp(Node.DECORATOR_PROP), DecoratorType.REGISTER);
+
+        scriptOrFn = temp;
     }
 
     // Returns the target
