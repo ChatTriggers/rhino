@@ -4443,9 +4443,15 @@ class BodyCodegen {
             } else if (childType == Token.GETPROPNOWARN) {
                 throw Kit.codeBug();
             } else {
-                generateFunctionAndThisObj(child, node, isPrivate);
-                methodName = "call0";
-                signature = new String[]{ CALLABLE, SCRIPTABLE, CONTEXT, SCRIPTABLE };
+                if (node.getProp(Node.CHAINING_PROP) != null) {
+                    generateExpression(child, node);
+                    methodName = "optionalCall0";
+                    signature = new String[] { OBJECT, CONTEXT, SCRIPTABLE };
+                } else {
+                    generateFunctionAndThisObj(child, node, isPrivate);
+                    methodName = "call0";
+                    signature = new String[]{ CALLABLE, SCRIPTABLE, CONTEXT, SCRIPTABLE };
+                }
             }
 
         } else if (childType == Token.NAME) {
@@ -4528,13 +4534,21 @@ class BodyCodegen {
                 signature = new String[]{ OBJECT, STRING, OBJECT_ARRAY, CONTEXT, SCRIPTABLE };
             } else if (node.getProp(Node.CHAINING_PROP) != null) {
                 // If the call itself is optional: obj.func?.()
-                Node prop = child.getFirstChild();
-                generateExpression(prop, child);
-                String property = prop.getNext().getString();
-                cfw.addPush(property);
-                generateCallArgArray(node, firstArgChild, false);
-                methodName = "optionalCallPropN";
-                signature = new String[]{ OBJECT, STRING, OBJECT_ARRAY, CONTEXT, SCRIPTABLE };
+                if (child.getType() == Token.NAME) {
+                    Node prop = child.getFirstChild();
+                    generateExpression(prop, child);
+                    String property = prop.getNext().getString();
+                    cfw.addPush(property);
+                    generateCallArgArray(node, firstArgChild, false);
+                    methodName = "optionalCallPropN";
+                    signature = new String[]{ OBJECT, STRING, OBJECT_ARRAY, CONTEXT, SCRIPTABLE };
+                } else {
+                    generateExpression(child, node);
+                    generateCallArgArray(node, firstArgChild, false);
+                    methodName = "optionalCallN";
+                    signature = new String[]{ OBJECT, OBJECT_ARRAY, CONTEXT, SCRIPTABLE };
+                }
+
             } else if (argCount == 1) {
                 generateFunctionAndThisObj(child, node, isPrivate);
                 generateExpression(firstArgChild, node);

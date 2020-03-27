@@ -2636,7 +2636,7 @@ public class Context {
     private boolean sealed;
     private Object sealKey;
 
-    Scriptable topCallScope;
+    public Scriptable topCallScope;
     boolean isContinuationsTopCall;
     NativeCall currentActivationCall;
     BaseFunction typeErrorThrower;

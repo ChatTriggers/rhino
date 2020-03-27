@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-
 package org.mozilla.javascript.optimizer;
 
 import org.mozilla.javascript.*;
@@ -18,7 +17,7 @@ public final class OptRuntime extends ScriptRuntime {
      * Implement ....() call shrinking optimizer code.
      */
     public static Object call0(Callable fun, Scriptable thisObj,
-                               Context cx, Scriptable scope) {
+        Context cx, Scriptable scope) {
         return fun.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
     }
 
@@ -26,7 +25,7 @@ public final class OptRuntime extends ScriptRuntime {
      * Implement ....(arg) call shrinking optimizer code.
      */
     public static Object call1(Callable fun, Scriptable thisObj, Object arg0,
-                               Context cx, Scriptable scope) {
+        Context cx, Scriptable scope) {
         return fun.call(cx, scope, thisObj, new Object[]{arg0});
     }
 
@@ -34,8 +33,8 @@ public final class OptRuntime extends ScriptRuntime {
      * Implement ....(arg0, arg1) call shrinking optimizer code.
      */
     public static Object call2(Callable fun, Scriptable thisObj,
-                               Object arg0, Object arg1,
-                               Context cx, Scriptable scope) {
+        Object arg0, Object arg1,
+        Context cx, Scriptable scope) {
         return fun.call(cx, scope, thisObj, new Object[]{arg0, arg1});
     }
 
@@ -43,9 +42,27 @@ public final class OptRuntime extends ScriptRuntime {
      * Implement ....(arg0, arg1, ...) call shrinking optimizer code.
      */
     public static Object callN(Callable fun, Scriptable thisObj,
-                               Object[] args,
-                               Context cx, Scriptable scope) {
+        Object[] args,
+        Context cx, Scriptable scope) {
         return fun.call(cx, scope, thisObj, args);
+    }
+
+    public static Object optionalCall0(Object fun, Context cx, Scriptable scope) {
+        return optionalCallN(fun, ScriptRuntime.emptyArgs, cx, scope);
+    }
+
+    public static Object optionalCallN(Object fun, Object[] args, Context cx, Scriptable scope) {
+        if (isNullOrUndefined(fun)) {
+            return Undefined.instance;
+        }
+
+        return callN(
+            ScriptRuntime.getValueFunctionAndThis(fun, cx),
+            ScriptRuntime.lastStoredScriptable(cx),
+            args,
+            cx,
+            scope
+        );
     }
 
     /**
@@ -155,15 +172,16 @@ public final class OptRuntime extends ScriptRuntime {
      */
     @Deprecated
     public static Object elemIncrDecr(Object obj, double index,
-                                      Context cx, int incrDecrMask) {
+        Context cx, int incrDecrMask) {
         return elemIncrDecr(obj, index, cx, getTopCallScope(cx), incrDecrMask);
     }
 
     public static Object elemIncrDecr(Object obj, double index,
-                                      Context cx, Scriptable scope,
-                                      int incrDecrMask) {
+        Context cx, Scriptable scope,
+        int incrDecrMask) {
         return ScriptRuntime.elemIncrDecr(obj, Double.valueOf(index), cx, scope,
-                incrDecrMask);
+                                          incrDecrMask
+        );
     }
 
     public static Object[] padStart(Object[] currentArgs, int count) {
@@ -173,7 +191,7 @@ public final class OptRuntime extends ScriptRuntime {
     }
 
     public static void initFunction(NativeFunction fn, int functionType,
-                                    Scriptable scope, Context cx) {
+        Scriptable scope, Context cx) {
         ScriptRuntime.initFunction(cx, scope, fn, functionType, false);
     }
 
@@ -182,18 +200,19 @@ public final class OptRuntime extends ScriptRuntime {
     }
 
     public static Object callSpecial(Context cx, Callable fun,
-                                     Scriptable thisObj, Object[] args,
-                                     Scriptable scope,
-                                     Scriptable callerThis, int callType,
-                                     String fileName, int lineNumber) {
+        Scriptable thisObj, Object[] args,
+        Scriptable scope,
+        Scriptable callerThis, int callType,
+        String fileName, int lineNumber) {
         return ScriptRuntime.callSpecial(cx, fun, thisObj, args, scope,
-                callerThis, callType,
-                fileName, lineNumber);
+                                         callerThis, callType,
+                                         fileName, lineNumber
+        );
     }
 
     public static Object newObjectSpecial(Context cx, Object fun,
-                                          Object[] args, Scriptable scope,
-                                          Scriptable callerThis, int callType) {
+        Object[] args, Scriptable scope,
+        Scriptable callerThis, int callType) {
         return ScriptRuntime.newSpecial(cx, fun, args, scope, callType);
     }
 
@@ -262,7 +281,8 @@ public final class OptRuntime extends ScriptRuntime {
             System.arraycopy(args, 0, argsCopy, 0, args.length);
             Scriptable argsObj = cx.newArray(global, argsCopy);
             global.defineProperty("arguments", argsObj,
-                    ScriptableObject.NOT_ENUMERABLE);
+                                  ScriptableObject.NOT_ENUMERABLE
+            );
             script.exec(cx, global);
             return null;
         });
@@ -270,16 +290,17 @@ public final class OptRuntime extends ScriptRuntime {
 
     public static void throwStopIteration(Object obj) {
         throw new JavaScriptException(
-                NativeIterator.getStopIterationObject((Scriptable) obj), "", 0);
+            NativeIterator.getStopIterationObject((Scriptable) obj), "", 0);
     }
 
     public static Scriptable createNativeGenerator(NativeFunction funObj,
-                                                   Scriptable scope,
-                                                   Scriptable thisObj,
-                                                   int maxLocals,
-                                                   int maxStack) {
+        Scriptable scope,
+        Scriptable thisObj,
+        int maxLocals,
+        int maxStack) {
         return new NativeGenerator(scope, funObj,
-                new GeneratorState(thisObj, maxLocals, maxStack));
+                                   new GeneratorState(thisObj, maxLocals, maxStack)
+        );
     }
 
     public static Object[] getGeneratorStackState(Object obj) {
@@ -298,17 +319,14 @@ public final class OptRuntime extends ScriptRuntime {
 
     public static class GeneratorState {
         static final String CLASS_NAME =
-                "org/mozilla/javascript/optimizer/OptRuntime$GeneratorState";
-
-        public int resumptionPoint;
+            "org/mozilla/javascript/optimizer/OptRuntime$GeneratorState";
         static final String resumptionPoint_NAME = "resumptionPoint";
         static final String resumptionPoint_TYPE = "I";
-
-        public Scriptable thisObj;
         static final String thisObj_NAME = "thisObj";
         static final String thisObj_TYPE =
-                "Lorg/mozilla/javascript/Scriptable;";
-
+            "Lorg/mozilla/javascript/Scriptable;";
+        public int resumptionPoint;
+        public Scriptable thisObj;
         Object[] stackState;
         Object[] localsState;
         int maxLocals;
