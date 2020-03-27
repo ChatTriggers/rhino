@@ -590,6 +590,9 @@ public final class IRFactory extends Parser {
             fn.setBody(body);
         }
 
+        ScriptNode temp = currentScriptOrFn;
+        currentScriptOrFn = fn;
+
         node.setTransformedFn(fn);
 
         fn.setFunctionName(node.getClassName());
@@ -619,11 +622,13 @@ public final class IRFactory extends Parser {
 
         node.putProp(Node.DECORATOR_PROP, decorators);
         fn.putProp(Node.INITIALIZE_PROP, initializers);
+
+        currentScriptOrFn = temp;
+
         Node transformedFn = transform(fn);
         node.addChildToBack(transformedFn);
         node.setParentFn(transformedFn);
 
-        ScriptNode temp = currentScriptOrFn;
         currentScriptOrFn = fn;
 
         for (ClassMethod cm : node.getMethods()) {
