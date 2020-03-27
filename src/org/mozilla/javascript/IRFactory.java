@@ -590,6 +590,8 @@ public final class IRFactory extends Parser {
             fn.setBody(body);
         }
 
+        node.setTransformedFn(fn);
+
         fn.setFunctionName(node.getClassName());
         fn.setFunctionType(FunctionNode.FUNCTION_EXPRESSION);
         fn.setParentClass(node);
@@ -604,15 +606,11 @@ public final class IRFactory extends Parser {
         // @initialize decorators must be attached to the
         // constructor
         List<AstNode> initializers = node.getMethods().stream().filter(cm ->
-                cm.getDecorators().stream().anyMatch(dn ->
-                        dn.getDecoratorType() == DecoratorType.INITIALIZE
-                )
+                cm.getDecorators().stream().anyMatch(dn -> dn.getDecoratorType() == DecoratorType.INITIALIZE)
         ).collect(Collectors.toList());
 
         initializers.addAll(node.getFields().stream().filter(cf ->
-                cf.getDecorators().stream().anyMatch(dn ->
-                        dn.getDecoratorType() == DecoratorType.INITIALIZE
-                )
+                cf.getDecorators().stream().anyMatch(dn -> dn.getDecoratorType() == DecoratorType.INITIALIZE)
         ).collect(Collectors.toList()));
 
         if (node.getDecorators().stream().anyMatch(dn -> dn.getDecoratorType() == DecoratorType.INITIALIZE)) {
@@ -624,6 +622,9 @@ public final class IRFactory extends Parser {
         Node transformedFn = transform(fn);
         node.addChildToBack(transformedFn);
         node.setParentFn(transformedFn);
+
+        ScriptNode temp = currentScriptOrFn;
+        currentScriptOrFn = fn;
 
         for (ClassMethod cm : node.getMethods()) {
             cm.setNameKey(getPropKey(cm.getName()));
@@ -640,20 +641,16 @@ public final class IRFactory extends Parser {
             node.addChildToBack(cm);
         }
 
-        ScriptNode currentScriptTemp = null;
-
         for (ClassField cp : node.getFields()) {
             if (!cp.isStatic()) {
-                currentScriptTemp = currentScriptOrFn;
-                currentScriptOrFn = fn;
+                currentScriptOrFn = temp;
             }
 
             cp.setNameKey(getPropKey(cp.getName()));
             cp.addChildToBack(transform(cp.getDefaultValue()));
 
             if (!cp.isStatic()) {
-                currentScriptOrFn = currentScriptTemp;
-                currentScriptTemp = null;
+                currentScriptOrFn = fn;
             }
 
             decorators = new ArrayList<>();
@@ -666,6 +663,8 @@ public final class IRFactory extends Parser {
             cp.putProp(Node.DECORATOR_PROP, decorators);
             node.addChildToBack(cp);
         }
+
+        currentScriptOrFn = temp;
 
         return node;
     }
