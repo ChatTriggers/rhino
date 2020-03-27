@@ -737,7 +737,7 @@ public class Parser {
             List<DecoratorNode> decorators = new ArrayList<>();
 
             while (matchToken(Token.AT)) {
-                decorators.add(decorator(false));
+                decorators.add(decorator(false, false));
             }
 
             boolean isStatic = matchToken(Token.STATIC);
@@ -1195,7 +1195,7 @@ public class Parser {
         return data;
     }
 
-    private AstNode  statement() throws IOException {
+    private AstNode statement() throws IOException {
         int pos = ts.tokenBeg;
         try {
             AstNode pn = statementHelper();
@@ -1244,8 +1244,9 @@ public class Parser {
         if (currentLabel != null && currentLabel.getStatement() != null)
             currentLabel = null;
 
-        AstNode pn = null;
-        int tt = peekToken(), pos = ts.tokenBeg;
+        AstNode pn;
+        int tt = peekToken();
+        int pos;
 
         switch (tt) {
             case Token.IF:
@@ -2351,7 +2352,7 @@ public class Parser {
             mustMatchToken(Token.LC, "msg.decorator.declaration.missing.lc");
 
             while (peekToken() == Token.AT) {
-                dn.addDecoratorNode(decorator(true));
+                dn.addDecoratorNode(decorator(true, false));
             }
         } finally {
             savedVars.restore();
@@ -2362,11 +2363,35 @@ public class Parser {
         return dn;
     }
 
-    private DecoratorNode decorator(boolean declaration) throws IOException {
-        return decorator(declaration, true);
+    private AstNode decoratedExpr() throws IOException {
+        List<DecoratorNode> decorators = new ArrayList<>();
+        int tt = peekToken();
+
+        while (tt == Token.AT) {
+            decorators.add(decorator(false, false));
+            tt = peekToken();
+        }
+
+        // We really just want a primaryExpr, but if the decorator
+        // is improperly used on a statement, we want the below error
+        // to be used instead of the possible "syntax error" message.
+        // statement() eventually calls primaryExpr().
+        AstNode expr = statement();
+
+        if (expr instanceof ExpressionStatement) {
+            expr = ((ExpressionStatement) expr).getExpression();
+        }
+
+        if (!(expr instanceof ClassNode)) {
+            reportError("msg.decorator.invalid.usage");
+            return makeErrorNode();
+        }
+
+        ((ClassNode) expr).setDecorators(decorators);
+        return expr;
     }
 
-    private DecoratorNode decorator(boolean declaration, boolean classDecorator) throws IOException {
+    private DecoratorNode decorator(boolean declaration, boolean numericLiteral) throws IOException {
         consumeToken();
         peekToken();
         Name name = createNameNode();
@@ -2386,15 +2411,17 @@ public class Parser {
         // Generate a specific error if there is a semicolon
         // after a decorator, as it is a fairly common error,
         // and the source might be hard to find without this error
-        int peeked = peekToken();
+        if (!numericLiteral) {
+            int peeked = peekToken();
 
-        if (peeked == Token.SEMI) {
-            reportError("msg.decorator.semi");
-            peekToken();
-        }
+            if (peeked == Token.SEMI) {
+                reportError("msg.decorator.semi");
+                peekToken();
+            }
 
-        if (classDecorator && !declaration && !insideClass && peeked != Token.CLASS && peeked != Token.AT) {
-            reportError("msg.decorator.invalid.usage");
+            if (!declaration && !insideClass && peeked != Token.CLASS && peeked != Token.AT && peeked != Token.EXPORT) {
+                reportError("msg.decorator.invalid.usage");
+            }
         }
 
         return dn;
@@ -3424,19 +3451,13 @@ public class Parser {
         List<DecoratorNode> decorators = new ArrayList<>();
 
         switch (tt) {
+            case Token.AT:
+                return decoratedExpr();
+
             case Token.FUNCTION:
                 consumeToken();
                 pn = function(FunctionNode.FUNCTION_EXPRESSION);
                 break;
-
-            case Token.AT:
-                // decorator
-                while (tt == Token.AT) {
-                    decorators.add(decorator(false));
-                    tt = peekToken();
-                }
-
-                // fallthrough
 
             case Token.CLASS:
                 consumeToken();
@@ -3495,7 +3516,7 @@ public class Parser {
 
                 // Check for decorator
                 if (matchToken(Token.AT)) {
-                    DecoratorNode dn = decorator(false, false);
+                    DecoratorNode dn =  decorator(false, true);
                     ((NumberLiteral) pn).setDecoratorNode(dn);
                 }
 
