@@ -992,7 +992,7 @@ public final class IRFactory extends Parser {
             properties = ScriptRuntime.emptyArgs;
             spreadIndices = new int[0];
         } else {
-            int size = elems.size(), i = 0, sI = 0;
+            int size = elems.size(), nonSpreadIndex = 0, spreadIndex = 0;
             properties = new Object[(int) elems.stream().filter(it -> it.getSpread() == null).count()];
             spreadIndices = new int[elems.size() - properties.length];
             for (ObjectProperty prop : elems) {
@@ -1007,7 +1007,7 @@ public final class IRFactory extends Parser {
                 AstNode spread = prop.getSpread();
 
                 if (spread == null) {
-                    properties[i++] = getPropKey(prop.getLeft());
+                    properties[nonSpreadIndex++] = getPropKey(prop.getLeft());
 
                     // OBJECTLIT is used as ':' in object literal for
                     // decompilation to solve spacing ambiguity.
@@ -1025,11 +1025,12 @@ public final class IRFactory extends Parser {
                     }
                     object.addChildToBack(right);
 
-                    if (i < size) {
+                    if (nonSpreadIndex < size) {
                         decompiler.addToken(Token.COMMA);
                     }
                 } else {
-                    spreadIndices[sI++] = i;
+                    spreadIndices[spreadIndex] = nonSpreadIndex + spreadIndex;
+                    spreadIndex++;
                     Node transformed = transform(spread);
                     object.addChildToBack(transformed);
                 }
