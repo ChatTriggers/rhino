@@ -2,6 +2,7 @@ package org.mozilla.javascript.decorators;
 
 import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ScriptRuntime;
 import org.mozilla.javascript.Scriptable;
 
 public abstract class Decorator extends BaseFunction {
@@ -30,7 +31,12 @@ public abstract class Decorator extends BaseFunction {
 
     @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        return consume(args[0], (int) args[1], (DecoratorType) args[2], cx, scope, thisObj, (Object[]) args[3]);
+        DecoratorType type = (DecoratorType) args[2];
+        if (args[0] instanceof Number && type == DecoratorType.NUMERICTEMPLATE) {
+            throw ScriptRuntime.typeError("Numeric literal decorator can only have @numericTemplate decorators");
+        }
+
+        return consume(args[0], (int) args[1], type, cx, scope, thisObj, (Object[]) args[3]);
     }
 
     public abstract Object consume(Object target, int descriptor, DecoratorType decoratorType, Context cx, Scriptable scope, Scriptable thisObj, Object[] args);
