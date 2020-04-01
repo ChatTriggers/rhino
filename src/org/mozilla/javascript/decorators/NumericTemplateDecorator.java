@@ -10,7 +10,10 @@ public class NumericTemplateDecorator extends Decorator {
 
     @Override
     public Object consume(Object target, int descriptor, DecoratorType decoratorType, Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        if (decoratorType != DecoratorType.NUMERICTEMPLATE) return target;
+        if (decoratorType != DecoratorType.NUMERICTEMPLATE) {
+            throw ScriptRuntime.typeError("@numericTemplate decorator expected numeric literal, got " + ScriptRuntime.toString(target));
+        }
+
         if (args.length == 0 || !(args[0] instanceof Callable)) return target;
 
         Scriptable obj = ScriptRuntime.newObjectLiteral(
