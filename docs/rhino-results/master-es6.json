@@ -310,9 +310,9 @@
     "misc›Proxy internal calls, Array.prototype.includes": true
   },
   "ES2015": {
-    "_successful": 551,
+    "_successful": 550,
     "_count": 689,
-    "_percent": 0.7997097242380261,
+    "_percent": 0.7982583454281568,
     "optimisation›proper tail calls (tail call optimisation)›direct recursion": "Test remove - crashes Rhino",
     "optimisation›proper tail calls (tail call optimisation)›mutual recursion": "Test remove - crashes Rhino",
     "syntax›default function parameters›basic functionality": true,
@@ -552,7 +552,7 @@
     "functions›generators›computed shorthand generators": true,
     "functions›generators›shorthand generator methods, classes": true,
     "functions›generators›computed shorthand generators, classes": true,
-    "functions›generators›shorthand generators can't be constructors": true,
+    "functions›generators›shorthand generators can't be constructors": false,
     "built-ins›typed arrays›Int8Array": true,
     "built-ins›typed arrays›Uint8Array": true,
     "built-ins›typed arrays›Uint8ClampedArray": true,
