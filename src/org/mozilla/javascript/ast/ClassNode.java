@@ -15,7 +15,6 @@ public class ClassNode extends ScriptNode {
     private List<DecoratorNode> decorators = new ArrayList<>();
     private Node parentFn = null;
     private Node extended = null;
-    private FunctionNode transformedFn;
 
     {
         type = Token.CLASS;
@@ -103,13 +102,5 @@ public class ClassNode extends ScriptNode {
 
     public void setDecorators(List<DecoratorNode> decorators) {
         this.decorators = decorators;
-    }
-
-    public FunctionNode getTransformedFn() {
-        return transformedFn;
-    }
-
-    public void setTransformedFn(FunctionNode transformedFn) {
-        this.transformedFn = transformedFn;
     }
 }

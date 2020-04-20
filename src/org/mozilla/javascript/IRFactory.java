@@ -590,11 +590,6 @@ public final class IRFactory extends Parser {
             fn.setBody(body);
         }
 
-        ScriptNode temp = currentScriptOrFn;
-        currentScriptOrFn = fn;
-
-        node.setTransformedFn(fn);
-
         fn.setFunctionName(node.getClassName());
         fn.setFunctionType(FunctionNode.FUNCTION_EXPRESSION);
         fn.setParentClass(node);
@@ -622,14 +617,9 @@ public final class IRFactory extends Parser {
 
         node.putProp(Node.DECORATOR_PROP, decorators);
         fn.putProp(Node.INITIALIZE_PROP, initializers);
-
-        currentScriptOrFn = temp;
-
         Node transformedFn = transform(fn);
         node.addChildToBack(transformedFn);
         node.setParentFn(transformedFn);
-
-        currentScriptOrFn = fn;
 
         for (ClassMethod cm : node.getMethods()) {
             cm.setNameKey(getPropKey(cm.getName()));
@@ -646,16 +636,20 @@ public final class IRFactory extends Parser {
             node.addChildToBack(cm);
         }
 
+        ScriptNode currentScriptTemp = null;
+
         for (ClassField cp : node.getFields()) {
             if (!cp.isStatic()) {
-                currentScriptOrFn = temp;
+                currentScriptTemp = currentScriptOrFn;
+                currentScriptOrFn = fn;
             }
 
             cp.setNameKey(getPropKey(cp.getName()));
             cp.addChildToBack(transform(cp.getDefaultValue()));
 
             if (!cp.isStatic()) {
-                currentScriptOrFn = fn;
+                currentScriptOrFn = currentScriptTemp;
+                currentScriptTemp = null;
             }
 
             decorators = new ArrayList<>();
@@ -668,8 +662,6 @@ public final class IRFactory extends Parser {
             cp.putProp(Node.DECORATOR_PROP, decorators);
             node.addChildToBack(cp);
         }
-
-        currentScriptOrFn = temp;
 
         return node;
     }
