@@ -160,7 +160,7 @@ task sourceJar(type: Jar) {
 publishing {
     publications {
         rhino(MavenPublication) {
-            groupId 'org.mozilla'
+            groupId 'com.chattriggers'
             artifactId 'rhino'
 
             pom.withXml {
@@ -172,23 +172,18 @@ publishing {
 """)
                 root.appendNode("url", "https://developer.mozilla.org/en/Rhino")
 
-                def p = root.appendNode("parent")
-                p.appendNode("groupId", "org.sonatype.oss")
-                p.appendNode("artifactId", "oss-parent")
-                p.appendNode("version", "7")
-
                 def l = root.appendNode("licenses").appendNode("license")
                 l.appendNode("name", "Mozilla Public License, Version 2.0")
                 l.appendNode("url", "http://www.mozilla.org/MPL/2.0/index.txt")
 
                 def scm = root.appendNode("scm")
-                scm.appendNode("connection", "scm:git:git@github.com:mozilla/rhino.git")
-                scm.appendNode("developerConnection", "scm:git:git@github.com:mozilla/rhino.git")
-                scm.appendNode("url", "git@github.com:mozilla/rhino.git")
+                scm.appendNode("connection", "scm:git:git@github.com:chattriggers/rhino.git")
+                scm.appendNode("developerConnection", "scm:git:git@github.com:chattriggers/rhino.git")
+                scm.appendNode("url", "git@github.com:chattriggers/rhino.git")
 
                 def o = root.appendNode("organization")
-                o.appendNode("name", "The Mozilla Foundation")
-                o.appendNode("url", "http://www.mozilla.org")
+                o.appendNode("name", "ChatTriggers")
+                o.appendNode("url", "https://www.chattriggers.com/")
 
             }
             from components.java
@@ -201,17 +196,13 @@ publishing {
         }
     }
 
-    if (project.hasProperty("mavenPassword")) {
+    if (project.hasProperty("nexus_user") && !project.version.endsWith('-SNAPSHOT')) {
         repositories {
             maven {
+                url "https://repo.sk1er.club/repository/maven-releases/"
                 credentials {
-                    username mavenUser
-                    password mavenPassword
-                }
-                if (project.version.endsWith('-SNAPSHOT')) {
-                    url mavenSnapshotRepo
-                } else {
-                    url mavenReleaseRepo
+                    username nexus_user
+                    password nexus_password
                 }
             }
         }
