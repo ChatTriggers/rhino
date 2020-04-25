@@ -1464,7 +1464,7 @@ sub report_failure {
     $html .= " [ ";
 
     $html .= "<a href='#tippy_top'>Top of Page</a> ]<br>\n" .
-          "<tt>$message</tt><br>\n";
+          "<code>$message</code><br>\n";
 
     @failed_tests[$#failed_tests + 1] = $test;
 

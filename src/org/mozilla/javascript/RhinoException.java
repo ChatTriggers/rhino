@@ -70,7 +70,7 @@ public abstract class RhinoException extends RuntimeException {
      * Initialize the uri of the script source containing the error.
      *
      * @param sourceName the uri of the script source responsible for the error.
-     *                   It should not be <tt>null</tt>.
+     *                   It should not be <code>null</code>.
      * @throws IllegalStateException if the method is called more then once.
      */
     public final void initSourceName(String sourceName) {
@@ -131,7 +131,7 @@ public abstract class RhinoException extends RuntimeException {
      * Initialize the text of the source line containing the error.
      *
      * @param lineSource the text of the source line responsible for the error.
-     *                   It should not be <tt>null</tt>.
+     *                   It should not be <code>null</code>.
      * @throws IllegalStateException if the method is called more then once.
      */
     public final void initLineSource(String lineSource) {

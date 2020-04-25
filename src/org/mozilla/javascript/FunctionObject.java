@@ -153,7 +153,7 @@ public class FunctionObject extends BaseFunction {
     }
 
     /**
-     * @return One of <tt>JAVA_*_TYPE</tt> constants to indicate desired type
+     * @return One of <code>JAVA_*_TYPE</code> constants to indicate desired type
      * or {@link #JAVA_UNSUPPORTED_TYPE} if the convertion is not
      * possible
      */

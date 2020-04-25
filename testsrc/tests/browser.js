@@ -73,12 +73,12 @@ function writeFormattedResult( expect, actual, string, passed ) {
 
   string = string.replace(/[<>&]/g, htmlesc);
 
-  var s = "<tt>"+ string ;
+  var s = "<code>"+ string ;
   s += "<b>" ;
   s += ( passed ) ? "<font color=#009900> &nbsp;" + PASSED
-    : "<font color=#aa0000>&nbsp;" +  FAILED + expect + "</tt>";
+    : "<font color=#aa0000>&nbsp;" +  FAILED + expect + "</code>";
 
-  DocumentWrite( s + "</font></b></tt><br>" );
+  DocumentWrite( s + "</font></b></code><br>" );
   return passed;
 }
 

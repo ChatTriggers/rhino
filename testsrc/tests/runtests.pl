@@ -156,9 +156,9 @@ sub execute_js_tests {
 
                     local @msg = split ( "FAILED", $_ );
                     &js_print ( $passed ? "\n" : "" );
-                    &js_print( "    " . $msg[0], "&nbsp;&nbsp;<tt>" );
+                    &js_print( "    " . $msg[0], "&nbsp;&nbsp;<code>" );
                     &js_print( "FAILED", "<font color=#990000>", "</font>");
-                    &js_print( $msg[1], "", "</tt><br>\n" );
+                    &js_print( $msg[1], "", "</code><br>\n" );
                     $passed = 0;
                 }
                 if ( $_ =~ /$js_test/ ) {
@@ -314,10 +314,10 @@ sub setup_env {
 
     # print out some nice stuff
     $start_date = &get_date;
-    &js_print( "JavaScript tests started: " . $start_date, "<p><tt>", "</tt></p>" );
+    &js_print( "JavaScript tests started: " . $start_date, "<p><code>", "</code></p>" );
 
     &js_print ("Executing all the tests under $test_dir\n against " .
-        "$shell_command\n", "<p><tt>", "</tt></p>" );
+        "$shell_command\n", "<p><code>", "</code></p>" );
 }
 
 #
@@ -397,21 +397,21 @@ sub js_print {
 sub cleanup_env {
     # print out some nice stuff
     $end_date = &get_date;
-    &js_print( "\nTests complete at $end_date", "<hr><tt>", "</tt>" );
+    &js_print( "\nTests complete at $end_date", "<hr><code>", "</code>" );
 
     # print out how long it took to complete
     $end_time = time;
 
     $test_seconds = ( $end_time - $start_time );
 
-    &js_print( "Start Date: $start_date\n", "<tt><br>" );
+    &js_print( "Start Date: $start_date\n", "<code><br>" );
     &js_print( "End Date:   $end_date\n", "<br>" );
     &js_print( "Test Time:  $test_seconds seconds\n", "<br>" );
 
     if ($js_output ) {
         if ( !$js_verbose) {
             &js_print( "Results were written to " . $js_output ."\n",
-                "<br>", "</tt>" );
+                "<br>", "</code>" );
         }
         close JS_OUTPUT;
     }
