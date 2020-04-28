@@ -2862,7 +2862,20 @@ class BodyCodegen {
                 cfw.addALoad(contextLocal);
                 cfw.addALoad(variableObjectLocal);
                 cfw.addPush(node.getString());
-                addScriptRuntimeInvoke("name", OBJECT, CONTEXT, SCRIPTABLE, STRING);
+                ClassFileWriter.MHandle bootstrap = new ClassFileWriter.MHandle(ByteCode.MH_INVOKESTATIC,
+                    "org/mozilla/javascript/optimizer/InvokeDynamicSupport",
+                    "bootstrapLookupName",
+                    MethodType.methodType(
+                        CallSite.class, MethodHandles.Lookup.class,
+                        String.class, MethodType.class
+                    ).toMethodDescriptorString()
+                );
+                cfw.addInvokeDynamic(
+                    "lookupName",
+                    "(" + CONTEXT + SCRIPTABLE + STRING + ")" + OBJECT,
+                    bootstrap
+                );
+//                addScriptRuntimeInvoke("name", OBJECT, CONTEXT, SCRIPTABLE, STRING);
                 break;
             }
 

@@ -5,6 +5,7 @@ import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.commonjs.module.Require;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 

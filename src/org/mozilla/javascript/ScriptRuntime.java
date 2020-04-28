@@ -4051,7 +4051,7 @@ public class ScriptRuntime {
      * otherwise.
      * Should only be called when <code>staticTopScope</code> is top scope.
      */
-    static Scriptable checkDynamicScope(Scriptable possibleDynamicScope,
+    public static Scriptable checkDynamicScope(Scriptable possibleDynamicScope,
                                         Scriptable staticTopScope) {
         // Return cx.topCallScope if scope
         if (possibleDynamicScope == staticTopScope) {

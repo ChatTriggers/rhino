@@ -2660,7 +2660,7 @@ public class Context {
     private boolean generatingDebug;
     private boolean generatingDebugChanged;
     private boolean generatingSource = true;
-    boolean useDynamicScope;
+    public boolean useDynamicScope;
     private int optimizationLevel;
     private int maximumInterpreterStackDepth;
     private WrapFactory wrapFactory;

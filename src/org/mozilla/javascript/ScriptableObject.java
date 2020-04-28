@@ -142,7 +142,7 @@ public abstract class ScriptableObject implements Scriptable,
      * This is the object that is stored in the SlotMap. For historical reasons it remains
      * inside this class. SlotMap references a number of members of this class directly.
      */
-    static class Slot implements Serializable {
+    public static class Slot implements Serializable {
         private static final long serialVersionUID = -6090581677123995491L;
         Object name; // This can change due to caching
         int indexOrHash;
@@ -192,7 +192,7 @@ public abstract class ScriptableObject implements Scriptable,
             return false;
         }
 
-        Object getValue(Scriptable start) {
+        public Object getValue(Scriptable start) {
             if (!this.initialized) {
                 throw ScriptRuntime.throwCustomError(Context.getContext(), Context.getScope(), "ReferenceError",
                     "can't access lexical declaration '" + name + "' before initialization");
@@ -324,7 +324,7 @@ public abstract class ScriptableObject implements Scriptable,
         }
 
         @Override
-        Object getValue(Scriptable start) {
+        public Object getValue(Scriptable start) {
             if (getter != null) {
                 if (getter instanceof MemberBox) {
                     MemberBox nativeGetter = (MemberBox) getter;
@@ -459,6 +459,10 @@ public abstract class ScriptableObject implements Scriptable,
             return Scriptable.NOT_FOUND;
         }
         return slot.getValue(start);
+    }
+
+    public Slot getSlot(String name) {
+        return slotMap.query(name, 0);
     }
 
     /**
@@ -2816,7 +2820,7 @@ public abstract class ScriptableObject implements Scriptable,
         return Context.call(null, fun, scope, obj, args);
     }
 
-    private static Scriptable getBase(Scriptable obj, String name) {
+    public static Scriptable getBase(Scriptable obj, String name) {
         do {
             if (obj.has(name, obj))
                 break;
