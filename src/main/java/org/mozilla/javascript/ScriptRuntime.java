@@ -4662,7 +4662,7 @@ public class ScriptRuntime {
         @Override
         public String getMessage(String messageId, Object[] arguments) {
             final String defaultResource
-                    = "org.mozilla.javascript.resources.Messages";
+                    = "Messages";
 
             Context cx = Context.getCurrentContext();
             Locale locale = cx != null ? cx.getLocale() : Locale.getDefault();
