@@ -2596,6 +2596,16 @@ class BodyCodegen {
                 if (!isGenerator) {
                     if (child != null) {
                         generateExpression(child, node);
+
+                        if (currentCtorClass) {
+                            cfw.addALoad(thisObjLocal);
+                            addScriptRuntimeInvoke(
+                                "coerceClassCtorReturnValue",
+                                SCRIPTABLE,
+                                OBJECT,
+                                SCRIPTABLE
+                            );
+                        }
                     } else if (type == Token.RETURN) {
                         if (!currentCtorClass) {
                             Codegen.pushUndefined(cfw);

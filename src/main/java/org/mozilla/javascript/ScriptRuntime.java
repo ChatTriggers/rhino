@@ -1093,6 +1093,15 @@ public class ScriptRuntime {
         return ((Callable) method).call(cx, scope, thisObj, args);
     }
 
+    public static Scriptable coerceClassCtorReturnValue(Object returnValue, Scriptable thisObj) {
+        if (returnValue instanceof NativeString || returnValue instanceof NativeNumber ||
+            returnValue instanceof NativeSymbol || returnValue instanceof NativeBoolean ||
+            Undefined.isUndefined(returnValue) || !(returnValue instanceof Scriptable)) {
+            return thisObj;
+        }
+        return (Scriptable) returnValue;
+    }
+
     public static Scriptable endClassCtor(Scriptable obj) {
         obj.delete("new.target");
         return obj;
