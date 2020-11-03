@@ -2637,7 +2637,11 @@ public class Parser {
             } else {
                 vi.setInitializer(init);
             }
-
+            if (declType == Token.CONST && init == null) {
+                // const x;
+                reportError("msg.const.decl.not.initialized");
+            }
+            System.out.println("here");
             vi.setType(declType);
             vi.setJsDocNode(jsdocNode);
             vi.setLineno(lineno);
