@@ -3891,8 +3891,12 @@ public class ScriptRuntime {
         }
 
         // for primitive values on LHS, return false
-        if (!(a instanceof Scriptable))
+        if (!(a instanceof Scriptable)) {
+            if (b instanceof NativeJavaClass)
+                return ((NativeJavaClass) b).getClassObject().isInstance(a);
+
             return false;
+        }
 
         return ((Scriptable) b).hasInstance((Scriptable) a);
     }
