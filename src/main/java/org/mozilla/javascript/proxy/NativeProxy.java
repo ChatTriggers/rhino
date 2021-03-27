@@ -86,7 +86,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         Function fn = (Function) get;
         Object result = fn.call(Context.getContext(), this, start, new Object[]{target, name, start});
 
-        if (hasProperty(target, name)) {
+        if (target.has(name, target)) {
             int attributes = target.getAttributes(name);
 
             if ((attributes & NOT_CONFIGURABLE) != 0 && (attributes & NOT_WRITABLE) != 0) {
@@ -120,7 +120,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         Function fn = (Function) get;
         Object result = fn.call(Context.getContext(), this, start, new Object[]{target, ScriptRuntime.toString(index), start});
 
-        if (hasProperty(target, index)) {
+        if (target.has(index, target)) {
             int attributes = target.getAttributes(index);
 
             if ((attributes & NOT_CONFIGURABLE) != 0 && (attributes & NOT_WRITABLE) != 0) {
@@ -154,7 +154,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         Function fn = (Function) get;
         Object result = fn.call(Context.getContext(), this, start, new Object[]{target, key, start});
 
-        if (hasProperty(target, key)) {
+        if (target.has(key, target)) {
             int attributes = target.getAttributes(key);
 
             if ((attributes & NOT_CONFIGURABLE) != 0 && (attributes & NOT_WRITABLE) != 0) {
@@ -178,7 +178,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             return;
         }
 
-        if (hasProperty(target, name)) {
+        if (target.has(name, target)) {
             int attributes = target.getAttributes(name);
 
             Object getter = target.getGetterOrSetter(name, 0, false);
@@ -214,7 +214,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             return;
         }
 
-        if (hasProperty(target, index)) {
+        if (target.has(index, target)) {
             int attributes = target.getAttributes(index);
 
             Object getter = target.getGetterOrSetter((String) null, index, false);
@@ -249,7 +249,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
             target.put(key, target, value);
         }
 
-        if (hasProperty(target, key)) {
+        if (target.has(key, target)) {
             int attributes = target.getAttributes(key);
 
             Object getter = target.getGetterOrSetter(key, 0, false);
@@ -301,7 +301,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
         boolean handlerResult = _handlerResult != Undefined.instance && (boolean) _handlerResult;
 
-        if (hasProperty(target, name)) {
+        if (target.has(name, target)) {
             int attributes = target.getAttributes(name);
 
             if ((attributes & NOT_CONFIGURABLE) != 0 && !handlerResult) {
@@ -339,7 +339,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
         boolean handlerResult = _handlerResult != Undefined.instance && (boolean) _handlerResult;
 
-        if (hasProperty(target, index)) {
+        if (target.has(index, target)) {
             int attributes = target.getAttributes(index);
 
             if ((attributes & NOT_CONFIGURABLE) != 0 && !handlerResult) {
@@ -377,7 +377,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
         boolean handlerResult = _handlerResult != Undefined.instance && (boolean) _handlerResult;
 
-        if (hasProperty(target, key)) {
+        if (target.has(key, target)) {
             int attributes = target.getAttributes(key);
 
             if ((attributes & NOT_CONFIGURABLE) != 0 && !handlerResult) {
@@ -415,7 +415,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
         boolean result = _result != Undefined.instance && (boolean) _result;
 
-        if (result && hasProperty(target, name)) {
+        if (result && target.has(name, target)) {
             int attributes = target.getAttributes(name);
 
             if ((attributes & NOT_CONFIGURABLE) != 0) {
@@ -450,7 +450,7 @@ public class NativeProxy extends IdScriptableObject implements Function {
         }
         boolean result = _result != Undefined.instance && (boolean) _result;
 
-        if (result && hasProperty(target, key)) {
+        if (result && target.has(key, target)) {
             int attributes = target.getAttributes(key);
 
             if ((attributes & NOT_CONFIGURABLE) != 0) {
@@ -486,10 +486,10 @@ public class NativeProxy extends IdScriptableObject implements Function {
         boolean exists;
 
         if (id instanceof String) {
-            exists = hasProperty(target, (String) id);
+            exists = target.has((String) id, target);
             targetDesc = exists ? target.getAttributes((String) id) : -1;
         } else if (ScriptRuntime.isSymbol(id)) {
-            exists = hasProperty(target, (Symbol) id);
+            exists = target.has((Symbol) id, target);
             targetDesc = exists ? target.getAttributes((Symbol) id) : -1;
         } else {
             throw Kit.codeBug();
@@ -526,13 +526,13 @@ public class NativeProxy extends IdScriptableObject implements Function {
             }
         }
 
-        if (!hasProperty(handlerDesc, "configurable")) {
+        if (!handlerDesc.has("configurable", handlerDesc)) {
             putProperty(handlerDesc, "configurable", false);
         }
-        if (!hasProperty(handlerDesc, "writable")) {
+        if (!handlerDesc.has("writable", handlerDesc)) {
             putProperty(handlerDesc, "writable", false);
         }
-        if (!hasProperty(handlerDesc, "enumerable")) {
+        if (!handlerDesc.has("enumerable", handlerDesc)) {
             putProperty(handlerDesc, "enumerable", false);
         }
 
@@ -796,11 +796,11 @@ public class NativeProxy extends IdScriptableObject implements Function {
     private static int getAttributes(ScriptableObject obj, Object id) {
         if (id instanceof String) {
             String s = (String) id;
-            if (!hasProperty(obj, s)) return -1;
+            if (!obj.has(s, obj)) return -1;
             return obj.getAttributes(s);
         } else if (ScriptRuntime.isSymbol(id)) {
             Symbol s = (Symbol) id;
-            if (!hasProperty(obj, s)) return -1;
+            if (!obj.has(s, obj)) return -1;
             return obj.getAttributes(s);
         } else {
             throw Kit.codeBug();
