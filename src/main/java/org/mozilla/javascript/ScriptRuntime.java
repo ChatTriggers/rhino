@@ -1684,7 +1684,9 @@ public class ScriptRuntime {
         }
 
         if (isSymbol(val)) {
-            NativeSymbol result = new NativeSymbol((NativeSymbol) val);
+            NativeSymbol result = val instanceof NativeSymbol ?
+                new NativeSymbol((NativeSymbol) val) :
+                new NativeSymbol((SymbolKey) val);
             setBuiltinProtoAndParent(result, scope, TopLevel.Builtins.Symbol);
             return result;
         }
