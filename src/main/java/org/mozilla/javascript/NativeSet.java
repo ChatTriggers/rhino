@@ -544,7 +544,7 @@ public class NativeSet extends IdScriptableObject {
             throw incompatibleCallError(f);
         }
         try {
-            final NativeSet ns = (NativeSet) thisObj;
+            final NativeSet ns = (NativeSet) ScriptRuntime.unwrapProxy(thisObj);
             if (!ns.instanceOfSet) {
                 // If we get here, then this object doesn't have the "Set internal data slot."
                 throw incompatibleCallError(f);

@@ -354,9 +354,10 @@ final class NativeDate extends IdScriptableObject {
 
         // The rest of Date.prototype methods require thisObj to be Date
 
-        if (!(thisObj instanceof NativeDate) || !((NativeDate) thisObj).isInstance)
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeDate) || !((NativeDate) unwrappedThis).isInstance)
             throw incompatibleCallError(f);
-        NativeDate realThis = (NativeDate) thisObj;
+        NativeDate realThis = (NativeDate) unwrappedThis;
         double t = realThis.date;
 
         switch (id) {

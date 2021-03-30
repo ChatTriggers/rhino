@@ -6,10 +6,7 @@
 
 package org.mozilla.javascript.typedarrays;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.IdFunctionObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.*;
 
 /**
  * An array view that stores 8-bit quantities and implements the JavaScript "Int8Array" interface.
@@ -59,10 +56,11 @@ public class NativeInt8Array extends NativeTypedArrayView<Byte> {
 
     @Override
     protected NativeInt8Array realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeInt8Array)) {
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeInt8Array)) {
             throw incompatibleCallError(f);
         }
-        return (NativeInt8Array) thisObj;
+        return (NativeInt8Array) unwrappedThis;
     }
 
     @Override

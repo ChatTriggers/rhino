@@ -629,9 +629,10 @@ final class NativeString extends IdScriptableObject {
     }
 
     private static NativeString realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeString))
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeString))
             throw incompatibleCallError(f);
-        return (NativeString) thisObj;
+        return (NativeString) unwrappedThis;
     }
 
     /*

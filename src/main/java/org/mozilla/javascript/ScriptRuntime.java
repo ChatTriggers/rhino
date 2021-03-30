@@ -4591,6 +4591,16 @@ public class ScriptRuntime {
         return (NativeArray) obj;
     }
 
+    public static Scriptable unwrapProxy(Scriptable object) {
+        if (object == null)
+            return null;
+
+        while (object instanceof NativeProxy)
+            object = ((NativeProxy) object).getTarget();
+
+        return object;
+    }
+
     public static Object[] getArrayElements(Scriptable object) {
         long longLen = NativeArray.getLengthProperty(object, false);
         if (longLen > Integer.MAX_VALUE) {

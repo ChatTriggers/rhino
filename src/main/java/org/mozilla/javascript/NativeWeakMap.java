@@ -173,7 +173,7 @@ public class NativeWeakMap extends IdScriptableObject {
             throw incompatibleCallError(f);
         }
         try {
-            final NativeWeakMap nm = (NativeWeakMap) thisObj;
+            final NativeWeakMap nm = (NativeWeakMap) ScriptRuntime.unwrapProxy(thisObj);
             if (!nm.instanceOfWeakMap) {
                 // Check for "Map internal data tag"
                 throw incompatibleCallError(f);

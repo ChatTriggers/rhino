@@ -121,10 +121,11 @@ public final class NativeIterator extends IdScriptableObject {
             return jsConstructor(cx, scope, thisObj, args);
         }
 
-        if (!(thisObj instanceof NativeIterator))
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeIterator))
             throw incompatibleCallError(f);
 
-        NativeIterator iterator = (NativeIterator) thisObj;
+        NativeIterator iterator = (NativeIterator) unwrappedThis;
 
         switch (id) {
 

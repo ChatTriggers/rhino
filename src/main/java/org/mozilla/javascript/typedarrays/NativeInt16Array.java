@@ -6,10 +6,7 @@
 
 package org.mozilla.javascript.typedarrays;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.IdFunctionObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.*;
 
 /**
  * An array view that stores 16-bit quantities and implements the JavaScript "Int16Array" interface.
@@ -61,10 +58,11 @@ public class NativeInt16Array
 
     @Override
     protected NativeInt16Array realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeInt16Array)) {
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeInt16Array)) {
             throw incompatibleCallError(f);
         }
-        return (NativeInt16Array) thisObj;
+        return (NativeInt16Array) unwrappedThis;
     }
 
     @Override

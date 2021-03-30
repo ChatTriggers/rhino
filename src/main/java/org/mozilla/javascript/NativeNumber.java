@@ -154,9 +154,10 @@ final class NativeNumber extends IdScriptableObject {
 
         // The rest of Number.prototype methods require thisObj to be Number
 
-        if (!(thisObj instanceof NativeNumber))
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeNumber))
             throw incompatibleCallError(f);
-        double value = ((NativeNumber) thisObj).doubleValue;
+        double value = ((NativeNumber) unwrappedThis).doubleValue;
 
         switch (id) {
 

@@ -147,9 +147,10 @@ public class NativeArrayBuffer extends IdScriptableObject {
     }
 
     private static NativeArrayBuffer realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeArrayBuffer))
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeArrayBuffer))
             throw incompatibleCallError(f);
-        return (NativeArrayBuffer) thisObj;
+        return (NativeArrayBuffer) unwrappedThis;
     }
 
     private static boolean isArg(Object[] args, int i) {

@@ -631,7 +631,7 @@ public class NativeMap extends IdScriptableObject {
             throw incompatibleCallError(f);
         }
         try {
-            final NativeMap nm = (NativeMap) thisObj;
+            final NativeMap nm = (NativeMap) ScriptRuntime.unwrapProxy(thisObj);
             if (!nm.instanceOfMap) {
                 // Check for "Map internal data tag"
                 throw incompatibleCallError(f);

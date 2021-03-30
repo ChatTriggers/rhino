@@ -2673,9 +2673,10 @@ public class NativeRegExp extends IdScriptableObject implements Function {
     }
 
     private static NativeRegExp realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeRegExp) || !((NativeRegExp) thisObj).isInstance)
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeRegExp) || !((NativeRegExp) unwrappedThis).isInstance)
             throw incompatibleCallError(f);
-        return (NativeRegExp) thisObj;
+        return (NativeRegExp) unwrappedThis;
     }
 
     // #string_id_map#

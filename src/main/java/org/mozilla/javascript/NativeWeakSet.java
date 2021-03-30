@@ -119,7 +119,7 @@ public class NativeWeakSet extends IdScriptableObject {
             throw incompatibleCallError(f);
         }
         try {
-            final NativeWeakSet ns = (NativeWeakSet) thisObj;
+            final NativeWeakSet ns = (NativeWeakSet) ScriptRuntime.unwrapProxy(thisObj);
             if (!ns.instanceOfWeakSet) {
                 // Check for "Set internal data tag"
                 throw incompatibleCallError(f);

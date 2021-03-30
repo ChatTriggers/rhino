@@ -97,9 +97,10 @@ final class NativeBoolean extends IdScriptableObject {
 
         // The rest of Boolean.prototype methods require thisObj to be Boolean
 
-        if (!(thisObj instanceof NativeBoolean))
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeBoolean))
             throw incompatibleCallError(f);
-        boolean value = ((NativeBoolean) thisObj).booleanValue;
+        boolean value = ((NativeBoolean) unwrappedThis).booleanValue;
 
         switch (id) {
 

@@ -58,10 +58,11 @@ public class NativeFloat64Array
 
     @Override
     protected NativeFloat64Array realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeFloat64Array)) {
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeFloat64Array)) {
             throw incompatibleCallError(f);
         }
-        return (NativeFloat64Array) thisObj;
+        return (NativeFloat64Array) unwrappedThis;
     }
 
     @Override

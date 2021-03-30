@@ -58,10 +58,11 @@ public class NativeInt32Array
 
     @Override
     protected NativeInt32Array realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeInt32Array)) {
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeInt32Array)) {
             throw incompatibleCallError(f);
         }
-        return (NativeInt32Array) thisObj;
+        return (NativeInt32Array) unwrappedThis;
     }
 
     @Override

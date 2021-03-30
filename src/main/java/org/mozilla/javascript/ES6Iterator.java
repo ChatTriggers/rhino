@@ -70,11 +70,12 @@ public abstract class ES6Iterator extends IdScriptableObject {
             return super.execIdCall(f, cx, scope, thisObj, args);
         }
         int id = f.methodId();
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
 
-        if (!(thisObj instanceof ES6Iterator))
+        if (!(unwrappedThis instanceof ES6Iterator))
             throw incompatibleCallError(f);
 
-        ES6Iterator iterator = (ES6Iterator) thisObj;
+        ES6Iterator iterator = (ES6Iterator) unwrappedThis;
 
         switch (id) {
             case Id_next:

@@ -6,10 +6,7 @@
 
 package org.mozilla.javascript.typedarrays;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.IdFunctionObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.*;
 
 /**
  * An array view that stores 8-bit quantities and implements the JavaScript "Uint8ClampedArray" interface.
@@ -61,10 +58,11 @@ public class NativeUint8ClampedArray
 
     @Override
     protected NativeUint8ClampedArray realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeUint8ClampedArray)) {
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeUint8ClampedArray)) {
             throw incompatibleCallError(f);
         }
-        return (NativeUint8ClampedArray) thisObj;
+        return (NativeUint8ClampedArray) unwrappedThis;
     }
 
     @Override

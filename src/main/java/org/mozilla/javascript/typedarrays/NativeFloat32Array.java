@@ -57,10 +57,11 @@ public class NativeFloat32Array extends NativeTypedArrayView<Float> {
 
     @Override
     protected NativeFloat32Array realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeFloat32Array)) {
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeFloat32Array)) {
             throw incompatibleCallError(f);
         }
-        return (NativeFloat32Array) thisObj;
+        return (NativeFloat32Array) unwrappedThis;
     }
 
     @Override

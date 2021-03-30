@@ -56,9 +56,10 @@ public class NativeDataView
     }
 
     private static NativeDataView realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeDataView))
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeDataView))
             throw incompatibleCallError(f);
-        return (NativeDataView) thisObj;
+        return (NativeDataView) unwrappedThis;
     }
 
     private NativeDataView js_constructor(Object[] args) {

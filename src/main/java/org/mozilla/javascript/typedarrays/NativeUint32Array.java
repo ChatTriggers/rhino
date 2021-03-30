@@ -6,10 +6,7 @@
 
 package org.mozilla.javascript.typedarrays;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.IdFunctionObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.*;
 
 /**
  * An array view that stores 32-bit quantities and implements the JavaScript "Uint32Array" interface.
@@ -61,10 +58,11 @@ public class NativeUint32Array
 
     @Override
     protected NativeUint32Array realThis(Scriptable thisObj, IdFunctionObject f) {
-        if (!(thisObj instanceof NativeUint32Array)) {
+        Scriptable unwrappedThis = ScriptRuntime.unwrapProxy(thisObj);
+        if (!(unwrappedThis instanceof NativeUint32Array)) {
             throw incompatibleCallError(f);
         }
-        return (NativeUint32Array) thisObj;
+        return (NativeUint32Array) unwrappedThis;
     }
 
     @Override
