@@ -17,9 +17,9 @@ import org.mozilla.javascript.Token;
  * {@link Token#LET}.
  */
 public class VariableInitializer extends AstNode {
-
     private AstNode target;
     private AstNode initializer;
+    private boolean hasExplicitInitializer;
 
     {
         type = Token.VAR;
@@ -49,7 +49,6 @@ public class VariableInitializer extends AstNode {
     public VariableInitializer(int pos, int len) {
         super(pos, len);
     }
-
 
     /**
      * Returns true if this is a destructuring assignment.  If so, the
@@ -91,6 +90,10 @@ public class VariableInitializer extends AstNode {
         return initializer;
     }
 
+    public boolean hasExplicitInitializer() {
+        return hasExplicitInitializer;
+    }
+
     /**
      * Sets the initial value expression, and sets its parent to this node.
      *
@@ -100,6 +103,10 @@ public class VariableInitializer extends AstNode {
         this.initializer = initializer;
         if (initializer != null)
             initializer.setParent(this);
+    }
+
+    public void setHasExplicitInitializer() {
+        hasExplicitInitializer = true;
     }
 
     @Override

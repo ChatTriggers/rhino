@@ -1950,7 +1950,7 @@ public class Parser {
                         reportError("msg.mult.index");
                     }
 
-                    if (inUseStrictDirective && decl.getVariables().get(0).getInitializer() != null) {
+                    if (inUseStrictDirective && decl.getVariables().get(0).hasExplicitInitializer()) {
                         reportError("msg.for.in.assignment.in.strict.mode");
                     }
                 }
@@ -2637,6 +2637,9 @@ public class Parser {
             } else {
                 vi.setInitializer(init);
             }
+
+            if (init != null)
+                vi.setHasExplicitInitializer();
 
             vi.setType(declType);
             vi.setJsDocNode(jsdocNode);
