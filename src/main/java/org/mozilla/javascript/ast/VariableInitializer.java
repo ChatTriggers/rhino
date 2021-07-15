@@ -20,7 +20,6 @@ public class VariableInitializer extends AstNode {
 
     private AstNode target;
     private AstNode initializer;
-    private boolean hasInitializer = false;
 
     {
         type = Token.VAR;
@@ -101,16 +100,6 @@ public class VariableInitializer extends AstNode {
         this.initializer = initializer;
         if (initializer != null)
             initializer.setParent(this);
-        hasInitializer = true;
-    }
-
-    public void setInitializerSilently(AstNode initializer) {
-        this.initializer = initializer;
-        initializer.setParent(this);
-    }
-
-    public boolean hasInitializer() {
-        return hasInitializer;
     }
 
     @Override

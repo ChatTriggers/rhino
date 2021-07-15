@@ -1950,7 +1950,7 @@ public class Parser {
                         reportError("msg.mult.index");
                     }
 
-                    if (inUseStrictDirective && decl.getVariables().get(0).hasInitializer()) {
+                    if (inUseStrictDirective && decl.getVariables().get(0).getInitializer() != null) {
                         reportError("msg.for.in.assignment.in.strict.mode");
                     }
                 }
@@ -2633,7 +2633,7 @@ public class Parser {
                 // To allow for the following:
                 //   let x;
                 //   print(x === undefined); // should print "true"
-                vi.setInitializerSilently(new Name(ts.tokenBeg, "undefined"));
+                vi.setInitializer(new Name(ts.tokenBeg, "undefined"));
             } else {
                 vi.setInitializer(init);
             }
