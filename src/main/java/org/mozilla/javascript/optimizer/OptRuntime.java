@@ -122,12 +122,6 @@ public final class OptRuntime extends ScriptRuntime {
         }
 
         if (!(prop instanceof Callable)) {
-            Object noSuchMethod = ScriptableObject.getProperty(thisObj, "__noSuchMethod__");
-            if (noSuchMethod instanceof Callable)
-                prop = new NoSuchMethodShim((Callable) noSuchMethod, property);
-        }
-
-        if (!(prop instanceof Callable)) {
             throw notFunctionError(thisObj, prop, property);
         }
 
