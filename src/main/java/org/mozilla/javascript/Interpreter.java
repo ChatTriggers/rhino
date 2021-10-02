@@ -1401,14 +1401,14 @@ public final class Interpreter extends Icode implements Evaluator {
                                 Object lhs = stack[stackTop];
                                 if (lhs == DBL_MRK) lhs = ScriptRuntime.wrapNumber(sDbl[stackTop]);
                                 stack[stackTop] = ScriptRuntime.getObjectPropNoWarn(lhs, stringReg,
-                                        cx, frame.scope);
+                                        cx, frame.scope, false);
                                 continue Loop;
                             }
                             case Token.GETPROP: {
                                 Object lhs = stack[stackTop];
                                 if (lhs == DBL_MRK) lhs = ScriptRuntime.wrapNumber(sDbl[stackTop]);
                                 stack[stackTop] = ScriptRuntime.getObjectProp(lhs, stringReg,
-                                        cx, frame.scope);
+                                        cx, frame.scope, false);
                                 continue Loop;
                             }
                             case Token.SETPROP: {
@@ -1418,7 +1418,7 @@ public final class Interpreter extends Icode implements Evaluator {
                                 Object lhs = stack[stackTop];
                                 if (lhs == DBL_MRK) lhs = ScriptRuntime.wrapNumber(sDbl[stackTop]);
                                 stack[stackTop] = ScriptRuntime.setObjectProp(lhs, stringReg, rhs,
-                                        cx, frame.scope);
+                                        cx, frame.scope, false);
                                 continue Loop;
                             }
                             case Icode_PROP_INC_DEC: {

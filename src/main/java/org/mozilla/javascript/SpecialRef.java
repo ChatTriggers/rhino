@@ -51,7 +51,7 @@ class SpecialRef extends Ref {
     public Object get(Context cx) {
         switch (type) {
             case SPECIAL_NONE:
-                return ScriptRuntime.getObjectProp(target, name, cx);
+                return ScriptRuntime.getObjectProp(target, name, cx, false);
             case SPECIAL_PROTO:
                 return target.getPrototype();
             case SPECIAL_PARENT:
@@ -71,7 +71,7 @@ class SpecialRef extends Ref {
     public Object set(Context cx, Scriptable scope, Object value) {
         switch (type) {
             case SPECIAL_NONE:
-                return ScriptRuntime.setObjectProp(target, name, value, cx);
+                return ScriptRuntime.setObjectProp(target, name, value, cx, false);
             case SPECIAL_PROTO:
             case SPECIAL_PARENT: {
                 Scriptable obj = ScriptRuntime.toObjectOrNull(cx, value, scope);

@@ -114,7 +114,7 @@ public abstract class ScriptableObject implements Scriptable,
      */
     private transient SlotMapContainer slotMap;
 
-    private transient SlotMapContainer privateSlots;
+    private transient SlotMapContainer privateSlotMap;
 
     // Where external array data is stored.
     private transient ExternalArrayData externalData;
@@ -376,6 +376,7 @@ public abstract class ScriptableObject implements Scriptable,
 
     public ScriptableObject() {
         slotMap = createSlotMap(0);
+        privateSlotMap = createSlotMap(0);
     }
 
     public ScriptableObject(Scriptable scope, Scriptable prototype) {
@@ -385,6 +386,7 @@ public abstract class ScriptableObject implements Scriptable,
         parentScopeObject = scope;
         prototypeObject = prototype;
         slotMap = createSlotMap(0);
+        privateSlotMap = createSlotMap(0);
     }
 
     /**
@@ -453,8 +455,8 @@ public abstract class ScriptableObject implements Scriptable,
      * @return the value of the property (may be null), or NOT_FOUND
      */
     @Override
-    public Object get(String name, Scriptable start) {
-        Slot slot = slotMap.query(name, 0);
+    public Object get(String name, Scriptable start, boolean isPrivate) {
+        Slot slot = getSlotMap(isPrivate).query(name, 0);
         if (slot == null) {
             return Scriptable.NOT_FOUND;
         }
@@ -506,14 +508,13 @@ public abstract class ScriptableObject implements Scriptable,
      * taken.
      * This method will actually set the property in the start
      * object.
-     *
-     * @param name  the name of the property
+     *  @param name  the name of the property
      * @param start the object whose property is being set
      * @param value value to set the property to
      */
     @Override
-    public void put(String name, Scriptable start, Object value) {
-        if (putImpl(name, 0, start, value))
+    public void put(String name, Scriptable start, Object value, boolean isPrivate) {
+        if (putImpl(name, 0, start, value, isPrivate))
             return;
 
         if (start == this) throw Kit.codeBug();
@@ -542,7 +543,7 @@ public abstract class ScriptableObject implements Scriptable,
             return;
         }
 
-        if (putImpl(null, index, start, value))
+        if (putImpl(null, index, start, value, false))
             return;
 
         if (start == this) throw Kit.codeBug();
@@ -554,7 +555,7 @@ public abstract class ScriptableObject implements Scriptable,
      */
     @Override
     public void put(Symbol key, Scriptable start, Object value) {
-        if (putImpl(key, 0, start, value))
+        if (putImpl(key, 0, start, value, false))
             return;
 
         if (start == this) throw Kit.codeBug();
@@ -716,7 +717,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @see org.mozilla.javascript.ScriptableObject#EMPTY
      */
     public int getAttributes(String name) {
-        return findAttributeSlot(name, 0, SlotAccess.QUERY).getAttributes();
+        return findAttributeSlot(name, 0, SlotAccess.QUERY, false).getAttributes();
     }
 
     /**
@@ -733,7 +734,7 @@ public abstract class ScriptableObject implements Scriptable,
      * @see org.mozilla.javascript.ScriptableObject#EMPTY
      */
     public int getAttributes(int index) {
-        return findAttributeSlot(null, index, SlotAccess.QUERY).getAttributes();
+        return findAttributeSlot(null, index, SlotAccess.QUERY, false).getAttributes();
     }
 
     public int getAttributes(Symbol sym) {
@@ -762,9 +763,13 @@ public abstract class ScriptableObject implements Scriptable,
      * @see org.mozilla.javascript.ScriptableObject#NOT_CONFIGURABLE
      * @see org.mozilla.javascript.ScriptableObject#EMPTY
      */
-    public void setAttributes(String name, int attributes) {
+    public void setAttributes(String name, int attributes, boolean isPrivate) {
         checkNotSealed(name, 0);
-        findAttributeSlot(name, 0, SlotAccess.MODIFY).setAttributes(attributes);
+        findAttributeSlot(name, 0, SlotAccess.MODIFY, isPrivate).setAttributes(attributes);
+    }
+
+    public void setAttributes(String name, int attributes) {
+        setAttributes(name, attributes, false);
     }
 
     /**
@@ -781,7 +786,7 @@ public abstract class ScriptableObject implements Scriptable,
      */
     public void setAttributes(int index, int attributes) {
         checkNotSealed(null, index);
-        findAttributeSlot(null, index, SlotAccess.MODIFY).setAttributes(attributes);
+        findAttributeSlot(null, index, SlotAccess.MODIFY, false).setAttributes(attributes);
     }
 
     /**
@@ -871,7 +876,11 @@ public abstract class ScriptableObject implements Scriptable,
         setGetterOrSetter(name, index, getterOrSetter, isSetter, false);
     }
 
-    private void setGetterOrSetter(String name, int index, Callable getterOrSetter, boolean isSetter, boolean force) {
+    public void setGetterOrSetter(String name, int index, Callable getterOrSetter, boolean isSetter, boolean force) {
+        setGetterOrSetter(name, index, getterOrSetter, isSetter, force, false);
+    }
+
+    public void setGetterOrSetter(String name, int index, Callable getterOrSetter, boolean isSetter, boolean force, boolean isPrivate) {
         if (name != null && index != 0)
             throw new IllegalArgumentException(name);
 
@@ -880,6 +889,8 @@ public abstract class ScriptableObject implements Scriptable,
         }
 
         final GetterSlot gslot;
+        SlotMapContainer slotMap = getSlotMap(isPrivate);
+
         if (isExtensible()) {
             gslot = (GetterSlot) slotMap.get(name, index, SlotAccess.MODIFY_GETTER_SETTER);
         } else {
@@ -916,10 +927,10 @@ public abstract class ScriptableObject implements Scriptable,
      * @throws IllegalArgumentException if both name and index are nonnull
      *                                  and nonzero respectively.
      */
-    public Object getGetterOrSetter(String name, int index, boolean isSetter) {
+    public Object getGetterOrSetter(String name, int index, boolean isSetter, boolean isPrivate) {
         if (name != null && index != 0)
             throw new IllegalArgumentException(name);
-        Slot slot = slotMap.query(name, index);
+        Slot slot = getSlotMap(isPrivate).query(name, index);
         if (slot == null)
             return null;
         if (slot instanceof GetterSlot) {
@@ -928,6 +939,10 @@ public abstract class ScriptableObject implements Scriptable,
             return result != null ? result : Undefined.instance;
         }
         return Undefined.instance;
+    }
+
+    public Object getGetterOrSetter(String name, int index, boolean isSetter) {
+        return getGetterOrSetter(name, index, isSetter, false);
     }
 
     /**
@@ -2413,6 +2428,13 @@ public abstract class ScriptableObject implements Scriptable,
         return result;
     }
 
+    public static Object getProperty(Scriptable obj, String name, boolean isPrivate) {
+        if (isPrivate)
+            return obj.get(name, obj, true);
+
+        return getProperty(obj, name);
+    }
+
     /**
      * This is a version of getProperty that works with Symbols.
      */
@@ -2610,6 +2632,14 @@ public abstract class ScriptableObject implements Scriptable,
         if (base == null)
             base = obj;
         base.put(name, obj, value);
+    }
+
+    public static void putProperty(Scriptable obj, String name, Object value, boolean isPrivate) {
+        if (isPrivate) {
+            obj.put(name, obj, value, true);
+        } else {
+            putProperty(obj, name, value);
+        }
     }
 
     /**
@@ -2942,10 +2972,12 @@ public abstract class ScriptableObject implements Scriptable,
      * @return false if this != start and no slot was found.  true if this == start
      * or this != start and a READONLY slot was found.
      */
-    private boolean putImpl(Object key, int index, Scriptable start, Object value) {
+    private boolean putImpl(Object key, int index, Scriptable start, Object value, boolean isPrivate) {
         // This method is very hot (basically called on each assignment)
         // so we inline the extensible/sealed checks below.
         Slot slot;
+        SlotMapContainer slotMap = getSlotMap(isPrivate);
+
         if (this != start) {
             slot = slotMap.query(key, index);
             if (!isExtensible && Context.getContext().isStrictMode() && (slot == null || !(slot instanceof GetterSlot)))
@@ -2967,14 +2999,8 @@ public abstract class ScriptableObject implements Scriptable,
         return slot.setValue(value, this, start);
     }
 
-    public void togglePrivateSlots() {
-        if (privateSlots == null) {
-            privateSlots = createSlotMap(1);
-        }
-
-        SlotMapContainer tmp = privateSlots;
-        privateSlots = slotMap;
-        slotMap = tmp;
+    private SlotMapContainer getSlotMap(boolean isPrivate) {
+        return isPrivate ? privateSlotMap : slotMap;
     }
 
     /**
@@ -3027,8 +3053,8 @@ public abstract class ScriptableObject implements Scriptable,
         return slot.setValue(value, this, start);
     }
 
-    private Slot findAttributeSlot(String name, int index, SlotAccess accessType) {
-        Slot slot = slotMap.get(name, index, accessType);
+    private Slot findAttributeSlot(String name, int index, SlotAccess accessType, boolean isPrivate) {
+        Slot slot = getSlotMap(isPrivate).get(name, index, accessType);
         if (slot == null) {
             String str = (name != null ? name : Integer.toString(index));
             throw Context.reportRuntimeError1("msg.prop.not.found", str);
@@ -3102,6 +3128,11 @@ public abstract class ScriptableObject implements Scriptable,
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
+        writeSlotMap(out, slotMap);
+        writeSlotMap(out, privateSlotMap);
+    }
+
+    private void writeSlotMap(ObjectOutputStream out, SlotMapContainer slotMap) throws IOException {
         final long stamp = slotMap.readLock();
         try {
             int objectsCount = slotMap.dirtySize();
@@ -3121,12 +3152,18 @@ public abstract class ScriptableObject implements Scriptable,
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
+        slotMap = readSlotMap(in);
+        privateSlotMap = readSlotMap(in);
+    }
+
+    private SlotMapContainer readSlotMap(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int tableSize = in.readInt();
-        slotMap = createSlotMap(tableSize);
+        SlotMapContainer slotMap = createSlotMap(tableSize);
         for (int i = 0; i < tableSize; i++) {
             Slot slot = (Slot) in.readObject();
             slotMap.addSlot(slot);
         }
+        return slotMap;
     }
 
     public ScriptableObject getOwnPropertyDescriptor(Context cx, Object id) {

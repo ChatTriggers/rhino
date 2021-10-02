@@ -87,7 +87,10 @@ public class NativeWith implements Scriptable, SymbolScriptable, IdFunctionCall,
     }
 
     @Override
-    public Object get(String id, Scriptable start) {
+    public Object get(String id, Scriptable start, boolean isPrivate) {
+        if (isPrivate)
+            throw Kit.codeBug("Unexpected private get from with statement");
+
         if (start == this) {
             start = prototype;
         }
@@ -114,7 +117,9 @@ public class NativeWith implements Scriptable, SymbolScriptable, IdFunctionCall,
     }
 
     @Override
-    public void put(String id, Scriptable start, Object value) {
+    public void put(String id, Scriptable start, Object value, boolean isPrivate) {
+        if (isPrivate)
+            throw Kit.codeBug("Unexpected private put from with statement");
         if (start == this)
             start = prototype;
         prototype.put(id, start, value);

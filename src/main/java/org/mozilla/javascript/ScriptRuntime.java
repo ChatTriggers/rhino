@@ -904,10 +904,6 @@ public class ScriptRuntime {
             }
         }
 
-        if (isPrivate) {
-            clazz.togglePrivateSlots();
-        }
-
         if (name instanceof String) {
             String nameString = (String) name;
             if (getterSetter == 0) {
@@ -917,29 +913,34 @@ public class ScriptRuntime {
                     ((BaseFunction) clazz).setForcedName(method);
                 }
 
-                clazz.put(nameString, clazz, method);
-                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.NOT_ENUMERABLE);
+                clazz.put(nameString, clazz, method, isPrivate);
+                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.NOT_ENUMERABLE, isPrivate);
             } else {
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
                 setFunctionNameIfApplicable(method, (isSetter ? "set " : "get ") + nameString);
-                clazz.setGetterOrSetter(nameString, 0, getterOrSetter, isSetter);
-                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.NOT_ENUMERABLE);
+                clazz.setGetterOrSetter(nameString, 0, getterOrSetter, isSetter, false, isPrivate);
+                clazz.setAttributes(nameString, clazz.getAttributes(nameString) | ScriptableObject.NOT_ENUMERABLE, isPrivate);
             }
         } else if (name instanceof Integer) {
+            if (isPrivate)
+                throw Kit.codeBug("Unexpected private integer method");
+
             int nameInt = ((Integer) name);
             if (getterSetter == 0) {
                 setFunctionNameIfApplicable(method, String.valueOf(nameInt));
                 clazz.put(nameInt, clazz, method);
-                clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.NOT_ENUMERABLE);
             } else {
                 Callable getterOrSetter = (Callable) method;
                 boolean isSetter = getterSetter == 1;
                 setFunctionNameIfApplicable(method, (isSetter ? "set " : "get ") + nameInt);
                 clazz.setGetterOrSetter(nameInt, 0, getterOrSetter, isSetter);
-                clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.NOT_ENUMERABLE);
             }
+            clazz.setAttributes(nameInt, clazz.getAttributes(nameInt) | ScriptableObject.NOT_ENUMERABLE);
         } else if (isSymbol(name)) {
+            if (isPrivate)
+                throw Kit.codeBug("Unexpected private symbol method");
+
             Symbol nameSymbol = ((Symbol) name);
             if (getterSetter == 0) {
                 setFunctionNameIfApplicable(method, nameSymbol.toSymbolString());
@@ -956,52 +957,34 @@ public class ScriptRuntime {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }
 
-        if (isPrivate) {
-            clazz.togglePrivateSlots();
-        }
-
         return clazzObj;
     }
 
     public static Object addClassProperty(Object clazzObj, Object name, Object defaultValue, Context cx, boolean isPrivate) {
         ScriptableObject clazz = ScriptableObject.ensureScriptableObject(clazzObj);
 
-        if (isPrivate) {
-            clazz.togglePrivateSlots();
-        }
-
         if (name instanceof String) {
             String s = toStringIdOrIndex(cx, name);
             if (s == null) {
+                if (isPrivate)
+                    throw Kit.codeBug("Unexpected private integer class property");
                 clazz.put(lastIndexResult(cx), clazz, defaultValue);
             } else {
-                clazz.put(s, clazz, defaultValue);
+                clazz.put(s, clazz, defaultValue, isPrivate);
             }
         } else if (isSymbol(name)) {
+            if (isPrivate)
+                throw Kit.codeBug("Unexpected private symbol class property");
             clazz.put((Symbol) name, clazz, defaultValue);
         } else if (name instanceof Integer) {
+            if (isPrivate)
+                throw Kit.codeBug("Unexpected private integer class property");
             clazz.put((Integer) name, clazz, defaultValue);
         } else {
             throw throwError(cx, clazz, "msg.object.invalid.key.type");
         }
 
-        if (isPrivate) {
-            clazz.togglePrivateSlots();
-        }
-
         return clazzObj;
-    }
-
-    public static void togglePrivateProtoTree(ScriptableObject obj) {
-        while (obj != null) {
-            obj.togglePrivateSlots();
-
-            if (obj.getPrototype() instanceof ScriptableObject && obj.getPrototype() != obj) {
-                obj = (ScriptableObject) obj.getPrototype();
-            } else {
-                obj = null;
-            }
-        }
     }
 
     public static Object callSuper(Object[] args, boolean isReturned, NativeFunction clazz, Scriptable thisObj, Scriptable scope, Context cx) {
@@ -2058,28 +2041,18 @@ public class ScriptRuntime {
     /**
      * Version of getObjectElem when elem is a valid JS identifier name.
      *
-     * @deprecated Use {@link #getObjectProp(Object, String, Context, Scriptable)} instead
-     */
-    @Deprecated
-    public static Object getObjectProp(Object obj, String property, Context cx) {
-        return getObjectProp(obj, property, cx, getTopCallScope(cx));
-    }
-
-    /**
-     * Version of getObjectElem when elem is a valid JS identifier name.
-     *
      * @param scope the scope that should be used to resolve primitive prototype
      */
-    public static Object getObjectProp(Object obj, String property, Context cx, Scriptable scope) {
+    public static Object getObjectProp(Object obj, String property, Context cx, Scriptable scope, boolean isPrivate) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefReadError(obj, property);
         }
-        return getObjectProp(sobj, property, cx);
+        return getObjectProp(sobj, property, cx, isPrivate);
     }
 
-    public static Object getObjectProp(Scriptable obj, String property, Context cx) {
-        Object result = ScriptableObject.getProperty(obj, property);
+    public static Object getObjectProp(Scriptable obj, String property, Context cx, boolean isPrivate) {
+        Object result = ScriptableObject.getProperty(obj, property, isPrivate);
         if (result == Scriptable.NOT_FOUND) {
             if (cx.hasFeature(Context.FEATURE_STRICT_MODE)) {
                 Context.reportWarning(ScriptRuntime.getMessage1(
@@ -2091,20 +2064,12 @@ public class ScriptRuntime {
         return result;
     }
 
-    /**
-     * @deprecated Use {@link #getObjectPropNoWarn(Object, String, Context, Scriptable)} instead
-     */
-    @Deprecated
-    public static Object getObjectPropNoWarn(Object obj, String property, Context cx) {
-        return getObjectPropNoWarn(obj, property, cx, getTopCallScope(cx));
-    }
-
-    public static Object getObjectPropNoWarn(Object obj, String property, Context cx, Scriptable scope) {
+    public static Object getObjectPropNoWarn(Object obj, String property, Context cx, Scriptable scope, boolean isPrivate) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefReadError(obj, property);
         }
-        Object result = ScriptableObject.getProperty(sobj, property);
+        Object result = ScriptableObject.getProperty(sobj, property, isPrivate);
         if (result == Scriptable.NOT_FOUND) {
             return Undefined.instance;
         }
@@ -2137,7 +2102,7 @@ public class ScriptRuntime {
             return getObjectIndex(sobj, index, cx);
         }
         String s = toString(dblIndex);
-        return getObjectProp(sobj, s, cx);
+        return getObjectProp(sobj, s, cx, scope, false);
     }
 
     public static Object getObjectIndex(Scriptable obj, int index, Context cx) {
@@ -2189,27 +2154,17 @@ public class ScriptRuntime {
 
     /**
      * Version of setObjectElem when elem is a valid JS identifier name.
-     *
-     * @deprecated Use {@link #setObjectProp(Object, String, Object, Context, Scriptable)} instead
      */
-    @Deprecated
-    public static Object setObjectProp(Object obj, String property, Object value, Context cx) {
-        return setObjectProp(obj, property, value, cx, getTopCallScope(cx));
-    }
-
-    /**
-     * Version of setObjectElem when elem is a valid JS identifier name.
-     */
-    public static Object setObjectProp(Object obj, String property, Object value, Context cx, Scriptable scope) {
+    public static Object setObjectProp(Object obj, String property, Object value, Context cx, Scriptable scope, boolean isPrivate) {
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefWriteError(obj, property, value);
         }
-        return setObjectProp(sobj, property, value, cx);
+        return setObjectProp(sobj, property, value, cx, isPrivate);
     }
 
-    public static Object setObjectProp(Scriptable obj, String property, Object value, Context cx) {
-        ScriptableObject.putProperty(obj, property, value);
+    public static Object setObjectProp(Scriptable obj, String property, Object value, Context cx, boolean isPrivate) {
+        ScriptableObject.putProperty(obj, property, value, isPrivate);
         return value;
     }
 
@@ -2239,7 +2194,7 @@ public class ScriptRuntime {
             return setObjectIndex(sobj, index, value, cx);
         }
         String s = toString(dblIndex);
-        return setObjectProp(sobj, s, value, cx);
+        return setObjectProp(sobj, s, value, cx, false);
     }
 
     public static Object setObjectIndex(Scriptable obj, int index, Object value, Context cx) {
@@ -2930,48 +2885,31 @@ public class ScriptRuntime {
      * as ScriptRuntime.lastStoredScriptable() for consumption as thisObj.
      * The caller must call ScriptRuntime.lastStoredScriptable() immediately
      * after calling this method.
-     * Warning: this doesn't allow to resolve primitive prototype properly when
-     * many top scopes are involved.
-     *
-     * @deprecated Use {@link #getPropFunctionAndThis(Object, String, Context, Scriptable)} instead
      */
-    @Deprecated
-    public static Callable getPropFunctionAndThis(Object obj,
-                                                  String property,
-                                                  Context cx) {
-        return getPropFunctionAndThis(obj, property, cx, getTopCallScope(cx));
-    }
-
-    /**
-     * Prepare for calling obj.property(...): return function corresponding to
-     * obj.property and make obj properly converted to Scriptable available
-     * as ScriptRuntime.lastStoredScriptable() for consumption as thisObj.
-     * The caller must call ScriptRuntime.lastStoredScriptable() immediately
-     * after calling this method.
-     */
-    public static Callable getPropFunctionAndThis(Object obj, String property, Context cx, Scriptable scope) {
+    public static Callable getPropFunctionAndThis(Object obj, String property, Context cx, Scriptable scope, boolean isPrivate) {
         Scriptable thisObj = toObjectOrNull(cx, obj, scope);
-        return getPropFunctionAndThisHelper(obj, property, cx, thisObj);
-    }
 
-    private static Callable getPropFunctionAndThisHelper(Object obj, String property, Context cx, Scriptable thisObj) {
         if (thisObj == null) {
             throw undefCallError(obj, property);
         }
 
-        Object value = ScriptableObject.getProperty(thisObj, property);
-        if (!(value instanceof Callable)) {
+        Object value = ScriptableObject.getProperty(thisObj, property, isPrivate);
+        if (!(value instanceof Callable) && !isPrivate) {
             Object noSuchMethod = ScriptableObject.getProperty(thisObj, "__noSuchMethod__");
             if (noSuchMethod instanceof Callable)
                 value = new NoSuchMethodShim((Callable) noSuchMethod, property);
         }
 
         if (!(value instanceof Callable)) {
-            throw notFunctionError(thisObj, value, property);
+            throw notFunctionError(thisObj, value, "#" + property);
         }
 
         storeScriptable(cx, thisObj);
         return (Callable) value;
+    }
+
+    public static Callable getPropFunctionAndThis(Object obj, String property, Context cx, Scriptable scope) {
+        return getPropFunctionAndThis(obj, property, cx, scope, false);
     }
 
     /**
@@ -3261,7 +3199,7 @@ public class ScriptRuntime {
         Scriptable val = bind(cx, scope, id);
         if (val == null)
             return "undefined";
-        return typeof(getObjectProp(val, id, cx));
+        return typeof(getObjectProp(val, id, cx, false));
     }
 
     public static boolean isObject(Object value) {
@@ -4932,20 +4870,30 @@ public class ScriptRuntime {
         return prop == null || prop == Undefined.instance || prop == UniqueTag.NOT_FOUND;
     }
 
-    public static Object optionalGetObjectProp(Object obj, String property, Context cx, Scriptable scope) {
+    // This has an isPrivate param even though "a?.#b" is a syntax error just to have the same
+    // call signature as getObjectProp
+    public static Object optionalGetObjectProp(Object obj, String property, Context cx, Scriptable scope, boolean isPrivate) {
+        if (isPrivate)
+            throw Kit.codeBug();
+
         if (isNullOrUndefined(obj)) return Undefined.instance;
 
         Scriptable sobj = toObjectOrNull(cx, obj, scope);
         if (sobj == null) {
             throw undefReadError(obj, property);
         }
-        return optionalGetObjectProp(sobj, property, cx);
+        return optionalGetObjectProp(sobj, property, cx, false);
     }
 
-    public static Object optionalGetObjectProp(Scriptable obj, String property, Context cx) {
+    // This has an isPrivate param even though "a?.#b" is a syntax error just to have the same
+    // call signature as getObjectProp
+    public static Object optionalGetObjectProp(Scriptable obj, String property, Context cx, boolean isPrivate) {
+        if (isPrivate)
+            throw Kit.codeBug();
+
         if (isNullOrUndefined(obj)) return Undefined.instance;
 
-        return getObjectProp(obj, property, cx);
+        return getObjectProp(obj, property, cx, false);
     }
 
     public static Object optionalGetObjectIndex(Object obj, double dblIndex, Context cx) {

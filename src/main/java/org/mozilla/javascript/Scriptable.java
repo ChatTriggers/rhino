@@ -82,7 +82,11 @@ public interface Scriptable {
      * @return the value of the property (may be null), or NOT_FOUND
      * @see org.mozilla.javascript.Context#getUndefinedValue
      */
-    Object get(String name, Scriptable start);
+    Object get(String name, Scriptable start, boolean isPrivate);
+
+    default Object get(String name, Scriptable start) {
+        return get(name, start, false);
+    }
 
     /**
      * Get a property from the object selected by an integral index.
@@ -177,7 +181,11 @@ public interface Scriptable {
      * @see org.mozilla.javascript.ScriptableObject#putProperty(Scriptable, String, Object)
      * @see org.mozilla.javascript.Context#toObject(Object, Scriptable)
      */
-    void put(String name, Scriptable start, Object value);
+    void put(String name, Scriptable start, Object value, boolean isPrivate);
+
+    default void put(String name, Scriptable start, Object value) {
+        put(name, start, value, false);
+    }
 
     /**
      * Sets an indexed property in this object.

@@ -76,7 +76,10 @@ public class NativeJavaObject implements Scriptable, SymbolScriptable, Wrapper, 
     }
 
     @Override
-    public Object get(String name, Scriptable start) {
+    public Object get(String name, Scriptable start, boolean isPrivate) {
+        if (isPrivate)
+            throw ScriptRuntime.typeError1("msg.java.private.access", name);
+
         if (fieldAndMethods != null) {
             Object result = fieldAndMethods.get(name);
             if (result != null) {
@@ -100,7 +103,10 @@ public class NativeJavaObject implements Scriptable, SymbolScriptable, Wrapper, 
     }
 
     @Override
-    public void put(String name, Scriptable start, Object value) {
+    public void put(String name, Scriptable start, Object value, boolean isPrivate) {
+        if (isPrivate)
+            throw ScriptRuntime.typeError1("msg.java.private.access", name);
+
         // We could be asked to modify the value of a property in the
         // prototype. Since we can't add a property to a Java object,
         // we modify it in the prototype rather than copy it down.

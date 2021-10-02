@@ -372,13 +372,16 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
     }
 
     @Override
-    public Object get(String name, Scriptable start) {
+    public Object get(String name, Scriptable start, boolean isPrivate) {
         // Check for slot first for performance. This is a very hot code
         // path that should be further optimized.
-        Object value = super.get(name, start);
-        if (value != NOT_FOUND) {
+        Object value = super.get(name, start, isPrivate);
+        if (value != NOT_FOUND)
             return value;
-        }
+
+        if (isPrivate)
+            return Scriptable.NOT_FOUND;
+
         int info = findInstanceIdInfo(name);
         if (info != 0) {
             int id = (info & 0xFFFF);
@@ -398,9 +401,9 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
     @Override
     public Object get(Symbol key, Scriptable start) {
         Object value = super.get(key, start);
-        if (value != NOT_FOUND) {
+        if (value != NOT_FOUND)
             return value;
-        }
+
         int info = findInstanceIdInfo(key);
         if (info != 0) {
             int id = (info & 0xFFFF);
@@ -418,7 +421,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
     }
 
     @Override
-    public void put(String name, Scriptable start, Object value) {
+    public void put(String name, Scriptable start, Object value, boolean isPrivate) {
         int info = findInstanceIdInfo(name);
         if (info != 0) {
             if (start == this && isSealed()) {
@@ -431,7 +434,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
                     int id = (info & 0xFFFF);
                     setInstanceIdValue(id, value);
                 } else {
-                    start.put(name, start, value);
+                    start.put(name, start, value, isPrivate);
                 }
             }
             return;
@@ -447,7 +450,7 @@ public abstract class IdScriptableObject extends ScriptableObject implements IdF
                 return;
             }
         }
-        super.put(name, start, value);
+        super.put(name, start, value, isPrivate);
     }
 
     @Override

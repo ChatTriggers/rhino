@@ -59,14 +59,14 @@ public class IteratorLikeIterable implements Iterable<Object>, Closeable {
         @Override
         public boolean hasNext() {
             final Object val = next.call(cx, scope, iterator, ScriptRuntime.emptyArgs);
-            Object doneval = ScriptRuntime.getObjectProp(val, "done", cx, scope);
+            Object doneval = ScriptRuntime.getObjectProp(val, "done", cx, scope, false);
             if (Undefined.instance.equals(doneval)) {
                 doneval = false;
             }
             if (ScriptRuntime.toBoolean(doneval)) {
                 return false;
             }
-            nextVal = ScriptRuntime.getObjectProp(val, "value", cx, scope);
+            nextVal = ScriptRuntime.getObjectProp(val, "value", cx, scope, false);
             return true;
         }
 

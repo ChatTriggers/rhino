@@ -6160,15 +6160,11 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         Node nameChild = child.getNext();
         generateExpression(nameChild, node);  // the name
 
-        if (isPrivate) {
-            cfw.addALoad(objLocal);
-            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
-        }
-
         if (node.getType() == Token.GETPROPNOWARN) {
             cfw.addALoad(contextLocal);
             cfw.addALoad(variableObjectLocal);
-            addScriptRuntimeInvoke("getObjectPropNoWarn", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+            cfw.addPush(isPrivate);
+            addScriptRuntimeInvoke("getObjectPropNoWarn", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE, BOOLEAN);
         } else {
             String methodName = node.getProp(Node.CHAINING_PROP) != null ? "optionalGetObjectProp" : "getObjectProp";
 
@@ -6177,17 +6173,14 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
             int childType = child.getType();
             if (childType == Token.THIS && nameChild.getType() == Token.STRING) {
                 cfw.addALoad(contextLocal);
-                addScriptRuntimeInvoke(methodName, OBJECT, SCRIPTABLE, STRING, CONTEXT);
+                cfw.addPush(isPrivate);
+                addScriptRuntimeInvoke(methodName, OBJECT, SCRIPTABLE, STRING, CONTEXT, BOOLEAN);
             } else {
                 cfw.addALoad(contextLocal);
                 cfw.addALoad(variableObjectLocal);
-                addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+                cfw.addPush(isPrivate);
+                addScriptRuntimeInvoke(methodName, OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE, BOOLEAN);
             }
-        }
-
-        if (isPrivate) {
-            cfw.addALoad(objLocal);
-            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
         }
     }
 
@@ -6217,25 +6210,20 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         generateExpression(child, node);
         child = child.getNext();
 
-
-        if (isPrivate) {
-            cfw.addALoad(objLocal);
-            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
-        }
-
         if (type == Token.SETPROP_OP) {
             // stack: ... object object name -> ... object name object name
             cfw.add(ByteCode.DUP_X1);
             //for 'this.foo += ...' we call thisGet which can skip some
             //casting overhead.
-            if (objectChild.getType() == Token.THIS
-                    && nameChild.getType() == Token.STRING) {
+            if (objectChild.getType() == Token.THIS && nameChild.getType() == Token.STRING) {
                 cfw.addALoad(contextLocal);
-                addScriptRuntimeInvoke("getObjectProp", OBJECT, SCRIPTABLE, STRING, CONTEXT);
+                cfw.addPush(isPrivate);
+                addScriptRuntimeInvoke("getObjectProp", OBJECT, SCRIPTABLE, STRING, CONTEXT, BOOLEAN);
             } else {
                 cfw.addALoad(contextLocal);
                 cfw.addALoad(variableObjectLocal);
-                addScriptRuntimeInvoke("getObjectProp", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+                cfw.addPush(isPrivate);
+                addScriptRuntimeInvoke("getObjectProp", OBJECT, OBJECT, STRING, CONTEXT, SCRIPTABLE, BOOLEAN);
             }
         }
 
@@ -6250,12 +6238,8 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         generateExpression(child, node);
         cfw.addALoad(contextLocal);
         cfw.addALoad(variableObjectLocal);
-        addScriptRuntimeInvoke("setObjectProp", OBJECT, OBJECT, STRING, OBJECT, CONTEXT, SCRIPTABLE);
-
-        if (isPrivate) {
-            cfw.addALoad(objLocal);
-            addScriptRuntimeInvoke("togglePrivateProtoTree", VOID, SCRIPTABLE_OBJECT);
-        }
+        cfw.addPush(isPrivate);
+        addScriptRuntimeInvoke("setObjectProp", OBJECT, OBJECT, STRING, OBJECT, CONTEXT, SCRIPTABLE, BOOLEAN);
     }
 
     private void visitSetElem(int type, Node node, Node child) {

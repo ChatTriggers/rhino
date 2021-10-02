@@ -87,15 +87,13 @@ public final class OptRuntime extends ScriptRuntime {
      * Implement x.property() call shrinking optimizer code.
      */
     public static Object callProp0(Object value, String property, Context cx, Scriptable scope) {
-        Callable f = getPropFunctionAndThis(value, property, cx, scope);
+        Callable f = getPropFunctionAndThis(value, property, cx, scope, false);
         Scriptable thisObj = lastStoredScriptable(cx);
         return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
     }
 
     public static Object privateCallProp0(Object value, String property, Context cx, Scriptable scope) {
-        optionalPrivateToggle(value);
-        Callable f = getPropFunctionAndThis(value, property, cx, scope);
-        optionalPrivateToggle(value);
+        Callable f = getPropFunctionAndThis(value, property, cx, scope, true);
         Scriptable thisObj = lastStoredScriptable(cx);
         return f.call(cx, scope, thisObj, ScriptRuntime.emptyArgs);
     }
@@ -143,12 +141,6 @@ public final class OptRuntime extends ScriptRuntime {
         if (ScriptRuntime.isNullOrUndefined(value)) return Undefined.instance;
 
         return optionalCallPropN(value, property, args, cx, scope);
-    }
-
-    public static void optionalPrivateToggle(Object value) {
-        if (value instanceof ScriptableObject) {
-            ScriptRuntime.togglePrivateProtoTree(((ScriptableObject) value));
-        }
     }
 
     public static Object add(Object val1, double val2) {

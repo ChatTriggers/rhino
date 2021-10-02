@@ -93,8 +93,8 @@ public class Delegator implements Function, SymbolScriptable {
      * @see org.mozilla.javascript.Scriptable#get(String, Scriptable)
      */
     @Override
-    public Object get(String name, Scriptable start) {
-        return getDelegee().get(name, start);
+    public Object get(String name, Scriptable start, boolean isPrivate) {
+        return getDelegee().get(name, start, isPrivate);
     }
 
     @Override
@@ -143,8 +143,8 @@ public class Delegator implements Function, SymbolScriptable {
      * @see org.mozilla.javascript.Scriptable#put(String, Scriptable, Object)
      */
     @Override
-    public void put(String name, Scriptable start, Object value) {
-        getDelegee().put(name, start, value);
+    public void put(String name, Scriptable start, Object value, boolean isPrivate) {
+        getDelegee().put(name, start, value, isPrivate);
     }
 
     /**
