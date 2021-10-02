@@ -3307,6 +3307,8 @@ public class Parser {
                     int currentFlagToken = currentFlaggedToken;
                     peekUntilNonComment(nextToken);
                     currentFlaggedToken = (currentFlaggedToken & TI_AFTER_EOL) != 0 ? currentFlaggedToken : currentFlagToken;
+                } else if (nextToken == Token.HASHTAG) {
+                    reportError("msg.optional.chaining.private.ident");
                 } else {
                     break;
                 }
@@ -3398,7 +3400,7 @@ public class Parser {
     }
 
     /**
-     * Handles any construct following a "." or ".." operator.
+     * Handles any construct following a "." or "?." operator.
      *
      * @param pn the left-hand side (target) of the operator.  Never null.
      * @return a PropertyGet, XmlMemberGet, or ErrorNode
