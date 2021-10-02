@@ -1826,6 +1826,26 @@ class TokenStream {
         return rawLiterals.toArray(new String[0]);
     }
 
+    public TokenPosition getPosition() {
+        return new TokenPosition(getTokenBeg(), getOffset(), getLine(), getLineno(), getTokenLength());
+    }
+
+    static class TokenPosition {
+        int start;
+        int lineno;
+        String line;
+        int colno;
+        int length;
+
+        public TokenPosition(int start, int colno, String line, int lineno, int length) {
+            this.start = start;
+            this.colno = colno;
+            this.line = line;
+            this.lineno = lineno;
+            this.length = length;
+        }
+    }
+
     // stuff other than whitespace since start of line
     private boolean dirtyLine;
 

@@ -55,6 +55,12 @@ public class Parser {
     protected int nestingOfFunction;
     protected boolean inUseStrictDirective;
     protected boolean insideClass;
+    // Store actual and accessed private separately so that using a private field in
+    // a method before the declaration (i.e. declaration at the end of a class instead of
+    // at the beginning) is valid. Also keep track of the position for proper reporting,
+    // since they are validated at the end of the class.
+    private Set<String> privateClassIdentifiers = new HashSet<>();
+    private Map<String, TokenStream.TokenPosition> accessedPrivateClassIdentifiers = new HashMap<>();
     CompilerEnvirons compilerEnv;
     boolean calledByCompileFunction;  // ugly - set directly by Context
     // The following are per function variables and should be saved/restored
@@ -695,6 +701,11 @@ public class Parser {
     }
 
     private ClassNode classExpr(List<DecoratorNode> classDecorators) throws IOException {
+        Set<String> prevPrivateClassIdentifiers = privateClassIdentifiers;
+        Map<String, TokenStream.TokenPosition> prevAccessedPrivateClassIdentifiers = accessedPrivateClassIdentifiers;
+        privateClassIdentifiers = new HashSet<>();
+        accessedPrivateClassIdentifiers = new HashMap<>();
+
         insideClass = true;
         ClassNode cls = new ClassNode(ts.tokenBeg);
         cls.setDecorators(classDecorators);
@@ -813,6 +824,7 @@ public class Parser {
 
                         if (isPrivate) {
                             cp.setIsPrivate();
+                            privateClassIdentifiers.add(((Name) cp.getName()).getIdentifier());
                         }
 
                         cp.setLength(getNodeEnd(defaultValue) - pos);
@@ -836,6 +848,7 @@ public class Parser {
                         }
                         if (isPrivate) {
                             fn.setPrivate(true);
+                            privateClassIdentifiers.add(fn.getName());
                         }
                         ClassMethod cm = new ClassMethod(pname, fn);
                         cm.setDecorators(decorators);
@@ -891,9 +904,20 @@ public class Parser {
             getAndResetJsDoc();
         }
 
+        for (Map.Entry<String, TokenStream.TokenPosition> en : accessedPrivateClassIdentifiers.entrySet()) {
+            if (!privateClassIdentifiers.contains(en.getKey())) {
+                TokenStream.TokenPosition pos = en.getValue();
+                addError("msg.unknown.private.ident", en.getKey(), pos.start, pos.length, pos.lineno, pos.line, pos.colno);
+                break;
+            }
+        }
+
         cls.setFields(classProperties);
         cls.setMethods(classMethods);
         insideClass = false;
+        privateClassIdentifiers = prevPrivateClassIdentifiers;
+        accessedPrivateClassIdentifiers = prevAccessedPrivateClassIdentifiers;
+
         return cls;
     }
 
@@ -3343,10 +3367,7 @@ public class Parser {
     }
 
     private AstNode matchPropertyAccess(AstNode pn, boolean chaining) throws IOException {
-        int lineno;
-
-        lineno = ts.lineno;
-
+        int lineno = ts.lineno;
 
         pn = propertyAccess(chaining ? Token.OPTIONAL_CHAINING : Token.DOT, pn);
         pn.setLineno(lineno);
@@ -3434,6 +3455,8 @@ public class Parser {
         Name name = createNameNode(true, Token.GETPROP);
         PropertyGet pg = new PropertyGet(pn, name, dotPos);
         if (isPrivateAccess) {
+            if (!accessedPrivateClassIdentifiers.containsKey(name.getIdentifier()))
+                accessedPrivateClassIdentifiers.put(name.getIdentifier(), ts.getPosition());
             pg.putProp(Node.PRIVATE_ACCESS_PROP, true);
         }
         pg.setLineno(lineno);
