@@ -758,6 +758,7 @@ public class Parser {
             int pos = ts.tokenBeg;
             if (pname == null && peekToken() != Token.MUL) {
                 reportError("msg.bad.prop");
+                break;
             } else {
                 propertyName = ts.getString();
                 int peeked = peekToken();
