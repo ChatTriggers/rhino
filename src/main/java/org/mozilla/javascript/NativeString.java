@@ -10,9 +10,7 @@ import org.mozilla.javascript.regexp.NativeRegExp;
 
 import java.text.Collator;
 import java.text.Normalizer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.mozilla.javascript.ScriptRuntime.rangeError;
 import static org.mozilla.javascript.ScriptRuntimeES6.requireObjectCoercible;
@@ -102,6 +100,7 @@ final class NativeString extends IdScriptableObject {
         addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_match, "match", 2);
         addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_search, "search", 2);
         addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_replace, "replace", 2);
+        addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_replaceAll, "replaceAll", 2);
         addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_localeCompare, "localeCompare", 2);
         addIdFunctionProperty(ctor, STRING_TAG, ConstructorId_toLocaleLowerCase, "toLocaleLowerCase", 1);
         super.fillConstructorProperties(ctor);
@@ -249,6 +248,10 @@ final class NativeString extends IdScriptableObject {
                 arity = 2;
                 s = "replace";
                 break;
+            case Id_replaceAll:
+                arity = 2;
+                s = "replaceAll";
+                break;
             case Id_localeCompare:
                 arity = 1;
                 s = "localeCompare";
@@ -336,6 +339,7 @@ final class NativeString extends IdScriptableObject {
                 case ConstructorId_match:
                 case ConstructorId_search:
                 case ConstructorId_replace:
+                case ConstructorId_replaceAll:
                 case ConstructorId_localeCompare:
                 case ConstructorId_toLocaleLowerCase: {
                     if (args.length > 0) {
@@ -522,14 +526,17 @@ final class NativeString extends IdScriptableObject {
 
                 case Id_match:
                 case Id_search:
-                case Id_replace: {
+                case Id_replace:
+                case Id_replaceAll: {
                     int actionType;
                     if (id == Id_match) {
                         actionType = RegExpProxy.RA_MATCH;
-                    } else if (id == Id_search) {
-                        actionType = RegExpProxy.RA_SEARCH;
-                    } else {
+                    } else if (id == Id_replace) {
                         actionType = RegExpProxy.RA_REPLACE;
+                    } else if (id == Id_replaceAll) {
+                        actionType = RegExpProxy.RA_REPLACE_ALL;
+                    } else {
+                        actionType = RegExpProxy.RA_SEARCH;
                     }
                     return ScriptRuntime.checkRegExpProxy(cx).
                             action(cx, scope, thisObj, args, actionType);
@@ -1043,7 +1050,7 @@ final class NativeString extends IdScriptableObject {
     @Override
     protected int findPrototypeId(String s) {
         int id;
-// #generated# Last update: 2020-03-02 23:40:46 CST
+// #generated# Last update: 2021-11-20 07:34:41 MST
         L0: { id = 0; String X = null; int c;
             L: switch (s.length()) {
             case 3: c=s.charAt(2);
@@ -1100,6 +1107,7 @@ final class NativeString extends IdScriptableObject {
                 } break L;
             case 10: c=s.charAt(0);
                 if (c=='c') { X="charCodeAt";id=Id_charCodeAt; }
+                else if (c=='r') { X="replaceAll";id=Id_replaceAll; }
                 else if (c=='s') { X="startsWith";id=Id_startsWith; }
                 break L;
             case 11: switch (s.charAt(2)) {
@@ -1161,21 +1169,22 @@ final class NativeString extends IdScriptableObject {
             Id_match = 31,
             Id_search = 32,
             Id_replace = 33,
-            Id_localeCompare = 34,
-            Id_toLocaleLowerCase = 35,
-            Id_toLocaleUpperCase = 36,
-            Id_trim = 37,
-            Id_trimLeft = 38,
-            Id_trimRight = 39,
-            Id_includes = 40,
-            Id_startsWith = 41,
-            Id_endsWith = 42,
-            Id_normalize = 43,
-            Id_repeat = 44,
-            Id_codePointAt = 45,
-            Id_padStart = 46,
-            Id_padEnd = 47,
-            SymbolId_iterator = 48,
+            Id_replaceAll = 34,
+            Id_localeCompare = 35,
+            Id_toLocaleLowerCase = 36,
+            Id_toLocaleUpperCase = 37,
+            Id_trim = 38,
+            Id_trimLeft = 39,
+            Id_trimRight = 40,
+            Id_includes = 41,
+            Id_startsWith = 42,
+            Id_endsWith = 43,
+            Id_normalize = 44,
+            Id_repeat = 45,
+            Id_codePointAt = 46,
+            Id_padStart = 47,
+            Id_padEnd = 48,
+            SymbolId_iterator = 49,
             MAX_PROTOTYPE_ID = SymbolId_iterator;
 
 // #/string_id_map#
@@ -1196,6 +1205,7 @@ final class NativeString extends IdScriptableObject {
             ConstructorId_match = -Id_match,
             ConstructorId_search = -Id_search,
             ConstructorId_replace = -Id_replace,
+            ConstructorId_replaceAll = -Id_replaceAll,
             ConstructorId_localeCompare = -Id_localeCompare,
             ConstructorId_toLocaleLowerCase = -Id_toLocaleLowerCase;
 

@@ -2406,6 +2406,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
             res.lastMatch = new SubString();
             res.leftContext = new SubString();
             res.rightContext = new SubString();
+            res.prevContext = new SubString(str, 0, 0);
         }
         res.lastMatch.str = str;
         res.lastMatch.index = index;
@@ -2428,6 +2429,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
              */
             res.leftContext.index = start;
             res.leftContext.length = gData.skipped;
+            res.prevContext.length = gData.skipped;
         } else {
             /*
              * For JS1.3 and ECMAv2, emulate Perl5 exactly:
@@ -2436,6 +2438,7 @@ public class NativeRegExp extends IdScriptableObject implements Function {
              */
             res.leftContext.index = 0;
             res.leftContext.length = start + gData.skipped;
+            res.prevContext.length = start + gData.skipped;
         }
 
         res.rightContext.str = str;

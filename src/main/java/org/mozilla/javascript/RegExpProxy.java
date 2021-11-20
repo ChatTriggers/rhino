@@ -16,7 +16,8 @@ public interface RegExpProxy {
     // Types of regexp actions
     int RA_MATCH = 1;
     int RA_REPLACE = 2;
-    int RA_SEARCH = 3;
+    int RA_REPLACE_ALL = 3;
+    int RA_SEARCH = 4;
 
     boolean isRegExp(Scriptable obj);
 

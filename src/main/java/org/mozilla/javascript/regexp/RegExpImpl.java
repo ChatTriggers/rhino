@@ -85,20 +85,33 @@ public class RegExpImpl implements RegExpProxy {
                 return matchOrReplace(cx, scope, thisObj, args, this, data, re);
             }
 
-            case RA_REPLACE: {
-                if (args[0] instanceof NativeObject) {
-                    NativeObject arg0 = (NativeObject) args[0];
+            case RA_REPLACE:
+            case RA_REPLACE_ALL: {
+                boolean isReplaceAll = actionType == RA_REPLACE_ALL;
+                boolean useRE = args[0] instanceof NativeRegExp;
+
+                if (args[0] instanceof ScriptableObject) {
+                    ScriptableObject arg0 = (ScriptableObject) args[0];
+
+                    if (isReplaceAll && arg0 instanceof NativeRegExp) {
+                        int flags = ((NativeRegExp) arg0).getFlags();
+                        if ((flags & NativeRegExp.JSREG_GLOB) == 0) {
+                            throw ScriptRuntime.typeError("RegExp as first argument to replaceAll must have a global flag");
+                        }
+                    }
 
                     if (ScriptableObject.hasProperty(arg0, SymbolKey.REPLACE)) {
                         Object replace = ScriptableObject.getProperty(arg0, SymbolKey.REPLACE);
 
                         if (replace instanceof Callable) {
                             return ((Callable) replace).call(cx, scope, thisObj, new Object[]{ data.str });
+                        } else if (replace instanceof Undefined || replace == null) {
+                            useRE = false;
+                        } else {
+                            throw ScriptRuntime.typeError1("msg.object.not.callable", ScriptRuntime.toString(replace));
                         }
                     }
                 }
-
-                boolean useRE = args.length > 0 && args[0] instanceof NativeRegExp;
 
                 // ignore other parameters
                 if (cx.getLanguageVersion() < Context.VERSION_1_6) {
@@ -110,7 +123,7 @@ public class RegExpImpl implements RegExpProxy {
                 if (useRE) {
                     re = createRegExp(cx, scope, args, 2, true);
                 } else {
-                    Object arg0 = args.length < 1 ? Undefined.instance : args[0];
+                    Object arg0 = args[0];
                     search = ScriptRuntime.toString(arg0);
                 }
 
@@ -123,43 +136,65 @@ public class RegExpImpl implements RegExpProxy {
                     repstr = ScriptRuntime.toString(arg1);
                 }
 
+                this.lastMatch = null;
+                this.lastParen = null;
+                this.leftContext = null;
+                this.rightContext = null;
+
                 data.lambda = lambda;
                 data.repstr = repstr;
                 data.dollar = repstr == null ? -1 : repstr.indexOf('$');
                 data.charBuf = null;
                 data.leftIndex = 0;
+                data.fromIndex = 0;
 
-                Object val;
-                if (useRE) {
-                    val = matchOrReplace(cx, scope, thisObj, args,
-                            this, data, re);
-                } else {
-                    String str = data.str;
-                    int index = str.indexOf(search);
-                    if (index >= 0) {
-                        int slen = search.length();
-                        this.lastParen = null;
-                        this.leftContext = new SubString(str, 0, index);
-                        this.lastMatch = new SubString(str, index, slen);
-                        this.rightContext = new SubString(str, index + slen, str.length() - index - slen);
-                        val = Boolean.TRUE;
+                do {
+                    int strLen = data.str.length();
+                    Object val;
+                    if (useRE) {
+                        val = matchOrReplace(cx, scope, thisObj, args, this, data, re);
                     } else {
-                        val = Boolean.FALSE;
-                    }
-                }
+                        String str = data.str;
+                        int index = -1;
+                        if (data.fromIndex <= strLen)
+                            index = str.indexOf(search, data.fromIndex);
 
-                if (data.charBuf == null) {
-                    if (data.global || val == null
-                            || !val.equals(Boolean.TRUE)) {
-                        /* Didn't match even once. */
-                        return data.str;
+                        if (index >= 0) {
+                            int slen = search.length();
+                            this.lastParen = null;
+                            if (this.lastMatch != null) {
+                                this.prevContext.length += index - data.fromIndex + 1;
+                            } else {
+                                this.prevContext = new SubString(str, 0, index);
+                            }
+                            this.leftContext = new SubString(str, 0, index);
+                            this.lastMatch = new SubString(str, index, slen);
+                            this.rightContext = new SubString(str, index + slen, str.length() - index - slen);
+                            val = Boolean.TRUE;
+                        } else {
+                            val = Boolean.FALSE;
+                        }
                     }
-                    SubString lc = this.leftContext;
-                    replace_glob(data, cx, scope, this, lc.index, lc.length);
-                }
-                SubString rc = this.rightContext;
-                data.charBuf.append(rc.str, rc.index, rc.index + rc.length);
-                return data.charBuf.toString();
+
+                    if (data.charBuf == null) {
+                        if (data.global || !Boolean.TRUE.equals(val)) {
+                            // Didn't match
+                            return data.str;
+                        }
+                        SubString lc = this.leftContext;
+                        replace_glob(data, cx, scope, this, lc.index, lc.length);
+                    }
+
+                    SubString rc = this.rightContext;
+                    data.charBuf.append(rc.str, rc.index, rc.index + rc.length);
+                    if (!isReplaceAll)
+                        return data.charBuf.toString();
+
+                    data.str = data.charBuf.toString();
+                    data.charBuf = null;
+
+                    data.fromIndex = leftContext.length + data.str.length() - strLen + 1;
+                } while (true);
             }
 
             default:
@@ -198,15 +233,15 @@ public class RegExpImpl implements RegExpProxy {
     private static Object matchOrReplace(Context cx, Scriptable scope, Scriptable thisObj, Object[] args, RegExpImpl reImpl, GlobData data, NativeRegExp re) {
         String str = data.str;
         data.global = (re.getFlags() & NativeRegExp.JSREG_GLOB) != 0;
-        int[] indexp = {0};
+        int[] indexp = {data.fromIndex};
         Object result = null;
         if (data.mode == RA_SEARCH) {
             result = re.executeRegExp(cx, scope, reImpl,
                     str, indexp, NativeRegExp.TEST);
             if (result != null && result.equals(Boolean.TRUE))
-                result = Integer.valueOf(reImpl.leftContext.length);
+                result = reImpl.leftContext.length;
             else
-                result = Integer.valueOf(-1);
+                result = -1;
         } else if (data.global) {
             re.lastIndex = 0d;
             for (int count = 0; indexp[0] <= str.length(); count++) {
@@ -217,7 +252,7 @@ public class RegExpImpl implements RegExpProxy {
                 if (data.mode == RA_MATCH) {
                     match_glob(data, cx, scope, count, reImpl);
                 } else {
-                    if (data.mode != RA_REPLACE) Kit.codeBug();
+                    if (data.mode != RA_REPLACE && data.mode != RA_REPLACE_ALL) Kit.codeBug();
                     SubString lastMatch = reImpl.lastMatch;
                     int leftIndex = data.leftIndex;
                     int leftlen = lastMatch.index - leftIndex;
@@ -232,7 +267,7 @@ public class RegExpImpl implements RegExpProxy {
             }
         } else {
             result = re.executeRegExp(cx, scope, reImpl, str, indexp,
-                    ((data.mode == RA_REPLACE)
+                    ((data.mode == RA_REPLACE || data.mode == RA_REPLACE_ALL)
                             ? NativeRegExp.TEST
                             : NativeRegExp.MATCH));
         }
@@ -252,13 +287,11 @@ public class RegExpImpl implements RegExpProxy {
 
         int version = cx.getLanguageVersion();
         NativeRegExp re = (NativeRegExp) reObj;
-        again:
         while (true) {  // imitating C label
             /* JS1.2 deviated from Perl by never matching at end of string. */
             int ipsave = ip[0]; // reuse ip to save object creation
             ip[0] = i;
-            Object ret = re.executeRegExp(cx, scope, this, target, ip,
-                    NativeRegExp.TEST);
+            Object ret = re.executeRegExp(cx, scope, this, target, ip, NativeRegExp.TEST);
             if (ret != Boolean.TRUE) {
                 // Mismatch: ensure our caller advances i past end of string.
                 ip[0] = ipsave;
@@ -295,7 +328,7 @@ public class RegExpImpl implements RegExpProxy {
                         break;
                     }
                     i++;
-                    continue again; // imitating C goto
+                    continue; // imitating C goto
                 }
             }
             // PR_ASSERT((size_t)i >= sep->length);
@@ -362,13 +395,14 @@ public class RegExpImpl implements RegExpProxy {
                     args[i + 1] = Undefined.instance;
                 }
             }
-            args[parenCount + 1] = Integer.valueOf(reImpl.leftContext.length);
+            args[parenCount + 1] = reImpl.leftContext.length;
             args[parenCount + 2] = rdata.str;
             // This is a hack to prevent expose of reImpl data to
             // JS function which can run new regexps modifing
             // regexp that are used later by the engine.
             // TODO: redesign is necessary
-            if (reImpl != ScriptRuntime.getRegExpProxy(cx)) Kit.codeBug();
+            if (reImpl != ScriptRuntime.getRegExpProxy(cx))
+                throw Kit.codeBug();
             RegExpImpl re2 = new RegExpImpl();
             re2.multiline = reImpl.multiline;
             re2.input = reImpl.input;
@@ -386,18 +420,17 @@ public class RegExpImpl implements RegExpProxy {
             replen = rdata.repstr.length();
             if (rdata.dollar >= 0) {
                 int[] skip = new int[1];
-                int dp = rdata.dollar;
+                int dollarPos = rdata.dollar;
                 do {
-                    SubString sub = interpretDollar(cx, reImpl, rdata.repstr,
-                            dp, skip);
+                    SubString sub = interpretDollar(cx, reImpl, rdata.repstr, dollarPos, skip);
                     if (sub != null) {
                         replen += sub.length - skip[0];
-                        dp += skip[0];
+                        dollarPos += skip[0];
                     } else {
-                        ++dp;
+                        ++dollarPos;
                     }
-                    dp = rdata.repstr.indexOf('$', dp);
-                } while (dp >= 0);
+                    dollarPos = rdata.repstr.indexOf('$', dollarPos);
+                } while (dollarPos >= 0);
             }
         }
 
@@ -418,50 +451,48 @@ public class RegExpImpl implements RegExpProxy {
         }
     }
 
-    private static SubString interpretDollar(Context cx, RegExpImpl res,
-                                             String da, int dp, int[] skip) {
-        char dc;
+    private static SubString interpretDollar(Context cx, RegExpImpl res, String repstr, int dollarPos, int[] skip) {
+        char dollarChar;
         int num, tmp;
 
-        if (da.charAt(dp) != '$') Kit.codeBug();
+        if (repstr.charAt(dollarPos) != '$')
+            throw Kit.codeBug();
 
         /* Allow a real backslash (literal "\\") to escape "$1" etc. */
         int version = cx.getLanguageVersion();
-        if (version != Context.VERSION_DEFAULT
-                && version <= Context.VERSION_1_4) {
-            if (dp > 0 && da.charAt(dp - 1) == '\\')
+        if (version != Context.VERSION_DEFAULT && version <= Context.VERSION_1_4) {
+            if (dollarPos > 0 && repstr.charAt(dollarPos - 1) == '\\')
                 return null;
         }
-        int daL = da.length();
-        if (dp + 1 >= daL)
+        int repstrLen = repstr.length();
+        if (dollarPos + 1 >= repstrLen)
             return null;
         /* Interpret all Perl match-induced dollar variables. */
-        dc = da.charAt(dp + 1);
-        if (NativeRegExp.isDigit(dc)) {
+        dollarChar = repstr.charAt(dollarPos + 1);
+        if (NativeRegExp.isDigit(dollarChar)) {
             int cp;
-            if (version != Context.VERSION_DEFAULT
-                    && version <= Context.VERSION_1_4) {
-                if (dc == '0')
+            if (version != Context.VERSION_DEFAULT && version <= Context.VERSION_1_4) {
+                if (dollarChar == '0')
                     return null;
                 /* Check for overflow to avoid gobbling arbitrary decimal digits. */
                 num = 0;
-                cp = dp;
-                while (++cp < daL && NativeRegExp.isDigit(dc = da.charAt(cp))) {
-                    tmp = 10 * num + (dc - '0');
+                cp = dollarPos;
+                while (++cp < repstrLen && NativeRegExp.isDigit(dollarChar = repstr.charAt(cp))) {
+                    tmp = 10 * num + (dollarChar - '0');
                     if (tmp < num)
                         break;
                     num = tmp;
                 }
             } else {  /* ECMA 3, 1-9 or 01-99 */
                 int parenCount = (res.parens == null) ? 0 : res.parens.length;
-                num = dc - '0';
+                num = dollarChar - '0';
                 if (num > parenCount)
                     return null;
-                cp = dp + 2;
-                if ((dp + 2) < daL) {
-                    dc = da.charAt(dp + 2);
-                    if (NativeRegExp.isDigit(dc)) {
-                        tmp = 10 * num + (dc - '0');
+                cp = dollarPos + 2;
+                if ((dollarPos + 2) < repstrLen) {
+                    dollarChar = repstr.charAt(dollarPos + 2);
+                    if (NativeRegExp.isDigit(dollarChar)) {
+                        tmp = 10 * num + (dollarChar - '0');
                         if (tmp <= parenCount) {
                             cp++;
                             num = tmp;
@@ -472,12 +503,12 @@ public class RegExpImpl implements RegExpProxy {
             }
             /* Adjust num from 1 $n-origin to 0 array-index-origin. */
             num--;
-            skip[0] = cp - dp;
+            skip[0] = cp - dollarPos;
             return res.getParenSubString(num);
         }
 
         skip[0] = 2;
-        switch (dc) {
+        switch (dollarChar) {
             case '$':
                 return new SubString("$");
             case '&':
@@ -493,10 +524,10 @@ public class RegExpImpl implements RegExpProxy {
                      * $` at the beginning of the target string when it is used in a
                      * substitution, so we emulate that special case here.
                      */
-                    res.leftContext.index = 0;
-                    res.leftContext.length = res.lastMatch.index;
+                    res.prevContext.index = 0;
+                    res.prevContext.length = res.lastMatch.index;
                 }
-                return res.leftContext;
+                return res.prevContext;
             case '\'':
                 return res.rightContext;
         }
@@ -515,7 +546,7 @@ public class RegExpImpl implements RegExpProxy {
         if (dp != -1) {
             int[] skip = new int[1];
             do {
-                int len = dp - cp;
+                int len;
                 charBuf.append(da, cp, dp);
                 cp = dp;
                 SubString sub = interpretDollar(cx, regExpImpl, da,
@@ -572,7 +603,7 @@ public class RegExpImpl implements RegExpProxy {
         }
 
         // return an array consisting of the target if no separator given
-        if (args.length < 1 || args[0] == Undefined.instance) {
+        if (args[0] == Undefined.instance) {
             result.put(0, result, target);
             return result;
         }
@@ -769,8 +800,9 @@ public class RegExpImpl implements RegExpProxy {
                                       matched (perl $1, $2) */
     protected SubString lastMatch;     /* last string matched (perl $&) */
     protected SubString lastParen;     /* last paren matched (perl $+) */
-    protected SubString leftContext;   /* input to left of last match (perl $`) */
+    protected SubString leftContext;   /* input to left of last match */
     protected SubString rightContext;  /* input to right of last match (perl $') */
+    protected SubString prevContext;   /* all of original string before current position (perl $`) */
 }
 
 
@@ -790,4 +822,5 @@ final class GlobData {
     int dollar = -1;   /* -1 or index of first $ in repstr */
     StringBuilder charBuf;       /* result characters, null initially */
     int leftIndex;     /* leftContext index, always 0 for JS1.2 */
+    int fromIndex; /* the index to search from */
 }
