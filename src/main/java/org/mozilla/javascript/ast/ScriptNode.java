@@ -32,6 +32,7 @@ public class ScriptNode extends Scope {
 
     private List<Symbol> symbols = new ArrayList<>(4);
     private int paramCount = 0;
+    private int functionLength = 0;
     private boolean hasRest = false;
     private String[] variableNames;
     private boolean[] isConsts;
@@ -262,6 +263,14 @@ public class ScriptNode extends Scope {
             paramCount++;
         }
         symbols.add(symbol);
+    }
+
+    public int getFunctionLength() {
+        return functionLength;
+    }
+
+    public void setFunctionLength(int length) {
+        functionLength = length;
     }
 
     public List<Symbol> getSymbols() {

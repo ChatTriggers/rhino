@@ -943,15 +943,20 @@ public class Parser {
         Node destructuringNode = new Node(Token.COMMA);
         Map<String, VariableInitializer> destructVars = new HashMap<>();
 
+        boolean countingArgs = true;
+        int functionLength = 0;
+
         for (int i1 = 0, variablesSize = variables.size(); i1 < variablesSize; i1++) {
             VariableInitializer variable = variables.get(i1);
             final AstNode target = variable.getTarget();
             final AstNode initializer = variable.getInitializer();
+            boolean increasesFunctionLength = countingArgs;
 
             fnNode.addParam(target);
             if (initializer != null) {
                 fnNode.addDefaultParam(i1, initializer);
                 fnNode.setHasComplexParameters();
+                increasesFunctionLength = false;
             }
 
             if (variable.isDestructuring()) {
@@ -959,12 +964,22 @@ public class Parser {
                 defineSymbol(Token.LP, tempName, false);
                 destructVars.put(tempName, variable);
                 fnNode.setHasComplexParameters();
+                increasesFunctionLength = false;
             }
 
             if (target.getProp(Node.SPREAD_PROP) != null) {
                 fnNode.setHasComplexParameters();
+                increasesFunctionLength = false;
+            }
+
+            if (increasesFunctionLength) {
+                functionLength += 1;
+            } else {
+                countingArgs = false;
             }
         }
+
+        ((ScriptNode) currentScope).setFunctionLength(functionLength);
 
         for (Map.Entry<String, VariableInitializer> destructure : destructVars.entrySet()) {
             Node assign = createDestructuringAssignment(
