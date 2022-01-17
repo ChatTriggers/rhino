@@ -856,17 +856,16 @@ public class Codegen implements Evaluator {
         // script/function id
 
         final int Do_getFunctionName = 0;
-        final int Do_getFunctionLength = 1;
-        final int Do_getParamCount = 2;
-        final int Do_getParamAndVarCount = 3;
-        final int Do_getParamOrVarName = 4;
-        final int Do_getEncodedSource = 5;
-        final int Do_getParamOrVarConst = 6;
-        final int Do_construct = 7;
-        final int Do_hasRest = 8;
-        final int Do_isCallable = 9;
-        final int Do_isVarLexical = 10;
-        final int SWITCH_COUNT = 11;
+        final int Do_getParamCount = 1;
+        final int Do_getParamAndVarCount = 2;
+        final int Do_getParamOrVarName = 3;
+        final int Do_getEncodedSource = 4;
+        final int Do_getParamOrVarConst = 5;
+        final int Do_construct = 6;
+        final int Do_hasRest = 7;
+        final int Do_isCallable = 8;
+        final int Do_isVarLexical = 9;
+        final int SWITCH_COUNT = 10;
 
         for (int methodIndex = 0; methodIndex != SWITCH_COUNT; ++methodIndex) {
             if (methodIndex == Do_getEncodedSource && encodedSource == null) {
@@ -883,10 +882,6 @@ public class Codegen implements Evaluator {
                 case Do_getFunctionName:
                     methodLocals = 1; // Only this
                     cfw.startMethod("getFunctionName", "()Ljava/lang/String;", ACC_PUBLIC);
-                    break;
-                case Do_getFunctionLength:
-                    methodLocals = 1; // Only this
-                    cfw.startMethod("getFunctionLength", "()I", ACC_PUBLIC);
                     break;
                 case Do_getParamCount:
                     methodLocals = 1; // Only this
@@ -972,10 +967,7 @@ public class Codegen implements Evaluator {
                         }
                         cfw.add(ByteCode.ARETURN);
                         break;
-                    case Do_getFunctionLength:
-                        cfw.addPush(n.getFunctionLength());
-                        cfw.add(ByteCode.IRETURN);
-                        break;
+
                     case Do_getParamCount:
                         // Push number of defined parameters
                         cfw.addPush(n.getParamCount());
@@ -1892,7 +1884,7 @@ class BodyCodegen {
 
         if (hasVarsInRegs) {
             // No need to create activation. Pad arguments if need be.
-            int paramCount = scriptOrFn.getFunctionLength();
+            int paramCount = scriptOrFn.getParamCount();
             if (paramCount > 0 && !inDirectCallFunction) {
                 // Set up args array
                 // check length of arguments, pad if need be
