@@ -8,7 +8,6 @@
 
 package org.mozilla.javascript;
 
-import org.mozilla.classfile.ClassFileWriter.ClassFileFormatException;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.debug.DebuggableScript;
@@ -2630,6 +2629,14 @@ public class Context {
         return isTopLevelStrict || (currentActivationCall != null && currentActivationCall.isStrict);
     }
 
+    public JavaObjectMappingProvider getJavaObjectMappingProvider() {
+        return javaObjectMappingProvider;
+    }
+
+    public void setJavaObjectMappingProvider(JavaObjectMappingProvider provider) {
+        javaObjectMappingProvider = provider;
+    }
+
     private static String implementationVersion;
 
     private final ContextFactory factory;
@@ -2670,6 +2677,7 @@ public class Context {
     private Object propertyListeners;
     private Map<Object, Object> threadLocalMap;
     private ClassLoader applicationClassLoader;
+    private JavaObjectMappingProvider javaObjectMappingProvider = JavaObjectMappingProvider.EMPTY;
 
     /**
      * This is the list of names of objects forcing the creation of
