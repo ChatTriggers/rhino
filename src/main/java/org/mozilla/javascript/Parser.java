@@ -3091,7 +3091,7 @@ public class Parser {
                 case Token.DIV:
                 case Token.MOD:
                     consumeToken();
-                    pn = new InfixExpression(tt, pn, unaryExpr(), opPos);
+                    pn = new InfixExpression(tt, pn, expExpr(), opPos);
                     continue;
             }
             break;
