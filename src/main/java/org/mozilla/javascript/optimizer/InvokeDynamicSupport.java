@@ -18,9 +18,9 @@ public class InvokeDynamicSupport {
         return callSite;
     }
 
-    public static Object getObjectProp(MutableCallSite callSite, Object value, String property, Context cx, Scriptable scope) throws Throwable {
+    public static Object getObjectProp(MutableCallSite callSite, Object value, String property, Context cx, Scriptable scope, boolean isPrivate) throws Throwable {
         callSite.setTarget(REAL_GET_OBJ_PROP);
-        return REAL_GET_OBJ_PROP.invoke(value, property, cx, scope);
+        return REAL_GET_OBJ_PROP.invoke(value, property, cx, scope, isPrivate);
     }
 
     public static CallSite bootstrapCallWithTemplateLiteral(MethodHandles.Lookup lookup, String name, MethodType type) {
@@ -69,13 +69,13 @@ public class InvokeDynamicSupport {
             REAL_GET_OBJ_PROP = lookup.findStatic(
                     ScriptRuntime.class,
                     "getObjectProp",
-                    MethodType.methodType(Object.class, Object.class, String.class, Context.class, Scriptable.class)
+                    MethodType.methodType(Object.class, Object.class, String.class, Context.class, Scriptable.class, boolean.class)
             );
 
             INIT_GET_OBJ_PROP = lookup.findStatic(
                     InvokeDynamicSupport.class,
                     "getObjectProp",
-                    MethodType.methodType(Object.class, MutableCallSite.class, Object.class, String.class, Context.class,  Scriptable.class)
+                    MethodType.methodType(Object.class, MutableCallSite.class, Object.class, String.class, Context.class,  Scriptable.class, boolean.class)
             );
 
             REAL_CALL_WITH_TEMPLATE = lookup.findStatic(
