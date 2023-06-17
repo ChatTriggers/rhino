@@ -19,7 +19,7 @@ import static org.mozilla.javascript.ScriptRuntimeES6.requireObjectCoercible;
  * @author Norris Boyd
  * @author Mike McCabe
  */
-public class NativeArray extends IdScriptableObject implements List {
+public class NativeArray extends IdScriptableObject implements List<Object> {
     private static final long serialVersionUID = 7331366857676127338L;
 
     /*
@@ -2412,6 +2412,37 @@ public class NativeArray extends IdScriptableObject implements List {
     @Override
     public List subList(int fromIndex, int toIndex) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (!(obj instanceof List)) {
+            return false;
+        } else {
+            List<?> objList = (List<?>) obj;
+            if (objList.size() != this.size()) {
+                return false;
+            }
+            Iterator<?> objIt = objList.iterator();
+            for (Object el : this) {
+                if (!objIt.hasNext() || !Objects.equals(el, objIt.next())) {
+                    return false;
+                }
+            }
+
+            return !objIt.hasNext();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 1;
+        for (Object el : this) {
+            hashCode = 31 * hashCode + (el == null ? 0 : el.hashCode());
+        }
+        return hashCode;
     }
 
     @Override
