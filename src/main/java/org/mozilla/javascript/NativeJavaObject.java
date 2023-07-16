@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class reflects non-Array Java objects into the JavaScript environment.  It
@@ -232,7 +233,20 @@ public class NativeJavaObject implements Scriptable, SymbolScriptable, Wrapper, 
             }
         }
         if (hint == null || hint == ScriptRuntime.StringClass) {
-            value = javaObject.toString();
+            String string = javaObject.toString();
+
+            // If the object doesn't have an overridden toString() method, try to replace
+            // its class name with a possibly-remapped version. Guard this with a sanity
+            // string check
+            if (string.length() >= 9 && string.charAt(string.length() - 9) == '@') {
+                Class<?> cls = javaObject.getClass();
+                String remapped = Context.getCurrentContext().getJavaObjectMappingProvider().remapClass(cls);
+                if (remapped != null) {
+                    string = string.replace(cls.getName(), remapped);
+                }
+            }
+
+            value = string;
         } else {
             String converterName;
             if (hint == ScriptRuntime.BooleanClass) {

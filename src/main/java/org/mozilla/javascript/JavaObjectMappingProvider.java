@@ -7,13 +7,20 @@ import java.util.List;
 import java.util.Map;
 
 public interface JavaObjectMappingProvider {
-    JavaObjectMappingProvider EMPTY = new Default();
+    JavaObjectMappingProvider DEFAULT = new Default();
+
+    String remapClass(Class<?> clazz);
 
     void findExtraMethods(Class<?> clazz, Map<MethodSignature, RenameableMethod> map, boolean includeProtected, boolean includePrivate);
 
     void findExtraFields(Class<?> clazz, List<RenameableField> list, boolean includeProtected, boolean includePrivate);
 
     class Default implements JavaObjectMappingProvider {
+        @Override
+        public String remapClass(Class<?> clazz) {
+            return null;
+        }
+
         @Override
         public void findExtraMethods(Class<?> clazz, Map<MethodSignature, RenameableMethod> map, boolean includeProtected, boolean includePrivate) {
         }

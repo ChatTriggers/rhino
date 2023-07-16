@@ -2677,7 +2677,7 @@ public class Context {
     private Object propertyListeners;
     private Map<Object, Object> threadLocalMap;
     private ClassLoader applicationClassLoader;
-    private JavaObjectMappingProvider javaObjectMappingProvider = JavaObjectMappingProvider.EMPTY;
+    private JavaObjectMappingProvider javaObjectMappingProvider = JavaObjectMappingProvider.DEFAULT;
 
     /**
      * This is the list of names of objects forcing the creation of
