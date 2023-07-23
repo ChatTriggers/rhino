@@ -10,6 +10,7 @@ import org.mozilla.javascript.JavaObjectMappingProvider.MethodSignature;
 import org.mozilla.javascript.JavaObjectMappingProvider.RenameableField;
 import org.mozilla.javascript.JavaObjectMappingProvider.RenameableMethod;
 
+import javax.lang.model.SourceVersion;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -23,6 +24,9 @@ import static java.lang.reflect.Modifier.isPublic;
  * @see NativeJavaClass
  */
 class JavaMembers {
+    private static final boolean STRICT_REFLECTIVE_ACCESS =
+        SourceVersion.latestSupported().ordinal() > 8;
+
     JavaMembers(Scriptable scope, Class<?> cl) {
         this(scope, cl, false);
     }
@@ -286,7 +290,7 @@ class JavaMembers {
      * interfaces (if they exist). Basically upcasts every method to the
      * nearest accessible method.
      */
-    private static RenameableMethod[] discoverAccessibleMethods(Class<?> clazz,
+    private RenameableMethod[] discoverAccessibleMethods(Class<?> clazz,
                                                       boolean includeProtected,
                                                       boolean includePrivate) {
         Map<MethodSignature, RenameableMethod> map = new HashMap<MethodSignature, RenameableMethod>();
@@ -294,7 +298,7 @@ class JavaMembers {
         return map.values().toArray(new RenameableMethod[map.size()]);
     }
 
-    private static void discoverAccessibleMethods(Class<?> clazz,
+    private void discoverAccessibleMethods(Class<?> clazz,
                                                   Map<MethodSignature, RenameableMethod> map, boolean includeProtected,
                                                   boolean includePrivate) {
         Context.getCurrentContext().getJavaObjectMappingProvider().findExtraMethods(clazz, map, includeProtected, includePrivate);
@@ -340,13 +344,7 @@ class JavaMembers {
                         }
                     }
                 } else {
-                    Method[] methods = clazz.getMethods();
-                    for (Method method : methods) {
-                        MethodSignature sig = new MethodSignature(method);
-                        // Array may contain methods with same signature but different return value!
-                        if (!map.containsKey(sig))
-                            map.put(sig, new RenameableMethod(method));
-                    }
+                    discoverPublicMethods(clazz, map);
                 }
                 return;
             } catch (SecurityException e) {
@@ -369,6 +367,19 @@ class JavaMembers {
             discoverAccessibleMethods(superclass, map, includeProtected,
                     includePrivate);
         }
+    }
+
+    void discoverPublicMethods(Class<?> clazz, Map<MethodSignature, RenameableMethod> map) {
+        Method[] methods = clazz.getMethods();
+        for (Method method : methods) {
+            registerMethod(map, new RenameableMethod(method));
+        }
+    }
+
+    static void registerMethod(Map<MethodSignature, RenameableMethod> map, RenameableMethod method) {
+        MethodSignature sig = new MethodSignature(method.getMethod());
+        // Array may contain methods with same signature but different return value!
+        map.putIfAbsent(sig, method);
     }
 
     private void reflect(Scriptable scope,
@@ -764,7 +775,7 @@ class JavaMembers {
                 return members;
             }
             try {
-                members = new JavaMembers(cache.getAssociatedScope(), cl,
+                members = createJavaMembers(cache.getAssociatedScope(), cl,
                         includeProtected);
                 break;
             } catch (SecurityException e) {
@@ -799,6 +810,15 @@ class JavaMembers {
             }
         }
         return members;
+    }
+
+    private static JavaMembers createJavaMembers(
+        Scriptable associatedScope, Class<?> cl, boolean includeProtected) {
+        if (STRICT_REFLECTIVE_ACCESS) {
+            return new JavaMembers_jdk11(associatedScope, cl, includeProtected);
+        } else {
+            return new JavaMembers(associatedScope, cl, includeProtected);
+        }
     }
 
     RuntimeException reportMemberNotFound(String memberName) {
