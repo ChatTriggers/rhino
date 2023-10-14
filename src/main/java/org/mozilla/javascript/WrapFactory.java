@@ -8,6 +8,8 @@
 
 package org.mozilla.javascript;
 
+import java.util.List;
+
 /**
  * Embeddings that wish to provide their own custom wrappings for Java
  * objects may extend this class and call
@@ -71,6 +73,8 @@ public class WrapFactory {
         if (cls.isArray()) {
             return NativeJavaArray.wrap(scope, obj);
         }
+        if (obj instanceof List)
+            return NativeJavaList.wrap(scope, obj);
         return wrapAsJavaObject(cx, scope, obj, staticType);
     }
 
@@ -90,6 +94,8 @@ public class WrapFactory {
         if (cls.isArray()) {
             return NativeJavaArray.wrap(scope, obj);
         }
+        if (obj instanceof List)
+            return NativeJavaList.wrap(scope, obj);
         return wrapAsJavaObject(cx, scope, obj, null);
     }
 
