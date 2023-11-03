@@ -1065,6 +1065,9 @@ public class Parser {
     }
 
     private AstNode arrowFunction(AstNode params) throws IOException {
+        if (params instanceof Name && params.getProp(Name.SPREAD_PROP) == Boolean.TRUE) {
+            reportError("msg.arrowfunction.rest.without.parens");
+        }
         int baseLineno = ts.lineno;  // line number where source starts
         int functionSourceStart = params != null ? params.getPosition() : -1;  // start of "function" kwd
 
