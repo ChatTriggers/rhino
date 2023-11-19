@@ -2628,6 +2628,11 @@ public class Parser {
                     }
                 }
                 defineSymbol(declType, ts.getString(), inForInit);
+
+                if (rest) {
+                    // Decrement paramCount by 1
+                    currentScriptOrFn.setParamCount(currentScriptOrFn.getParamCount() - 1);
+                }
             }
 
             int lineno = ts.lineno;

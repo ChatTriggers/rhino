@@ -1903,6 +1903,7 @@ class BodyCodegen {
             paramCount = fnCurrent.fnode.getParamCount();
             int varCount = fnCurrent.fnode.getParamAndVarCount();
             boolean[] constDeclarations = fnCurrent.fnode.getParamAndVarConst();
+            boolean hasRest = fnCurrent.fnode.hasRest();
 
             List<AstNode> params = fnCurrent.fnode.getParams();
             Map<Integer, Node> defaultParams = fnCurrent.fnode.getDefaultParams();
@@ -1919,7 +1920,7 @@ class BodyCodegen {
             short firstUndefVar = -1;
             for (int i = 0; i != varCount; ++i) {
                 short reg = -1;
-                if (i < paramCount) {
+                if (i < paramCount + (hasRest ? 1 : 0)) {
                     if (!inDirectCallFunction) {
                         reg = getNewWordLocal();
 

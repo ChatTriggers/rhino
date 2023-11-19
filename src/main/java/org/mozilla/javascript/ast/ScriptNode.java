@@ -236,6 +236,10 @@ public class ScriptNode extends Scope {
         return paramCount;
     }
 
+    public void setParamCount(int paramCount) {
+        this.paramCount = paramCount;
+    }
+
     public int getParamAndVarCount() {
         if (variableNames == null) codeBug();
         return symbols.size();
