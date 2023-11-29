@@ -9,11 +9,19 @@ import java.util.Map;
 public interface JavaObjectMappingProvider {
     JavaObjectMappingProvider EMPTY = new Default();
 
+    String remapClassName(String className);
+
     void findExtraMethods(Class<?> clazz, Map<MethodSignature, RenameableMethod> map, boolean includeProtected, boolean includePrivate);
 
     void findExtraFields(Class<?> clazz, List<RenameableField> list, boolean includeProtected, boolean includePrivate);
 
     class Default implements JavaObjectMappingProvider {
+        @Override
+        public String remapClassName(String className)
+        {
+            return null;
+        }
+
         @Override
         public void findExtraMethods(Class<?> clazz, Map<MethodSignature, RenameableMethod> map, boolean includeProtected, boolean includePrivate) {
         }
