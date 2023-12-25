@@ -6045,15 +6045,7 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         generateExpression(child.getNext(), node);
         boolean isNumber = (node.getIntProp(Node.ISNUMBER_PROP, -1) != -1);
         short reg = varRegisters[varIndex];
-        boolean[] constDeclarations = fnCurrent.fnode.getParamAndVarConst();
-        if (constDeclarations[varIndex]) {
-            if (!needValue) {
-                if (isNumber)
-                    cfw.add(ByteCode.POP2);
-                else
-                    cfw.add(ByteCode.POP);
-            }
-        } else if (varIsDirectCallParameter(varIndex)) {
+        if (varIsDirectCallParameter(varIndex)) {
             if (isNumber) {
                 if (needValue) cfw.add(ByteCode.DUP2);
                 cfw.addALoad(reg);
@@ -6102,40 +6094,17 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
         generateExpression(child.getNext(), node);
         boolean isNumber = (node.getIntProp(Node.ISNUMBER_PROP, -1) != -1);
         short reg = varRegisters[varIndex];
-        int beyond = cfw.acquireLabel();
-        int noAssign = cfw.acquireLabel();
         if (isNumber) {
-            cfw.addILoad(reg + 2);
-            cfw.add(ByteCode.IFNE, noAssign);
-            short stack = cfw.getStackTop();
-            cfw.addPush(1);
-            cfw.addIStore(reg + 2);
             cfw.addDStore(reg);
             if (needValue) {
                 cfw.addDLoad(reg);
-                cfw.markLabel(noAssign, stack);
-            } else {
-                cfw.add(ByteCode.GOTO, beyond);
-                cfw.markLabel(noAssign, stack);
-                cfw.add(ByteCode.POP2);
             }
         } else {
-            cfw.addILoad(reg + 1);
-            cfw.add(ByteCode.IFNE, noAssign);
-            short stack = cfw.getStackTop();
-            cfw.addPush(1);
-            cfw.addIStore(reg + 1);
             cfw.addAStore(reg);
             if (needValue) {
                 cfw.addALoad(reg);
-                cfw.markLabel(noAssign, stack);
-            } else {
-                cfw.add(ByteCode.GOTO, beyond);
-                cfw.markLabel(noAssign, stack);
-                cfw.add(ByteCode.POP);
             }
         }
-        cfw.markLabel(beyond);
     }
 
     private void visitGetProp(Node node, Node child) {

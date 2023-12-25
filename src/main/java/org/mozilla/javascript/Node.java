@@ -7,7 +7,6 @@
 package org.mozilla.javascript;
 
 import org.mozilla.javascript.ast.*;
-import org.mozilla.javascript.optimizer.Codegen;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -67,7 +66,8 @@ public class Node implements Iterable<Node> {
             PRIVATE_ACCESS_PROP = 34,
             EXPORT_PROP = 35,
             INITIALIZE_PROP = 36,
-            PARTIAL_PROP = 37;
+            PARTIAL_PROP = 37,
+            CONST_DECL_PROP = 38;
 
     // values of ISNUMBER_PROP to specify
     // which of the children are Number types
