@@ -184,10 +184,6 @@ public class UrlModuleSourceProvider extends ModuleSourceProviderBase {
         if (encoding != null) {
             return encoding;
         }
-        final String contentType = pct.getContentType();
-        if (contentType != null && contentType.startsWith("text/")) {
-            return "8859_1";
-        }
         return "utf-8";
     }
 
