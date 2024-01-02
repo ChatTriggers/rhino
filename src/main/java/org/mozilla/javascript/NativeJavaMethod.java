@@ -476,6 +476,19 @@ public class NativeJavaMethod extends BaseFunction {
                                        boolean vararg1,
                                        Class<?>[] sig2,
                                        boolean vararg2) {
+        // In the case where there is a zero-arg method and a method with a single vararg
+        // parameter, the zero-arg method should be preferred over the vararg method since,
+        // while the vararg method can be called in Java with no arguments, in reality it
+        // has a single argument: T[].
+        if (args.length == 0) {
+            if (vararg1 == vararg2)
+                return PREFERENCE_EQUAL;
+            if (vararg1 && sig2.length == 0)
+                return PREFERENCE_SECOND_ARG;
+            if (vararg2 && sig1.length == 0)
+                return PREFERENCE_FIRST_ARG;
+        }
+
         int totalPreference = 0;
         for (int j = 0; j < args.length; j++) {
             Class<?> type1 = vararg1 && j >= sig1.length ? sig1[sig1.length - 1] : sig1[j];
