@@ -43,7 +43,7 @@ public final class NativeCall extends IdScriptableObject {
         int paramAndVarCount = function.getParamAndVarCount();
         int paramCount = function.getParamCount();
         if (paramAndVarCount != 0) {
-            for (int i = 0; i < paramCount; ++i) {
+            for (int i = 0; i < paramCount + (function.hasRest() ? 1 : 0); ++i) {
                 String name = function.getParamOrVarName(i);
                 Object val = i < this.effectiveArgs.length ? this.effectiveArgs[i] : Undefined.instance;
                 defineProperty(name, val, NOT_CONFIGURABLE);
