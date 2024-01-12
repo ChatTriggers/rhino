@@ -4895,29 +4895,21 @@ Else pass the JS object in the aReg and 0.0 in the dReg.
 
                 Node id = target.getNext();
 
-                if (isPrivate) {
-                    cfw.addALoad(objLocal);
-                    addOptRuntimeInvoke("optionalPrivateToggle", VOID, OBJECT);
-                }
-
                 if (type == Token.GETPROP) {
                     String property = id.getString();
                     cfw.addPush(property);
                     cfw.addALoad(contextLocal);
                     cfw.addALoad(variableObjectLocal);
-                    addScriptRuntimeInvoke("getPropFunctionAndThis", CALLABLE, OBJECT, STRING, CONTEXT, SCRIPTABLE);
+                    cfw.addPush(isPrivate);
+                    addScriptRuntimeInvoke("getPropFunctionAndThis", CALLABLE, OBJECT, STRING, CONTEXT, SCRIPTABLE, BOOLEAN);
                 } else {
                     generateExpression(id, node);  // id
                     if (node.getIntProp(Node.ISNUMBER_PROP, -1) != -1)
                         addDoubleWrap();
                     cfw.addALoad(contextLocal);
                     cfw.addALoad(variableObjectLocal);
-                    addScriptRuntimeInvoke("getElemFunctionAndThis", CALLABLE, OBJECT, OBJECT, CONTEXT, SCRIPTABLE);
-                }
-
-                if (isPrivate) {
-                    cfw.addALoad(objLocal);
-                    addOptRuntimeInvoke("optionalPrivateToggle", VOID, OBJECT);
+                    cfw.addPush(isPrivate);
+                    addScriptRuntimeInvoke("getElemFunctionAndThis", CALLABLE, OBJECT, OBJECT, CONTEXT, SCRIPTABLE, BOOLEAN);
                 }
 
                 break;
