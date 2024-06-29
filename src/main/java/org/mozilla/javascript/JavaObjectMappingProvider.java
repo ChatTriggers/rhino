@@ -9,7 +9,9 @@ import java.util.Map;
 public interface JavaObjectMappingProvider {
     JavaObjectMappingProvider EMPTY = new Default();
 
-    String remapClassName(String className);
+    String mapClassName(String className);
+
+    String unmapClassName(String className);
 
     void findExtraMethods(Class<?> clazz, Map<MethodSignature, RenameableMethod> map, boolean includeProtected, boolean includePrivate);
 
@@ -17,8 +19,12 @@ public interface JavaObjectMappingProvider {
 
     class Default implements JavaObjectMappingProvider {
         @Override
-        public String remapClassName(String className)
-        {
+        public String mapClassName(String className) {
+            return null;
+        }
+
+        @Override
+        public String unmapClassName(String className) {
             return null;
         }
 

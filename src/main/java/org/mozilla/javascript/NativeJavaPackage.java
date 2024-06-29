@@ -113,9 +113,9 @@ public class NativeJavaPackage extends ScriptableObject {
             return null;
         }
 
-        String className = (packageName.length() == 0) ? name : packageName + '.' + name;
+        String className = packageName.isEmpty() ? name : packageName + '.' + name;
         Context cx = Context.getContext();
-        String remappedClassName = cx.getJavaObjectMappingProvider().remapClassName(className);
+        String remappedClassName = cx.getJavaObjectMappingProvider().mapClassName(className);
         if (remappedClassName != null) {
             className = remappedClassName;
         }
